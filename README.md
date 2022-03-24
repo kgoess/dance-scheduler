@@ -21,3 +21,6 @@ The files in lib/bacds/Scheduler/Schema\* were generated via
          'dbi:mysql:dbname=schedule' \
          scheduler \
          $(cat ~/.mysql-password)
+
+the command for running dancer 
+    plackup bin/app.psgi
