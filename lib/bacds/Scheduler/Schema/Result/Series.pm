@@ -55,16 +55,15 @@ __PACKAGE__->table("series");
 
 =head2 created_ts
 
-  data_type: 'timestamp'
+  data_type: 'datetime'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
   is_nullable: 0
 
 =head2 modified_ts
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '0000-00-00 00:00:00'
+  default_value: current_timestamp
   is_nullable: 0
 
 =cut
@@ -78,16 +77,15 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 128 },
   "created_ts",
   {
-    data_type => "timestamp",
+    data_type => "datetime",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
     is_nullable => 0,
   },
   "modified_ts",
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "0000-00-00 00:00:00",
+    default_value => \"current_timestamp",
     is_nullable => 0,
   },
 );
@@ -122,8 +120,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-19 14:26:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xJZEgT1ArdcqNuKem0mufQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:23:49
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:rHkOc2+WV7ob71drwemu2A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -7,7 +7,7 @@ CREATE TABLE venues (
     city VARCHAR(64),
     zip CHAR(10),
     comment VARCHAR(32766),
-    created_ts TIMESTAMP NOT NULL,
+    created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 
     UNIQUE INDEX vkey_idx (vkey)

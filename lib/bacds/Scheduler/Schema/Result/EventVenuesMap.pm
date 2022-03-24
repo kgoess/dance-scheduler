@@ -52,6 +52,19 @@ __PACKAGE__->table("event_venues_map");
   data_type: 'integer'
   is_nullable: 0
 
+=head2 created_ts
+
+  data_type: 'datetime'
+  datetime_undef_if_invalid: 1
+  is_nullable: 0
+
+=head2 modified_ts
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  default_value: current_timestamp
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -61,6 +74,19 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "ordering",
   { data_type => "integer", is_nullable => 0 },
+  "created_ts",
+  {
+    data_type => "datetime",
+    datetime_undef_if_invalid => 1,
+    is_nullable => 0,
+  },
+  "modified_ts",
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    default_value => \"current_timestamp",
+    is_nullable => 0,
+  },
 );
 
 =head1 UNIQUE CONSTRAINTS
@@ -126,8 +152,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-19 14:26:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lwHOjHgRjtEJmjsrH8DUhQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:23:49
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1PerJn8GkHuEYHsZIAtaLw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

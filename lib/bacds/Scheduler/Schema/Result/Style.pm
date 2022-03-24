@@ -49,16 +49,15 @@ __PACKAGE__->table("styles");
 
 =head2 created_ts
 
-  data_type: 'timestamp'
+  data_type: 'datetime'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
   is_nullable: 0
 
 =head2 modified_ts
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '0000-00-00 00:00:00'
+  default_value: current_timestamp
   is_nullable: 0
 
 =cut
@@ -70,16 +69,15 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 0, size => 256 },
   "created_ts",
   {
-    data_type => "timestamp",
+    data_type => "datetime",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
     is_nullable => 0,
   },
   "modified_ts",
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "0000-00-00 00:00:00",
+    default_value => \"current_timestamp",
     is_nullable => 0,
   },
 );
@@ -98,7 +96,7 @@ __PACKAGE__->set_primary_key("style_id");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<style_id_idx>
+=head2 C<styles_id_idx>
 
 =over 4
 
@@ -108,7 +106,7 @@ __PACKAGE__->set_primary_key("style_id");
 
 =cut
 
-__PACKAGE__->add_unique_constraint("style_id_idx", ["name"]);
+__PACKAGE__->add_unique_constraint("styles_id_idx", ["name"]);
 
 =head1 RELATIONS
 
@@ -128,8 +126,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-19 14:26:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SvefYwh8vGR7lYUXMh2XwA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:40:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Fl3/zjkRX6ellDdVz1wc5w
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

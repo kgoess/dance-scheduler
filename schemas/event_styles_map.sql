@@ -3,6 +3,8 @@ CREATE TABLE event_styles_map (
     event_id INT NOT NULL,
     style_id INT NOT NULL,
     ordering INT NOT NULL,
+    created_ts DATETIME NOT NULL,
+    modified_ts TIMESTAMP NOT NULL,
 
     FOREIGN KEY (event_id)
         REFERENCES events(event_id)

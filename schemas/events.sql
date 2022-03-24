@@ -11,7 +11,7 @@ CREATE TABLE events (
     series_id INT,
     event_type ENUM('ONEDAY', 'MULTIDAY'),
 
-    created_ts TIMESTAMP NOT NULL,
+    created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 
     INDEX events_name_idx (name),

@@ -38,20 +38,48 @@ __PACKAGE__->table("band_membership");
 =head2 band_id
 
   data_type: 'integer'
+  is_foreign_key: 1
   is_nullable: 0
 
 =head2 talent_id
 
   data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 0
+
+=head2 created_ts
+
+  data_type: 'datetime'
+  datetime_undef_if_invalid: 1
+  is_nullable: 0
+
+=head2 modified_ts
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  default_value: current_timestamp
   is_nullable: 0
 
 =cut
 
 __PACKAGE__->add_columns(
   "band_id",
-  { data_type => "integer", is_nullable => 0 },
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "talent_id",
-  { data_type => "integer", is_nullable => 0 },
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "created_ts",
+  {
+    data_type => "datetime",
+    datetime_undef_if_invalid => 1,
+    is_nullable => 0,
+  },
+  "modified_ts",
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    default_value => \"current_timestamp",
+    is_nullable => 0,
+  },
 );
 
 =head1 UNIQUE CONSTRAINTS
@@ -70,9 +98,41 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->add_unique_constraint("band_membership_idx", ["band_id", "talent_id"]);
 
+=head1 RELATIONS
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-19 14:26:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2AHO5TAay8ESfRtZOFosXg
+=head2 band
+
+Type: belongs_to
+
+Related object: L<bacds::Scheduler::Schema::Result::Band>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "band",
+  "bacds::Scheduler::Schema::Result::Band",
+  { band_id => "band_id" },
+  { is_deferrable => 1, on_delete => "RESTRICT", on_update => "RESTRICT" },
+);
+
+=head2 talent
+
+Type: belongs_to
+
+Related object: L<bacds::Scheduler::Schema::Result::Talent>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "talent",
+  "bacds::Scheduler::Schema::Result::Talent",
+  { talent_id => "talent_id" },
+  { is_deferrable => 1, on_delete => "RESTRICT", on_update => "RESTRICT" },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:23:49
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:06kvuIFK6ByCAslPa8OW4A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

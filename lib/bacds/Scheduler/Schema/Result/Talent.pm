@@ -49,16 +49,15 @@ __PACKAGE__->table("talent");
 
 =head2 created_ts
 
-  data_type: 'timestamp'
+  data_type: 'datetime'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
   is_nullable: 0
 
 =head2 modified_ts
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '0000-00-00 00:00:00'
+  default_value: current_timestamp
   is_nullable: 0
 
 =cut
@@ -70,16 +69,15 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 0, size => 256 },
   "created_ts",
   {
-    data_type => "timestamp",
+    data_type => "datetime",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
     is_nullable => 0,
   },
   "modified_ts",
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "0000-00-00 00:00:00",
+    default_value => \"current_timestamp",
     is_nullable => 0,
   },
 );
@@ -112,6 +110,21 @@ __PACKAGE__->add_unique_constraint("talent_name_idx", ["name"]);
 
 =head1 RELATIONS
 
+=head2 band_memberships
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::BandMembership>
+
+=cut
+
+__PACKAGE__->has_many(
+  "band_memberships",
+  "bacds::Scheduler::Schema::Result::BandMembership",
+  { "foreign.talent_id" => "self.talent_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 event_talent_maps
 
 Type: has_many
@@ -128,8 +141,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-19 14:26:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XJJZ5ELD7K81wiropeP/6Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:23:49
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FqI53iLFtmYTyKrP95H5tA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
