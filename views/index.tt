@@ -9,21 +9,33 @@
     See Ruby on Rails if you want a kickass framework in Ruby:
     http://www.rubyonrails.org/
 -->
+<script>
+</script>
 
-<div id="page">
+    <div id="page">
       <div id="sidebar">
         <ul id="sidebar-items">
           <li>
               Sidebar!
           </li>
         </ul>
-
       </div>
-
       <div id="content">
-      
-      <form>
-       Event id: 
-      
+        <form> 
+          <label>
+            Event id: 
+            <input name="event_id" id="event-id-input"/>
+          </label>
+          <button id="load-event-button" type="button">Load Event</button> 
+        </form>
+        <div id="event-display" style="display: none">
+          <div id="name" class="event-display-row"></div>
+          <div id="start_time" class="event-display-row"></div>
+          <div id="end_time" class="event-display-row"></div>
+          <div id="is_camp" class="event-display-row"></div>
+          <div id="long_desc" class="event-display-row"></div>
+          <div id="short_desc" class="event-display-row"></div>
+          <div id="event_type" class="event-display-row"></div>
+        </div>
       </div>
     </div>
