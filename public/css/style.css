@@ -187,3 +187,17 @@ padding-right: 160px;
 font-family: sans-serif;
 font-size: 10px;
 }
+
+.event-display {
+    border: 1px solid black;
+}
+.event-display-row {
+    border: 1px solid black;
+    background: lightgrey;
+    padding: 3px;
+}
+.row-label {
+    display: inline-block;
+    width: 10em;
+    height: 100%;
+}

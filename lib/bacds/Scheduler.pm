@@ -1,17 +1,57 @@
 package bacds::Scheduler;
+
+use 5.16.0;
+use warnings;
+
 use Dancer2;
 use Data::Dump qw/dump/;
+
+use bacds::Scheduler::Schema;
 
 our $VERSION = '0.1';
 
 get '/' => sub {
-    template 'index' => { 'title' => 'Dance Schedule', 'stuff'=>'does this work' };
+
+    template 'index' => {
+        title => 'Dance Schedule',
+        stuff =>'does this work',
+    };
 };
+
+get '/events' => sub {
+
+    my $dbh = get_dbh();
+
+    my $resultset = $dbh->resultset('Event')->search();
+
+    $resultset or die "empty set";
+
+    my @events;
+
+    while (my $event = $resultset->next) {
+        push @events, event_row_to_json($event);
+    }
+
+    return encode_json \@events;
+};
+
 get '/event/:event_id' => sub {
     my $event_id = params->{event_id};
 
-    use bacds::Scheduler::Schema;
+    my $dbh = get_dbh();
 
+    my $resultset = $dbh->resultset('Event')->search(
+        { event_id=> { '=' => $event_id } } # SQL::Abstract::Classic
+    );
+
+    $resultset or die "empty set";
+
+    my $event = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
+    
+    return encode_json event_row_to_json($event);
+};
+
+sub get_dbh {
     my $database = 'schedule';
     my $hostname = 'localhost';
     my $port = 3306;
@@ -22,19 +62,17 @@ get '/event/:event_id' => sub {
 
     my $dbi_dsn = "DBI:mysql:database=$database;host=$hostname;port=$port";
 
-    my $schema = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params)
+    my $dbh = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params)
         or die "can't connect";
 
-    my $resultset = $schema->resultset('Event')->search(
-        { event_id=> { '=' => $event_id } } # SQL::Abstract::Classic
-    );
+    return $dbh;
+}
 
-    $resultset or die "empty set";
+sub event_row_to_json {
+    my ($event) = @_;
 
-    my $event = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
-    
+    my $result = {};
 
-    my $result;
     foreach my $field (qw/
         event_id
         name
@@ -50,11 +88,13 @@ get '/event/:event_id' => sub {
         modified_ts/){
         $result->{$field} = $event->$field;
     };
+
     foreach my $datetime (qw/start_time end_time created_ts modified_ts/){
+        next unless $result->{$datetime};
         $result->{$datetime} = $result->{$datetime}->iso8601;
     };
-    return encode_json $result;
-};
 
+    return $result;
+}
 
 true;

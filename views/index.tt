@@ -22,20 +22,35 @@
       </div>
       <div id="content">
         <form> 
+          <select id="all-events-list" class="all-events-list" size="5">
+          </select>
+        </form>
+        <!-- <form> 
           <label>
             Event id: 
             <input name="event_id" id="event-id-input"/>
           </label>
           <button id="load-event-button" type="button">Load Event</button> 
         </form>
+        -->
         <div id="event-display" style="display: none">
-          <div id="name" class="event-display-row"></div>
-          <div id="start_time" class="event-display-row"></div>
-          <div id="end_time" class="event-display-row"></div>
-          <div id="is_camp" class="event-display-row"></div>
-          <div id="long_desc" class="event-display-row"></div>
-          <div id="short_desc" class="event-display-row"></div>
-          <div id="event_type" class="event-display-row"></div>
+          <% event_column_types = [
+                [ "name", "Name" ],
+                [ "start_time", "Start" ],
+                [ "end_time", "End" ],
+                [ "is_camp", "Is Camp?" ],
+                [ "long_desc", "" ],
+                [ "short_desc", "" ],
+                [ "event_type", "Event Type" ],
+            ]
+           %>
+          <% FOREACH column IN event_column_types %>
+          <div name="<% column.0 %>" class="event-display-row">
+            <span class="row-label"><% column.1 %></span>
+            <span class="row-contents"></span>
+            <input name="<% column.0 %>" class="row-edit"x />
+          </div>
+            <% END %>
         </div>
       </div>
     </div>
