@@ -10,11 +10,7 @@
     .done( (msg) => { displayEvent(msg) });
   });
 
-  $.ajax({
-    url: "events",
-    dataType: "json"
-  })
-  .done( (msg) => { displayEventList(msg) });
+   loadEventList();
 
   $( '.all-events-list' ).change(function() {
     const eventId = $( '#all-events-list' )[0].value;
@@ -48,7 +44,14 @@
             method: "post",
             data: dataString
         })
-        .done( (msg) => { displayEvent(msg) })
+        .done( (msg) => { 
+            loadEventList();
+            $.ajax({
+              url: `event/${eventId}`,
+              dataType: "json"
+            })
+            .done( (msg) => { displayEvent(msg) });
+         })
         .fail( () => { alert("something bad happened, update failed") }); // FIXME later
     });
 
@@ -58,12 +61,14 @@
 function displayEvent(eventObj) {
   $( '#event-display .event-display-row' ).each(
     function(index) {
+      $(this).children(".row-contents")[0].hidden = false;
       $(this).children(".row-contents")[0].textContent = eventObj[this.getAttribute("name")];
+      $(this).children(".row-edit")[0].hidden = true;
       $(this).children(".row-edit")[0].value = eventObj[this.getAttribute("name")];
     }
   );
   $( '#event-display [name="event_id"]' )[0].value = eventObj["event_id"]; 
-  $( '#event-display' ).show();
+  $( '#event-display' )[0].hidden = false;
 }
 
 function displayEventList(events) {
@@ -76,4 +81,16 @@ function displayEventList(events) {
         element.setAttribute("value", event["event_id"]);
         insertTarget.append(element);
     });
+}
+
+function loadEventList() {
+
+    $( "#all-events-list" ).empty();
+    $( "#event-display")[0].hidden = true;
+
+    $.ajax({
+        url: "events",
+        dataType: "json"
+    })
+    .done( (msg) => { displayEventList(msg) });
 }

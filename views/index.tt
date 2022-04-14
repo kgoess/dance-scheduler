@@ -33,7 +33,7 @@
           <button id="load-event-button" type="button">Load Event</button> 
         </form>
         -->
-        <div id="event-display" style="display: none">
+        <div id="event-display" hidden>
             <form id="event-display-form">
               <% event_column_types = [
                     [ "name", "Name" ],
