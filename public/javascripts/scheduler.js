@@ -35,17 +35,21 @@
         edit.hidden = !edit.hidden;
     });
 
+    // because we're handling the submit ourselves with the button
+    $( '#event-display-form' ).submit(function(e){
+        e.preventDefault();
+    });
     $( '#event-save-button' ).click(function() {
         const eventId = $( '#event-display [name="event_id"]' )[0].value;
+        const dataString = $( '#event-display-form' ).serialize();
         $.ajax({
             url: `event/${eventId}`,
             dataType: "json",
-            method: "post"
+            method: "post",
+            data: dataString
         })
         .done( (msg) => { displayEvent(msg) })
         .fail( () => { alert("something bad happened, update failed") }); // FIXME later
-
-
     });
 
 
