@@ -5,6 +5,7 @@ use warnings;
 
 use Dancer2;
 use Data::Dump qw/dump/;
+use DateTime;
 
 use bacds::Scheduler::Schema;
 
@@ -32,7 +33,7 @@ get '/events' => sub {
         push @events, event_row_to_json($event);
     }
 
-    return encode_json \@events;
+    return encode_json {data => \@events};
 };
 
 get '/event/:event_id' => sub {
@@ -40,18 +41,48 @@ get '/event/:event_id' => sub {
 
     my $dbh = get_dbh();
 
-    my $resultset = $dbh->resultset('Event')->search(
-        { event_id=> { '=' => $event_id } } # SQL::Abstract::Classic
-    );
+    my $event = $dbh->resultset('Event')->find($event_id)
+        or return encode_json {
+            error => "Nothing Found for event_id $event_id",
+            errornum => 100
+        };
 
-    $resultset or die "empty set"; #TODO: More gracefully
-
-    my $event = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
-    
-    return encode_json event_row_to_json($event);
+    return encode_json {data => event_row_to_json($event)};
 };
 
-post '/event/:event_id' => sub {
+post '/event/' => sub {
+    my $dbh = get_dbh();
+
+    my @columns = qw(
+        name
+        end_time
+        start_time
+        is_camp
+        long_desc
+        short_desc
+        event_type
+        series_id
+        );
+
+
+    my $event = $dbh->resultset('Event')->new({});
+
+    foreach my $column (@columns){
+        $event->$column(params->{$column});
+    };
+    
+    $event->series_id(undef) if !$event->series_id;
+    $event->modified_ts(DateTime->now);
+    $event->created_ts(DateTime->now);
+
+
+    $event->insert(); #TODO: check for failure?
+    
+    return encode_json {data => event_row_to_json($event)};
+
+};
+
+put '/event/:event_id' => sub {
     my $event_id = params->{event_id};
     my $dbh = get_dbh();
 
@@ -79,11 +110,12 @@ post '/event/:event_id' => sub {
         $event->$column(params->{$column});
     };
     
-    $event->modified_ts(time());
+    $event->series_id(undef) if !$event->series_id;
+    $event->modified_ts(DateTime->now);
 
     $event->update(); #TODO: check for failure?
     
-    return 1;
+    return encode_json {data => event_row_to_json($event)};
 
 };
 
@@ -96,7 +128,7 @@ sub get_dbh {
     my $user = 'scheduler';
     my %dbi_params = ();
 
-    my $dbi_dsn = "DBI:mysql:database=$database;host=$hostname;port=$port";
+    my $dbi_dsn = $ENV{TEST_DSN} || "DBI:mysql:database=$database;host=$hostname;port=$port";
 
     my $dbh = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params)
         or die "can't connect"; #TODO: More gracefully
