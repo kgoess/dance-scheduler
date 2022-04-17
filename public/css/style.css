@@ -200,12 +200,12 @@ font-size: 10px;
 .event-display-row:hover {
     background: salmon;
 }
-.event-save-button-container {
+.event-button-container {
     display: flex;
     justify-content: center;
 }
-#event-save-button {
-    margin-top: 5px;
+.event-button {
+    margin: 5px;
 }
 .row-contents {
     cursor: pointer;

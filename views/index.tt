@@ -25,6 +25,9 @@
           <select id="all-events-list" class="all-events-list" size="5">
           </select>
         </form>
+        <span class="event-button-container">
+            <button id="event-create-button" class="event-button">Create New</button>
+        </span>
         <!-- <form> 
           <label>
             Event id: 
@@ -53,8 +56,8 @@
               </div>
                 <% END %>
                 <input type="hidden" name="event_id"/>
-                <span class="event-save-button-container">
-                <button id="event-save-button">Save</button>
+                <span class="event-button-container">
+                    <button id="event-save-button" class="event-button">Save</button>
                 </span>
             </form>
         </div>
