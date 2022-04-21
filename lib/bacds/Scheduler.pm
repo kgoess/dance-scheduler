@@ -16,6 +16,15 @@ get '/' => sub {
     template 'index' => {
         title => 'Dance Schedule',
         stuff =>'does this work',
+        accordions => [
+            { label => 'Events',
+              content => template("events.tt", {}, { layout=> undef }),
+            },
+            { label => 'something else',
+              content => template("accordion2.tt", {}, { layout=> undef }),
+            },
+        ],
+
     };
 };
 

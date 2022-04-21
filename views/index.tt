@@ -21,45 +21,15 @@
         </ul>
       </div>
       <div id="content">
-        <form> 
-          <select id="all-events-list" class="all-events-list" size="5">
-          </select>
-        </form>
-        <span class="event-button-container">
-            <button id="event-create-button" class="event-button">Create New</button>
-        </span>
-        <!-- <form> 
-          <label>
-            Event id: 
-            <input name="event_id" id="event-id-input"/>
-          </label>
-          <button id="load-event-button" type="button">Load Event</button> 
-        </form>
-        -->
-        <div id="event-display" hidden>
-            <form id="event-display-form">
-              <% event_column_types = [
-                    [ "name", "Name" ],
-                    [ "start_time", "Start" ],
-                    [ "end_time", "End" ],
-                    [ "is_camp", "Is Camp?" ],
-                    [ "long_desc", "" ],
-                    [ "short_desc", "" ],
-                    [ "event_type", "Event Type" ],
-                ]
-               %>
-              <% FOREACH column IN event_column_types %>
-              <div name="<% column.0 %>" class="event-display-row">
-                <span class="row-label"><% column.1 %></span>
-                <span class="row-contents"></span>
-                <input class="row-edit" name="<% column.0 %>" hidden />
-              </div>
-                <% END %>
-                <input type="hidden" name="event_id"/>
-                <span class="event-button-container">
-                    <button id="event-save-button" class="event-button">Save</button>
-                </span>
-            </form>
+        <div class="accordion">
+            <hr>
+            <% FOR accordion IN accordions %>
+                <div class="container">
+                    <div class="label"><% accordion.label %></div>
+                    <div class="content"><% accordion.content %></div>
+                </div>
+                <hr>
+            <% END %>
         </div>
       </div>
     </div>

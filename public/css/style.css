@@ -216,3 +216,56 @@ font-size: 10px;
     height: 100%;
 }
 
+/* 
+ * accordion nav menu!
+ * https://www.freecodecamp.org/news/build-an-accordion-menu-using-html-css-and-javascript/#:~:text=In%20UI%20design%2C%20an%20accordion,label%20will%20expand%20its%20content.
+ */
+.accordion .container {
+    position: relative;
+    margin: 10px 10px;
+}
+
+.accordion .label {
+    position: relative;
+    padding: 10px 0;
+    font-size: 30px;
+    color: black;
+    cursor: pointer;
+}
+
+.accordion .label::before {
+    content: '+';
+    color: black;
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    font-size: 30px;
+    transform: translateY(-50%);
+}
+
+.accordion .content {
+    position: relative;
+    background: white;
+    height: 0;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.accordion hr {
+    width: 100;
+    margin-left: 0;
+    border: 1px solid grey;
+}
+
+/* Unhides the content part when active. Sets the height */
+
+.accordion .container.active .content {
+  height: 100%;
+}
+
+/* Changes from plus sign to negative sign once active */
+
+.accordion .container.active .label::before {
+  content: '-';
+  font-size: 30px;
+}

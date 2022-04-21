@@ -73,6 +73,8 @@
         $( '#event-display [name="event_id"]' )[0].value = "";
         $( '#event-display' )[0].hidden = false;
     });
+
+    $( '.accordion .label' ).click(function() { $( this ).parent(".container")[0].classList.toggle("active") });
 }); 
 
 function displayEvent(msg) {
@@ -87,7 +89,7 @@ function displayEvent(msg) {
                 $(this).children(".row-edit")[0].value = eventObj[this.getAttribute("name")];
             }
         );
-        $( '#event-display [name="event_id"]' )[0].value = eventObj["event_id"]; 
+        $( '#event-display [name="event_id"]' )[0].value = eventObj["event_id"];
         $( '#event-display' )[0].hidden = false;
     } else {
         alert("error: " + msg["error"]);
@@ -104,8 +106,8 @@ function displayEventList(msg) {
 
         events.forEach((event, i) => {
             let element = document.createElement('option');
-            element.innerHTML = event["name"];
-            element.setAttribute("value", event["event_id"]);
+            element.innerHTML = escapeHtml(event["name"]);
+            element.setAttribute("value", escapeHtml(event["event_id"]));
             insertTarget.append(element);
         });
     } else {
@@ -124,3 +126,13 @@ function loadEventList() {
     })
     .done( (msg) => { displayEventList(msg) });
 }
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
