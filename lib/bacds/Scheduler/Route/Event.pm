@@ -1,53 +1,43 @@
-package bacds::Scheduler;
+package bacds::Scheduler::Route::Event;
 
 use 5.16.0;
 use warnings;
 
 use Dancer2;
 use Data::Dump qw/dump/;
-use bacds::Scheduler::Route::Event;
+use DateTime;
 
-our $VERSION = '0.1';
-my $event_model = 'bacds::Scheduler::Route::Event';
+use bacds::Scheduler::Schema;
 
-get '/' => sub {
+sub get_events {
 
-    template 'index' => {
-        title => 'Dance Schedule',
-        stuff =>'does this work',
-        accordions => [
-            { label => 'Events',
-              content => template("events.tt", {}, { layout=> undef }),
-            },
-            { label => 'something else',
-              content => template("accordion2.tt", {}, { layout=> undef }),
-            },
-        ],
+    my $dbh = get_dbh();
 
-    };
+    my $resultset = $dbh->resultset('Event')->search();
+
+    $resultset or die "empty set"; #TODO: More gracefully
+
+    my @events;
+
+    while (my $event = $resultset->next) {
+        push @events, event_row_to_result($event);
+    }
+
+    return \@events;
 };
 
-get '/events' => sub {
-    my $results = Results->new;
-    
-    $results->data($event_model->get_events);
-    
-    return $results->format;
-};
-
-get '/event/:event_id' => sub {
+sub get_event() {
     my $event_id = params->{event_id};
-    my $results = $event_model->get_event($event_id) 
-        or return encode_json {
-            error => "Nothing Found for event_id $event_id",
-            errornum => 100
-        };
 
-    return encode_json {data => $results};
+    my $dbh = get_dbh();
+
+    my $event = $dbh->resultset('Event')->find($event_id)
+        or return false;
+
+    return event_row_to_result($event);
 };
 
 post '/event/' => sub {
-
     my $dbh = get_dbh();
 
     my @columns = qw(
@@ -78,6 +68,7 @@ post '/event/' => sub {
 
 };
 
+=pod
 put '/event/:event_id' => sub {
     my $event_id = params->{event_id};
     my $dbh = get_dbh();
@@ -114,6 +105,7 @@ put '/event/:event_id' => sub {
 
 };
 
+=cut
 sub get_dbh {
     my $database = 'schedule';
     my $hostname = 'localhost';
@@ -131,7 +123,7 @@ sub get_dbh {
     return $dbh;
 }
 
-sub event_row_to_json {
+sub event_row_to_result {
     my ($event) = @_;
 
     my $result = {};
@@ -157,39 +149,6 @@ sub event_row_to_json {
     };
 
     return $result;
-}
-
-package Results {
-    use Dancer2;
-    use Class::Accessor::Lite (
-        new => 0,
-        rw => [ qw(data errors) ],
-    );
-
-    sub new {
-        return bless {data=>'',errors=>[]};
-    }
-
-    sub add_error {
-        my ($self, $num, $msg) = @_;
-        push @{$self->errors}, {
-            msg => $msg,
-            num => $num,
-        };
-    }
-
-    sub format {
-        my ($self) = @_;
-        return encode_json({
-            $self->data ? (data => $self->data) : (),
-            $self->errors ? (errors => [
-                map { {
-                    msg => $_->msg,
-                    num => $_->num,
-                } } @{$self->errors}
-            ]) : (),
-        });
-    }
 }
 
 true;
