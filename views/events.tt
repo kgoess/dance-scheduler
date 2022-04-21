@@ -23,7 +23,6 @@
                     [ "is_camp", "Is Camp?" ],
                     [ "long_desc", "" ],
                     [ "short_desc", "" ],
-                    [ "event_type", "Event Type" ],
                 ]
                %>
               <% FOREACH column IN event_column_types %>

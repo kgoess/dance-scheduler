@@ -87,12 +87,6 @@ __PACKAGE__->table("events");
   is_foreign_key: 1
   is_nullable: 1
 
-=head2 event_type
-
-  data_type: 'enum'
-  extra: {list => ["CONTRA","ENGLISH","WOODSHED","TEENCONTRA","ONLINE","ENGLISH/REGENCY","SPECIAL"]}
-  is_nullable: 1
-
 =head2 created_ts
 
   data_type: 'datetime'
@@ -135,22 +129,6 @@ __PACKAGE__->add_columns(
   { data_type => "tinyint", is_nullable => 1 },
   "series_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
-  "event_type",
-  {
-    data_type => "enum",
-    extra => {
-      list => [
-        "CONTRA",
-        "ENGLISH",
-        "WOODSHED",
-        "TEENCONTRA",
-        "ONLINE",
-        "ENGLISH/REGENCY",
-        "SPECIAL",
-      ],
-    },
-    is_nullable => 1,
-  },
   "created_ts",
   {
     data_type => "datetime",
@@ -292,8 +270,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-16 17:31:20
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tsEzBphu9Gz3PR5t/x1JnA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-20 19:52:39
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SrOFV5wl/9mHjeOryaiRtw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -9,7 +9,6 @@ CREATE TABLE events (
     short_desc VARCHAR(1024),    
     is_template BOOLEAN,
     series_id INT,
-    event_type ENUM('CONTRA', 'ENGLISH', 'WOODSHED', 'TEENCONTRA', 'ONLINE', 'ENGLISH/REGENCY', 'SPECIAL'),
 
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,

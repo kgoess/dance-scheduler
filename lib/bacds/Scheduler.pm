@@ -69,7 +69,6 @@ post '/event/' => sub {
         is_camp
         long_desc
         short_desc
-        event_type
         series_id
         );
 
@@ -102,7 +101,6 @@ put '/event/:event_id' => sub {
         is_camp
         long_desc
         short_desc
-        event_type
         series_id
         );
 
@@ -160,7 +158,6 @@ sub event_row_to_json {
         short_desc
         is_template
         series_id
-        event_type
         created_ts
         modified_ts/){
         $result->{$field} = $event->$field;

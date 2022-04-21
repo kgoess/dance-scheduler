@@ -5,7 +5,7 @@ use Data::Dump qw/dump/;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
-use Test::More tests => 27;
+use Test::More tests => 25;
 use Plack::Test;
 use HTTP::Request::Common;
 use Ref::Util qw/is_coderef/;
@@ -45,7 +45,6 @@ $expected = {
 $data = {
   end_time    => "2022-05-01T22:00:00",
   event_id    => 1,
-  event_type  => "ONEDAY",
   is_camp     => 1,
   long_desc   => "this is the long desc",
   name        => "saturday night test event",
@@ -68,7 +67,6 @@ foreach my $key (sort keys %$data){
 $data = {
     end_time    => "2022-05-01T22:00:00",
     event_id    => 1,
-    event_type  => "ONEDAY",
     is_camp     => 1,
     long_desc   => "this is the long desc",
     name        => "saturday night test event",
@@ -90,7 +88,6 @@ is $event->is_camp, 1, '[PUT /event/1] changes is_camp ';
 $data = {
     end_time    => "2022-05-01T22:00:00",
     event_id    => 1,
-    event_type  => "ONEDAY",
     is_camp     => 1,
     long_desc   => "this is the long desc",
     name        => "saturday night test event",
