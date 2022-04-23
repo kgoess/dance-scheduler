@@ -34,3 +34,6 @@ inc/
 /pm_to_blib
 /*.zip
 *.swp
+
+#test db file
+testdb
