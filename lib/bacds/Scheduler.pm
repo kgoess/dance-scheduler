@@ -37,20 +37,22 @@ get '/events' => sub {
 
 get '/event/:event_id' => sub {
     my $event_id = params->{event_id};
-    my $results = $event_model->get_event($event_id) 
-        or return encode_json {
-            error => "Nothing Found for event_id $event_id",
-            errornum => 100
-        };
+    my $results = Results->new;
 
-    return encode_json {data => $results};
+    my $event = $event_model->get_event($event_id);
+    if($event){
+        $results->data($event)
+    }
+    else{
+        $results->add_error(100, "Nothing Found for event_id $event_id");
+    }
+
+    return $results->format;
 };
 
 post '/event/' => sub {
-
-    my $dbh = get_dbh();
-
-    my @columns = qw(
+    my $data = {};
+    foreach my $field (qw/
         name
         end_time
         start_time
@@ -58,23 +60,22 @@ post '/event/' => sub {
         long_desc
         short_desc
         series_id
-        );
-
-
-    my $event = $dbh->resultset('Event')->new({});
-
-    foreach my $column (@columns){
-        $event->$column(params->{$column});
+        /){
+        $data->{$field} = params->{$field};
     };
-    
-    $event->series_id(undef) if !$event->series_id;
-    $event->modified_ts(DateTime->now);
-    $event->created_ts(DateTime->now);
 
+    my $event = $event_model->post_event($data);
+    my $results = Results->new;
 
-    $event->insert(); #TODO: check for failure?
+    if($event){
+        $results->data($event)
+    }
+    else{
+        $results->add_error(200, "Insert failed for new event");
+    }
+
     
-    return encode_json {data => event_row_to_json($event)};
+    return $results->format;
 
 };
 
@@ -184,8 +185,8 @@ package Results {
             $self->data ? (data => $self->data) : (),
             $self->errors ? (errors => [
                 map { {
-                    msg => $_->msg,
-                    num => $_->num,
+                    msg => $_->{msg},
+                    num => $_->{num},
                 } } @{$self->errors}
             ]) : (),
         });

@@ -31,8 +31,10 @@ $res = $test->request( GET '/event/1' );
 ok($res->is_success, '[GET /event/1] for no id match');
 $decoded = decode_json($res->content);
 $expected = {
-    error => 'Nothing Found for event_id 1',
-    errornum => 100,
+    errors => [{
+        msg => 'Nothing Found for event_id 1',
+        num => 100,
+    }]
 };
 is_deeply $decoded, $expected, '[GET /event/1] error msg' or diag explain $decoded;
 

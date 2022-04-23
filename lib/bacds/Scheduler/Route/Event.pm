@@ -27,7 +27,7 @@ sub get_events {
 };
 
 sub get_event() {
-    my $event_id = params->{event_id};
+    my ($self, $event_id) = @_;
 
     my $dbh = get_dbh();
 
@@ -37,9 +37,9 @@ sub get_event() {
     return event_row_to_result($event);
 };
 
-post '/event/' => sub {
+sub post_event() {
+    my ($self, $data) = @_;
     my $dbh = get_dbh();
-
     my @columns = qw(
         name
         end_time
@@ -50,25 +50,27 @@ post '/event/' => sub {
         series_id
         );
 
-
     my $event = $dbh->resultset('Event')->new({});
 
     foreach my $column (@columns){
-        $event->$column(params->{$column});
+        $event->$column($data->{$column});
     };
     
     $event->series_id(undef) if !$event->series_id;
+
+    #TODO: Move this to the schema
     $event->modified_ts(DateTime->now);
     $event->created_ts(DateTime->now);
 
 
     $event->insert(); #TODO: check for failure?
+    #TODO: make it so that we are returning the new data from the db, instead of what was sent.
+    return event_row_to_result($event);
     
-    return encode_json {data => event_row_to_json($event)};
-
 };
 
 =pod
+
 put '/event/:event_id' => sub {
     my $event_id = params->{event_id};
     my $dbh = get_dbh();
