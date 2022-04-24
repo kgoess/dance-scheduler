@@ -8,6 +8,7 @@ use Data::Dump qw/dump/;
 use DateTime;
 
 use bacds::Scheduler::Schema;
+use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 sub get_events {
     #TODO: This should probably only allow a maximum number of results
@@ -105,22 +106,6 @@ sub put_event() {
 
 };
 
-sub get_dbh {
-    my $database = 'schedule';
-    my $hostname = 'localhost';
-    my $port = 3306;
-    my $password = `cat ~/.mysql-password`;
-    chomp $password;
-    my $user = 'scheduler';
-    my %dbi_params = ();
-
-    my $dbi_dsn = $ENV{TEST_DSN} || "DBI:mysql:database=$database;host=$hostname;port=$port";
-
-    my $dbh = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params)
-        or die "can't connect"; #TODO: More gracefully
-
-    return $dbh;
-}
 
 sub event_row_to_result {
     my ($event) = @_;
