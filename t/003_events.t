@@ -10,11 +10,12 @@ use Plack::Test;
 use HTTP::Request::Common;
 use Ref::Util qw/is_coderef/;
 use URL::Encode qw/url_encode/;
+use DateTime;
 
 unlink "testdb";
 
 $ENV{TEST_DSN} = 'dbi:SQLite:dbname=testdb';
-# load an in-memory database and deploy the required tables
+# load an on-disk test database and deploy the required tables
 bacds::Scheduler::Schema->connection($ENV{TEST_DSN},'','');
 bacds::Scheduler::Schema->load_namespaces;
 bacds::Scheduler::Schema->deploy;
@@ -27,6 +28,8 @@ my $decoded;
 my $expected;
 my $data;
 my $to_test;
+my $insert_ts;
+my $modified_ts;
 
 subtest 'Invalid GET' => sub{
     plan tests=>2;
@@ -53,10 +56,13 @@ subtest 'POST' => sub{
         series_id   => undef,
         short_desc  => "itsa shortdesc",
     };
+    $insert_ts = DateTime->now->iso8601;
     $res = $test->request(POST '/event/', $data );
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $to_test = {};
+    $data->{created_ts} = $insert_ts;
+    $data->{modified_ts} = $insert_ts;
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}{$key};
     };
@@ -88,8 +94,11 @@ subtest 'PUT' => sub {
         name        => "new name",
         short_desc  => "new shortdef",
     };
+    $modified_ts = DateTime->now->iso8601;
     $res = $test->request( PUT '/event/1' , content => $data);
     ok( $res->is_success, 'returned success' );
+    $data->{created_ts} = $insert_ts;
+    $data->{modified_ts} = $modified_ts;
     $decoded = decode_json($res->content);
     $to_test = {};
     foreach my $key (keys %$data){
