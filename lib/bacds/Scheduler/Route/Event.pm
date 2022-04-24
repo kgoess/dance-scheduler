@@ -10,7 +10,9 @@ use DateTime;
 use bacds::Scheduler::Schema;
 
 sub get_events {
-
+    #TODO: This should probably only allow a maximum number of results
+    #It should also probably accept args to filter?
+    #Or maybe that should be a different function?
     my $dbh = get_dbh();
 
     my $resultset = $dbh->resultset('Event')->search();
@@ -63,19 +65,26 @@ sub post_event() {
     $event->created_ts(DateTime->now);
 
 
-    $event->insert(); #TODO: check for failure?
+    $event->insert(); #TODO: check for failure
     #TODO: make it so that we are returning the new data from the db, instead of what was sent.
     return event_row_to_result($event);
     
 };
 
-=pod
 
-put '/event/:event_id' => sub {
-    my $event_id = params->{event_id};
+sub put_event() {
+    my ($self, $data) = @_;
     my $dbh = get_dbh();
 
-    my @columns = qw(
+    my $resultset = $dbh->resultset('Event')->search(
+        { event_id=> { '=' => $data->{event_id} } } # SQL::Abstract::Classic
+    );
+
+    $resultset or return 0; #TODO: More robust error handling
+
+    my $event = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
+
+    foreach my $column (qw/
         name
         end_time
         start_time
@@ -83,31 +92,19 @@ put '/event/:event_id' => sub {
         long_desc
         short_desc
         series_id
-        );
-
-
-    my $resultset = $dbh->resultset('Event')->search(
-        { event_id=> { '=' => $event_id } } # SQL::Abstract::Classic
-    );
-
-    $resultset or die "empty set"; #TODO: More gracefully
-
-    my $event = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
-
-    foreach my $column (@columns){
-        $event->$column(params->{$column});
+        /){
+        $event->$column($data->{$column});
     };
     
     $event->series_id(undef) if !$event->series_id;
-    $event->modified_ts(DateTime->now);
+    $event->modified_ts(DateTime->now); #TODO: Move this to the schema
 
-    $event->update(); #TODO: check for failure?
+    $event->update(); #TODO: check for failure
     
-    return encode_json {data => event_row_to_json($event)};
+    return event_row_to_result($event);
 
 };
 
-=cut
 sub get_dbh {
     my $database = 'schedule';
     my $hostname = 'localhost';
