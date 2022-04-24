@@ -43,7 +43,10 @@ sub get_event() {
 sub post_event() {
     my ($self, $data) = @_;
     my $dbh = get_dbh();
-    my @columns = qw(
+
+    my $event = $dbh->resultset('Event')->new({});
+
+    foreach my $column (qw/
         name
         end_time
         start_time
@@ -51,11 +54,7 @@ sub post_event() {
         long_desc
         short_desc
         series_id
-        );
-
-    my $event = $dbh->resultset('Event')->new({});
-
-    foreach my $column (@columns){
+        /){
         $event->$column($data->{$column});
     };
     

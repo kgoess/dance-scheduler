@@ -57,6 +57,7 @@ subtest 'POST' => sub{
         short_desc  => "itsa shortdesc",
     };
     $insert_ts = DateTime->now->iso8601;
+    #TODO This can be off by a second if the process occurs at the right(wrong) time.
     $res = $test->request(POST '/event/', $data );
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
@@ -95,6 +96,7 @@ subtest 'PUT' => sub {
         short_desc  => "new shortdef",
     };
     $modified_ts = DateTime->now->iso8601;
+    #TODO This can be off by a second if the process occurs at the right(wrong) time.
     $res = $test->request( PUT '/event/1' , content => $data);
     ok( $res->is_success, 'returned success' );
     $data->{created_ts} = $insert_ts;

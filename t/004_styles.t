@@ -5,16 +5,17 @@ use Data::Dump qw/dump/;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
-use Test::More tests => 25;
+use Test::More tests => 5;
 use Plack::Test;
 use HTTP::Request::Common;
 use Ref::Util qw/is_coderef/;
 use URL::Encode qw/url_encode/;
+use DateTime;
 
 unlink "testdb";
 
 $ENV{TEST_DSN} = 'dbi:SQLite:dbname=testdb';
-# load an in-memory database and deploy the required tables
+# load an on-disk test database and deploy the required tables
 bacds::Scheduler::Schema->connection($ENV{TEST_DSN},'','');
 bacds::Scheduler::Schema->load_namespaces;
 bacds::Scheduler::Schema->deploy;
@@ -26,68 +27,96 @@ my $res;
 my $decoded; 
 my $expected;
 my $data;
+my $to_test;
+my $insert_ts;
+my $modified_ts;
 
+subtest 'Invalid GET' => sub{
+    plan tests=>2;
 
-$res = $test->request( GET '/style/1' );
-ok($res->is_success, '[GET /style/1] for no id match');
-$decoded = decode_json($res->content);
-$expected = {
-    error => 'Nothing Found for style_id 1',
-    errornum => 100,
-};
-is_deeply $decoded, $expected, '[GET /style/1] error msg' or diag explain $decoded;
-
-$data = {
-  name    => "Test style",
-  };
-$res = $test->request(POST '/style/', $data );
-ok($res->is_success, '[POST /style/]');
-$decoded = decode_json($res->content);
-is $decoded->{data}{name}, $data->{name}, '[POST /style/] name' or diag explain $decoded;
-
-$res  = $test->request( GET '/style/1' );
-ok( $res->is_success, '[GET /style/1]' );
-$decoded = decode_json($res->content); 
-foreach my $key (sort keys %$data){
-    is $decoded->{data}{$key}, $data->{$key}, "Checking $key" or diag explain $decoded;
+    $res = $test->request( GET '/style/1' );
+    ok($res->is_success, 'returned success');
+    $decoded = decode_json($res->content);
+    $expected = {
+        errors => [{
+            msg => 'Nothing Found for style_id 1',
+            num => 1400,
+        }]
+    };
+    is_deeply $decoded, $expected, 'error msg matches' or diag explain $decoded;
 };
 
-$data = {
-    end_time    => "2022-05-01T22:00:00",
-    style_id    => 1,
-    is_camp     => 1,
-    long_desc   => "this is the long desc",
-    name        => "saturday night test style",
-    series_id   => undef,
-    short_desc  => "itsa shortdesc",
-    start_time  => "2022-05-01T20:00:00",
+subtest 'POST' => sub{
+    plan tests=>2;
+
+    $data = {
+        name        => "test style",
+    };
+    $insert_ts = DateTime->now->iso8601;
+    #TODO This can be off by a second if the process occurs at the right(wrong) time.
+    $res = $test->request(POST '/style/', $data );
+    ok($res->is_success, 'returned success');
+    $decoded = decode_json($res->content);
+    $to_test = {};
+    $data->{created_ts} = $insert_ts;
+    $data->{modified_ts} = $insert_ts;
+    foreach my $key (keys %$data){
+        $to_test->{$key} = $decoded->{data}{$key};
+    };
+    is_deeply $to_test, $data, 'return matches' or diag explain $decoded;
 };
-$res = $test->request( PUT '/style/1' , content => $data);
-ok( $res->is_success, '[PUT /style/1] ' );
-my $dbh = bacds::Scheduler->get_dbh();
-my $resultset = $dbh->resultset('Event')->search(
-    { style_id=> { '=' => 1 } } # SQL::Abstract::Classic
-);
-$resultset or die "empty set"; #TODO: More gracefully
-my $style = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
-is $style->is_camp, 1, '[PUT /style/1] changes is_camp ';
 
 
-$data = {
-    end_time    => "2022-05-01T22:00:00",
-    style_id    => 1,
-    is_camp     => 1,
-    long_desc   => "this is the long desc",
-    name        => "saturday night test style",
-    series_id   => undef,
-    short_desc  => "itsa shortdesc",
-    start_time  => "2022-05-01T20:00:00",
+subtest 'GET /style/1' => sub{
+    plan tests=>2;
+    $res  = $test->request( GET '/style/1' );
+    ok( $res->is_success, 'returned success' );
+    $decoded = decode_json($res->content); 
+    $to_test = {};
+    foreach my $key (keys %$data){
+        $to_test->{$key} = $decoded->{data}{$key};
+    };
+    is_deeply $to_test, $data, 'matches' or diag explain $decoded;
 };
-$res  = $test->request( GET '/styles' );
-ok( $res->is_success, '[GET /styles] ' );
-$decoded = decode_json($res->content);
-foreach my $style (@{$decoded->{data}}){
-    foreach my $key (sort keys %$data){
-        is $style->{$key}, $data->{$key}, "Checking $key" or diag explain $style;
-    }
-}
+
+
+subtest 'PUT' => sub {
+    plan tests => 3;
+
+    $data = {
+        name        => "new name",
+    };
+    $modified_ts = DateTime->now->iso8601;
+    #TODO This can be off by a second if the process occurs at the right(wrong) time.
+    $res = $test->request( PUT '/style/1' , content => $data);
+    ok( $res->is_success, 'returned success' );
+    $data->{created_ts} = $insert_ts;
+    $data->{modified_ts} = $modified_ts;
+    $decoded = decode_json($res->content);
+    $to_test = {};
+    foreach my $key (keys %$data){
+        $to_test->{$key} = $decoded->{data}{$key};
+    };
+    is_deeply $to_test, $data, 'return matches' or diag explain $decoded;
+
+    $res  = $test->request( GET '/style/1' );
+    $decoded = decode_json($res->content); 
+    foreach my $key (keys %$data){
+        $to_test->{$key} = $decoded->{data}{$key};
+    };
+    is_deeply $to_test, $data, 'GET changed after PUT' or diag explain $decoded;
+};
+
+
+subtest 'GET /styles' => sub{
+    plan tests => 2;
+    $res  = $test->request( GET '/styles' );
+    ok( $res->is_success, 'Returned success' );
+    $data->{style_id} = 1;
+    $decoded = decode_json($res->content);
+    $to_test = {};
+    foreach my $key (keys %$data){
+        $to_test->{$key} = $decoded->{data}[0]{$key};
+    };
+    is_deeply $to_test, $data, 'matches' or diag explain $decoded;
+};

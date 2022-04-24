@@ -80,9 +80,7 @@ post '/event/' => sub {
         $results->add_error(1200, "Insert failed for new event");
     }
 
-    
     return $results->format;
-
 };
 
 
@@ -109,6 +107,78 @@ put '/event/:event_id' => sub {
     }
     else{
         $results->add_error(1300, "Update failed for new $data->{event_id}");
+    }
+    
+    return $results->format;
+};
+
+
+
+#Styles
+my $style_model = 'bacds::Scheduler::Route::Style';
+use bacds::Scheduler::Route::Style;
+
+
+get '/styles' => sub {
+    my $results = Results->new;
+    
+    $results->data($style_model->get_styles);
+    
+    return $results->format;
+};
+
+
+get '/style/:style_id' => sub {
+    my $style_id = params->{style_id};
+    my $results = Results->new;
+
+    my $style = $style_model->get_style($style_id);
+    if($style){
+        $results->data($style)
+    }
+    else{
+        $results->add_error(1400, "Nothing Found for style_id $style_id");
+    }
+
+    return $results->format;
+};
+
+
+post '/style/' => sub {
+    my $data = {};
+    $data->{name} = params->{name};
+
+    my $style = $style_model->post_style($data);
+    my $results = Results->new;
+
+    if($style){
+        $results->data($style)
+    }
+    else{
+        $results->add_error(1500, "Insert failed for new style");
+    }
+
+    return $results->format;
+};
+
+
+put '/style/:style_id' => sub {
+    my $data = {};
+    foreach my $field (qw/
+        style_id
+        name
+        /){
+        $data->{$field} = params->{$field};
+    };
+    
+    my $style = $style_model->put_style($data);
+    my $results = Results->new;
+
+    if($style){
+        $results->data($style)
+    }
+    else{
+        $results->add_error(1600, "Update failed for new $data->{style_id}");
     }
     
     return $results->format;
