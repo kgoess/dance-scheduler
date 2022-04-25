@@ -11,6 +11,7 @@ use HTTP::Request::Common;
 use Ref::Util qw/is_coderef/;
 use URL::Encode qw/url_encode/;
 use DateTime;
+use DateTime::Format::Strptime qw/strptime/;
 
 unlink "testdb";
 
@@ -28,11 +29,14 @@ my $decoded;
 my $expected;
 my $data;
 my $to_test;
-my $insert_ts;
-my $modified_ts;
+my $created_time;
+my $created_over_time;
+my $modified_time;
+my $modified_over_time;
 
-subtest 'Invalid GET' => sub{
+subtest 'Invalid GET /event/1' => sub{
     plan tests=>2;
+
     $res = $test->request( GET '/event/1' );
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
@@ -42,11 +46,12 @@ subtest 'Invalid GET' => sub{
             num => 1100,
         }]
     };
-    is_deeply $decoded, $expected, 'error msg matches' or diag explain $decoded;
+    is_deeply $decoded, $expected, 'error msg matches';
 };
 
-subtest 'POST' => sub{
-    plan tests=>2;
+subtest 'POST /event' => sub{
+    plan tests=>5;
+
     $data = {
         start_time  => "2022-05-01T20:00:00",
         end_time    => "2022-05-01T22:00:00",
@@ -56,23 +61,25 @@ subtest 'POST' => sub{
         series_id   => undef,
         short_desc  => "itsa shortdesc",
     };
-    $insert_ts = DateTime->now->iso8601;
-    #TODO This can be off by a second if the process occurs at the right(wrong) time.
+    $created_time = DateTime->now;
     $res = $test->request(POST '/event/', $data );
+    $created_over_time = DateTime->now;
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $to_test = {};
-    $data->{created_ts} = $insert_ts;
-    $data->{modified_ts} = $insert_ts;
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'return matches' or diag explain $decoded;
+    is_deeply $to_test, $data, 'return matches';
+    cmp_ok strptime('%FT%T', $decoded->{data}{created_ts}), '>=', $created_time, 'created_ts within lower bound';
+    cmp_ok strptime('%FT%T', $decoded->{data}{created_ts}), '<=', $created_over_time, 'created_ts within upper bound';
+    is $decoded->{data}{created_ts}, $decoded->{data}{modified_ts}, 'created_ts == modified_ts';
 };
 
 
 subtest 'GET /event/1' => sub{
     plan tests=>2;
+
     $res  = $test->request( GET '/event/1' );
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content); 
@@ -80,12 +87,16 @@ subtest 'GET /event/1' => sub{
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'matches' or diag explain $decoded;
+    is_deeply $to_test, $data, 'matches';
+    $created_time = $decoded->{data}{created_ts}; #for verification in the PUT test
 };
 
 
-subtest 'PUT' => sub {
-    plan tests => 3;
+subtest 'PUT /event/1' => sub {
+    plan tests => 5;
+
+    note 'waiting so that modified_ts != created_ts';
+    sleep(1);
 
     $data = {
         start_time  => "2022-05-01T21:00:00",
@@ -95,30 +106,32 @@ subtest 'PUT' => sub {
         name        => "new name",
         short_desc  => "new shortdef",
     };
-    $modified_ts = DateTime->now->iso8601;
-    #TODO This can be off by a second if the process occurs at the right(wrong) time.
+    $modified_time = DateTime->now;
     $res = $test->request( PUT '/event/1' , content => $data);
+    $modified_over_time = DateTime->now;
+    $data->{created_ts} = $created_time;
     ok( $res->is_success, 'returned success' );
-    $data->{created_ts} = $insert_ts;
-    $data->{modified_ts} = $modified_ts;
     $decoded = decode_json($res->content);
     $to_test = {};
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'return matches' or diag explain $decoded;
+    is_deeply $to_test, $data, 'return matches';
 
     $res  = $test->request( GET '/event/1' );
     $decoded = decode_json($res->content); 
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'GET changed after PUT' or diag explain $decoded;
+    is_deeply $to_test, $data, 'GET changed after PUT';
+    cmp_ok strptime('%FT%T', $decoded->{data}{modified_ts}), '>=', $modified_time, 'modified_ts within lower bound';
+    cmp_ok strptime('%FT%T', $decoded->{data}{modified_ts}), '<=', $modified_over_time, 'modified_ts within upper bound';
 };
 
 
 subtest 'GET /events' => sub{
     plan tests => 2;
+
     $res  = $test->request( GET '/events' );
     ok( $res->is_success, 'Returned success' );
     $data->{event_id} = 1;
@@ -127,5 +140,5 @@ subtest 'GET /events' => sub{
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}[0]{$key};
     };
-    is_deeply $to_test, $data, 'matches' or diag explain $decoded;
+    is_deeply $to_test, $data, 'matches';
 };
