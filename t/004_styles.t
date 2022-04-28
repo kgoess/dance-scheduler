@@ -5,6 +5,7 @@ use Data::Dump qw/dump/;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
+use bacds::Scheduler::Util::Time qw/get_now/;
 use Test::More tests => 5;
 use Plack::Test;
 use HTTP::Request::Common;
@@ -30,9 +31,7 @@ my $expected;
 my $data;
 my $to_test;
 my $created_time;
-my $created_over_time;
 my $modified_time;
-my $modified_over_time;
 
 subtest 'Invalid GET /style/1' => sub{
     plan tests=>2;
@@ -50,24 +49,22 @@ subtest 'Invalid GET /style/1' => sub{
 };
 
 subtest 'POST /style' => sub{
-    plan tests=>5;
+    plan tests=>2;
 
     $data = {
         name        => "test style",
     };
-    $created_time = DateTime->now;
+    $ENV{TEST_NOW} = 1651112285;
+    $created_time = get_now();
     $res = $test->request(POST '/style/', $data );
-    $created_over_time = DateTime->now;
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $to_test = {};
+    $data->{created_ts} = $data->{modified_ts} = $created_time;
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}{$key};
     };
     is_deeply $to_test, $data, 'return matches';
-    cmp_ok strptime('%FT%T', $decoded->{data}{created_ts}), '>=', $created_time, 'created_ts within lower bound';
-    cmp_ok strptime('%FT%T', $decoded->{data}{created_ts}), '<=', $created_over_time, 'created_ts within upper bound';
-    is $decoded->{data}{created_ts}, $decoded->{data}{modified_ts}, 'created_ts == modified_ts';
 };
 
 
@@ -82,22 +79,18 @@ subtest 'GET /style/1' => sub{
         $to_test->{$key} = $decoded->{data}{$key};
     };
     is_deeply $to_test, $data, 'matches';
-    $created_time = $decoded->{data}{created_ts}; #for verification in the PUT test
 };
 
 
 subtest 'PUT /style/1' => sub {
-    plan tests => 5;
-
-    note 'waiting so that modified_ts != created_ts';
-    sleep(1);
+    plan tests => 3;
 
     $data = {
         name        => "new name",
     };
-    $modified_time = DateTime->now;
+    $ENV{TEST_NOW} += 100;
+    $modified_time = get_now();
     $res = $test->request( PUT '/style/1' , content => $data);
-    $modified_over_time = DateTime->now;
     ok( $res->is_success, 'returned success' );
     $data->{created_ts} = $created_time;
     $decoded = decode_json($res->content);
@@ -109,12 +102,12 @@ subtest 'PUT /style/1' => sub {
 
     $res  = $test->request( GET '/style/1' );
     $decoded = decode_json($res->content); 
+    $data->{created_ts} = $created_time;
+    $data->{modified_ts} = $modified_time;
     foreach my $key (keys %$data){
         $to_test->{$key} = $decoded->{data}{$key};
     };
     is_deeply $to_test, $data, 'GET changed after PUT';
-    cmp_ok strptime('%FT%T', $decoded->{data}{modified_ts}), '>=', $modified_time, 'modified_ts within lower bound';
-    cmp_ok strptime('%FT%T', $decoded->{data}{modified_ts}), '<=', $modified_over_time, 'modified_ts within upper bound';
 };
 
 

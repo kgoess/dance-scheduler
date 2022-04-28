@@ -5,7 +5,6 @@ use warnings;
 
 use Dancer2;
 use Data::Dump qw/dump/;
-use DateTime;
 
 use Exporter 'import';
 our @EXPORT_OK = qw/get_dbh/;

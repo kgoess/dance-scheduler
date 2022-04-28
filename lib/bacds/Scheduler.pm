@@ -27,8 +27,8 @@ get '/' => sub {
 
 
 #Events
-my $event_model = 'bacds::Scheduler::Route::Event';
-use bacds::Scheduler::Route::Event;
+my $event_model = 'bacds::Scheduler::Model::Event';
+use bacds::Scheduler::Model::Event;
 
 
 get '/events' => sub {
@@ -115,8 +115,8 @@ put '/event/:event_id' => sub {
 
 
 #Styles
-my $style_model = 'bacds::Scheduler::Route::Style';
-use bacds::Scheduler::Route::Style;
+my $style_model = 'bacds::Scheduler::Model::Style';
+use bacds::Scheduler::Model::Style;
 
 
 get '/styles' => sub {

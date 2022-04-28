@@ -1,4 +1,4 @@
-package bacds::Scheduler::Route::Style;
+package bacds::Scheduler::Model::Style;
 
 use 5.16.0;
 use warnings;

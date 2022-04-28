@@ -130,29 +130,31 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Fl3/zjkRX6ellDdVz1wc5w
 
 
-use DateTime;
+use bacds::Scheduler::Util::Time qw/get_now/;
 
 sub insert {
 #Set created_ts, modified_ts to now
     my $self = shift;
 
+    my $time = get_now();
     foreach my $column (qw/
         created_ts
         modified_ts
         /){
-        $self->store_column($column, DateTime->now());
-    };
+        $self->store_column($column, $time);
+    }
 
     $self->next::method(@_);
-};
+}
 
 sub update {
 #Set modified_ts to now
     my $self = shift;
 
-    $self->modified_ts(DateTime->now());
+    my $time = get_now();
+    $self->modified_ts($time);
 
     $self->next::method(@_);
-};
+}
 
 1;

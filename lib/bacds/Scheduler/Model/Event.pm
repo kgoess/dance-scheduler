@@ -1,4 +1,4 @@
-package bacds::Scheduler::Route::Event;
+package bacds::Scheduler::Model::Event;
 
 use 5.16.0;
 use warnings;
