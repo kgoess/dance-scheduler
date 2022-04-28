@@ -1,4 +1,3 @@
-
 CREATE TABLE event_talent_map (
     event_id INT NOT NULL,
     talent_id INT NOT NULL,

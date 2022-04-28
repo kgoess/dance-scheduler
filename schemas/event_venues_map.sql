@@ -1,4 +1,3 @@
-
 CREATE TABLE event_venues_map (
     event_id INT NOT NULL,
     venue_id INT NOT NULL,

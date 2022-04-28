@@ -1,4 +1,3 @@
-
 CREATE TABLE venues (
     venue_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     vkey CHAR(10) NOT NULL,
@@ -7,6 +6,7 @@ CREATE TABLE venues (
     city VARCHAR(64),
     zip CHAR(10),
     comment VARCHAR(32766),
+    is_deleted BOOLEAN,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 

@@ -1,4 +1,3 @@
-
 CREATE TABLE event_band_map (
     event_id INT NOT NULL,
     band_id INT NOT NULL,

@@ -87,6 +87,11 @@ __PACKAGE__->table("events");
   is_foreign_key: 1
   is_nullable: 1
 
+=head2 is_deleted
+
+  data_type: 'tinyint'
+  is_nullable: 1
+
 =head2 created_ts
 
   data_type: 'datetime'
@@ -129,6 +134,8 @@ __PACKAGE__->add_columns(
   { data_type => "tinyint", is_nullable => 1 },
   "series_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
+  "is_deleted",
+  { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
   {
     data_type => "datetime",
@@ -270,8 +277,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-20 19:52:39
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SrOFV5wl/9mHjeOryaiRtw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E6VPHsU25lbylJDAiJzKg
 
 
 

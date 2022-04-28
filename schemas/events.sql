@@ -1,4 +1,3 @@
-
 CREATE TABLE events (
     event_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(256),
@@ -9,7 +8,7 @@ CREATE TABLE events (
     short_desc VARCHAR(1024),    
     is_template BOOLEAN,
     series_id INT,
-
+    is_deleted BOOLEAN,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 

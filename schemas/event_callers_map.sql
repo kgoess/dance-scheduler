@@ -1,4 +1,3 @@
-
 CREATE TABLE event_callers_map (
     event_id INT NOT NULL,
     caller_id INT NOT NULL,

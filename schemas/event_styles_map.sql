@@ -1,4 +1,3 @@
-
 CREATE TABLE event_styles_map (
     event_id INT NOT NULL,
     style_id INT NOT NULL,

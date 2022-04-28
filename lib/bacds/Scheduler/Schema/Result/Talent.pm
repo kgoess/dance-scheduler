@@ -47,6 +47,11 @@ __PACKAGE__->table("talent");
   is_nullable: 0
   size: 256
 
+=head2 is_deleted
+
+  data_type: 'tinyint'
+  is_nullable: 1
+
 =head2 created_ts
 
   data_type: 'datetime'
@@ -67,6 +72,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
   { data_type => "varchar", is_nullable => 0, size => 256 },
+  "is_deleted",
+  { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
   {
     data_type => "datetime",
@@ -141,8 +148,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:23:49
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FqI53iLFtmYTyKrP95H5tA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SiL1RuVBL+LcvsDo9zHwZA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

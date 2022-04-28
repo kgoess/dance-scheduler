@@ -47,6 +47,11 @@ __PACKAGE__->table("styles");
   is_nullable: 0
   size: 256
 
+=head2 is_deleted
+
+  data_type: 'tinyint'
+  is_nullable: 1
+
 =head2 created_ts
 
   data_type: 'datetime'
@@ -67,6 +72,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
   { data_type => "varchar", is_nullable => 0, size => 256 },
+  "is_deleted",
+  { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
   {
     data_type => "datetime",
@@ -126,8 +133,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:40:40
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Fl3/zjkRX6ellDdVz1wc5w
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:an0LBSfPRGJzrbsa3l4dVg
 
 
 use bacds::Scheduler::Util::Time qw/get_now/;

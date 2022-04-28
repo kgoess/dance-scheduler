@@ -1,4 +1,3 @@
-
 CREATE TABLE band_membership (
     band_id INT NOT NULL,
     talent_id INT NOT NULL,
