@@ -7,7 +7,6 @@ use Dancer2;
 use Data::Dump qw/dump/;
 use DateTime;
 
-use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 sub get_events {
@@ -60,11 +59,6 @@ sub post_event() {
     
     $event->series_id(undef) if !$event->series_id;
 
-    #TODO: Move this to the schema
-    $event->modified_ts(DateTime->now);
-    $event->created_ts(DateTime->now);
-
-
     $event->insert(); #TODO: check for failure
     #TODO: make it so that we are returning the new data from the db, instead of what was sent.
     return event_row_to_result($event);
@@ -97,7 +91,6 @@ sub put_event() {
     };
     
     $event->series_id(undef) if !$event->series_id;
-    $event->modified_ts(DateTime->now); #TODO: Move this to the schema
 
     $event->update(); #TODO: check for failure
     

@@ -274,5 +274,30 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SrOFV5wl/9mHjeOryaiRtw
 
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+
+use DateTime;
+
+sub insert {
+#Set created_ts, modified_ts to now
+    my $self = shift;
+
+    foreach my $column (qw/
+        created_ts
+        modified_ts
+        /){
+        $self->store_column($column, DateTime->now());
+    };
+
+    $self->next::method(@_);
+};
+
+sub update {
+#Set modified_ts to now
+    my $self = shift;
+
+    $self->modified_ts(DateTime->now());
+
+    $self->next::method(@_);
+};
+
 1;

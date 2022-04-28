@@ -44,9 +44,6 @@ sub post_style() {
     my $style = $dbh->resultset('Style')->new({});
 
     $style->name($data->{name});
-    #TODO: Move this to the schema
-    $style->modified_ts(DateTime->now);
-    $style->created_ts(DateTime->now);
 
     $style->insert(); #TODO: check for failure
     #TODO: make it so that we are returning the new data from the db, instead of what was sent.
@@ -65,7 +62,6 @@ sub put_style() {
     $resultset or return 0; #TODO: More robust error handling
     my $style = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
     $style->name($data->{name});
-    $style->modified_ts(DateTime->now); #TODO: Move this to the schema
 
     $style->update(); #TODO: check for failure
     
