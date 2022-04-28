@@ -200,11 +200,11 @@ font-size: 10px;
 .event-display-row:hover {
     background: salmon;
 }
-.event-button-container {
+.button-container {
     display: flex;
     justify-content: center;
 }
-.event-button {
+.button {
     margin: 5px;
 }
 .row-contents {

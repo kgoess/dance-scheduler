@@ -1,19 +1,11 @@
 
         <form> 
-          <select id="all-events-list" class="all-events-list" size="5">
+          <select id="all-event-list" class="all-event-list" size="5">
           </select>
         </form>
-        <span class="event-button-container">
-            <button id="event-create-button" class="event-button">Create New</button>
+        <span class="button-container">
+            <button class="button create-new-button">Create New</button>
         </span>
-        <!-- <form> 
-          <label>
-            Event id: 
-            <input name="event_id" id="event-id-input"/>
-          </label>
-          <button id="load-event-button" type="button">Load Event</button> 
-        </form>
-        -->
         <div id="event-display" hidden>
             <form id="event-display-form">
               <% event_column_types = [
@@ -34,7 +26,7 @@
                 <% END %>
                 <input type="hidden" name="event_id"/>
                 <span class="event-button-container">
-                    <button id="event-save-button" class="event-button">Save</button>
+                    <button class="button save-button">Save</button>
                 </span>
             </form>
         </div>

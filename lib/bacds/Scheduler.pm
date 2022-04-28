@@ -14,10 +14,12 @@ get '/' => sub {
         stuff =>'does this work',
         accordions => [
             { label => 'Events',
+              modelName => 'event',
               content => template("events.tt", {}, { layout=> undef }),
             },
-            { label => 'something else',
-              content => template("accordion2.tt", {}, { layout=> undef }),
+            { label => 'Styles',
+              modelName => 'style',
+              content => template("styles.tt", {}, { layout=> undef }),
             },
         ],
     };
@@ -31,7 +33,7 @@ my $event_model = 'bacds::Scheduler::Model::Event';
 use bacds::Scheduler::Model::Event;
 
 
-get '/events' => sub {
+get '/eventAll' => sub {
     my $results = Results->new;
     
     $results->data($event_model->get_events);
@@ -119,7 +121,7 @@ my $style_model = 'bacds::Scheduler::Model::Style';
 use bacds::Scheduler::Model::Style;
 
 
-get '/styles' => sub {
+get '/styleAll' => sub {
     my $results = Results->new;
     
     $results->data($style_model->get_styles);

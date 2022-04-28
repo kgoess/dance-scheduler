@@ -122,10 +122,10 @@ subtest 'PUT /event/1' => sub {
 };
 
 
-subtest 'GET /events' => sub{
+subtest 'GET /eventAll' => sub{
     plan tests => 2;
 
-    $res  = $test->request( GET '/events' );
+    $res  = $test->request( GET '/eventAll' );
     ok( $res->is_success, 'Returned success' );
     $data->{event_id} = 1;
     $decoded = decode_json($res->content);

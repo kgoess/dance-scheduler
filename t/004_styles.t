@@ -111,10 +111,10 @@ subtest 'PUT /style/1' => sub {
 };
 
 
-subtest 'GET /styles' => sub{
+subtest 'GET /styleAll' => sub{
     plan tests => 2;
 
-    $res  = $test->request( GET '/styles' );
+    $res  = $test->request( GET '/styleAll' );
     ok( $res->is_success, 'Returned success' );
     $data->{style_id} = 1;
     $decoded = decode_json($res->content);
