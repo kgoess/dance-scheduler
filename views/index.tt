@@ -24,8 +24,7 @@
         <div class="accordion">
             <hr>
             <% FOR accordion IN accordions %>
-                <div class="container">
-                    <input name="modelName" value="<% accordion.modelName %>" type="hidden">
+                <div class="container" modelName="<% accordion.modelName %>">
                     <div class="label"><% accordion.label %></div>
                     <div class="content">
                         <% accordion.content %>

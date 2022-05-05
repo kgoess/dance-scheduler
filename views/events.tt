@@ -1,12 +1,12 @@
 
         <form> 
-          <select id="all-event-list" class="all-event-list" size="5">
+          <select class="clickable-list" size="5">
           </select>
         </form>
         <span class="button-container">
             <button class="button create-new-button">Create New</button>
         </span>
-        <div id="event-display" hidden>
+        <div class="model-display" hidden>
             <form id="event-display-form">
               <% event_column_types = [
                     [ "name", "Name" ],
@@ -18,14 +18,14 @@
                 ]
                %>
               <% FOREACH column IN event_column_types %>
-              <div name="<% column.0 %>" class="event-display-row">
+              <div name="<% column.0 %>" class="display-row">
                 <span class="row-label"><% column.1 %></span>
                 <span class="row-contents"></span>
                 <input class="row-edit" name="<% column.0 %>" hidden />
               </div>
                 <% END %>
                 <input type="hidden" name="event_id"/>
-                <span class="event-button-container">
+                <span class="button-container">
                     <button class="button save-button">Save</button>
                 </span>
             </form>

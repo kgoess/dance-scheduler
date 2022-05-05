@@ -1,48 +1,37 @@
 
  $( document ).ready(function() {
 
- $( '#load-event-button' ).click(function() {
-    const eventId = $( '#event-id-input' )[0].value;
-    $.ajax({
-      url: `event/${eventId}`,
-      dataType: 'json'
-    })
-    .done( (msg) => { displayItem('event', msg) });
-  });
+    $( '.clickable-list' ).change(function() {
+        const rowId = $(this).val();
+        const [parentContainer, modelName] = getParentAndModelName(this);
+        $.ajax({
+            url: `${modelName}/${rowId}`,
+            dataType: 'json'
+        })
+        .done( (msg) => { displayItem(modelName, msg) });
+    });
 
-  $( '.all-event-list' ).change(function() {
-    const eventId = $( '#all-event-list' )[0].value;
-    $.ajax({
-      url: `event/${eventId}`,
-      dataType: 'json'
-    })
-    .done( (msg) => { displayItem('event', msg) });
-  });
-
-    $( '.event-display-row' ).click(function() {
-        const display = $(this).children('.row-contents')[0];
-        if (display.hidden) {
+    $( '.display-row' ).click(function() {
+        const display = $(this).find('.row-contents');
+        if (display.is(':hidden')) {
             return;
         }
-        display.hidden = !display.hidden;
-        const edit  = $(this).children('.row-edit')[0];
-        edit.hidden = !edit.hidden;
+        display.toggle();
+        $(this).find('.row-edit').toggle();
     });
 
     // because we're handling the submit ourselves with the button
-    $( '#event-display-form' ).submit(function(e){
+    $( 'form' ).submit(function(e){
         e.preventDefault();
     });
 
     $( '.save-button' ).click(function() {
 
-        const parentContainer = $(this).closest('.container');
-        const modelName = parentContainer.find('[name="modelName"]')[0].value;
-
-        const rowId = parentContainer.find(`[name="${modelName}_id"]` )[0].value;
+        const [parentContainer, modelName] = getParentAndModelName(this);
+        
+        const rowId = parentContainer.find(`[name="${modelName}_id"]` ).val();
         const dataString = $( `#${modelName}-display-form` ).serialize();
 
-            
         let http_method;
         let url;
         if (rowId) {
@@ -67,26 +56,24 @@
 
     $( '.create-new-button' ).click(function() {
         
-        const parentContainer = $(this).closest('.container');
-        const modelName = parentContainer.find('[name=modelName]')[0].value;
+        const [parentContainer, modelName] = getParentAndModelName(this);
 
         parentContainer.each(
             function(index) {
-                $(this).find('.row-contents')[0].hidden = true;
+                $(this).find('.row-contents').hide();
                 $(this).find('.row-contents')[0].textContent = '';
-                $(this).find('.row-edit')[0].hidden = false;
+                $(this).find('.row-edit').show();
                 $(this).find('.row-edit')[0].value = '';
             }
         );
         
         parentContainer.find(`[name="${modelName}_id"]` )[0].value = '';
-        $( `#${modelName}-display` )[0].hidden = false;
+        $( `#${modelName}-display` ).show();
     });
 
     $( '.accordion .label' ).click(function() {
-        const parentContainer = $(this).closest('.container');
+        const [parentContainer, modelName] = getParentAndModelName(this);
         parentContainer.toggleClass('active')
-        const modelName = parentContainer.find('[name=modelName]')[0].value;
         loadListForModel(modelName);
     });
 }); 
@@ -100,17 +87,18 @@
 function displayItem(modelName, msg) {
 
     if (msg['data']) {
-        const eventObj = msg['data'];
-        $( `#${modelName}-display .${modelName}-display-row` ).each(
+        const parentContainer = getContainerForModelName(modelName);
+        const targetObj = msg['data'];
+        parentContainer.find(`.display-row`).each(
             function(index) {
-                $(this).children('.row-contents')[0].hidden = false;
-                $(this).children('.row-contents')[0].textContent = eventObj[this.getAttribute('name')];
-                $(this).children('.row-edit')[0].hidden = true;
-                $(this).children('.row-edit')[0].value = eventObj[this.getAttribute('name')];
+                $(this).children('.row-contents').show();
+                $(this).children('.row-contents')[0].textContent = targetObj[this.getAttribute('name')];
+                $(this).children('.row-edit').hide();
+                $(this).children('.row-edit')[0].value = targetObj[this.getAttribute('name')];
             }
         );
-        $( `#${modelName}-display [name="${modelName}_id"]` )[0].value = eventObj[`${modelName}_id`];
-        $( `#${modelName}-display` )[0].hidden = false;
+        $( `[name="${modelName}_id"]` )[0].value = targetObj[`${modelName}_id`];
+        parentContainer.find('.model-display').show();
     } else {
         alert('error: ' + msg['error']);
     }
@@ -118,7 +106,7 @@ function displayItem(modelName, msg) {
 
 function displayListForModel(modelName, msg) {
 
-    let insertTarget = $( `#all-${modelName}-list` );
+    const insertTarget = getContainerForModelName(modelName).find('.clickable-list');
 
     if (msg['data']) {
 
@@ -137,8 +125,8 @@ function displayListForModel(modelName, msg) {
 
 function loadListForModel(modelName) {
 
-    $( `#all-${modelName}-list` ).empty();
-    $( `#${modelName}-display` ).first().hidden = true;
+    getContainerForModelName(modelName).find('.clickable-list' ).empty();
+    $( `#${modelName}-display` ).first().hide();
 
     $.ajax({
         url: `${modelName}All`,
@@ -156,3 +144,11 @@ function escapeHtml(unsafe) {
          .replace(/'/g, '&#039;');
 }
 
+function getParentAndModelName(element) {
+    const parentContainer = $(element).closest('.container');
+    const modelName = parentContainer.attr('modelName');
+    return [parentContainer, modelName];
+}
+function getContainerForModelName(modelName) {
+    return $( `.container[modelName="${modelName}"]` );
+}

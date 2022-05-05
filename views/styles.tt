@@ -1,26 +1,26 @@
 
         <form> 
-          <select id="all-style-list" class="all-style-list" size="5">
+          <select class="clickable-list" size="5">
           </select>
         </form>
         <span class="button-container">
             <button class="button create-new-button">Create New</button>
         </span>
-        <div id="style-display" hidden>
+        <div class="model-display" hidden>
             <form id="style-display-form">
               <% style_column_types = [
                     [ "name", "Name" ],
                 ]
                %>
               <% FOREACH column IN style_column_types %>
-              <div name="<% column.0 %>" class="style-display-row">
+              <div name="<% column.0 %>" class="display-row">
                 <span class="row-label"><% column.1 %></span>
                 <span class="row-contents"></span>
                 <input class="row-edit" name="<% column.0 %>" hidden />
               </div>
                 <% END %>
                 <input type="hidden" name="style_id"/>
-                <span class="style-button-container">
+                <span class="button-container">
                     <button class="button save-button">Save</button>
                 </span>
             </form>
