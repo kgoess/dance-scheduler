@@ -36,7 +36,13 @@ sub get_event() {
     my $event = $dbh->resultset('Event')->find($event_id)
         or return false;
 
-    return event_row_to_result($event);
+    my $other_tables = {};
+    foreach my $other_table_name (qw/styles/){
+        my $rs = $event->$other_table_name;
+        $other_tables->{$other_table_name} = $rs->all
+    }
+    
+    return event_row_to_result($event, $other_tables);
 };
 
 sub post_event() {
@@ -100,7 +106,7 @@ sub put_event() {
 
 
 sub event_row_to_result {
-    my ($event) = @_;
+    my ($event, $other_tables) = @_;
 
     my $result = {};
 
@@ -117,12 +123,20 @@ sub event_row_to_result {
         created_ts
         modified_ts/){
         $result->{$field} = $event->$field;
-    };
+    }
 
     foreach my $datetime (qw/start_time end_time created_ts modified_ts/){
         next unless $result->{$datetime};
         $result->{$datetime} = $result->{$datetime}->iso8601;
-    };
+    }
+
+    if ($other_tables){
+        foreach my $other_table_name (keys %$other_tables){
+            my $other = $other_tables->{$other_table_name}
+                or next;
+            $result->{$other_table_name} = $other->get_fields_for_event_row
+        }
+    }
 
     return $result;
 }

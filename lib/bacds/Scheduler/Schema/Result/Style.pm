@@ -137,7 +137,17 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:an0LBSfPRGJzrbsa3l4dVg
 
 
+
+__PACKAGE__->many_to_many(events=> 'event_styles_maps', 'event');
 use bacds::Scheduler::Util::Time qw/get_now/;
+
+sub get_fields_for_event_row {
+    my ($self) = @_;
+    return {
+        name=>$self->name,
+        id=>$self->style_id,
+    };
+};
 
 sub insert {
 #Set created_ts, modified_ts to now
