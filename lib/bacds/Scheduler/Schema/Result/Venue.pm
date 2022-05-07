@@ -177,5 +177,30 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LRCdL+ARtoyFYCcKEkgVXA
 
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+use bacds::Scheduler::Util::Time qw/get_now/;
+
+#Set created_ts, modified_ts to now
+sub insert {
+    my $self = shift;
+
+    my $time = get_now();
+    foreach my $column (qw/
+        created_ts
+        modified_ts
+        /){
+        $self->store_column($column, $time);
+    }
+
+    $self->next::method(@_);
+}
+
+#Set modified_ts to now
+sub update {
+    my $self = shift;
+
+    my $time = get_now();
+    $self->modified_ts($time);
+
+    $self->next::method(@_);
+}
 1;

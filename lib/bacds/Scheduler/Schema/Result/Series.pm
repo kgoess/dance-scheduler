@@ -130,6 +130,30 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:/pgvLY95Dihqz5leTt1WCg
 
+use bacds::Scheduler::Util::Time qw/get_now/;
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+#Set created_ts, modified_ts to now
+sub insert {
+    my $self = shift;
+
+    my $time = get_now();
+    foreach my $column (qw/
+        created_ts
+        modified_ts
+        /){
+        $self->store_column($column, $time);
+    }
+
+    $self->next::method(@_);
+}
+
+#Set modified_ts to now
+sub update {
+    my $self = shift;
+
+    my $time = get_now();
+    $self->modified_ts($time);
+
+    $self->next::method(@_);
+}
 1;
