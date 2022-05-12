@@ -61,14 +61,14 @@
         parentContainer.each(
             function(index) {
                 $(this).find('.row-contents').hide();
-                $(this).find('.row-contents')[0].textContent = '';
+                $(this).find('.row-contents').text('');
                 $(this).find('.row-edit').show();
-                $(this).find('.row-edit')[0].value = '';
+                $(this).find('.row-edit').val('');
             }
         );
         
-        parentContainer.find(`[name="${modelName}_id"]` )[0].value = '';
-        $( `#${modelName}-display` ).show();
+        parentContainer.find(`[name="${modelName}_id"]` ).val('');
+        parentContainer.find('.model-display').show();
     });
 
     $( '.accordion .label' ).click(function() {
@@ -92,12 +92,12 @@ function displayItem(modelName, msg) {
         parentContainer.find(`.display-row`).each(
             function(index) {
                 $(this).children('.row-contents').show();
-                $(this).children('.row-contents')[0].textContent = targetObj[this.getAttribute('name')];
+                $(this).children('.row-contents').text(targetObj[this.getAttribute('name')]);
                 $(this).children('.row-edit').hide();
-                $(this).children('.row-edit')[0].value = targetObj[this.getAttribute('name')];
+                $(this).children('.row-edit').val(targetObj[this.getAttribute('name')]);
             }
         );
-        $( `[name="${modelName}_id"]` )[0].value = targetObj[`${modelName}_id`];
+        $( `[name="${modelName}_id"]` ).val(targetObj[`${modelName}_id`]);
         parentContainer.find('.model-display').show();
     } else {
         alert('error: ' + msg['error']);
