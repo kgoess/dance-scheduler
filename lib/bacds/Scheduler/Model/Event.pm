@@ -67,7 +67,21 @@ sub post_event() {
 
     $event->insert(); #TODO: check for failure
     #TODO: make it so that we are returning the new data from the db, instead of what was sent.
-    return event_row_to_result($event);
+
+    my @relationships = (
+        [qw/Style styles style_id/],
+    );
+    my $other_tables = {};
+    foreach my $relationship (@relationships){
+        my ($other_model, $other_table_name, $primary_key) = @$relationship;
+        next unless $data->{$primary_key};
+        my @rs = $dbh->resultset($other_model)->search({
+            $primary_key=> {'-in'=>$data->{$primary_key}}});
+        $event->set_styles(\@rs);
+        $other_tables->{$other_table_name} = [map $_->all, @rs];
+    }
+    
+    return event_row_to_result($event, $other_tables);
     
 };
 
