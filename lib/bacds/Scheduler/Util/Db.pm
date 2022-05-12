@@ -16,7 +16,7 @@ sub get_dbh {
     my $database = 'schedule';
     my $hostname = 'localhost';
     my $port = 3306;
-    my $password = `cat ~/.mysql-password`;
+    my $password = -e "$ENV{HOME}/.mysql-password" ? `cat ~/.mysql-password` : '';
     chomp $password;
     my $user = 'scheduler';
     my %dbi_params = ();
