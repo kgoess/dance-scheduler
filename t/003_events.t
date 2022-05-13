@@ -28,8 +28,7 @@ my $test = Plack::Test->create($app);
 my $res;
 my $decoded; 
 my $expected;
-my $data;
-my $to_test;
+my $got;
 my $created_time;
 my $modified_time;
 
@@ -51,7 +50,7 @@ subtest 'Invalid GET /event/1' => sub{
 subtest 'POST /event' => sub{
     plan tests=>2;
 
-    $data = {
+    $expected = {
         start_time  => "2022-05-01T20:00:00",
         end_time    => "2022-05-01T22:00:00",
         is_camp     => 1,
@@ -62,15 +61,15 @@ subtest 'POST /event' => sub{
     };
     $ENV{TEST_NOW} = 1651112285;
     $created_time = get_now();
-    $res = $test->request(POST '/event/', $data );
+    $res = $test->request(POST '/event/', $expected );
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
-    $to_test = {};
-    $data->{created_ts} = $data->{modified_ts} = $created_time;
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $got = {};
+    $expected->{created_ts} = $expected->{modified_ts} = $created_time;
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'return matches';
+    is_deeply $got, $expected, 'return matches';
 };
 
 
@@ -80,18 +79,18 @@ subtest 'GET /event/1' => sub{
     $res  = $test->request( GET '/event/1' );
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content); 
-    $to_test = {};
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $got = {};
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'matches';
+    is_deeply $got, $expected, 'matches';
 };
 
 
 subtest 'PUT /event/1' => sub {
     plan tests => 3;
 
-    $data = {
+    $expected = {
         start_time  => "2022-05-01T21:00:00",
         end_time    => "2022-05-01T23:00:00",
         is_camp     => 0,
@@ -101,24 +100,24 @@ subtest 'PUT /event/1' => sub {
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
-    $res = $test->request( PUT '/event/1' , content => $data);
-    $data->{created_ts} = $created_time;
+    $res = $test->request( PUT '/event/1' , content => $expected);
+    $expected->{created_ts} = $created_time;
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content);
-    $to_test = {};
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $got = {};
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'return matches';
+    is_deeply $got, $expected, 'return matches';
 
     $res  = $test->request( GET '/event/1' );
     $decoded = decode_json($res->content); 
-    $data->{created_ts} = $created_time;
-    $data->{modified_ts} = $modified_time;
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $expected->{created_ts} = $created_time;
+    $expected->{modified_ts} = $modified_time;
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'GET changed after PUT';
+    is_deeply $got, $expected, 'GET changed after PUT';
 };
 
 # *******Now adding styles *******
@@ -128,21 +127,21 @@ my $style_id;
 subtest 'POST /event with styles' => sub{
     plan tests=>4;
 
-    $data = {
+    $expected = {
         name        => "test style",
     };
-    $res = $test->request(POST '/style/', $data );
+    $res = $test->request(POST '/style/', $expected );
     ok($res->is_success, 'created style');
     $decoded = decode_json($res->content);
     $style_id = $decoded->{data}{style_id};
-    $to_test = {};
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $got = {};
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'style return matches';
+    is_deeply $got, $expected, 'style return matches';
 
 
-    $data = {
+    $expected = {
         start_time  => "2022-05-01T20:00:00",
         end_time    => "2022-05-01T22:00:00",
         is_camp     => 1,
@@ -154,15 +153,15 @@ subtest 'POST /event with styles' => sub{
     };
     $ENV{TEST_NOW} = 1651112285;
     $created_time = get_now();
-    $res = $test->request(POST '/event/', $data );
+    $res = $test->request(POST '/event/', $expected );
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
-    $to_test = {};
-    $data->{created_ts} = $data->{modified_ts} = $created_time;
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $got = {};
+    $expected->{created_ts} = $expected->{modified_ts} = $created_time;
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'return matches' or dump($decoded);
+    is_deeply $got, $expected, 'return matches' or dump($decoded);
 };
 
 
@@ -172,18 +171,18 @@ subtest 'GET /event/1' => sub{
     $res  = $test->request( GET '/event/1' );
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content); 
-    $to_test = {};
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $got = {};
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'matches';
+    is_deeply $got, $expected, 'matches';
 };
 
 
 subtest 'PUT /event/1' => sub {
     plan tests => 3;
 
-    $data = {
+    $expected = {
         start_time  => "2022-05-01T21:00:00",
         end_time    => "2022-05-01T23:00:00",
         is_camp     => 0,
@@ -193,24 +192,24 @@ subtest 'PUT /event/1' => sub {
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
-    $res = $test->request( PUT '/event/1' , content => $data);
-    $data->{created_ts} = $created_time;
+    $res = $test->request( PUT '/event/1' , content => $expected);
+    $expected->{created_ts} = $created_time;
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content);
-    $to_test = {};
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $got = {};
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'return matches';
+    is_deeply $got, $expected, 'return matches';
 
     $res  = $test->request( GET '/event/1' );
     $decoded = decode_json($res->content); 
-    $data->{created_ts} = $created_time;
-    $data->{modified_ts} = $modified_time;
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}{$key};
+    $expected->{created_ts} = $created_time;
+    $expected->{modified_ts} = $modified_time;
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $to_test, $data, 'GET changed after PUT';
+    is_deeply $got, $expected, 'GET changed after PUT';
 };
 
 subtest 'GET /eventAll' => sub{
@@ -218,11 +217,11 @@ subtest 'GET /eventAll' => sub{
 
     $res  = $test->request( GET '/eventAll' );
     ok( $res->is_success, 'Returned success' );
-    $data->{event_id} = 1;
+    $expected->{event_id} = 1;
     $decoded = decode_json($res->content);
-    $to_test = {};
-    foreach my $key (keys %$data){
-        $to_test->{$key} = $decoded->{data}[0]{$key};
+    $got = {};
+    foreach my $key (keys %$expected){
+        $got->{$key} = $decoded->{data}[0]{$key};
     };
-    is_deeply $to_test, $data, 'matches';
+    is_deeply $got, $expected, 'matches';
 };
