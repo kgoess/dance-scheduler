@@ -7,6 +7,7 @@ use bacds::Scheduler;
 use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use Test::More tests => 5;
+use Test::Differences qw/eq_or_diff/;
 use Plack::Test;
 use HTTP::Request::Common;
 use Ref::Util qw/is_coderef/;
@@ -152,16 +153,16 @@ subtest 'POST /event with styles' => sub{
         style_id   => [$style_id],
     };
     $ENV{TEST_NOW} = 1651112285;
-    $created_time = get_now();
     $res = $test->request(POST '/event/', $expected );
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
-    $got = {};
+    $created_time = get_now()->iso8601;
     $expected->{created_ts} = $expected->{modified_ts} = $created_time;
+    $got = {};
     foreach my $key (keys %$expected){
         $got->{$key} = $decoded->{data}{$key};
     };
-    is_deeply $got, $expected, 'return matches' or dump($decoded);
+    eq_or_diff $got, $expected, 'return matches';
 };
 
 
