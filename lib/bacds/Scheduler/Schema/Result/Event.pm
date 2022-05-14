@@ -280,7 +280,7 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E6VPHsU25lbylJDAiJzKg
 
-__PACKAGE__->many_to_many(styles=> 'event_styles_maps', 'style');
+__PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
 
 
 use bacds::Scheduler::Util::Time qw/get_now/;
