@@ -78,7 +78,8 @@ sub style_row_to_result {
         style_id
         name
         created_ts
-        modified_ts/){
+        modified_ts
+    /){
         $result->{$field} = $style->$field;
     };
 
