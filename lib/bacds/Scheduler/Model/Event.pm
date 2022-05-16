@@ -8,6 +8,7 @@ use Data::Dump qw/dump/;
 use DateTime;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
+use bacds::Scheduler::Util::Time qw/get_now/;
 
 sub get_events {
     #TODO: This should probably only allow a maximum number of results
@@ -46,7 +47,7 @@ sub get_event() {
 };
 
 sub post_event() {
-    my ($self, $data) = @_;
+    my ($self, $incoming_data) = @_;
     my $dbh = get_dbh();
 
     my $event = $dbh->resultset('Event')->new({});
@@ -60,25 +61,44 @@ sub post_event() {
         short_desc
         series_id
         /){
-        $event->$column($data->{$column});
+        $event->$column($incoming_data->{$column});
     };
     
     $event->series_id(undef) if !$event->series_id;
 
     $event->insert(); #TODO: check for failure
-    #TODO: make it so that we are returning the new data from the db, instead of what was sent.
 
+    my $retrieved_event = $dbh->resultset('Event')->find($event->event_id);
+    # TODO: load a fresh one to be returned
+    #     my $millennium_cds_rs = $schema->resultset('CD')->search(
+    #    { event_id => $event->event_id },
+    #    { prefetch => 'style' }
+    #  );
+
+    # for docs on related tables see DBIx::Class::Relationship::Base
     my @relationships = (
         [qw/Style styles style_id/],
     );
+    my $now = get_now();
     my $other_tables = {};
     foreach my $relationship (@relationships){
         my ($other_model, $other_table_name, $primary_key) = @$relationship;
-        next unless $data->{$primary_key};
+
+        my $remove = "remove_from_$other_table_name";
+        $event->$remove($_) for $event->$other_table_name;
+
+        next unless $incoming_data->{$primary_key};
+
+        my $i = 1;
         my @rs = $dbh->resultset($other_model)->search({
-            $primary_key=> {'-in'=>$data->{$primary_key}}});
-        $event->set_styles(\@rs);
-        $other_tables->{$other_table_name} = [map $_->all, @rs];
+            $primary_key => { '-in' => $incoming_data->{$primary_key} }
+        });
+        my $add = "add_to_$other_table_name";
+        $event->$add($_, {
+             ordering => $i++,
+             created_ts => $now,
+         }) for @rs;
+        $other_tables->{$other_table_name} = \@rs;
     }
     
     return event_row_to_result($event, $other_tables);
@@ -148,7 +168,8 @@ sub event_row_to_result {
         foreach my $other_table_name (keys %$other_tables){
             my $other = $other_tables->{$other_table_name}
                 or next;
-            $result->{$other_table_name} = $other->get_fields_for_event_row
+            $result->{$other_table_name} =
+                [ map { $_->get_fields_for_event_row } @$other ];
         }
     }
 
