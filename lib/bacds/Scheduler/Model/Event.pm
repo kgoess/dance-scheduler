@@ -29,7 +29,7 @@ sub get_events {
     return \@events;
 };
 
-sub get_event() {
+sub get_event {
     my ($self, $event_id) = @_;
 
     my $dbh = get_dbh();
@@ -39,8 +39,8 @@ sub get_event() {
 
     my $other_tables = {};
     foreach my $other_table_name (qw/styles/){
-        my $rs = $event->$other_table_name;
-        $other_tables->{$other_table_name} = $rs->all
+        my @others = $event->$other_table_name;
+        $other_tables->{$other_table_name} = \@others;
     }
     
     return event_row_to_result($event, $other_tables);
@@ -124,7 +124,7 @@ sub update_relationships {
     return $other_tables;
 }
     
-sub put_event() {
+sub put_event {
     my ($self, $data) = @_;
     my $dbh = get_dbh();
 
@@ -147,13 +147,18 @@ sub put_event() {
         /){
         $event->$column($data->{$column});
     };
-    
+
     $event->series_id(undef) if !$event->series_id;
 
     $event->update(); #TODO: check for failure
-    
-    return event_row_to_result($event);
 
+    my $other_tables = {};
+    foreach my $other_table_name (qw/styles/){
+        my @others = $event->$other_table_name;
+        $other_tables->{$other_table_name} = \@others;
+    }
+
+    return event_row_to_result($event, $other_tables);
 };
 
 
@@ -187,7 +192,9 @@ sub event_row_to_result {
             my $other = $other_tables->{$other_table_name}
                 or next;
             $result->{$other_table_name} =
-                [ map { $_->get_fields_for_event_row } @$other ];
+                ref $other eq 'ARRAY'
+                    ?  [ map { $_->get_fields_for_event_row } @$other ]
+                    : $other->get_fields_for_event_row;
         }
     }
 
