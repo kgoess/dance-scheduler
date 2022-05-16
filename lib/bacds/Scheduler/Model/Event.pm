@@ -75,7 +75,23 @@ sub post_event() {
     #    { prefetch => 'style' }
     #  );
 
-    # for docs on related tables see DBIx::Class::Relationship::Base
+    my $other_tables = $self->update_relationships($event, $incoming_data, $dbh);
+
+    return event_row_to_result($event, $other_tables);
+}
+
+=head2 update_relationships
+
+Clear out the mapping tables for the event, and set them according to the
+incoming data.
+
+For docs on related tables see DBIx::Class::Relationship::Base
+
+=cut
+
+sub update_relationships {
+    my ($self, $event, $incoming_data, $dbh) = @_;
+
     my @relationships = (
         [qw/Style styles style_id/],
     );
@@ -84,15 +100,19 @@ sub post_event() {
     foreach my $relationship (@relationships){
         my ($other_model, $other_table_name, $primary_key) = @$relationship;
 
+        # start by clearing the existing mappings
         my $remove = "remove_from_$other_table_name";
         $event->$remove($_) for $event->$other_table_name;
 
         next unless $incoming_data->{$primary_key};
 
+        # look up all the objects on the other end of the mappings
         my $i = 1;
         my @rs = $dbh->resultset($other_model)->search({
             $primary_key => { '-in' => $incoming_data->{$primary_key} }
         });
+
+        # add them in one at a time
         my $add = "add_to_$other_table_name";
         $event->$add($_, {
              ordering => $i++,
@@ -100,12 +120,10 @@ sub post_event() {
          }) for @rs;
         $other_tables->{$other_table_name} = \@rs;
     }
-    
-    return event_row_to_result($event, $other_tables);
-    
-};
 
-
+    return $other_tables;
+}
+    
 sub put_event() {
     my ($self, $data) = @_;
     my $dbh = get_dbh();
