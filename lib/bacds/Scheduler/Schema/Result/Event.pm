@@ -282,7 +282,6 @@ __PACKAGE__->belongs_to(
 
 __PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
 
-
 use bacds::Scheduler::Util::Time qw/get_now/;
 
 sub insert {
@@ -296,7 +295,6 @@ sub insert {
         /){
         $self->store_column($column, $time);
     }
-
     $self->next::method(@_);
 }
 
@@ -309,5 +307,4 @@ sub update {
 
     $self->next::method(@_);
 }
-
 1;

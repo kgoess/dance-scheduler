@@ -8,7 +8,6 @@ use Data::Dump qw/dump/;
 use DateTime;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
-use bacds::Scheduler::Util::Time qw/get_now/;
 
 sub get_events {
     #TODO: This should probably only allow a maximum number of results
@@ -86,7 +85,6 @@ Clear out the mapping tables for the event, and set them according to the
 incoming data.
 
 For docs on related tables see DBIx::Class::Relationship::Base
-
 =cut
 
 sub update_relationships {
@@ -95,7 +93,6 @@ sub update_relationships {
     my @relationships = (
         [qw/Style styles style_id/],
     );
-    my $now = get_now();
     my $other_tables = {};
     foreach my $relationship (@relationships){
         my ($other_model, $other_table_name, $primary_key) = @$relationship;
@@ -116,7 +113,6 @@ sub update_relationships {
         my $add = "add_to_$other_table_name";
         $event->$add($_, {
              ordering => $i++,
-             created_ts => $now,
          }) for @rs;
         $other_tables->{$other_table_name} = \@rs;
     }
