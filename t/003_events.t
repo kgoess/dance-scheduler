@@ -79,6 +79,7 @@ subtest 'POST /event' => sub {
 		name        => $new_event->{name},
 		is_template => undef,
 		series_id   => undef,
+		styles      => [],
 		created_ts  => "2022-04-28T02:18:05",
 		modified_ts => "2022-04-28T02:18:05",
 	};
@@ -265,9 +266,18 @@ subtest "GET /event/$Styled_Event_Id" => sub {
 
 
 subtest "PUT /event/$Styled_Event_Id" => sub {
-    plan tests => 3;
+    plan tests => 4;
 
     my ($expected, $created_time, $modified_time, $res, $decoded, $got);
+
+    my $other_style = {
+        name        => "some other style",
+    };
+    $res = $test->request(POST '/style/', $other_style );
+    ok($res->is_success, 'created style');
+
+    $decoded = decode_json($res->content);
+    my $other_style_id = $decoded->{data}{style_id};
 
     my $edit_event = {
         start_time  => "2022-05-01T21:00:00",
@@ -276,6 +286,7 @@ subtest "PUT /event/$Styled_Event_Id" => sub {
         long_desc   => "this is a new long desc",
         name        => "new name",
         short_desc  => "new shortdef",
+        style_id   => [$Style_Id, $other_style_id],
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
@@ -297,8 +308,12 @@ subtest "PUT /event/$Styled_Event_Id" => sub {
         start_time  => "2022-05-01T21:00:00",
 	    styles => [
 			{
-				id => 1,
+				id => $Style_Id,
 				name => 'test style',
+			},
+			{
+				id => $other_style_id,
+				name => 'some other style',
 			}
 		]
     };

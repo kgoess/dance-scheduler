@@ -101,31 +101,34 @@ sub update_relationships {
         my $remove = "remove_from_$other_table_name";
         $event->$remove($_) for $event->$other_table_name;
 
-        next unless $incoming_data->{$primary_key};
+        if ($incoming_data->{$primary_key}){
+            # look up all the objects on the other end of the mappings
+            my $i = 1;
+            my @rs = $dbh->resultset($other_model)->search({
+                $primary_key => { '-in' => $incoming_data->{$primary_key} }
+            });
 
-        # look up all the objects on the other end of the mappings
-        my $i = 1;
-        my @rs = $dbh->resultset($other_model)->search({
-            $primary_key => { '-in' => $incoming_data->{$primary_key} }
-        });
-
-        # add them in one at a time
-        my $add = "add_to_$other_table_name";
-        $event->$add($_, {
-             ordering => $i++,
-         }) for @rs;
-        $other_tables->{$other_table_name} = \@rs;
+            # add them in one at a time
+            my $add = "add_to_$other_table_name";
+            $event->$add($_, {
+                 ordering => $i++,
+             }) for @rs;
+            $other_tables->{$other_table_name} = \@rs;
+        }
+        else{
+            $other_tables->{$other_table_name} = [];
+        }
     }
 
     return $other_tables;
 }
     
 sub put_event {
-    my ($self, $data) = @_;
+    my ($self, $incoming_data) = @_;
     my $dbh = get_dbh();
 
     my $resultset = $dbh->resultset('Event')->search(
-        { event_id=> { '=' => $data->{event_id} } } # SQL::Abstract::Classic
+        { event_id=> { '=' => $incoming_data->{event_id} } } # SQL::Abstract::Classic
     );
 
     $resultset or return 0; #TODO: More robust error handling
@@ -141,18 +144,14 @@ sub put_event {
         short_desc
         series_id
         /){
-        $event->$column($data->{$column});
+        $event->$column($incoming_data->{$column});
     };
 
     $event->series_id(undef) if !$event->series_id;
 
     $event->update(); #TODO: check for failure
 
-    my $other_tables = {};
-    foreach my $other_table_name (qw/styles/){
-        my @others = $event->$other_table_name;
-        $other_tables->{$other_table_name} = \@others;
-    }
+    my $other_tables = $self->update_relationships($event, $incoming_data, $dbh);
 
     return event_row_to_result($event, $other_tables);
 };

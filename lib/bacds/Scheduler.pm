@@ -98,6 +98,7 @@ put '/event/:event_id' => sub {
         long_desc
         short_desc
         series_id
+        style_id
         /){
         $data->{$field} = params->{$field};
     };
