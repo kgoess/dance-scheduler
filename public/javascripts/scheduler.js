@@ -58,6 +58,8 @@
         
         const [parentContainer, modelName] = getParentAndModelName(this);
 
+        displayItem(modelName, false);
+
         parentContainer.each(
             function(index) {
                 $(this).find('.row-contents').hide();
@@ -66,9 +68,6 @@
                 $(this).find('.row-edit').val('');
             }
         );
-        
-        parentContainer.find(`[name="${modelName}_id"]` ).val('');
-        parentContainer.find('.model-display').show();
     });
 
     $( '.accordion .label' ).click(function() {
@@ -76,6 +75,8 @@
         parentContainer.toggleClass('active')
         loadListForModel(modelName);
     });
+
+    $( '.add-multi-select-button' ).click(multiSelectOptionAdd);
 }); 
 
 
@@ -86,19 +87,74 @@
 
 function displayItem(modelName, msg) {
 
-    if (msg['data']) {
+    if (msg['data'] || msg === false) {
         const parentContainer = getContainerForModelName(modelName);
-        const targetObj = msg['data'];
-        parentContainer.find(`.display-row`).each(
-            function(index) {
-                $(this).children('.row-contents').show();
-                $(this).children('.row-contents').text(targetObj[this.getAttribute('name')]);
-                $(this).children('.row-edit').hide();
-                $(this).children('.row-edit').val(targetObj[this.getAttribute('name')]);
-            }
+        const targetObj = msg ? msg['data'] : false;
+        parentContainer.find('.display-row').each(
+            (index, currentRow) => displayItemRow($(currentRow), targetObj)
         );
-        $( `[name="${modelName}_id"]` ).val(targetObj[`${modelName}_id`]);
+        $( `[name="${modelName}_id"]` ).val(targetObj ? targetObj[`${modelName}_id`] : '');
         parentContainer.find('.model-display').show();
+    } else {
+        alert('error: ' + msg['error']);
+    }
+}
+
+function displayItemRow(currentRow, targetObj) {
+
+    currentRow.children('.row-contents').show();
+    currentRow.children('.row-edit').hide();
+
+
+    switch(currentRow.attr('column-type')) {
+        case 'text-item':
+            const theText = targetObj
+                ? targetObj[currentRow.attr('name')]
+                : '';
+            currentRow.children('.row-contents').text(theText);
+            currentRow.children('.row-edit').val(theText);
+            break;
+        case 'list-item':
+            const modelName = currentRow.attr('model-name');
+            const tableName = currentRow.attr('table-name');
+            const selections = targetObj
+                ? targetObj[tableName]
+                : '';
+            $.ajax({
+                url: `${modelName}All`,
+                dataType: 'json'
+            })
+            .done((msg) => fillInItemRowList(currentRow, msg, selections));
+
+            break;
+        default:
+            console.log(currentRow.attr('column-type'));
+    }
+}
+
+function fillInItemRowList(currentRow, msg, selections) {
+    if (msg['data']) {
+        const rows = msg['data'];
+        const name = currentRow.attr('name');
+        const insertTarget = currentRow.find('select');
+        insertTarget.find('option').remove();
+        currentRow.find('[cloned-selectlist=1]').remove();
+        rows.forEach((row, i) => {
+            let element = document.createElement('option');
+            element.innerHTML = escapeHtml(row['name']);
+            element.setAttribute('value', escapeHtml(row[name]));
+            insertTarget.append(element);
+        });
+        if (selections.length) {
+            insertTarget.val(selections[0]['id']);
+            for (var i = 1; i < selections.length; i++) {
+                //const clone = insertTarget.clone();
+                const clone = multiSelectOptionAdd.call(insertTarget);
+                clone.val(selections[i]['id']);
+            }
+        } else {
+            insertTarget.val('');
+        }
     } else {
         alert('error: ' + msg['error']);
     }
@@ -151,4 +207,18 @@ function getParentAndModelName(element) {
 }
 function getContainerForModelName(modelName) {
     return $( `.container[modelName="${modelName}"]` );
+}
+
+function multiSelectOptionAdd() {
+    const displayRow = $(this).closest('.display-row')
+    const newSelectBoxDiv = displayRow.find('.multi-select-wrapper:first').clone();
+    displayRow.append(newSelectBoxDiv);
+    const newSelectBox = newSelectBoxDiv.find('select').first();
+    newSelectBox.val('');
+    newSelectBoxDiv.append('<span class="remove-multi-select-button">x</span>');
+    newSelectBoxDiv.find('.remove-multi-select-button' ).click(function() {
+        $(this).closest('.multi-select-wrapper').remove();
+    });
+    newSelectBoxDiv.attr('cloned-selectlist', 1);
+    return newSelectBox;
 }
