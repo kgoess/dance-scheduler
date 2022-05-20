@@ -139,7 +139,6 @@ __PACKAGE__->has_many(
 
 
 __PACKAGE__->many_to_many(events=> 'event_styles_maps', 'event');
-use bacds::Scheduler::Util::Time qw/get_now/;
 
 sub get_fields_for_event_row {
     my ($self) = @_;
@@ -149,29 +148,7 @@ sub get_fields_for_event_row {
     };
 };
 
-sub insert {
-#Set created_ts, modified_ts to now
-    my $self = shift;
-
-    my $time = get_now();
-    foreach my $column (qw/
-        created_ts
-        modified_ts
-        /){
-        $self->store_column($column, $time);
-    }
-
-    $self->next::method(@_);
-}
-
-sub update {
-#Set modified_ts to now
-    my $self = shift;
-
-    my $time = get_now();
-    $self->modified_ts($time);
-
-    $self->next::method(@_);
-}
+use Role::Tiny::With;
+with 'bacds::Scheduler::Model::Time';
 
 1;

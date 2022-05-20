@@ -282,29 +282,7 @@ __PACKAGE__->belongs_to(
 
 __PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
 
-use bacds::Scheduler::Util::Time qw/get_now/;
+use Role::Tiny::With;
+with 'bacds::Scheduler::Model::Time';
 
-sub insert {
-#Set created_ts, modified_ts to now
-    my $self = shift;
-
-    my $time = get_now();
-    foreach my $column (qw/
-        created_ts
-        modified_ts
-        /){
-        $self->store_column($column, $time);
-    }
-    $self->next::method(@_);
-}
-
-sub update {
-#Set modified_ts to now
-    my $self = shift;
-
-    my $time = get_now();
-    $self->modified_ts($time);
-
-    $self->next::method(@_);
-}
 1;

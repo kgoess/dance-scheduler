@@ -155,30 +155,7 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:40:40
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ezqK911AW4OGiz9TjnZoig
 
-use bacds::Scheduler::Util::Time qw/get_now/;
-
-sub insert {
-#Set created_ts, modified_ts to now
-    my $self = shift;
-
-    my $time = get_now();
-    foreach my $column (qw/
-        created_ts
-        modified_ts
-        /){
-        $self->store_column($column, $time);
-    }
-    $self->next::method(@_);
-}
-
-sub update {
-#Set modified_ts to now
-    my $self = shift;
-
-    my $time = get_now();
-    $self->modified_ts($time);
-
-    $self->next::method(@_);
-}
+use Role::Tiny::With;
+with 'bacds::Scheduler::Model::Time';
 
 1;

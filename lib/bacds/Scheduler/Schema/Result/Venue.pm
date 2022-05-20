@@ -177,30 +177,7 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LRCdL+ARtoyFYCcKEkgVXA
 
 
-use bacds::Scheduler::Util::Time qw/get_now/;
 
-#Set created_ts, modified_ts to now
-sub insert {
-    my $self = shift;
-
-    my $time = get_now();
-    foreach my $column (qw/
-        created_ts
-        modified_ts
-        /){
-        $self->store_column($column, $time);
-    }
-
-    $self->next::method(@_);
-}
-
-#Set modified_ts to now
-sub update {
-    my $self = shift;
-
-    my $time = get_now();
-    $self->modified_ts($time);
-
-    $self->next::method(@_);
-}
+use Role::Tiny::With;
+with 'bacds::Scheduler::Model::Time';
 1;

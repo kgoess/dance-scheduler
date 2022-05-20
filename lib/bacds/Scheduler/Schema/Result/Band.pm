@@ -152,5 +152,6 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:mcDiUY5jCssNhjxR+oVOow
 
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+use Role::Tiny::With;
+with 'bacds::Scheduler::Model::Time';
 1;
