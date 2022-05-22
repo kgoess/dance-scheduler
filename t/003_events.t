@@ -91,7 +91,7 @@ subtest 'POST /event' => sub {
 };
 
 
-subtest "GET /event/$Event_Id" => sub{
+subtest "GET /event/#" => sub{
     plan tests=>2;
 
     my ($res, $decoded, $got, $expected);
@@ -120,7 +120,7 @@ subtest "GET /event/$Event_Id" => sub{
 };
 
 
-subtest "PUT /event/$Event_Id" => sub {
+subtest "PUT /event/#" => sub {
     plan tests => 3;
 
     my ($expected, $modified_time, $created_time, $res, $decoded, $got);
@@ -170,7 +170,7 @@ subtest "PUT /event/$Event_Id" => sub {
 
 # *******Now adding styles *******
 
-subtest 'POST /event with styles' => sub{
+subtest 'POST /event/# with styles' => sub{
     plan tests=>4;
 
     my ($expected, $res, $decoded, $got, $created_time);
@@ -232,7 +232,7 @@ subtest 'POST /event with styles' => sub{
 };
 
 
-subtest "GET /event/$Styled_Event_Id" => sub {
+subtest "GET /event/# with styles" => sub {
     plan tests=>2;
 
     my ($expected, $res, $decoded, $got);
@@ -265,7 +265,7 @@ subtest "GET /event/$Styled_Event_Id" => sub {
 };
 
 
-subtest "PUT /event/$Styled_Event_Id" => sub {
+subtest "PUT /event/# with styles" => sub {
     plan tests => 4;
 
     my ($expected, $created_time, $modified_time, $res, $decoded, $got);
