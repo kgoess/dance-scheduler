@@ -283,6 +283,5 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
 
 use Role::Tiny::With;
-with 'bacds::Scheduler::Model::Time';
-
+with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 1;

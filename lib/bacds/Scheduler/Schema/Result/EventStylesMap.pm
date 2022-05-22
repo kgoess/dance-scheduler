@@ -156,6 +156,5 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ezqK911AW4OGiz9TjnZoig
 
 use Role::Tiny::With;
-with 'bacds::Scheduler::Model::Time';
-
+with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 1;

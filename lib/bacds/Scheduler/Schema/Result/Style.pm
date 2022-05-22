@@ -149,6 +149,5 @@ sub get_fields_for_event_row {
 };
 
 use Role::Tiny::With;
-with 'bacds::Scheduler::Model::Time';
-
+with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 1;

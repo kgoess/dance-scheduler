@@ -157,5 +157,5 @@ __PACKAGE__->belongs_to(
 
 
 use Role::Tiny::With;
-with 'bacds::Scheduler::Model::Time';
+with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 1;

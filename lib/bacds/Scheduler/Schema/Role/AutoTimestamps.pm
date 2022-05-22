@@ -1,4 +1,4 @@
-package bacds::Scheduler::Schema::Role::Time;
+package bacds::Scheduler::Schema::Role::AutoTimestamps;
 use 5.16.0;
 use warnings;
 use Role::Tiny;

@@ -131,5 +131,5 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:/pgvLY95Dihqz5leTt1WCg
 
 use Role::Tiny::With;
-with 'bacds::Scheduler::Model::Time';
+with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 1;
