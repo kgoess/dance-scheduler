@@ -10,7 +10,6 @@ use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
 use Test::More tests => 8;
-use URL::Encode qw/url_encode/;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
