@@ -17,13 +17,8 @@ use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-unlink "testdb";
-
-$ENV{TEST_DSN} = 'dbi:SQLite:dbname=testdb';
-# load an on-disk test database and deploy the required tables
-bacds::Scheduler::Schema->connection($ENV{TEST_DSN},'','');
-bacds::Scheduler::Schema->load_namespaces;
-bacds::Scheduler::Schema->deploy;
+use bacds::Scheduler::Util::TestDb qw/setup_test_db/;
+setup_test_db;
 
 my $app = bacds::Scheduler->to_app;
 my $test = Plack::Test->create($app);

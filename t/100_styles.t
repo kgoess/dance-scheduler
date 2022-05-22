@@ -14,13 +14,8 @@ use URL::Encode qw/url_encode/;
 use DateTime;
 use DateTime::Format::Strptime qw/strptime/;
 
-unlink "testdb";
-
-$ENV{TEST_DSN} = 'dbi:SQLite:dbname=testdb';
-# load an on-disk test database and deploy the required tables
-bacds::Scheduler::Schema->connection($ENV{TEST_DSN},'','');
-bacds::Scheduler::Schema->load_namespaces;
-bacds::Scheduler::Schema->deploy;
+use bacds::Scheduler::Util::TestDb qw/setup_test_db/;
+setup_test_db;
 
 my $app = bacds::Scheduler->to_app;
 
