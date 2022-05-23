@@ -57,8 +57,9 @@ schemas/talent.sql
 schemas/venues.sql
 t/001_base.t
 t/002_index_route.t
-t/003_events.t
-t/004_styles.t
+t/200_events.t
+t/100_styles.t
+t/101_venue.t
 views/events.tt
 views/index.tt
 views/layouts/main.tt
