@@ -11,7 +11,6 @@ our $VERSION = '0.1';
 get '/' => sub {
     template 'index' => {
         title => 'Dance Schedule',
-        stuff =>'does this work',
         accordions => [
             { label => 'Events',
               modelName => 'event',
