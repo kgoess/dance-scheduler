@@ -71,6 +71,33 @@ sub create_events {
         $new->series_id( $series_obj->series_id );
 
         $new->insert;
+
+        my @old_styles;
+        my $old_style = $old->type;
+        if ($old_style =~ /ONLINE/) {
+            push @old_styles, 'ONLINE' # fudging e.g. ONLINE Concert &amp; Dance
+        } elsif ($old_style eq 'ENGLISH/CAMP') {
+            push @old_styles, 'ENGLISH', 'CAMP';
+        } elsif ($old_style eq 'FAMILY/CAMP') {
+            push @old_styles, 'FAMILY', 'CAMP';
+        } elsif ($old_style eq 'CONTRA/CAMP') {
+            push @old_styles, 'CONTRA', 'CAMP';
+        } elsif ($old_style eq 'ENGLISH/REGENCY') {
+            push @old_styles, 'ENGLISH', 'REGENCY';
+        } else {
+            push @old_styles, $old_style;
+        }
+
+        my $i = 1;
+        foreach my $style (@old_styles) {
+            my @rs = $dbh->resultset('Style')->search({
+                name => $style,
+            });
+            @rs or die "can't find $style in styles table";
+            $new->add_to_styles($rs[0], {
+                ordering => $i++,
+            });
+        }
     }
 }
 

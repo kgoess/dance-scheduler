@@ -26,6 +26,9 @@ my @styles =(
     {
         name=>'CONTRA',
     },
+    {
+        name=>'CAMP',
+    },
 );
 
 foreach my $style (@styles) {
