@@ -3,3 +3,4 @@
 ../bin/migrate-series.pl
 ../bin/migrate-styles.pl
 ../bin/migrate-events.pl
+../bin/migrate-venues.pl
