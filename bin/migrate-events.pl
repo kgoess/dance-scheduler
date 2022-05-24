@@ -36,7 +36,9 @@ sub create_events {
         'SSU-ENGLISH/CAMP' => 'Hey Days English Week',
         'MON-FAMILY/CAMP' => 'Family Week',
         'JPC-CONTRA/CAMP' => 'Balance the Bay',
+        'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
         'SME-ENGLISH/REGENCY' => 'English Regency',
+        'ACC-ENGLISH' => 'Arlington Community Church English',
     );
 
     my @old_events = bacds::Model::Event->load_all;
@@ -48,8 +50,16 @@ sub create_events {
 
         say "doing $name";
 
-        # there's not really a name in the old schema
-        $new->name($name);
+        if ($old->type eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
+            $new->name('Balance the Bay');
+        } elsif ($old->type eq 'ENGLISH/CAMP') {
+            $new->name('Hey Days English Week');
+        } elsif ($old->type eq 'FAMILY/CAMP') {
+            $new->name('Family Camp');
+        } else {
+            # series don't really have a name in the old schema
+            $new->name($name);
+        }
         $new->start_time( $old->startday );
         $new->end_time( $old->endday )
             if $old->endday;
@@ -65,10 +75,13 @@ sub create_events {
                 name => { -like => "$loc_str%" },
         }) or die "Series->search $loc_str% failed";
 
-        my $series_obj = $rs->next
-            or die "no next for $loc_str";
+        if (my $series_obj = $rs->next) {
+            $new->series_id( $series_obj->series_id );
+        } else {
+            # ACC has no series ?
+            warn "no next for $loc_str";
+        }
 
-        $new->series_id( $series_obj->series_id );
 
         $new->insert;
 
@@ -84,6 +97,8 @@ sub create_events {
             push @old_styles, 'CONTRA', 'CAMP';
         } elsif ($old_style eq 'ENGLISH/REGENCY') {
             push @old_styles, 'ENGLISH', 'REGENCY';
+        } elsif ($old_style eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
+            push @old_styles, 'CONTRA', 'CAMP';
         } else {
             push @old_styles, $old_style;
         }
