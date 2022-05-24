@@ -40,6 +40,13 @@ get '/eventAll' => sub {
     return $results->format;
 };
 
+get '/eventsUpcoming' => sub {
+    my $results = Results->new;
+
+    $results->data($event_model->get_upcoming_events);
+
+    return $results->format;
+};
 
 get '/event/:event_id' => sub {
     my $event_id = params->{event_id};

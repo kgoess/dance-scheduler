@@ -105,7 +105,6 @@ function displayItemRow(currentRow, targetObj) {
     currentRow.children('.row-contents').show();
     currentRow.children('.row-edit').hide();
 
-
     switch(currentRow.attr('column-type')) {
         case 'text-item':
             const theText = targetObj
@@ -181,17 +180,23 @@ function displayListForModel(modelName, msg) {
 
 function loadListForModel(modelName) {
 
+    const urlForModel = {
+        'event': 'eventsUpcoming',
+    };
+    const url = urlForModel[modelName] || `${modelName}All`;
+
     getContainerForModelName(modelName).find('.clickable-list' ).empty();
     $( `#${modelName}-display` ).first().hide();
 
     $.ajax({
-        url: `${modelName}All`,
+        url: url,
         dataType: 'json'
     })
     .done( (msg) => { displayListForModel(modelName, msg) });
 }
 
 function escapeHtml(unsafe) {
+    unsafe = new String(unsafe); // is that right? else "unsafe.replace is not a function"
     return unsafe
          .replace(/&/g, '&amp;')
          .replace(/</g, '&lt;')

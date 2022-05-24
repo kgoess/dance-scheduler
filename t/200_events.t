@@ -9,7 +9,7 @@ use JSON qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -184,8 +184,8 @@ subtest 'POST /event/# with styles' => sub{
     is_deeply $got, $expected, 'style return matches';
 
     my $new_event = {
-        start_time  => "2022-05-01T20:00:00",
-        end_time    => "2022-05-01T22:00:00",
+        start_time  => "2022-05-03T20:00:00",
+        end_time    => "2022-05-03T22:00:00",
         is_camp     => 1,
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
@@ -237,7 +237,7 @@ subtest "GET /event/# with styles" => sub {
     $got = $decoded->{data};
     $expected = {
         created_ts  => '2022-04-28T02:18:05',
-        end_time    => '2022-05-01T22:00:00',
+        end_time    => '2022-05-03T22:00:00',
         event_id    => $Styled_Event_Id,
         is_camp     => 1,
         is_template => undef,
@@ -246,7 +246,7 @@ subtest "GET /event/# with styles" => sub {
         name        => 'saturday night test event',
         series_id   => undef,
         short_desc  => 'itsa shortdesc',
-        start_time  => '2022-05-01T20:00:00',
+        start_time  => '2022-05-03T20:00:00',
 	    styles => [
 			{
 				id => 1,
@@ -274,8 +274,8 @@ subtest "PUT /event/# with styles" => sub {
     my $other_style_id = $decoded->{data}{style_id};
 
     my $edit_event = {
-        start_time  => "2022-05-01T21:00:00",
-        end_time    => "2022-05-01T23:00:00",
+        start_time  => "2022-05-03T21:00:00",
+        end_time    => "2022-05-03T23:00:00",
         is_camp     => 0,
         long_desc   => "this is a new long desc",
         name        => "new name",
@@ -290,7 +290,7 @@ subtest "PUT /event/# with styles" => sub {
     $got = $decoded->{data};
     $expected = {
         created_ts  => "2022-04-28T02:18:05",
-        end_time    => "2022-05-01T23:00:00",
+        end_time    => "2022-05-03T23:00:00",
         event_id    => $Styled_Event_Id,
         is_camp     => 0,
         is_template => undef,
@@ -299,7 +299,7 @@ subtest "PUT /event/# with styles" => sub {
         name        => "new name",
         series_id   => undef,
         short_desc  => "new shortdef",
-        start_time  => "2022-05-01T21:00:00",
+        start_time  => "2022-05-03T21:00:00",
 	    styles => [
 			{
 				id => $Style_Id,
@@ -320,19 +320,18 @@ subtest "PUT /event/# with styles" => sub {
     eq_or_diff $got, $expected, 'GET changed after PUT';
 };
 
-subtest 'GET /eventAll' => sub{
+subtest 'GET /eventAll' => sub {
     plan tests => 2;
 
     my ($res, $expected, $decoded, $got);
 
     $res  = $test->request( GET '/eventAll' );
     ok( $res->is_success, 'Returned success' );
-    $expected->{event_id} = 1;
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = [
       {
-        created_ts  => "2022-04-28T02:18:05",
+        start_time  => "2022-05-01T21:00:00",
         end_time    => "2022-05-01T23:00:00",
         event_id    => $Event_Id,
         is_camp     => 0,
@@ -342,11 +341,11 @@ subtest 'GET /eventAll' => sub{
         name        => "new name",
         series_id   => undef,
         short_desc  => "new shortdef",
-        start_time  => "2022-05-01T21:00:00",
+        created_ts  => "2022-04-28T02:18:05",
       },
       {
-        created_ts  => "2022-04-28T02:18:05",
-        end_time    => "2022-05-01T23:00:00",
+        start_time  => '2022-05-03T21:00:00',
+        end_time    => "2022-05-03T23:00:00",
         event_id    => $Styled_Event_Id,
         is_camp     => 0,
         is_template => undef,
@@ -355,9 +354,59 @@ subtest 'GET /eventAll' => sub{
         name        => "new name",
         series_id   => undef,
         short_desc  => "new shortdef",
-        start_time  => '2022-05-01T21:00:00',
+        created_ts  => "2022-04-28T02:18:05",
       },
     ];
 
     eq_or_diff $got, $expected, 'matches';
+};
+
+
+subtest 'GET /eventsUpcoming' => sub {
+    plan tests => 5;
+
+    # could these tests all have independent data?
+
+    my ($res, $expected, $decoded, $got);
+
+    # on May 1 they're both in the future
+    my $now = DateTime->new(
+        year       => 2022,
+        month      => 5,
+        day        => 1,
+    );
+    $ENV{TEST_NOW} = $now->epoch;
+
+    $res  = $test->request( GET '/eventsUpcoming' );
+    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    is @$got, 2, "both events are in the future from $now";
+
+    $now = $now->add(days => 1);
+    $ENV{TEST_NOW} = $now->epoch;
+    $res  = $test->request( GET '/eventsUpcoming' );
+    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    is @$got, 2, "both events are still 'upcoming' from $now";
+
+    $now = $now->add(days => 1);
+    $ENV{TEST_NOW} = $now->epoch;
+    $res  = $test->request( GET '/eventsUpcoming' );
+    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    is @$got, 1, "only one event is future from $now";
+    is $got->[0]{event_id}, $Styled_Event_Id, "and it's the 'styled event'";
+
+
+    $now = $now->add(days => 2);
+    $ENV{TEST_NOW} = $now->epoch;
+    $res  = $test->request( GET '/eventsUpcoming' );
+    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    is @$got, 0, "no events are future from $now";
+
 };

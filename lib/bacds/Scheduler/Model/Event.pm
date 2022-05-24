@@ -26,7 +26,41 @@ sub get_events {
     }
 
     return \@events;
-};
+}
+
+=head2 get_upcoming_events
+
+Return all events from yesterday into the future. Useful for the UI.
+
+Still not sure if this needs to be a separate function or just parameters to
+get_events.
+
+=cut
+
+sub get_upcoming_events {
+    my $dbh = get_dbh();
+
+    my $yesterday = DateTime
+        ->from_epoch(epoch => ($ENV{TEST_NOW} || time))
+        ->subtract(days => 1);
+
+    # see DBIx::Class::Manual::FAQ "format a DateTime object for searching"
+    my $dtf = $dbh->storage->datetime_parser;
+
+    my $resultset = $dbh->resultset('Event')->search({
+        start_time => { '>=' => $dtf->format_datetime($yesterday) }
+    });
+
+    $resultset or die "empty set"; #TODO: More gracefully
+
+    my @events;
+
+    while (my $event = $resultset->next) {
+        push @events, event_row_to_result($event);
+    }
+
+    return \@events;
+}
 
 sub get_event {
     my ($self, $event_id) = @_;
@@ -41,7 +75,7 @@ sub get_event {
         my @others = $event->$other_table_name;
         $other_tables->{$other_table_name} = \@others;
     }
-    
+
     return event_row_to_result($event, $other_tables);
 };
 
@@ -62,7 +96,7 @@ sub post_event() {
         /){
         $event->$column($incoming_data->{$column});
     };
-    
+
     $event->series_id(undef) if !$event->series_id;
 
     $event->insert(); #TODO: check for failure
@@ -122,7 +156,7 @@ sub update_relationships {
 
     return $other_tables;
 }
-    
+
 sub put_event {
     my ($self, $incoming_data) = @_;
     my $dbh = get_dbh();
