@@ -31,7 +31,6 @@ get '/' => sub {
 my $event_model = 'bacds::Scheduler::Model::Event';
 use bacds::Scheduler::Model::Event;
 
-
 get '/eventAll' => sub {
     my $results = Results->new;
     
@@ -195,7 +194,111 @@ put '/style/:style_id' => sub {
 };
 
 
+=head2 Venues
 
+=cut
+
+my $venue_model = 'bacds::Scheduler::Model::Venue';
+use bacds::Scheduler::Model::Venue;
+
+
+=head3 get '/venue/:venue_id'
+
+=cut
+
+get '/venue/:venue_id' => sub {
+    my $venue_id = params->{venue_id};
+    my $results = Results->new;
+
+    my $venue = $venue_model->get_venue($venue_id);
+    if($venue){
+        $results->data($venue)
+    }
+    else{
+        $results->add_error(1700, "Nothing Found for venue_id $venue_id");
+    }
+
+    return $results->format;
+};
+
+=head3 post /venue/
+
+Create a new venue
+
+=cut
+
+post '/venue/' => sub {
+    my $data = {};
+    foreach my $field (qw/
+        vkey
+        hall_name
+        address
+        city
+        zip
+        comment
+        is_deleted
+        /){
+        $data->{$field} = params->{$field};
+    };
+
+    my $venue = $venue_model->post_venue($data);
+    my $results = Results->new;
+
+    if ($venue) {
+        $results->data($venue)
+    } else {
+        $results->add_error(1800, "Insert failed for new venue");
+    }
+
+    return $results->format;
+};
+
+=head3 put /venue/:venue_id
+
+Update an existing venue.
+
+=cut
+
+put '/venue/:venue_id' => sub {
+    my $data = {};
+    foreach my $field (qw/
+        venue_id
+        vkey
+        hall_name
+        address
+        city
+        zip
+        comment
+        is_deleted
+        /){
+        $data->{$field} = params->{$field};
+    };
+    
+    my $venue = $venue_model->put_venue($data);
+    my $results = Results->new;
+
+    if($venue){
+        $results->data($venue)
+    }
+    else{
+        $results->add_error(1900, "Update failed for new $data->{venue_id}");
+    }
+    
+    return $results->format;
+};
+
+=head3 get /venueAll
+
+Return all the non-deleted venues
+
+=cut
+get '/venueAll' => sub {
+    my $results = Results->new;
+    
+    $results->data($venue_model->get_venues);
+    
+    return $results->format;
+};
 
 package Results {
     use Dancer2;
@@ -229,5 +332,6 @@ package Results {
         });
     }
 }
+
 
 true;

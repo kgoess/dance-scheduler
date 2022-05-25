@@ -36,7 +36,7 @@ subtest 'Invalid GET /venue/1' => sub{
     $expected = {
         errors => [{
             msg => 'Nothing Found for venue_id 1',
-            num => 1500,
+            num => 1700,
         }]
     };
     is_deeply $decoded, $expected, 'error msg matches';
@@ -53,29 +53,33 @@ subtest 'POST /venue' => sub{
         city       => 'test city',
         zip        => '12345-1234',
         comment    => 'test comment',
+        is_deleted => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/venue/', $new_venue);
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-	$expected = {
-		venue_id    => 1,
-        hall_name	=> $new_venue->{hall_name},
-        address	    => $new_venue->{address},
-        city	    => $new_venue->{city},
-        zip	        => $new_venue->{zip},
-        comment	    => $new_venue->{comment},
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:18:05",
-        is_deleted  => 0,
-	};
+    $expected = {
+        venue_id    => 1,
+        vkey        => $new_venue->{vkey},
+        hall_name   => $new_venue->{hall_name},
+        address     => $new_venue->{address},
+        city        => $new_venue->{city},
+        zip         => $new_venue->{zip},
+        comment     => $new_venue->{comment},
+        is_deleted  => $new_venue->{is_deleted},
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:18:05",
+        is_deleted  => 0, # FIXME is that right? test 1
+    };
     eq_or_diff $got, $expected, 'return matches';
 
-	# now save it for the subsequent tests
-	$Venue = $dbh->resultset('Venue')->find($decoded->{data}{venue_id});
-	$Venue_Id = $Venue->venue_id;
+    # now save it for the subsequent tests
+    $Venue = $dbh->resultset('Venue')->find($decoded->{data}{venue_id});
+    $Venue_Id = $Venue->venue_id;
 };
+
 
 subtest 'GET /venue/#' => sub{
     plan tests=>2;
@@ -85,24 +89,25 @@ subtest 'GET /venue/#' => sub{
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content); 
     $got = $decoded->{data};
-	$expected = {
-		venue_id    => 1,
-        hall_name	=> $Venue->hall_name,
-        address	    => $Venue->address,
-        city	    => $Venue->city,
-        zip	        => $Venue->zip,
-        comment	    => $Venue->comment,
-        is_deleted	=> $Venue->is_deleted,
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:18:05",
-	};
+    $expected = {
+        venue_id    => 1,
+        vkey        => $Venue->vkey,
+        hall_name   => $Venue->hall_name,
+        address     => $Venue->address,
+        city        => $Venue->city,
+        zip         => $Venue->zip,
+        comment     => $Venue->comment,
+        is_deleted   => $Venue->is_deleted,
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:18:05",
+    };
 
     eq_or_diff $got, $expected, 'matches';
 };
 
 
 subtest 'PUT /venue/1' => sub {
-    plan tests => 3;
+    plan tests => 4;
     my ($expected, $res, $decoded, $got);
 
     $ENV{TEST_NOW} += 100;
@@ -114,22 +119,24 @@ subtest 'PUT /venue/1' => sub {
         city       => 'test altered city',
         zip        => '54321-1234',
         comment    => 'test different comment',
+        is_deleted => 1,
     };
     $res = $test->request( PUT '/venue/1' , content => $edit_venue);
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content);
 
-	$expected = {
-		venue_id    => 1,
-        hall_name	=> $edit_venue->{hall_name},
-        address	    => $edit_venue->{address},
-        city	    => $edit_venue->{city},
-        zip	        => $edit_venue->{zip},
-        comment	    => $edit_venue->{comment},
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:19:45",
-        is_deleted => 0,
-	};
+    $expected = {
+        venue_id    => 1,
+        vkey        => $edit_venue->{vkey},
+        hall_name   => $edit_venue->{hall_name},
+        address     => $edit_venue->{address},
+        city        => $edit_venue->{city},
+        zip         => $edit_venue->{zip},
+        comment     => $edit_venue->{comment},
+        is_deleted  => 1,
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:19:45",
+    };
 
     $got = $decoded->{data};
     eq_or_diff $got, $expected, 'matches';
@@ -139,12 +146,17 @@ subtest 'PUT /venue/1' => sub {
     $got = $decoded->{data};
     eq_or_diff $got, $expected, 'GET changed after PUT';
 
-	# update our global venue object
-	$Venue = $dbh->resultset('Venue')->find($decoded->{data}{venue_id});
+    # update our global venue object
+    # reset it so the next test can find it
+    $edit_venue->{is_deleted} = 0;
+    $res = $test->request( PUT '/venue/1' , content => $edit_venue);
+    ok( $res->is_success, 'returned success' );
+
+    $Venue = $dbh->resultset('Venue')->find($decoded->{data}{venue_id});
+
 };
 
-
-subtest 'GET /venueAll' => sub{
+subtest 'GET /venueAll' => sub {
     plan tests => 2;
     my ($res, $expected, $decoded, $got);
 
@@ -152,17 +164,20 @@ subtest 'GET /venueAll' => sub{
     ok( $res->is_success, 'Returned success' );
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-	$expected = {
-		venue_id    => 1,
-        hall_name	=> $Venue->hall_name,
-        address	    => $Venue->address,
-        city	    => $Venue->city,
-        zip	        => $Venue->zip,
-        comment	    => $Venue->comment,
-        is_deleted	=> $Venue->is_deleted,
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:19:45",
-	};
+    $expected = [
+        {
+            venue_id    => 1,
+            vkey        => 'BCD',
+            hall_name   => $Venue->hall_name,
+            address     => $Venue->address,
+            city        => $Venue->city,
+            zip         => $Venue->zip,
+            comment     => $Venue->comment,
+            is_deleted  => $Venue->is_deleted,
+            created_ts  => "2022-04-28T02:18:05",
+            modified_ts => "2022-04-28T02:19:45",
+        }
+    ];
 
     eq_or_diff $got, $expected, 'matches';
 };

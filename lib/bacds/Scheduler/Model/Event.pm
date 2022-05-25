@@ -77,9 +77,9 @@ sub get_event {
     }
 
     return event_row_to_result($event, $other_tables);
-};
+}
 
-sub post_event() {
+sub post_event {
     my ($self, $incoming_data) = @_;
     my $dbh = get_dbh();
 
