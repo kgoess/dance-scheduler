@@ -13,7 +13,7 @@
                 ]
                %>
               <% FOREACH column IN style_column_types %>
-              <div name="<% column.0 %>" class="display-row">
+              <div name="<% column.0 %>" class="display-row" column-type="text-item">
                 <span class="row-label"><% column.1 %></span>
                 <span class="row-contents"></span>
                 <input class="row-edit" name="<% column.0 %>" hidden />

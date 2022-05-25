@@ -93,7 +93,7 @@ function displayItem(modelName, msg) {
         parentContainer.find('.display-row').each(
             (index, currentRow) => displayItemRow($(currentRow), targetObj)
         );
-        $( `[name="${modelName}_id"]` ).val(targetObj ? targetObj[`${modelName}_id`] : '');
+        parentContainer.find( `[name="${modelName}_id"]` ).val(targetObj ? targetObj[`${modelName}_id`] : '');
         parentContainer.find('.model-display').show();
     } else {
         alert('error: ' + msg['error']);
@@ -104,7 +104,6 @@ function displayItemRow(currentRow, targetObj) {
 
     currentRow.children('.row-contents').show();
     currentRow.children('.row-edit').hide();
-
     switch(currentRow.attr('column-type')) {
         case 'text-item':
             const theText = targetObj
@@ -127,7 +126,7 @@ function displayItemRow(currentRow, targetObj) {
 
             break;
         default:
-            console.log(currentRow.attr('column-type'));
+            console.log(`displayItemRow's currentRow `, currentRow, `'s currentRow.attr('column-type') is ${currentRow.attr('column-type')}`);
     }
 }
 
