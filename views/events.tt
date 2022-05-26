@@ -1,40 +1,40 @@
 
-        <form> 
-          <select class="clickable-list" size="5">
-          </select>
-        </form>
-        <span class="button-container">
-            <button class="button create-new-button">Create New</button>
-        </span>
-        <div class="model-display" hidden>
-            <form id="event-display-form">
-              <% event_column_types = [
-                    [ "name", "Name" ],
-                    [ "start_time", "Start" ],
-                    [ "end_time", "End" ],
-                    [ "is_camp", "Is Camp?" ],
-                    [ "long_desc", "" ],
-                    [ "short_desc", "" ],
-                ]
-               %>
-              <% FOREACH column IN event_column_types %>
-              <div name="<% column.0 %>" class="display-row" column-type="text-item">
+<form>
+    <select class="clickable-list" size="5">
+    </select>
+</form>
+<span class="button-container">
+    <button class="button create-new-button">Create New</button>
+</span>
+<div class="model-display" hidden>
+    <form id="event-display-form">
+        <% event_column_types = [
+              [ "name", "Name" ],
+              [ "start_time", "Start" ],
+              [ "end_time", "End" ],
+              [ "is_camp", "Is Camp?" ],
+              [ "long_desc", "" ],
+              [ "short_desc", "" ],
+          ]
+         %>
+        <% FOREACH column IN event_column_types %>
+            <div name="<% column.0 %>" class="display-row" column-type="text-item">
                 <span class="row-label"><% column.1 %></span>
                 <span class="row-contents"></span>
                 <input class="row-edit" name="<% column.0 %>" hidden />
-              </div>
-                <% END %>
-              <div name="style_id" class="display-row" column-type="list-item" model-name="style" table-name="styles" >
-              <div class="multi-select-wrapper">
+            </div>
+        <% END %>
+        <div name="style_id" class="display-row" column-type="list-item" model-name="style" table-name="styles" >
+            <div class="multi-select-wrapper">
                 <span class="row-label">Style</span>
                 <select name="style_id">
                 </select>
                 <span class="add-multi-select-button">+</span>
-              </div>
-              </div>
-                <input type="hidden" name="event_id"/>
-                <span class="button-container">
-                    <button class="button save-button">Save</button>
-                </span>
-            </form>
+            </div>
         </div>
+        <input type="hidden" name="event_id"/>
+        <span class="button-container">
+            <button class="button save-button">Save</button>
+        </span>
+    </form>
+</div>
