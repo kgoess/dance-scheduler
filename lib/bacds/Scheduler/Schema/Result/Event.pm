@@ -281,7 +281,9 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E6VPHsU25lbylJDAiJzKg
 
 __PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
+__PACKAGE__->many_to_many(venues => 'event_venues_maps', 'venue');
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
+
 1;

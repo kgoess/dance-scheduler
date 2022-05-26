@@ -21,6 +21,8 @@ sub create_venues {
 
     foreach my $old (@old_venues) {
 
+        say "doing venue ".$old->vkey;
+
         # ZOOM Concert, ZOOM Contra, ZOOM Waltz, weren't really venues
         # I think were an early attempt to handle ZOOM stuff
         next if $old->vkey =~ /^ZOOM \w+/;

@@ -71,7 +71,7 @@ sub get_event {
         or return false;
 
     my $other_tables = {};
-    foreach my $other_table_name (qw/styles/){
+    foreach my $other_table_name (qw/styles venues/){
         my @others = $event->$other_table_name;
         $other_tables->{$other_table_name} = \@others;
     }
@@ -126,10 +126,14 @@ sub update_relationships {
 
     my @relationships = (
         [qw/Style styles style_id/],
+        [qw/Venue venues venue_id/],
     );
     my $other_tables = {};
     foreach my $relationship (@relationships){
         my ($other_model, $other_table_name, $primary_key) = @$relationship;
+
+        # FIXME I think this double-step could be replaced by ->set_$other_table_name
+        # see DBIx::Class::Relationship::Base
 
         # start by clearing the existing mappings
         my $remove = "remove_from_$other_table_name";

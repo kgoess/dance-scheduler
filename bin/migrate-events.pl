@@ -49,7 +49,9 @@ sub create_events {
 
         my $new = migrate_event($dbh, $old);
 
-        migrate_styles($dbh, $old, $new);
+        attach_styles($dbh, $old, $new);
+
+        attach_venues($dbh, $old, $new);
     }
 
 }
@@ -101,7 +103,7 @@ sub migrate_event {
 }
 
 
-sub migrate_styles {
+sub attach_styles {
     my ($dbh, $old, $new) = @_;
 
     my @old_styles;
@@ -132,4 +134,19 @@ sub migrate_styles {
             ordering => $i++,
         });
     }
+}
+
+sub attach_venues {
+    my ($dbh, $old, $new) = @_;
+
+    my $vkey = $old->loc;
+
+    my @rs = $dbh->resultset('Venue')->search({
+        vkey => $vkey,
+    });
+    my $i = 1;
+    @rs or die "can't find $vkey in venues table";
+    $new->add_to_venues($rs[0], {
+        ordering => $i++, # there is only 1
+    });
 }

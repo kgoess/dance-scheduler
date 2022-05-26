@@ -176,8 +176,17 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LRCdL+ARtoyFYCcKEkgVXA
 
-
-
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
+
+__PACKAGE__->many_to_many(events=> 'event_venues_maps', 'event');
+
+sub get_fields_for_event_row {
+    my ($self) = @_;
+    return {
+        id   => $self->venue_id,
+        name => $self->vkey,
+    };
+};
+
 1;

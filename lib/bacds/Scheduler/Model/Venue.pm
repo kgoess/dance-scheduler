@@ -31,7 +31,8 @@ sub get_venues {
     # TODO maybe change that to is_active? or add is_active?
 
     my $resultset = $dbh->resultset('Venue')->search(
-        { is_deleted => false }
+        # FIXME not working, returns nothing
+        #{ is_deleted => false }
     );
 
     $resultset or die "empty set"; #TODO: More gracefully
@@ -130,6 +131,15 @@ sub venue_row_to_result {
     /){
         $result->{$field} = $venue->$field;
     };
+
+
+	# FIXME setting 'name' to match this in the javascript
+	# but I think that's why update isn't working
+    #    element.innerHTML = escapeHtml(row['name']);
+    #    element.setAttribute('value', escapeHtml(row[name]));
+
+
+    $result->{name} = $venue->vkey;
 
     foreach my $datetime (qw/created_ts modified_ts/){
         next unless $result->{$datetime};

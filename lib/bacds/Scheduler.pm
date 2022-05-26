@@ -20,6 +20,10 @@ get '/' => sub {
               modelName => 'style',
               content => template("styles.tt", {}, { layout=> undef }),
             },
+            { label => 'Venues',
+              modelName => 'venue',
+              content => template("venues.tt", {}, { layout=> undef }),
+            },
         ],
     };
 };
@@ -292,6 +296,7 @@ put '/venue/:venue_id' => sub {
 Return all the non-deleted venues
 
 =cut
+
 get '/venueAll' => sub {
     my $results = Results->new;
     
