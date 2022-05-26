@@ -8,111 +8,128 @@ use bacds::Model::Event;# the old CSV schema
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
+# this is a mapping of loc+type in the old schedule csv table
+# to the new series table, by name
+my %Series_Lookup = (
+    'CCB-CONTRA' => 'Berkeley Contra',
+    'SF-CONTRA' => 'San Francisco Contra',
+    'FUM-CONTRA' => 'Palo Alto Contra', # ?
+    'HVC-CONTRA' => 'Hayward Contra',
+    'FSJ-CONTRA' => 'South Bay Contra',
+    'ASE-ENGLISH' => 'Peninsula English',
+    'CCB-ENGLISH' => 'Berkeley English',
+    # ???
+    #'CCB-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
+    'SJP-ENGLISH' => 'San Francisco English',
+    'FSJ-ENGLISH' => 'San Jose English',
+    'HPP-WOODSHED' => 'Atherton Woodshed',
+    'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
+    'ONLINE-ENGLISH' => 'Odd Sundays Online',
+    'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
+    'ONLINE-ONLINE Concert &amp; Dance' => 'Online Concert',
+    'SSU-ENGLISH/CAMP' => 'Hey Days English Week',
+    'MON-FAMILY/CAMP' => 'Family Week',
+    'JPC-CONTRA/CAMP' => 'Balance the Bay',
+    'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
+    'SME-ENGLISH/REGENCY' => 'English Regency',
+    'ACC-ENGLISH' => 'Arlington Community Church English',
+);
+
 my $dbh = get_dbh();
 
-create_events();
+create_events($dbh);
 
 sub create_events {
+    my ($dbh) = @_;
 
-    # this is a mapping of loc+type in the old schedule csv table
-    # to the new series table, by name
-    my %series_lookup = (
-        'CCB-CONTRA' => 'Berkeley Contra',
-        'SF-CONTRA' => 'San Francisco Contra',
-        'FUM-CONTRA' => 'Palo Alto Contra', # ?
-        'HVC-CONTRA' => 'Hayward Contra',
-        'FSJ-CONTRA' => 'South Bay Contra',
-        'ASE-ENGLISH' => 'Peninsula English',
-        'CCB-ENGLISH' => 'Berkeley English',
-        # ???
-        #'CCB-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
-        'SJP-ENGLISH' => 'San Francisco English',
-        'FSJ-ENGLISH' => 'San Jose English',
-        'HPP-WOODSHED' => 'Atherton Woodshed',
-        'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
-        'ONLINE-ENGLISH' => 'Odd Sundays Online',
-        'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
-        'ONLINE-ONLINE Concert &amp; Dance' => 'Online Concert',
-        'SSU-ENGLISH/CAMP' => 'Hey Days English Week',
-        'MON-FAMILY/CAMP' => 'Family Week',
-        'JPC-CONTRA/CAMP' => 'Balance the Bay',
-        'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
-        'SME-ENGLISH/REGENCY' => 'English Regency',
-        'ACC-ENGLISH' => 'Arlington Community Church English',
-    );
 
     my @old_events = bacds::Model::Event->load_all;
 
     foreach my $old (@old_events) {
-        my $new = $dbh->resultset('Event')->new({});
 
-        my $name = join ' ', map { $old->$_ } qw/startday type loc leader/ ;
+        my $new = migrate_event($dbh, $old);
 
-        say "doing $name";
-
-        if ($old->type eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
-            $new->name('Balance the Bay');
-        } elsif ($old->type eq 'ENGLISH/CAMP') {
-            $new->name('Hey Days English Week');
-        } elsif ($old->type eq 'FAMILY/CAMP') {
-            $new->name('Family Camp');
-        } else {
-            # series don't really have a name in the old schema
-            $new->name($name);
-        }
-        $new->start_time( $old->startday );
-        $new->end_time( $old->endday )
-            if $old->endday;
-        $new->is_camp( $old->type ? 1 : 0 );
-        $new->long_desc( $old->leader . ' with ' .$old->band );
-        $new->short_desc( $old->leader );
-
-        my $key = join '-', $old->loc, $old->type;
-        my $loc_str = $series_lookup{$key}
-            or die "can't lookup series for '$key'";
-
-        my $rs = $dbh->resultset('Series')->search({
-                name => { -like => "$loc_str%" },
-        }) or die "Series->search $loc_str% failed";
-
-        if (my $series_obj = $rs->next) {
-            $new->series_id( $series_obj->series_id );
-        } else {
-            # ACC has no series ?
-            warn "no next for $loc_str";
-        }
-
-
-        $new->insert;
-
-        my @old_styles;
-        my $old_style = $old->type;
-        if ($old_style =~ /ONLINE/) {
-            push @old_styles, 'ONLINE' # fudging e.g. ONLINE Concert &amp; Dance
-        } elsif ($old_style eq 'ENGLISH/CAMP') {
-            push @old_styles, 'ENGLISH', 'CAMP';
-        } elsif ($old_style eq 'FAMILY/CAMP') {
-            push @old_styles, 'FAMILY', 'CAMP';
-        } elsif ($old_style eq 'CONTRA/CAMP') {
-            push @old_styles, 'CONTRA', 'CAMP';
-        } elsif ($old_style eq 'ENGLISH/REGENCY') {
-            push @old_styles, 'ENGLISH', 'REGENCY';
-        } elsif ($old_style eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
-            push @old_styles, 'CONTRA', 'CAMP';
-        } else {
-            push @old_styles, $old_style;
-        }
-
-        my $i = 1;
-        foreach my $style (@old_styles) {
-            my @rs = $dbh->resultset('Style')->search({
-                name => $style,
-            });
-            @rs or die "can't find $style in styles table";
-            $new->add_to_styles($rs[0], {
-                ordering => $i++,
-            });
-        }
+        migrate_styles($dbh, $old, $new);
     }
+
 }
 
+sub migrate_event {
+    my ($dbh, $old) = @_;
+
+    my $new = $dbh->resultset('Event')->new({});
+
+    my $name = join ' ', map { $old->$_ } qw/startday type loc leader/ ;
+
+    say "doing $name";
+
+    if ($old->type eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
+        $new->name('Balance the Bay');
+    } elsif ($old->type eq 'ENGLISH/CAMP') {
+        $new->name('Hey Days English Week');
+    } elsif ($old->type eq 'FAMILY/CAMP') {
+        $new->name('Family Camp');
+    } else {
+        # series don't really have a name in the old schema
+        $new->name($name);
+    }
+    $new->start_time( $old->startday );
+    $new->end_time( $old->endday )
+        if $old->endday;
+    $new->is_camp( $old->type ? 1 : 0 );
+    $new->long_desc( $old->leader . ' with ' .$old->band );
+    $new->short_desc( $old->leader );
+
+    my $key = join '-', $old->loc, $old->type;
+    my $loc_str = $Series_Lookup{$key}
+        or die "can't lookup series for '$key'";
+
+    my $rs = $dbh->resultset('Series')->search({
+            name => { -like => "$loc_str%" },
+    }) or die "Series->search $loc_str% failed";
+
+    if (my $series_obj = $rs->next) {
+        $new->series_id( $series_obj->series_id );
+    } else {
+        # ACC has no series ?
+        warn "no next for $loc_str";
+    }
+
+    $new->insert;
+
+    return $new;
+}
+
+
+sub migrate_styles {
+    my ($dbh, $old, $new) = @_;
+
+    my @old_styles;
+    my $old_style = $old->type;
+    if ($old_style =~ /ONLINE/) {
+        push @old_styles, 'ONLINE' # fudging e.g. ONLINE Concert &amp; Dance
+    } elsif ($old_style eq 'ENGLISH/CAMP') {
+        push @old_styles, 'ENGLISH', 'CAMP';
+    } elsif ($old_style eq 'FAMILY/CAMP') {
+        push @old_styles, 'FAMILY', 'CAMP';
+    } elsif ($old_style eq 'CONTRA/CAMP') {
+        push @old_styles, 'CONTRA', 'CAMP';
+    } elsif ($old_style eq 'ENGLISH/REGENCY') {
+        push @old_styles, 'ENGLISH', 'REGENCY';
+    } elsif ($old_style eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
+        push @old_styles, 'CONTRA', 'CAMP';
+    } else {
+        push @old_styles, $old_style;
+    }
+
+    my $i = 1;
+    foreach my $style (@old_styles) {
+        my @rs = $dbh->resultset('Style')->search({
+            name => $style,
+        });
+        @rs or die "can't find $style in styles table";
+        $new->add_to_styles($rs[0], {
+            ordering => $i++,
+        });
+    }
+}
