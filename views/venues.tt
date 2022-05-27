@@ -8,7 +8,13 @@
 <div class="model-display" hidden>
     <form id="venue-display-form">
         <% venue_column_types = [
-            [ "name", "Name" ],
+            [ "name", "vkey" ],
+            [ "hall_name", "Hall Name" ],
+            [ "address", "Street Address" ],
+            [ "city", "City" ],
+            [ "zip", "Zip" ],
+            [ "comment", "Comments" ],
+            [ "is_deleted", "Is Deleted" ],
            ]
         %>
         <% FOREACH column IN venue_column_types %>
