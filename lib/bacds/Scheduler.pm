@@ -235,7 +235,6 @@ Create a new venue
 post '/venue/' => sub {
     my $data = {};
     foreach my $field (qw/
-        vkey
         hall_name
         address
         city
@@ -245,6 +244,10 @@ post '/venue/' => sub {
         /){
         $data->{$field} = params->{$field};
     };
+
+    # FIXME "name" is dicated by the javascript
+    # see the FIXME in Model/Venue.pm
+    $data->{vkey} = params->{name};
 
     my $venue = $venue_model->post_venue($data);
     my $results = Results->new;
