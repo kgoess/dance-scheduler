@@ -78,6 +78,7 @@ post '/event/' => sub {
         short_desc
         series_id
         style_id
+        venue_id
         /){
         $data->{$field} = params->{$field};
     };

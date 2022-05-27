@@ -74,6 +74,7 @@ subtest 'POST /event' => sub {
 		is_template => undef,
 		series_id   => undef,
 		styles      => [],
+		venues      => [],
 		created_ts  => "2022-04-28T02:18:05",
 		modified_ts => "2022-04-28T02:18:05",
 	};
@@ -108,6 +109,7 @@ subtest "GET /event/#" => sub{
 		created_ts  => "2022-04-28T02:18:05",
 		modified_ts => "2022-04-28T02:18:05",
 		styles      => [],
+		venues      => [],
 	};
 
     eq_or_diff $got, $expected, 'matches';
@@ -148,6 +150,7 @@ subtest "PUT /event/#" => sub {
 		series_id   => undef,
 		short_desc  => "new shortdef",
 		styles      => [],
+		venues      => [],
 	};
 
     is_deeply $got, $expected, 'return matches';
@@ -155,14 +158,14 @@ subtest "PUT /event/#" => sub {
     $res  = $test->request( GET "/event/$Event_Id" );
     $decoded = decode_json($res->content); 
 	$got = $decoded->{data};
-    is_deeply $got, $expected, 'GET changed after PUT';
+    eq_or_diff $got, $expected, 'GET changed after PUT';
 
 
 	# update our global event object
 	$Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
 };
 
-# *******Now adding styles *******
+# ******* Now adding styles *******
 
 subtest 'POST /event/# with styles' => sub{
     plan tests=>4;
@@ -216,7 +219,7 @@ subtest 'POST /event/# with styles' => sub{
         is_template => undef,
         created_ts  => $now_ts,
         modified_ts => $now_ts,
-        event_id    => $Styled_Event_Id,
+        venues      => [],
         styles      => [{ id => $Style_Id, name => "test style" }],
     };
 
@@ -247,12 +250,13 @@ subtest "GET /event/# with styles" => sub {
         series_id   => undef,
         short_desc  => 'itsa shortdesc',
         start_time  => '2022-05-03T20:00:00',
+        venues => [],
 	    styles => [
 			{
 				id => 1,
 				name => 'test style',
 			}
-		]
+		],
 	};
 
     eq_or_diff $got, $expected, 'matches';
@@ -280,6 +284,7 @@ subtest "PUT /event/# with styles" => sub {
         long_desc   => "this is a new long desc",
         name        => "new name",
         short_desc  => "new shortdef",
+        venues     => [],
         style_id   => [$Style_Id, $other_style_id],
     };
     $ENV{TEST_NOW} += 100;
@@ -300,6 +305,7 @@ subtest "PUT /event/# with styles" => sub {
         series_id   => undef,
         short_desc  => "new shortdef",
         start_time  => "2022-05-03T21:00:00",
+        venues      => [],
 	    styles => [
 			{
 				id => $Style_Id,
