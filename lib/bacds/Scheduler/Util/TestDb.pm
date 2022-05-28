@@ -4,6 +4,7 @@ use 5.16.0;
 use warnings;
 
 use File::Basename qw/basename/;
+use FindBin qw/$Bin/;
 
 use Exporter 'import';
 our @EXPORT_OK = qw/setup_test_db/;
@@ -13,7 +14,9 @@ sub setup_test_db{
 
     my $test_script = basename $0, '.t';
 
-    my $test_db = "testdb.$test_script.sqlite";
+    mkdir "$Bin/testdbs"; # might already exist, that's ok
+
+    my $test_db = "$Bin/testdbs/testdb.$test_script.sqlite";
 
     unlink $test_db;
 
