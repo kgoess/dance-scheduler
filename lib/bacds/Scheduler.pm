@@ -37,9 +37,9 @@ use bacds::Scheduler::Model::Event;
 
 get '/eventAll' => sub {
     my $results = Results->new;
-    
+
     $results->data($event_model->get_events);
-    
+
     return $results->format;
 };
 
@@ -113,7 +113,7 @@ put '/event/:event_id' => sub {
         /){
         $data->{$field} = params->{$field};
     };
-    
+
     my $event = $event_model->put_event($data);
     my $results = Results->new;
 
@@ -123,7 +123,7 @@ put '/event/:event_id' => sub {
     else{
         $results->add_error(1300, "Update failed for new $data->{event_id}");
     }
-    
+
     return $results->format;
 };
 
@@ -136,9 +136,9 @@ use bacds::Scheduler::Model::Style;
 
 get '/styleAll' => sub {
     my $results = Results->new;
-    
+
     $results->data($style_model->get_styles);
-    
+
     return $results->format;
 };
 
@@ -185,7 +185,7 @@ put '/style/:style_id' => sub {
         /){
         $data->{$field} = params->{$field};
     };
-    
+
     my $style = $style_model->put_style($data);
     my $results = Results->new;
 
@@ -195,7 +195,7 @@ put '/style/:style_id' => sub {
     else{
         $results->add_error(1600, "Update failed for new $data->{style_id}");
     }
-    
+
     return $results->format;
 };
 
@@ -291,7 +291,7 @@ put '/venue/:venue_id' => sub {
     if (! length $data->{is_deleted}) {
         $data->{is_deleted} = 0;
     }
-    
+
     my $venue = $venue_model->put_venue($data);
     my $results = Results->new;
 
@@ -301,7 +301,7 @@ put '/venue/:venue_id' => sub {
     else{
         $results->add_error(1900, "Update failed for new $data->{venue_id}");
     }
-    
+
     return $results->format;
 };
 
@@ -313,9 +313,116 @@ Return all the non-deleted venues
 
 get '/venueAll' => sub {
     my $results = Results->new;
-    
+
     $results->data($venue_model->get_venues);
-    
+
+    return $results->format;
+};
+
+
+=head2 Series
+
+=cut
+
+my $series_model = 'bacds::Scheduler::Model::Series';
+use bacds::Scheduler::Model::Series;
+
+
+=head3 get '/series/:series_id'
+
+=cut
+
+get '/series/:series_id' => sub {
+    my $series_id = params->{series_id};
+    my $results = Results->new;
+
+    my $series = $series_model->get_series($series_id);
+    if($series){
+        $results->data($series)
+    }
+    else{
+        $results->add_error(1800, "Nothing Found for series_id $series_id");
+    }
+
+    return $results->format;
+};
+
+=head3 post /series/
+
+Create a new series
+
+=cut
+
+post '/series/' => sub {
+    my $data = {};
+    foreach my $field (qw/
+        name
+        frequency
+        is_deleted
+        /){
+        $data->{$field} = params->{$field};
+    };
+
+    my $series = $series_model->post_series($data);
+    my $results = Results->new;
+
+    if ($series) {
+        $results->data($series)
+    } else {
+        $results->add_error(1900, "Insert failed for new series");
+    }
+
+    return $results->format;
+};
+
+=head3 put /series/:series_id
+
+Update an existing series.
+
+=cut
+
+put '/series/:series_id' => sub {
+    my $data = {};
+    foreach my $field (qw/
+        series_id
+        name
+        frequency
+        is_deleted
+        /){
+        $data->{$field} = params->{$field};
+    };
+
+
+    # FIXME otherwise insert error:
+    # DBD::mysql::st execute failed: Incorrect integer value: '' for column `schedule`.`seriess`.`is_deleted`
+    if (! length $data->{is_deleted}) {
+        $data->{is_deleted} = 0;
+    }
+
+    my $series = $series_model->put_series($data);
+    my $results = Results->new;
+
+    if($series){
+        $results->data($series)
+    }
+    else{
+        $results->add_error(2100, "Update failed for new $data->{series_id}");
+    }
+
+    return $results->format;
+};
+
+=head3 get /seriesAll
+
+Return all the non-deleted seriess
+
+=cut
+
+get '/seriesAll' => sub {
+    my $results = Results->new;
+
+    $results->data($series_model->get_seriess);
+
     return $results->format;
 };
 
