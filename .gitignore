@@ -36,5 +36,5 @@ inc/
 *.swp
 
 #test db file
-testdb
+testdb*.sqlite
 TODO
