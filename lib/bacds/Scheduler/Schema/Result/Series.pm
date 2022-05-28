@@ -132,4 +132,13 @@ __PACKAGE__->has_many(
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
+
+sub get_fields_for_event_row {
+    my ($self) = @_;
+    return {
+        id => $self->series_id,
+        name => $self->name,
+    };
+}
+
 1;

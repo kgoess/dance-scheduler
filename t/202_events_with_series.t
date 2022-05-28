@@ -57,7 +57,7 @@ subtest 'POST /event' => sub {
 		short_desc  => $new_event->{short_desc},
 		name        => $new_event->{name},
 		is_template => undef,
-		series_id   => undef,
+        series      => [],
 		styles      => [],
 		venues      => [],
 		created_ts  => "2022-04-28T02:18:05",
@@ -127,7 +127,12 @@ subtest 'POST /event/# with series' => sub {
 	$Seriesed_Event_Id = $got->{event_id},
 
     my $expected = {
-        series_id   => $Series_Id,
+        series => [
+          {
+            id => 1,
+            name => 'Bree Trewsday English'
+          }
+        ],
 		event_id    => $Seriesed_Event_Id,
         start_time  => $new_event->{start_time},
         end_time    => $new_event->{end_time},
@@ -165,7 +170,12 @@ subtest "GET /event/# with series" => sub {
         long_desc   => 'this is the long desc',
         modified_ts => '2022-04-28T02:18:05',
         name        => 'saturday night test event',
-        series_id   => $Series_Id,
+        series => [
+          {
+            id => 1,
+            name => 'Bree Trewsday English'
+          }
+        ],
         short_desc  => 'itsa shortdesc',
         start_time  => '2022-05-03T20:00:00',
         venues      => [],
@@ -217,7 +227,12 @@ subtest "PUT /event/# with series" => sub {
         long_desc   => "this is a new long desc",
         modified_ts => "2022-04-28T02:19:45",
         name        => "new name",
-        series_id   => $other_series_id,
+        series => [
+          {
+            id => 2,
+            name => 'Fifth Mersday in Michel Delving',
+          }
+        ],
         short_desc  => "new shortdef",
         start_time  => "2022-05-03T21:00:00",
         venues      => [],

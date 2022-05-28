@@ -71,7 +71,7 @@ sub get_event {
         or return false;
 
     my $other_tables = {};
-    foreach my $other_table_name (qw/styles venues/){
+    foreach my $other_table_name (qw/styles venues series/){
         my @others = $event->$other_table_name;
         $other_tables->{$other_table_name} = \@others;
     }
@@ -158,6 +158,17 @@ sub update_relationships {
         }
     }
 
+    # Series:
+    # one-to-many relationship: there's no mapping table to
+    # update, but we need to add the data to $other_tables so
+    # that the UI can populate the dropdown
+    $other_tables->{series} = [];
+    if (my $series_id = $incoming_data->{series_id}) {
+        if (my @rs = $dbh->resultset('Series')->search({series_id => $series_id })) {
+            $other_tables->{series} = \@rs;
+        }
+    }
+
     return $other_tables;
 }
 
@@ -185,8 +196,6 @@ sub put_event {
         $event->$column($incoming_data->{$column});
     };
 
-    $event->series_id(undef) if !$event->series_id;
-
     $event->update(); #TODO: check for failure
 
     my $other_tables = $self->update_relationships($event, $incoming_data, $dbh);
@@ -209,7 +218,6 @@ sub event_row_to_result {
         long_desc
         short_desc
         is_template
-        series_id
         created_ts
         modified_ts/){
         $result->{$field} = $event->$field;
@@ -226,7 +234,7 @@ sub event_row_to_result {
                 or next;
             $result->{$other_table_name} =
                 ref $other eq 'ARRAY'
-                    ?  [ map { $_->get_fields_for_event_row } @$other ]
+                    ?  [ map { $_->get_fields_for_event_row } grep $_, @$other ]
                     : $other->get_fields_for_event_row;
         }
     }

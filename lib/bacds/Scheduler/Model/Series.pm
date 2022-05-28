@@ -37,13 +37,16 @@ sub get_seriess {
 
     $resultset or die "empty set"; #TODO: More gracefully
 
-    my @seriess;
+    my @series;
 
     while (my $series = $resultset->next) {
-        push @seriess, series_row_to_result($series);
+        push @series, series_row_to_result($series);
     }
 
-    return \@seriess;
+    # could also sort in the sql
+    @series = sort { $a->{name} cmp $b->{name} } @series;
+
+    return \@series;
 };
 
 sub get_series {

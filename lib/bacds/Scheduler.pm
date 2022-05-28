@@ -24,6 +24,10 @@ get '/' => sub {
               modelName => 'venue',
               content => template("venues.tt", {}, { layout=> undef }),
             },
+            { label => 'Series',
+              modelName => 'series',
+              content => template("series.tt", {}, { layout=> undef }),
+            },
         ],
     };
 };

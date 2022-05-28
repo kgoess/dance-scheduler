@@ -56,33 +56,32 @@ subtest 'POST /event' => sub {
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
-        series_id   => undef,
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/event/', $new_event );
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-	$expected = {
-		event_id    => 1,
-		start_time  => $new_event->{start_time},
-		end_time    => $new_event->{end_time},
-		is_camp     => $new_event->{is_camp},
-		long_desc   => $new_event->{long_desc},
-		short_desc  => $new_event->{short_desc},
-		name        => $new_event->{name},
-		is_template => undef,
-		series_id   => undef,
-		styles      => [],
-		venues      => [],
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:18:05",
-	};
+    $expected = {
+        event_id    => 1,
+        start_time  => $new_event->{start_time},
+        end_time    => $new_event->{end_time},
+        is_camp     => $new_event->{is_camp},
+        long_desc   => $new_event->{long_desc},
+        short_desc  => $new_event->{short_desc},
+        name        => $new_event->{name},
+        is_template => undef,
+        series      => [],
+        styles      => [],
+        venues      => [],
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:18:05",
+    };
     eq_or_diff $got, $expected, 'return matches';
 
-	# now save it for the subsequent tests
-	$Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
-	$Event_Id = $Event->event_id;
+    # now save it for the subsequent tests
+    $Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
+    $Event_Id = $Event->event_id;
 };
 
 
@@ -96,21 +95,21 @@ subtest "GET /event/#" => sub{
     $decoded = decode_json($res->content); 
     $got = $decoded->{data};
 
-	$expected = {
-		event_id    => $Event->event_id,
-		start_time  => $Event->start_time->iso8601,
-		end_time    => $Event->end_time->iso8601,
-		is_camp     => $Event->is_camp,
-		long_desc   => $Event->long_desc,
-		short_desc  => $Event->short_desc,
-		name        => $Event->name,
-		is_template => $Event->is_template,
-		series_id   => undef,
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:18:05",
-		styles      => [],
-		venues      => [],
-	};
+    $expected = {
+        event_id    => $Event->event_id,
+        start_time  => $Event->start_time->iso8601,
+        end_time    => $Event->end_time->iso8601,
+        is_camp     => $Event->is_camp,
+        long_desc   => $Event->long_desc,
+        short_desc  => $Event->short_desc,
+        name        => $Event->name,
+        is_template => $Event->is_template,
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:18:05",
+        series      => [],
+        styles      => [],
+        venues      => [],
+    };
 
     eq_or_diff $got, $expected, 'matches';
 };
@@ -137,32 +136,32 @@ subtest "PUT /event/#" => sub {
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-	$expected = {
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:19:45",
-		start_time  => "2022-05-01T21:00:00",
-		end_time    => "2022-05-01T23:00:00",
-		event_id    => $Event_Id,
-		is_camp     => 0,
-		is_template => undef,
-		long_desc   => "this is a new long desc",
-		name        => "new name",
-		series_id   => undef,
-		short_desc  => "new shortdef",
-		styles      => [],
-		venues      => [],
-	};
+    $expected = {
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:19:45",
+        start_time  => "2022-05-01T21:00:00",
+        end_time    => "2022-05-01T23:00:00",
+        event_id    => $Event_Id,
+        is_camp     => 0,
+        is_template => undef,
+        long_desc   => "this is a new long desc",
+        name        => "new name",
+        short_desc  => "new shortdef",
+        series      => [],
+        styles      => [],
+        venues      => [],
+    };
 
     is_deeply $got, $expected, 'return matches';
 
     $res  = $test->request( GET "/event/$Event_Id" );
     $decoded = decode_json($res->content); 
-	$got = $decoded->{data};
+    $got = $decoded->{data};
     eq_or_diff $got, $expected, 'GET changed after PUT';
 
 
-	# update our global event object
-	$Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
+    # update our global event object
+    $Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
 };
 
 # ******* Now adding styles *******
@@ -193,7 +192,6 @@ subtest 'POST /event/# with styles' => sub{
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
-        series_id   => undef,
         style_id   => [$Style_Id],
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -205,27 +203,27 @@ subtest 'POST /event/# with styles' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
 
-	$Styled_Event_Id = $got->{event_id},
+    $Styled_Event_Id = $got->{event_id},
 
     $expected = {
-		event_id    => $Styled_Event_Id,
+        event_id    => $Styled_Event_Id,
         start_time  => $new_event->{start_time},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
         long_desc   => $new_event->{long_desc},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
-        series_id   => undef,
         is_template => undef,
         created_ts  => $now_ts,
         modified_ts => $now_ts,
+        series      => [],
         venues      => [],
         styles      => [{ id => $Style_Id, name => "test style" }],
     };
 
     eq_or_diff $got, $expected, 'return matches';
 
-	$Styled_Event = $dbh->resultset('Event')->find($Styled_Event_Id);
+    $Styled_Event = $dbh->resultset('Event')->find($Styled_Event_Id);
 };
 
 
@@ -247,17 +245,17 @@ subtest "GET /event/# with styles" => sub {
         long_desc   => 'this is the long desc',
         modified_ts => '2022-04-28T02:18:05',
         name        => 'saturday night test event',
-        series_id   => undef,
         short_desc  => 'itsa shortdesc',
         start_time  => '2022-05-03T20:00:00',
+        series      => [],
         venues => [],
-	    styles => [
-			{
-				id => 1,
-				name => 'test style',
-			}
-		],
-	};
+        styles => [
+            {
+                id => 1,
+                name => 'test style',
+            }
+        ],
+    };
 
     eq_or_diff $got, $expected, 'matches';
 };
@@ -284,8 +282,8 @@ subtest "PUT /event/# with styles" => sub {
         long_desc   => "this is a new long desc",
         name        => "new name",
         short_desc  => "new shortdef",
-        venues     => [],
-        style_id   => [$Style_Id, $other_style_id],
+        venues      => [],
+        style_id    => [$Style_Id, $other_style_id],
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
@@ -302,20 +300,20 @@ subtest "PUT /event/# with styles" => sub {
         long_desc   => "this is a new long desc",
         modified_ts => "2022-04-28T02:19:45",
         name        => "new name",
-        series_id   => undef,
         short_desc  => "new shortdef",
         start_time  => "2022-05-03T21:00:00",
+        series      => [],
         venues      => [],
-	    styles => [
-			{
-				id => $Style_Id,
-				name => 'test style',
-			},
-			{
-				id => $other_style_id,
-				name => 'some other style',
-			}
-		]
+        styles => [
+            {
+                id => $Style_Id,
+                name => 'test style',
+            },
+            {
+                id => $other_style_id,
+                name => 'some other style',
+            }
+        ]
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -345,7 +343,6 @@ subtest 'GET /eventAll' => sub {
         long_desc   => "this is a new long desc",
         modified_ts => "2022-04-28T02:19:45",
         name        => "new name",
-        series_id   => undef,
         short_desc  => "new shortdef",
         created_ts  => "2022-04-28T02:18:05",
       },
@@ -358,7 +355,6 @@ subtest 'GET /eventAll' => sub {
         long_desc   => "this is a new long desc",
         modified_ts => '2022-04-28T02:19:45',,
         name        => "new name",
-        series_id   => undef,
         short_desc  => "new shortdef",
         created_ts  => "2022-04-28T02:18:05",
       },
