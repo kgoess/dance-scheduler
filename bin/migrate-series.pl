@@ -103,7 +103,7 @@ sub create_series {
         },
         {
             name => 'English Regency',
-            frequency => 'seond Fridays',
+            frequency => 'second Fridays',
             is_deleted => 0,
         },
     );
