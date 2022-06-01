@@ -1,0 +1,28 @@
+<form>
+    <select class="clickable-list" size="5">
+    </select>
+</form>
+<span class="button-container">
+    <button class="button create-new-button">Create New</button>
+</span>
+<div class="model-display" hidden>
+    <form id="series-display-form">
+        <% series_column_types = [
+            [ "name", "Name" ],
+            [ "frequency", "Frequency" ],
+            [ "is_deleted", "Is Deleted" ],
+           ]
+        %>
+        <% FOREACH column IN series_column_types %>
+            <div name="<% column.0 %>" class="display-row" column-type="text-item">
+                <span class="row-label"><% column.1 %></span>
+                <span class="row-contents"></span>
+                <input class="row-edit" name="<% column.0 %>" hidden />
+            </div>
+        <% END %>
+        <input type="hidden" name="series_id"/>
+        <span class="button-container">
+            <button class="button save-button">Save</button>
+        </span>
+    </form>
+</div>
