@@ -41,7 +41,7 @@ subtest 'Invalid GET /event/1' => sub{
             num => 1100,
         }]
     };
-    is_deeply $decoded, $expected, 'error msg matches';
+    eq_or_diff $decoded, $expected, 'error msg matches';
 };
 
 subtest 'POST /event' => sub {
@@ -76,6 +76,7 @@ subtest 'POST /event' => sub {
         venues      => [],
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
+        is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -109,6 +110,7 @@ subtest "GET /event/#" => sub{
         series      => [],
         styles      => [],
         venues      => [],
+        is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -150,6 +152,7 @@ subtest "PUT /event/#" => sub {
         series      => [],
         styles      => [],
         venues      => [],
+        is_deleted  => 0,
     };
 
     is_deeply $got, $expected, 'return matches';
@@ -165,6 +168,7 @@ subtest "PUT /event/#" => sub {
 };
 
 # ******* Now adding styles *******
+# TODO: Move this to its own test file.
 
 subtest 'POST /event/# with styles' => sub{
     plan tests=>4;
@@ -219,6 +223,7 @@ subtest 'POST /event/# with styles' => sub{
         series      => [],
         venues      => [],
         styles      => [{ id => $Style_Id, name => "test style" }],
+        is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'return matches';
@@ -255,6 +260,7 @@ subtest "GET /event/# with styles" => sub {
                 name => 'test style',
             }
         ],
+        is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -313,7 +319,8 @@ subtest "PUT /event/# with styles" => sub {
                 id => $other_style_id,
                 name => 'some other style',
             }
-        ]
+        ],
+        is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -345,6 +352,7 @@ subtest 'GET /eventAll' => sub {
         name        => "new name",
         short_desc  => "new shortdef",
         created_ts  => "2022-04-28T02:18:05",
+        is_deleted  => 0,
       },
       {
         start_time  => '2022-05-03T21:00:00',
@@ -357,6 +365,7 @@ subtest 'GET /eventAll' => sub {
         name        => "new name",
         short_desc  => "new shortdef",
         created_ts  => "2022-04-28T02:18:05",
+        is_deleted  => 0,
       },
     ];
 

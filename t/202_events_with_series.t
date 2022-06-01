@@ -62,6 +62,7 @@ subtest 'POST /event' => sub {
 		venues      => [],
 		created_ts  => "2022-04-28T02:18:05",
 		modified_ts => "2022-04-28T02:18:05",
+        is_deleted  => 0,
 	};
     eq_or_diff $got, $expected, 'return matches';
 
@@ -80,7 +81,6 @@ subtest 'POST /series' => sub {
     my $new_series = {
         name       => 'Bree Trewsday English',
         frequency  => 'fourth Trewsday',
-        is_deleted => 0,
         
     };
     $res = $test->request(POST '/series/', $new_series );
@@ -93,9 +93,9 @@ subtest 'POST /series' => sub {
         series_id    => $Series_Id,
         name        => 'Bree Trewsday English',
         frequency   => 'fourth Trewsday',
-        is_deleted  => 0,
         created_ts  => '2022-04-28T02:18:05',
         modified_ts => '2022-04-28T02:18:05',
+        is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'series return matches';
@@ -145,6 +145,7 @@ subtest 'POST /event/# with series' => sub {
         modified_ts => $now_ts,
         venues      => [],
         styles      => [],
+        is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'return matches';
@@ -180,6 +181,7 @@ subtest "GET /event/# with series" => sub {
         start_time  => '2022-05-03T20:00:00',
         venues      => [],
 	    styles => [],
+        is_deleted  => 0,
 	};
 
     eq_or_diff $got, $expected, 'matches';
@@ -193,7 +195,6 @@ subtest "PUT /event/# with series" => sub {
     my $other_series = {
         name        => 'Fifth Mersday in Michel Delving',
         frequency   => 'monthly',
-        is_deleted  => 0,
     };
     $res = $test->request(POST '/series/', $other_series );
     ok($res->is_success, 'created series');
@@ -237,6 +238,7 @@ subtest "PUT /event/# with series" => sub {
         start_time  => "2022-05-03T21:00:00",
         venues      => [],
 	    styles      => [],
+        is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 

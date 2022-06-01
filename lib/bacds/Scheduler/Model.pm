@@ -21,10 +21,14 @@ need to impliment the following functions
 
 =over 4
 
-=item * get_model_name
+=item * get_model_name()
 
-This must return a string that can be sent to
-C<< dbh->resultset() >>, like C<'Event'>.
+This must return a string that can be sent to C<< dbh->resultset() >>, like C<'Event'>.
+
+=item * get_other_table_names()
+
+This must return an array of tablenames that should have their
+relationships checked for single-row output, like C<qw/styles/>.
 
 =item * get_fields_for_output()
 
@@ -36,20 +40,25 @@ result output, like C<qw/name start_time end_time/>.
 This must return an array of fieldnames that may be set via POST/PUT,
 like C<qw/name start_time end_time/> 
 
-=item * get_other_table_names()
-
-This must return an array of tablenames that should have their 
-relationships checked for single-row output, like C<qw/styles/>.
-
 =item * get_fkey_fields()
 
-This must return an array of fieldnames that should be set to C<undef>
-if POST/PUT is sent anything falsey for them.
+This must return an array of fieldnames that should be set to
+C<undef> if POST/PUT is sent anything falsey for them.
 
 =item * get_relationships()
 
-This must return a nested list of lists of other tables to update
-relationships to, like C<[qw/Style styles style_id/]>
+This must return a nested list of lists of other tables with
+many-to-many relationships like C<[qw/Style styles style_id/],>
+
+=item * get_one_to_manys()
+
+This must return a nested list of lists of other tables with
+one-to-many relationships, like C<[qw/Series series series_id/],>
+
+=item * get_default_sorting()
+
+This must return a dict that can be sent to C<order_by> in 
+C<< DBIx::Class::ResultSet->seach() >>
 
 =back
 
@@ -58,19 +67,23 @@ relationships to, like C<[qw/Style styles style_id/]>
 =head2 get_multiple_rows()
 
 Return all rows for this table. Does not include any information from
-related tables.
+related tables. Uses get_default_sorting from the decendent class.
 
 =cut
 
 sub get_multiple_rows {
     #TODO: This should probably only allow a maximum number of results
-    #It should also probably accept args to filter?
+    #It should also probably accept args to filter/sort?
     #Or maybe that should be a different function?
     my ($class, $args) = @_;
     my $model_name = $class->get_model_name;
     my $dbh = get_dbh();
+    my %sorting = $class->get_default_sorting;
 
-    my $resultset = $dbh->resultset($model_name)->search();
+    my $resultset = $dbh->resultset($model_name)->search(
+        undef, 
+        { order_by => \%sorting }
+    );
 
     $resultset or die "empty set"; #TODO: More gracefully
 
@@ -169,6 +182,9 @@ sub post_row {
     foreach my $column (@fkey_fields) {
         $row->$column(undef) if !$row->$column;
     };
+    
+    #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
+    $row->is_deleted(0) if not $row->is_deleted;
 
     $row->insert(); #TODO: check for failure
 
@@ -188,8 +204,8 @@ sub post_row {
 
 =head2 put_row()
 
-Updates an existing row. Uses get_model_name(), get_fields_for_input(),
-and get_fkey_fields from decendent class.
+Updates an existing row. Uses get_model_name(),
+get_fields_for_input(), and get_fkey_fields from decendent class.
 
 =cut
 
@@ -220,6 +236,9 @@ sub put_row {
     foreach my $column (@fkey_fields) {
         $row->$column(undef) if !$row->$column;
     }
+    
+    #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
+    $row->is_deleted(0) if not $row->is_deleted;
 
     $row->update(); #TODO: check for failure
 
@@ -230,8 +249,8 @@ sub put_row {
 
 =head2 _row_to_result()
 
-Returns a dict of all applicable information from a row.
-Uses $Fields_For_Output to determine which columns to include.
+Returns a dict of all applicable information from a row.  Uses
+$Fields_For_Output to determine which columns to include.
 
 =cut
 
@@ -267,8 +286,8 @@ sub _row_to_result {
 
 =head2 _update_relationships
 
-Clear out the mapping tables for the event, and set them according to the
-incoming data.
+Clear out the mapping tables for the event, and set them according to
+the incoming data.
 
 For docs on related tables see DBIx::Class::Relationship::Base
 

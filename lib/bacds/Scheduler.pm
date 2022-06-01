@@ -298,7 +298,7 @@ get '/series/:series_id' => sub {
     my $series_id = params->{series_id};
     my $results = Results->new;
 
-    my $series = $series_model->get_series($series_id);
+    my $series = $series_model->get_row($series_id);
     if($series){
         $results->data($series)
     }
@@ -316,16 +316,7 @@ Create a new series
 =cut
 
 post '/series/' => sub {
-    my $data = {};
-    foreach my $field (qw/
-        name
-        frequency
-        is_deleted
-        /){
-        $data->{$field} = params->{$field};
-    };
-
-    my $series = $series_model->post_series($data);
+    my $series = $series_model->post_row(params);
     my $results = Results->new;
 
     if ($series) {
@@ -344,31 +335,14 @@ Update an existing series.
 =cut
 
 put '/series/:series_id' => sub {
-    my $data = {};
-    foreach my $field (qw/
-        series_id
-        name
-        frequency
-        is_deleted
-        /){
-        $data->{$field} = params->{$field};
-    };
-
-
-    # FIXME otherwise insert error:
-    # DBD::mysql::st execute failed: Incorrect integer value: '' for column `schedule`.`seriess`.`is_deleted`
-    if (! length $data->{is_deleted}) {
-        $data->{is_deleted} = 0;
-    }
-
-    my $series = $series_model->put_series($data);
+    my $series = $series_model->put_row(params);
     my $results = Results->new;
 
     if($series){
         $results->data($series)
     }
     else{
-        $results->add_error(2100, "Update failed for new $data->{series_id}");
+        $results->add_error(2100, "Update failed for series");
     }
 
     return $results->format;
@@ -383,7 +357,7 @@ Return all the non-deleted seriess
 get '/seriesAll' => sub {
     my $results = Results->new;
 
-    $results->data($series_model->get_seriess);
+    $results->data($series_model->get_multiple_rows);
 
     return $results->format;
 };

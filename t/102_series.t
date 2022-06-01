@@ -49,7 +49,6 @@ subtest 'POST /series' => sub{
     my $new_series = {
         name       => 'Bree Trewsday English',
         frequency  => 'second and fourth Trewday',
-        is_deleted => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/series/', $new_series);
@@ -62,7 +61,7 @@ subtest 'POST /series' => sub{
         frequency  => 'second and fourth Trewday',
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
-        is_deleted  => 0, # FIXME is that right? test 1
+        is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -84,9 +83,9 @@ subtest 'GET /series/#' => sub {
         series_id    => 1,
         name        => 'Bree Trewsday English',
         frequency  => 'second and fourth Trewday',
-        is_deleted   => 0,
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
+        is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -94,7 +93,7 @@ subtest 'GET /series/#' => sub {
 
 
 subtest 'PUT /series/1' => sub {
-    plan tests => 4;
+    plan tests => 3;
     my ($expected, $res, $decoded, $got);
 
     $ENV{TEST_NOW} += 100;
@@ -102,7 +101,6 @@ subtest 'PUT /series/1' => sub {
     my $edit_series = {
         name       => 'Bree Trewsday WEEKLY English',
         frequency  => 'second and fourth Trewsday',
-        is_deleted => 1,
     };
     $res = $test->request( PUT '/series/1' , content => $edit_series);
     ok( $res->is_success, 'returned success' );
@@ -112,9 +110,9 @@ subtest 'PUT /series/1' => sub {
         series_id   => 1,
         name        => 'Bree Trewsday WEEKLY English',
         frequency   => 'second and fourth Trewsday',
-        is_deleted  => 1,
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:19:45",
+        is_deleted  => 0,
     };
 
     $got = $decoded->{data};
@@ -126,11 +124,6 @@ subtest 'PUT /series/1' => sub {
     eq_or_diff $got, $expected, 'GET changed after PUT';
 
     # update our global series object
-    # reset it so the next test can find it
-    $edit_series->{is_deleted} = 0;
-    $res = $test->request( PUT '/series/1' , content => $edit_series);
-    ok( $res->is_success, 'returned success' );
-
     $Series = $dbh->resultset('Series')->find($decoded->{data}{series_id});
 
 };
@@ -148,9 +141,9 @@ subtest 'GET /seriesAll' => sub {
             series_id    => 1,
             name        => 'Bree Trewsday WEEKLY English',
             frequency  => 'second and fourth Trewsday',
-            is_deleted  => $Series->is_deleted,
             created_ts  => "2022-04-28T02:18:05",
             modified_ts => "2022-04-28T02:19:45",
+            is_deleted  => 0,
         }
     ];
 

@@ -63,6 +63,7 @@ subtest 'POST /event' => sub {
 		venues      => [],
 		created_ts  => "2022-04-28T02:18:05",
 		modified_ts => "2022-04-28T02:18:05",
+        is_deleted  => 0,
 	};
     eq_or_diff $got, $expected, 'return matches';
 
@@ -158,6 +159,7 @@ subtest 'POST /event/# with venues' => sub{
             name => $Venue_Vkey,
         }],
         styles      => [],
+        is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'return matches';
@@ -191,6 +193,7 @@ subtest "GET /event/# with venues" => sub {
             name => $Venue_Vkey,
         }],
 	    styles => [],
+        is_deleted  => 0,
 	};
 
     eq_or_diff $got, $expected, 'matches';
@@ -256,6 +259,7 @@ subtest "PUT /event/# with venues" => sub {
             }
         ],
 	    styles      => [],
+        is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 

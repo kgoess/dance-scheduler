@@ -19,6 +19,7 @@ sub get_fields_for_output {
         is_template
         created_ts
         modified_ts
+        is_deleted
     /
 }
 sub get_fields_for_input {
@@ -42,5 +43,6 @@ sub get_relationships {
     [qw/Venue venues venue_id/],
 }
 sub get_one_to_manys { [qw/Series series series_id/] }
+sub get_default_sorting { {-asc=>'start_time'} }
 
 1;

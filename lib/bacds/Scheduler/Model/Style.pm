@@ -13,16 +13,19 @@ sub get_fields_for_output {
         name
         created_ts
         modified_ts
+        is_deleted
     /
 }
 sub get_fields_for_input {
     qw/
         style_id
         name
+        is_deleted
     /
 }
 sub get_fkey_fields { }
 sub get_relationships { }
 sub get_one_to_manys { }
+sub get_default_sorting { {-asc=>'name'} }
 
 1;
