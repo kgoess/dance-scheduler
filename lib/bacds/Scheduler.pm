@@ -41,16 +41,16 @@ use bacds::Scheduler::Model::Event;
 
 get '/eventAll' => sub {
     my $results = Results->new;
-
-    $results->data($event_model->get_events);
-
+    
+    $results->data($event_model->get_multiple_rows);
+    
     return $results->format;
 };
 
 get '/eventsUpcoming' => sub {
     my $results = Results->new;
 
-    $results->data($event_model->get_upcoming_events);
+    $results->data($event_model->get_upcoming_rows);
 
     return $results->format;
 };
@@ -59,7 +59,7 @@ get '/event/:event_id' => sub {
     my $event_id = params->{event_id};
     my $results = Results->new;
 
-    my $event = $event_model->get_event($event_id);
+    my $event = $event_model->get_row($event_id);
     if($event){
         $results->data($event)
     }
@@ -72,22 +72,7 @@ get '/event/:event_id' => sub {
 
 
 post '/event/' => sub {
-    my $data = {};
-    foreach my $field (qw/
-        name
-        end_time
-        start_time
-        is_camp
-        long_desc
-        short_desc
-        series_id
-        style_id
-        venue_id
-        /){
-        $data->{$field} = params->{$field};
-    };
-
-    my $event = $event_model->post_event($data);
+    my $event = $event_model->post_row(params);
     my $results = Results->new;
 
     if($event){
@@ -103,22 +88,8 @@ post '/event/' => sub {
 
 put '/event/:event_id' => sub {
     my $data = {};
-    foreach my $field (qw/
-        event_id
-        name
-        end_time
-        start_time
-        is_camp
-        long_desc
-        short_desc
-        series_id
-        style_id
-        venue_id
-        /){
-        $data->{$field} = params->{$field};
-    };
 
-    my $event = $event_model->put_event($data);
+    my $event = $event_model->put_row(params);
     my $results = Results->new;
 
     if($event){
