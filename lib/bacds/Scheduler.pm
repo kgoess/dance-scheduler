@@ -87,8 +87,6 @@ post '/event/' => sub {
 
 
 put '/event/:event_id' => sub {
-    my $data = {};
-
     my $event = $event_model->put_row(params);
     my $results = Results->new;
 
@@ -96,7 +94,7 @@ put '/event/:event_id' => sub {
         $results->data($event)
     }
     else{
-        $results->add_error(1300, "Update failed for new $data->{event_id}");
+        $results->add_error(1300, "Update failed for new event");
     }
 
     return $results->format;
@@ -112,7 +110,7 @@ use bacds::Scheduler::Model::Style;
 get '/styleAll' => sub {
     my $results = Results->new;
 
-    $results->data($style_model->get_styles);
+    $results->data($style_model->get_multiple_rows);
 
     return $results->format;
 };
@@ -122,7 +120,7 @@ get '/style/:style_id' => sub {
     my $style_id = params->{style_id};
     my $results = Results->new;
 
-    my $style = $style_model->get_style($style_id);
+    my $style = $style_model->get_row($style_id);
     if($style){
         $results->data($style)
     }
@@ -135,10 +133,7 @@ get '/style/:style_id' => sub {
 
 
 post '/style/' => sub {
-    my $data = {};
-    $data->{name} = params->{name};
-
-    my $style = $style_model->post_style($data);
+    my $style = $style_model->post_row(params);
     my $results = Results->new;
 
     if($style){
@@ -153,22 +148,14 @@ post '/style/' => sub {
 
 
 put '/style/:style_id' => sub {
-    my $data = {};
-    foreach my $field (qw/
-        style_id
-        name
-        /){
-        $data->{$field} = params->{$field};
-    };
-
-    my $style = $style_model->put_style($data);
+    my $style = $style_model->put_row(params);
     my $results = Results->new;
 
     if($style){
         $results->data($style)
     }
     else{
-        $results->add_error(1600, "Update failed for new $data->{style_id}");
+        $results->add_error(1600, "Update failed for new style");
     }
 
     return $results->format;
