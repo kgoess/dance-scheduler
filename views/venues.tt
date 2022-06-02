@@ -8,7 +8,7 @@
 <div class="model-display" hidden>
     <form id="venue-display-form">
         <% venue_column_types = [
-            [ "name", "vkey" ],
+            [ "vkey", "vkey" ],
             [ "hall_name", "Hall Name" ],
             [ "address", "Street Address" ],
             [ "city", "City" ],

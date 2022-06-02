@@ -47,7 +47,7 @@ subtest 'POST /venue' => sub{
     my ($res, $decoded, $expected, $got);
 
     my $new_venue = {
-        name       => 'ABC', # this is "vkey" in the schema
+        vkey       => 'ABC', # this is "vkey" in the schema
         hall_name  => 'test venue name',
         address    => 'test address',
         city       => 'test city',
@@ -62,8 +62,7 @@ subtest 'POST /venue' => sub{
     $got = $decoded->{data};
     $expected = {
         venue_id    => 1,
-        vkey        => $new_venue->{name}, # FIXME conflating vkey and name
-        name        => $new_venue->{name},
+        vkey        => $new_venue->{vkey},
         hall_name   => $new_venue->{hall_name},
         address     => $new_venue->{address},
         city        => $new_venue->{city},
@@ -92,8 +91,7 @@ subtest 'GET /venue/#' => sub {
     $got = $decoded->{data};
     $expected = {
         venue_id    => 1,
-        vkey        => $Venue->vkey, # FIXME conflating vkey and name
-        name        => $Venue->vkey,
+        vkey        => $Venue->vkey,
         hall_name   => $Venue->hall_name,
         address     => $Venue->address,
         city        => $Venue->city,
@@ -115,7 +113,7 @@ subtest 'PUT /venue/1' => sub {
     $ENV{TEST_NOW} += 100;
 
     my $edit_venue = {
-        name       => 'BCD',
+        vkey       => 'BCD',
         hall_name  => 'test change name',
         address    => 'test new address',
         city       => 'test altered city',
@@ -129,8 +127,7 @@ subtest 'PUT /venue/1' => sub {
 
     $expected = {
         venue_id    => 1,
-        vkey        => $edit_venue->{name}, # FIXME conflating vkey and name
-        name        => $edit_venue->{name},
+        vkey        => $edit_venue->{vkey},
         hall_name   => $edit_venue->{hall_name},
         address     => $edit_venue->{address},
         city        => $edit_venue->{city},
@@ -171,7 +168,6 @@ subtest 'GET /venueAll' => sub {
         {
             venue_id    => 1,
             vkey        => 'BCD',
-            name        => 'BCD',
             hall_name   => $Venue->hall_name,
             address     => $Venue->address,
             city        => $Venue->city,

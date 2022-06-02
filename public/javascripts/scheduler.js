@@ -100,6 +100,30 @@ function displayItem(modelName, msg) {
     }
 }
 
+/* getLabelForDisplayInItemListbox
+ *
+ * In the data returned from the server for listbox, we usually want to
+ * pick the 'name' attribute to display, but in some cases we don't:
+ */
+const keyToDisplayInItemRow = {
+    venue: 'vkey',
+};
+function getLabelForDisplayInItemListbox (modelName, data) {
+
+    let keyname;
+    if (keyName = keyToDisplayInItemRow[modelName]) {
+        return data[keyName];
+    } else {
+        return data['name'];
+    }
+}
+
+/* displayItemRow
+ *
+ * The "item" is the thing we're displaying, like an event or a venue. This
+ * "row" is one thing for that, like "long_desc" or a listbox like "style" or
+ * "venue".
+ */
 function displayItemRow(currentRow, targetObj) {
 
     currentRow.children('.row-contents').show();
@@ -118,11 +142,12 @@ function displayItemRow(currentRow, targetObj) {
             const selections = targetObj
                 ? targetObj[tableName]
                 : '';
+            const labelGetter = row => getLabelForDisplayInItemListbox(modelName, row);
             $.ajax({
                 url: `${modelName}All`,
                 dataType: 'json'
             })
-            .done((msg) => fillInItemRowList(currentRow, msg, selections));
+            .done((msg) => fillInItemRowList(currentRow, msg, selections, labelGetter));
 
             break;
         default:
@@ -130,7 +155,13 @@ function displayItemRow(currentRow, targetObj) {
     }
 }
 
-function fillInItemRowList(currentRow, msg, selections) {
+
+/* fillInItemRowList
+ *
+ * We're displaying an "item", like an event, going through each of its "rows"
+ * on the display, and we've hit one that's a listbox.
+ */
+function fillInItemRowList(currentRow, msg, selections, labelGetter) {
     if (msg['data']) {
         const rows = msg['data'];
         const name = currentRow.attr('name');
@@ -138,8 +169,9 @@ function fillInItemRowList(currentRow, msg, selections) {
         insertTarget.find('option').remove();
         currentRow.find('[cloned-selectlist=1]').remove();
         rows.forEach((row, i) => {
-            let element = document.createElement('option');
-            element.innerHTML = escapeHtml(row['name']);
+            const element = document.createElement('option');
+            const label = labelGetter(row);
+            element.innerHTML = escapeHtml(label);
             element.setAttribute('value', escapeHtml(row[name]));
             insertTarget.append(element);
         });
@@ -158,6 +190,10 @@ function fillInItemRowList(currentRow, msg, selections) {
     }
 }
 
+/* displayListForModel
+ *
+ * This is the main chooser list for a given model, like "Events" or "Venues".
+ */
 function displayListForModel(modelName, msg) {
 
     const insertTarget = getContainerForModelName(modelName).find('.clickable-list');
@@ -167,8 +203,9 @@ function displayListForModel(modelName, msg) {
         const rows = msg['data'];
 
         rows.forEach((row, i) => {
-            let element = document.createElement('option');
-            element.innerHTML = escapeHtml(row['name']);
+            const element = document.createElement('option');
+            const label = getLabelForDisplayInItemListbox(modelName, row);
+            element.innerHTML = escapeHtml(label);
             element.setAttribute('value', escapeHtml(row[`${modelName}_id`]));
             insertTarget.append(element);
         });

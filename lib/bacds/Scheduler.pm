@@ -198,6 +198,7 @@ Create a new venue
 post '/venue/' => sub {
     my $data = {};
     foreach my $field (qw/
+        vkey
         hall_name
         address
         city
@@ -207,10 +208,6 @@ post '/venue/' => sub {
         /){
         $data->{$field} = params->{$field};
     };
-
-    # FIXME "name" is dicated by the javascript
-    # see the FIXME in Model/Venue.pm
-    $data->{vkey} = params->{name};
 
     my $venue = $venue_model->post_venue($data);
     my $results = Results->new;
@@ -234,6 +231,7 @@ put '/venue/:venue_id' => sub {
     my $data = {};
     foreach my $field (qw/
         venue_id
+        vkey
         hall_name
         address
         city
@@ -243,10 +241,6 @@ put '/venue/:venue_id' => sub {
         /){
         $data->{$field} = params->{$field};
     };
-
-    # FIXME "name" is dicated by the javascript
-    # see the FIXME in Model/Venue.pm
-    $data->{vkey} = params->{name};
 
     # FIXME otherwise insert error:
     # DBD::mysql::st execute failed: Incorrect integer value: '' for column `schedule`.`venues`.`is_deleted`

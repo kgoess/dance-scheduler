@@ -81,7 +81,7 @@ subtest 'POST /event/# with venues' => sub{
     my ($new_venue, $res, $decoded, $got, $created_time);
 
     $new_venue = {
-        name        => 'VXX', # aka vkey
+        vkey        => 'VXX',
         hall_name   => 'the hall',
         address     => '123 Sesame St.',
         city        => 'Gotham',
@@ -101,8 +101,7 @@ subtest 'POST /event/# with venues' => sub{
 
     my $expected = {
         venue_id    => $Venue_Id,
-        name        => $Venue_Vkey, # aka vkey
-        vkey        => $Venue_Vkey, # aka vkey
+        vkey        => $Venue_Vkey,
         hall_name   => 'the hall',
         address     => '123 Sesame St.',
         city        => 'Gotham',
@@ -206,7 +205,7 @@ subtest "PUT /event/# with venues" => sub {
     my ($expected, $created_time, $modified_time, $res, $decoded, $got);
 
     my $other_venue = {
-        name        => 'VZZ', # aka vkey
+        vkey        => 'VZZ',
         hall_name   => 'the hall',
         address     => '123 Sesame St.',
         city        => 'Gotham',

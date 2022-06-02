@@ -133,14 +133,6 @@ sub venue_row_to_result {
     };
 
 
-	# FIXME setting 'name' to match this in the javascript
-	# but I think that's why update isn't working
-    #    element.innerHTML = escapeHtml(row['name']);
-    #    element.setAttribute('value', escapeHtml(row[name]));
-
-
-    $result->{name} = $venue->vkey;
-
     foreach my $datetime (qw/created_ts modified_ts/){
         next unless $result->{$datetime};
         $result->{$datetime} = $result->{$datetime}->iso8601;
