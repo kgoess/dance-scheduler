@@ -4,7 +4,7 @@ bacds::Scheduler::Model::Series - a regular series of events under one managemen
 
 =head1 SYNOPSIS
 
-    my $series = $class->get_series($series_id);
+    my $series = $class->get_row($series_id);
 
 =head1 DESCRIPTION
 
