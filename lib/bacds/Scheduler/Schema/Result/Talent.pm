@@ -151,6 +151,15 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SiL1RuVBL+LcvsDo9zHwZA
 
+__PACKAGE__->many_to_many(bands=> 'band_memberships', 'band');
+
+sub get_fields_for_band_row {
+    my ($self) = @_;
+    return {
+        name => $self->name,
+        id   => $self->talent_id,
+    };
+}
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

@@ -151,6 +151,7 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:mcDiUY5jCssNhjxR+oVOow
 
+__PACKAGE__->many_to_many(talents => 'band_memberships', 'talent');
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

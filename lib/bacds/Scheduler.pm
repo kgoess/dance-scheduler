@@ -404,7 +404,7 @@ get '/series/:series_id' => sub {
         $results->data($series)
     }
     else{
-        $results->add_error(1800, "Nothing Found for series_id $series_id");
+        $results->add_error(2000, "Nothing Found for series_id $series_id");
     }
 
     return $results->format;
@@ -423,7 +423,7 @@ post '/series/' => sub {
     if ($series) {
         $results->data($series)
     } else {
-        $results->add_error(1900, "Insert failed for new series");
+        $results->add_error(2100, "Insert failed for new series");
     }
 
     return $results->format;
@@ -443,7 +443,7 @@ put '/series/:series_id' => sub {
         $results->data($series)
     }
     else{
-        $results->add_error(2100, "Update failed for series");
+        $results->add_error(2200, "Update failed for series");
     }
 
     return $results->format;
@@ -459,6 +459,86 @@ get '/seriesAll' => sub {
     my $results = Results->new;
 
     $results->data($series_model->get_multiple_rows);
+
+    return $results->format;
+};
+
+=head2 Bands
+
+=cut
+
+my $band_model = 'bacds::Scheduler::Model::Band';
+use bacds::Scheduler::Model::Band;
+
+
+=head3 GET '/band/:band_id'
+
+=cut
+
+get '/band/:band_id' => sub {
+    my $band_id = params->{band_id};
+    my $results = Results->new;
+
+    my $band = $band_model->get_row($band_id);
+    if($band){
+        $results->data($band)
+    }
+    else{
+        $results->add_error(2300, "Nothing Found for band_id $band_id");
+    }
+
+    return $results->format;
+};
+
+=head3 POST /band/
+
+Create a new band
+
+=cut
+
+post '/band/' => sub {
+    my $band = $band_model->post_row(params);
+    my $results = Results->new;
+
+    if ($band) {
+        $results->data($band)
+    } else {
+        $results->add_error(2400, "Insert failed for new band");
+    }
+
+    return $results->format;
+};
+
+=head3 PUT /band/:band_id
+
+Update an existing band.
+
+=cut
+
+put '/band/:band_id' => sub {
+    my $band = $band_model->put_row(params);
+    my $results = Results->new;
+
+    if($band){
+        $results->data($band)
+    }
+    else{
+        $results->add_error(2500, "Update failed for band");
+    }
+
+    return $results->format;
+};
+
+=head3 GET /bandAll
+
+Return all the non-deleted bands
+
+=cut
+
+get '/bandAll' => sub {
+    my $results = Results->new;
+
+    $results->data($band_model->get_multiple_rows);
 
     return $results->format;
 };

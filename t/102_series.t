@@ -36,7 +36,7 @@ subtest 'Invalid GET /series/1' => sub{
     $expected = {
         errors => [{
             msg => 'Nothing Found for series_id 1',
-            num => 1800,
+            num => 2000,
         }]
     };
     is_deeply $decoded, $expected, 'error msg matches';
