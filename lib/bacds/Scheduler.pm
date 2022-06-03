@@ -303,7 +303,7 @@ get '/venue/:venue_id' => sub {
     my $venue_id = params->{venue_id};
     my $results = Results->new;
 
-    my $venue = $venue_model->get_venue($venue_id);
+    my $venue = $venue_model->get_row($venue_id);
     if($venue){
         $results->data($venue)
     }
@@ -321,20 +321,7 @@ Create a new venue
 =cut
 
 post '/venue/' => sub {
-    my $data = {};
-    foreach my $field (qw/
-        vkey
-        hall_name
-        address
-        city
-        zip
-        comment
-        is_deleted
-        /){
-        $data->{$field} = params->{$field};
-    };
-
-    my $venue = $venue_model->post_venue($data);
+    my $venue = $venue_model->post_row(params);
     my $results = Results->new;
 
     if ($venue) {
@@ -353,34 +340,14 @@ Update an existing venue.
 =cut
 
 put '/venue/:venue_id' => sub {
-    my $data = {};
-    foreach my $field (qw/
-        venue_id
-        vkey
-        hall_name
-        address
-        city
-        zip
-        comment
-        is_deleted
-        /){
-        $data->{$field} = params->{$field};
-    };
-
-    # FIXME otherwise insert error:
-    # DBD::mysql::st execute failed: Incorrect integer value: '' for column `schedule`.`venues`.`is_deleted`
-    if (! length $data->{is_deleted}) {
-        $data->{is_deleted} = 0;
-    }
-
-    my $venue = $venue_model->put_venue($data);
+    my $venue = $venue_model->put_row(params);
     my $results = Results->new;
 
     if($venue){
         $results->data($venue)
     }
     else{
-        $results->add_error(1900, "Update failed for new $data->{venue_id}");
+        $results->add_error(1900, "Update failed for venue");
     }
 
     return $results->format;
@@ -410,7 +377,7 @@ Return all the non-deleted venues
 get '/venueAll' => sub {
     my $results = Results->new;
 
-    $results->data($venue_model->get_venues);
+    $results->data($venue_model->get_multiple_rows);
 
     return $results->format;
 };
