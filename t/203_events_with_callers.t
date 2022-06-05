@@ -9,7 +9,7 @@ use JSON qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -23,17 +23,16 @@ my $app = bacds::Scheduler->to_app;
 my $test = Plack::Test->create($app);
 my $dbh = get_dbh();
 
-my ($Event, $Venued_Event);
-my ($Event_Id, $Venued_Event_Id);
-my ($Venue_Id, $Venue_Vkey);
+my ($Event, $Callered_Event);
+my ($Event_Id, $Callered_Event_Id);
+my ($Caller_Id);
 
 
-# We've already tested POST /event in 200_events.t, so
 # this could just use DBIx::Class to insert it directly
 subtest 'POST /event' => sub {
     plan tests=>2;
 
-    my ($expected, $created_time, $res, $decoded, $got);
+    my ($expected, $res, $decoded, $got);
 
     my $new_event = {
         start_time  => "2022-05-01T20:00:00",
@@ -42,7 +41,7 @@ subtest 'POST /event' => sub {
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
-        series_id   => undef,
+        caller_id   => undef,
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/event/', $new_event );
@@ -59,7 +58,7 @@ subtest 'POST /event' => sub {
 		name        => $new_event->{name},
 		is_template => undef,
         callers     => [],
-        series      => [],
+		series      => [],
 		styles      => [],
 		venues      => [],
 		created_ts  => "2022-04-28T02:18:05",
@@ -74,46 +73,38 @@ subtest 'POST /event' => sub {
 };
 
 
-# ******* Now adding venues *******
+# ******* Now adding Caller *******
 
-subtest 'POST /event/# with venues' => sub{
-    plan tests=>4;
 
-    my ($new_venue, $res, $decoded, $got, $created_time);
+subtest 'POST /caller' => sub {
+    my ($res, $decoded, $got);
 
-    $new_venue = {
-        vkey        => 'VXX',
-        hall_name   => 'the hall',
-        address     => '123 Sesame St.',
-        city        => 'Gotham',
-        zip         => '02134',
-        comment     => 'this is the comment',
-        is_deleted  => 0,
+    my $new_caller = {
+        name       => 'Rose Gamgee',
+        frequency  => 'fourth Trewsday',
+        
     };
-    $res = $test->request(POST '/venue/', $new_venue );
-    ok($res->is_success, 'created venue');
+    $res = $test->request(POST '/caller/', $new_caller );
+    ok($res->is_success, 'created caller');
     $decoded = decode_json($res->content);
-    $Venue_Id = $decoded->{data}{venue_id};
-    $Venue_Vkey = $decoded->{data}{vkey};
-    $got = {};
-    foreach my $key (keys %{$decoded->{data}}){
-        $got->{$key} = $decoded->{data}{$key};
-    };
+    $Caller_Id = $decoded->{data}{caller_id};
+    $got = $decoded->{data};
 
     my $expected = {
-        venue_id    => $Venue_Id,
-        vkey        => $Venue_Vkey,
-        hall_name   => 'the hall',
-        address     => '123 Sesame St.',
-        city        => 'Gotham',
-        zip         => '02134',
-        comment     => 'this is the comment',
-        is_deleted  => 0,
+        caller_id    => $Caller_Id,
+        name        => 'Rose Gamgee',
         created_ts  => '2022-04-28T02:18:05',
         modified_ts => '2022-04-28T02:18:05',
+        is_deleted  => 0,
     };
 
-    eq_or_diff $got, $expected, 'venue return matches';
+    eq_or_diff $got, $expected, 'caller return matches';
+};
+
+subtest 'POST /event/# with caller' => sub {
+    plan tests => 2;
+
+    my ($res, $decoded, $got);
 
     my $new_event = {
         start_time  => "2022-05-03T20:00:00",
@@ -122,14 +113,7 @@ subtest 'POST /event/# with venues' => sub{
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
-        series_id   => undef,
-        venue_id   => [$Venue_Id],
-        venues     => [
-            {
-                id => $Venue_Id,
-                name  => $Venue_Vkey,
-            }
-        ],
+        caller_id   => $Caller_Id,
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
@@ -140,87 +124,85 @@ subtest 'POST /event/# with venues' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
 
-	$Venued_Event_Id = $got->{event_id},
+	$Callered_Event_Id = $got->{event_id},
 
-    $expected = {
-		event_id    => $Venued_Event_Id,
+    my $expected = {
+        callers => [
+          {
+            id => 1,
+            name => 'Rose Gamgee'
+          }
+        ],
+		event_id    => $Callered_Event_Id,
         start_time  => $new_event->{start_time},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
         long_desc   => $new_event->{long_desc},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
-        callers     => [],
-        series      => [],
         is_template => undef,
         created_ts  => $now_ts,
         modified_ts => $now_ts,
-        venues      => [{
-            id   => $Venue_Id,
-            name => $Venue_Vkey,
-        }],
+        venues      => [],
+        series      => [],
         styles      => [],
         is_deleted  => 0,
     };
 
     eq_or_diff $got, $expected, 'return matches';
 
-	$Venued_Event = $dbh->resultset('Event')->find($Venued_Event_Id);
+	$Callered_Event = $dbh->resultset('Event')->find($Callered_Event_Id);
 };
 
-subtest "GET /event/# with venues" => sub {
+subtest "GET /event/# with caller" => sub {
     plan tests=>2;
 
     my ($expected, $res, $decoded, $got);
 
-    $res  = $test->request( GET "/event/$Venued_Event_Id" );
+    $res  = $test->request( GET "/event/$Callered_Event_Id" );
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
         created_ts  => '2022-04-28T02:18:05',
         end_time    => '2022-05-03T22:00:00',
-        event_id    => $Venued_Event_Id,
+        event_id    => $Callered_Event_Id,
         is_camp     => 1,
         is_template => undef,
         long_desc   => 'this is the long desc',
         modified_ts => '2022-04-28T02:18:05',
         name        => 'saturday night test event',
-        callers     => [],
-        series      => [],
+        callers => [
+          {
+            id => 1,
+            name => 'Rose Gamgee'
+          }
+        ],
         short_desc  => 'itsa shortdesc',
         start_time  => '2022-05-03T20:00:00',
-        venues      => [{
-            id   => $Venue_Id,
-            name => $Venue_Vkey,
-        }],
+	    series => [],
 	    styles => [],
+        venues      => [],
         is_deleted  => 0,
 	};
 
     eq_or_diff $got, $expected, 'matches';
 };
 
-
-subtest "PUT /event/# with venues" => sub {
+subtest "PUT /event/# with caller" => sub {
     plan tests => 4;
 
-    my ($expected, $created_time, $modified_time, $res, $decoded, $got);
+    my ($expected, $modified_time, $res, $decoded, $got);
 
-    my $other_venue = {
-        vkey        => 'VZZ',
-        hall_name   => 'the hall',
-        address     => '123 Sesame St.',
-        city        => 'Gotham',
-        zip         => '02134',
-        comment     => 'this is the comment',
-        is_deleted  => 0,
+    my $other_caller = {
+        name        => 'Daffodil Brandybuck',
+        frequency   => 'monthly',
     };
-    $res = $test->request(POST '/venue/', $other_venue );
-    ok($res->is_success, 'created venue');
+    $res = $test->request(POST '/caller/', $other_caller );
+    ok($res->is_success, 'created caller');
 
     $decoded = decode_json($res->content);
-    my $other_venue_id = $decoded->{data}{venue_id};
+    my $other_caller_id = $decoded->{data}{caller_id};
 
     my $edit_event = {
         start_time  => "2022-05-03T21:00:00",
@@ -229,44 +211,41 @@ subtest "PUT /event/# with venues" => sub {
         long_desc   => "this is a new long desc",
         name        => "new name",
         short_desc  => "new shortdef",
-        venue_id    => [$Venue_Id, $other_venue_id],
+        #venue_id    => [],
         style_id   => [],
+        caller_id   => $other_caller_id,
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
-    $res = $test->request( PUT "/event/$Venued_Event_Id" , content => $edit_event);
+    $res = $test->request( PUT "/event/$Callered_Event_Id" , content => $edit_event);
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
         created_ts  => "2022-04-28T02:18:05",
         end_time    => "2022-05-03T23:00:00",
-        event_id    => $Venued_Event_Id,
+        event_id    => $Callered_Event_Id,
         is_camp     => 0,
         is_template => undef,
         long_desc   => "this is a new long desc",
         modified_ts => "2022-04-28T02:19:45",
         name        => "new name",
-        callers     => [],
-        series      => [],
+        callers => [
+          {
+            id => 2,
+            name => 'Daffodil Brandybuck',
+          }
+        ],
         short_desc  => "new shortdef",
         start_time  => "2022-05-03T21:00:00",
-        venues      => [
-            {
-                id => 1,
-                name => 'VXX',
-            },
-            {
-                id => 2,
-                name => 'VZZ',
-            }
-        ],
+        venues      => [],
+	    series      => [],
 	    styles      => [],
         is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
-    $res  = $test->request( GET "/event/$Venued_Event_Id" );
+    $res  = $test->request( GET "/event/$Callered_Event_Id" );
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
 

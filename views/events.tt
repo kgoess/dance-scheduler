@@ -50,6 +50,14 @@
                  -->
             </div>
         </div>
+        <div name="caller_id" class="display-row" column-type="list-item" model-name="caller" table-name="callers" >
+            <div class="multi-select-wrapper">
+                <span class="row-label">Caller</span>
+                <select name="caller_id">
+                </select>
+                <span class="add-multi-select-button">+</span>
+            </div>
+        </div>
         <input type="hidden" name="event_id"/>
         <span class="button-container">
             <button class="button save-button">Save</button>

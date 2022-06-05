@@ -139,4 +139,15 @@ __PACKAGE__->has_many(
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
+
+__PACKAGE__->many_to_many(events => 'event_callers_maps', 'event');
+
+sub get_fields_for_event_row {
+    my ($self) = @_;
+    return {
+        name => $self->name,
+        id   => $self->caller_id,
+    };
+}
+
 1;

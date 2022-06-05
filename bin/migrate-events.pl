@@ -52,6 +52,8 @@ sub create_events {
         attach_styles($dbh, $old, $new);
 
         attach_venues($dbh, $old, $new);
+
+        attach_callers($dbh, $old, $new);
     }
 
 }
@@ -148,5 +150,26 @@ sub attach_venues {
     @rs or die "can't find $vkey in venues table";
     $new->add_to_venues($rs[0], {
         ordering => $i++, # there is only 1
+    });
+}
+
+sub attach_callers {
+    my ($dbh, $old, $new) = @_;
+
+    my $caller_name = $old->leader;
+    $caller_name =~ s/^ +//;
+    $caller_name =~ s/ +$//;
+
+    # there's enough junk in the callers column that we might not be able to
+    # suss out the caller, so just leave those blank and we can fill them in
+    # manually later
+    my @rs = $dbh->resultset('Caller')->search({
+        name => $caller_name
+    })
+        or return;
+
+    say "attaching caller $caller_name to event ".$new->event_id;
+    $new->add_to_callers($rs[0], {
+        ordering => 1, # there is only 1
     });
 }

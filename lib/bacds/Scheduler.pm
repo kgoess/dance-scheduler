@@ -27,6 +27,7 @@ use Data::Dump qw/dump/;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
+use bacds::Scheduler::Model::Caller;
 
 our $VERSION = '0.1';
 
@@ -55,6 +56,10 @@ get '/' => sub {
             { label => 'Series',
               modelName => 'series',
               content => template("series.tt", {}, { layout=> undef }),
+            },
+            { label => 'Callers',
+              modelName => 'caller',
+              content => template("callers.tt", {}, { layout=> undef }),
             },
         ],
     };
@@ -98,7 +103,7 @@ get '/eventAll' => sub {
 
 =head3 GET /eventsUpcoming
 
-Like /eventsAll, but just events from yesterday on.
+Like /eventAll, but just events from yesterday on.
 
 =cut
 
@@ -623,6 +628,104 @@ get '/talentAll' => sub {
     my $results = Results->new;
 
     $results->data($talent_model->get_multiple_rows);
+
+    return $results->format;
+};
+
+=head2 Callers
+
+=head3 GET /callerAll
+
+Returns all of the callers in the db not marked "is_deleted".
+
+    "data": [
+      {
+        "name": "Alice Smith",
+        "caller_id": 6
+      },
+      {
+        "name": "Bob Jones",
+        "caller_id": 5
+      },
+      ...
+    "errors": [],
+
+=cut
+
+my $caller_model = 'bacds::Scheduler::Model::Caller';
+
+get '/callerAll' => sub {
+    my $results = Results->new;
+
+    $results->data($caller_model->get_multiple_rows);
+
+    return $results->format;
+};
+
+
+=head3 GET /caller/:caller_id
+
+    "data": {
+      "caller_id": 6,
+      "name": "Alice Smith",
+      "is_deleted": 0
+    }
+    "errors": [],
+
+
+=cut
+
+get '/caller/:caller_id' => sub {
+    my $caller_id = params->{caller_id};
+    my $results = Results->new;
+
+    my $caller = $caller_model->get_row($caller_id);
+    if($caller){
+        $results->data($caller)
+    }
+    else{
+        $results->add_error(2900, "Nothing Found for caller_id $caller_id");
+    }
+
+    return $results->format;
+};
+
+=head2 POST /caller
+
+Create a new caller.
+
+=cut
+
+post '/caller/' => sub {
+    my $caller = $caller_model->post_row(params);
+    my $results = Results->new;
+
+    if($caller){
+        $results->data($caller)
+    }
+    else{
+        $results->add_error(3000, "Insert failed for new caller");
+    }
+
+    return $results->format;
+};
+
+=head2 PUT /caller/:caller_id
+
+Update a caller.
+
+=cut
+
+put '/caller/:caller_id' => sub {
+    my $caller = $caller_model->put_row(params);
+    my $results = Results->new;
+
+    if($caller){
+        $results->data($caller)
+    }
+    else{
+        $results->add_error(3100, "Update failed for new caller");
+    }
 
     return $results->format;
 };
