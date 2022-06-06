@@ -49,28 +49,28 @@ subtest 'POST /event' => sub {
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-	$expected = {
-		event_id    => 1,
-		start_time  => $new_event->{start_time},
-		end_time    => $new_event->{end_time},
-		is_camp     => $new_event->{is_camp},
-		long_desc   => $new_event->{long_desc},
-		short_desc  => $new_event->{short_desc},
-		name        => $new_event->{name},
-		is_template => undef,
+    $expected = {
+        event_id    => 1,
+        start_time  => $new_event->{start_time},
+        end_time    => $new_event->{end_time},
+        is_camp     => $new_event->{is_camp},
+        long_desc   => $new_event->{long_desc},
+        short_desc  => $new_event->{short_desc},
+        name        => $new_event->{name},
+        is_template => undef,
         callers     => [],
         series      => [],
-		styles      => [],
-		venues      => [],
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:18:05",
+        styles      => [],
+        venues      => [],
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
-	};
+    };
     eq_or_diff $got, $expected, 'return matches';
 
-	# now save it for the subsequent tests
-	$Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
-	$Event_Id = $Event->event_id;
+    # now save it for the subsequent tests
+    $Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
+    $Event_Id = $Event->event_id;
 };
 
 
@@ -140,10 +140,10 @@ subtest 'POST /event/# with venues' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
 
-	$Venued_Event_Id = $got->{event_id},
+    $Venued_Event_Id = $got->{event_id},
 
     $expected = {
-		event_id    => $Venued_Event_Id,
+        event_id    => $Venued_Event_Id,
         start_time  => $new_event->{start_time},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
@@ -165,7 +165,7 @@ subtest 'POST /event/# with venues' => sub{
 
     eq_or_diff $got, $expected, 'return matches';
 
-	$Venued_Event = $dbh->resultset('Event')->find($Venued_Event_Id);
+    $Venued_Event = $dbh->resultset('Event')->find($Venued_Event_Id);
 };
 
 subtest "GET /event/# with venues" => sub {
@@ -194,9 +194,9 @@ subtest "GET /event/# with venues" => sub {
             id   => $Venue_Id,
             name => $Venue_Vkey,
         }],
-	    styles => [],
+        styles => [],
         is_deleted  => 0,
-	};
+    };
 
     eq_or_diff $got, $expected, 'matches';
 };
@@ -261,7 +261,7 @@ subtest "PUT /event/# with venues" => sub {
                 name => 'VZZ',
             }
         ],
-	    styles      => [],
+        styles      => [],
         is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';

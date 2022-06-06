@@ -48,28 +48,28 @@ subtest 'POST /event' => sub {
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-	$expected = {
-		event_id    => 1,
-		start_time  => $new_event->{start_time},
-		end_time    => $new_event->{end_time},
-		is_camp     => $new_event->{is_camp},
-		long_desc   => $new_event->{long_desc},
-		short_desc  => $new_event->{short_desc},
-		name        => $new_event->{name},
-		is_template => undef,
+    $expected = {
+        event_id    => 1,
+        start_time  => $new_event->{start_time},
+        end_time    => $new_event->{end_time},
+        is_camp     => $new_event->{is_camp},
+        long_desc   => $new_event->{long_desc},
+        short_desc  => $new_event->{short_desc},
+        name        => $new_event->{name},
+        is_template => undef,
         callers     => [],
-		series      => [],
-		styles      => [],
-		venues      => [],
-		created_ts  => "2022-04-28T02:18:05",
-		modified_ts => "2022-04-28T02:18:05",
+        series      => [],
+        styles      => [],
+        venues      => [],
+        created_ts  => "2022-04-28T02:18:05",
+        modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
-	};
+    };
     eq_or_diff $got, $expected, 'return matches';
 
-	# now save it for the subsequent tests
-	$Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
-	$Event_Id = $Event->event_id;
+    # now save it for the subsequent tests
+    $Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
+    $Event_Id = $Event->event_id;
 };
 
 
@@ -124,7 +124,7 @@ subtest 'POST /event/# with caller' => sub {
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
 
-	$Callered_Event_Id = $got->{event_id},
+    $Callered_Event_Id = $got->{event_id},
 
     my $expected = {
         callers => [
@@ -133,7 +133,7 @@ subtest 'POST /event/# with caller' => sub {
             name => 'Rose Gamgee'
           }
         ],
-		event_id    => $Callered_Event_Id,
+        event_id    => $Callered_Event_Id,
         start_time  => $new_event->{start_time},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
@@ -151,7 +151,7 @@ subtest 'POST /event/# with caller' => sub {
 
     eq_or_diff $got, $expected, 'return matches';
 
-	$Callered_Event = $dbh->resultset('Event')->find($Callered_Event_Id);
+    $Callered_Event = $dbh->resultset('Event')->find($Callered_Event_Id);
 };
 
 subtest "GET /event/# with caller" => sub {
@@ -180,11 +180,11 @@ subtest "GET /event/# with caller" => sub {
         ],
         short_desc  => 'itsa shortdesc',
         start_time  => '2022-05-03T20:00:00',
-	    series => [],
-	    styles => [],
+        series => [],
+        styles => [],
         venues      => [],
         is_deleted  => 0,
-	};
+    };
 
     eq_or_diff $got, $expected, 'matches';
 };
@@ -239,8 +239,8 @@ subtest "PUT /event/# with caller" => sub {
         short_desc  => "new shortdef",
         start_time  => "2022-05-03T21:00:00",
         venues      => [],
-	    series      => [],
-	    styles      => [],
+        series      => [],
+        styles      => [],
         is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
