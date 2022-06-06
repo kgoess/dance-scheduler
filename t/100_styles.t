@@ -52,6 +52,7 @@ subtest 'POST /style' => sub{
     my ($expected, $res, $decoded, $got);
     my $new_style = {
         name        => "test style",
+        style_id   => '', # the webapp sends name=test+style&style_id=
     };
     $ENV{TEST_NOW} = 1651112285;
     $Created_Time = get_now()->iso8601;

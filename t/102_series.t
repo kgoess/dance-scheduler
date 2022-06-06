@@ -49,6 +49,8 @@ subtest 'POST /series' => sub{
     my $new_series = {
         name       => 'Bree Trewsday English',
         frequency  => 'second and fourth Trewday',
+        series_id   => '', # the webapp sends
+                           # name=New+Series&frequency=monthly&is_deleted=0&series_id=
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/series/', $new_series);

@@ -54,6 +54,8 @@ subtest 'POST /venue' => sub{
         zip        => '12345-1234',
         comment    => 'test comment',
         is_deleted => 0,
+        # the webapp doesn't have a problem with venue_id here like the other
+        # models, not sure why
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/venue/', $new_venue);

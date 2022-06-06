@@ -6,6 +6,7 @@ use warnings;
 use Dancer2;
 use DateTime;
 use Data::Dump qw/dump/;
+use List::Util;
 use Scalar::Util qw/blessed/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
@@ -176,6 +177,9 @@ sub post_row {
     my $row = $dbh->resultset($model_name)->new({});
 
     foreach my $column (@fields_for_input) {
+        # don't touch the whatever_id primary key
+        # or DBIx::Class gets unhappy
+        next if List::Util::any { $column eq $_ } $row->primary_columns;
         $row->$column($incoming_data{$column});
     };
 
