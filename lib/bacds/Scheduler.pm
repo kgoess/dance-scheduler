@@ -473,6 +473,8 @@ use bacds::Scheduler::Model::Band;
 
 =head3 GET '/band/:band_id'
 
+Get all the info for one band.
+
 =cut
 
 get '/band/:band_id' => sub {
@@ -492,7 +494,7 @@ get '/band/:band_id' => sub {
 
 =head3 POST /band/
 
-Create a new band
+Create a new band.
 
 =cut
 
@@ -539,6 +541,88 @@ get '/bandAll' => sub {
     my $results = Results->new;
 
     $results->data($band_model->get_multiple_rows);
+
+    return $results->format;
+};
+
+=head2 Talents
+
+=cut
+
+my $talent_model = 'bacds::Scheduler::Model::Talent';
+use bacds::Scheduler::Model::Talent;
+
+
+=head3 GET '/talent/:talent_id'
+
+Get all the info for one talent.
+
+=cut
+
+get '/talent/:talent_id' => sub {
+    my $talent_id = params->{talent_id};
+    my $results = Results->new;
+
+    my $talent = $talent_model->get_row($talent_id);
+    if($talent){
+        $results->data($talent)
+    }
+    else{
+        $results->add_error(2600, "Nothing Found for talent_id $talent_id");
+    }
+
+    return $results->format;
+};
+
+=head3 POST /talent/
+
+Create a new talent.
+
+=cut
+
+post '/talent/' => sub {
+    my $talent = $talent_model->post_row(params);
+    my $results = Results->new;
+
+    if ($talent) {
+        $results->data($talent)
+    } else {
+        $results->add_error(2700, "Insert failed for new talent");
+    }
+
+    return $results->format;
+};
+
+=head3 PUT /talent/:talent_id
+
+Update an existing talent.
+
+=cut
+
+put '/talent/:talent_id' => sub {
+    my $talent = $talent_model->put_row(params);
+    my $results = Results->new;
+
+    if($talent){
+        $results->data($talent)
+    }
+    else{
+        $results->add_error(2800, "Update failed for talent");
+    }
+
+    return $results->format;
+};
+
+=head3 GET /talentAll
+
+Return all the non-deleted talents
+
+=cut
+
+get '/talentAll' => sub {
+    my $results = Results->new;
+
+    $results->data($talent_model->get_multiple_rows);
 
     return $results->format;
 };
