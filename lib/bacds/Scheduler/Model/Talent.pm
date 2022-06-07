@@ -6,7 +6,6 @@ use warnings;
 use parent 'bacds::Scheduler::Model';
 
 sub get_model_name { 'Talent' }
-sub get_other_table_names { }
 sub get_fields_for_output {
     qw/
         talent_id
@@ -23,7 +22,7 @@ sub get_fields_for_input {
     /
 }
 sub get_fkey_fields { }
-sub get_relationships { }
+sub get_many_to_manys { }
 sub get_one_to_manys { }
 sub get_default_sorting { {-asc=>'name'} }
 

@@ -6,7 +6,6 @@ use warnings;
 use parent 'bacds::Scheduler::Model';
 
 sub get_model_name { 'Event' }
-sub get_other_table_names { qw/styles venues series callers/ }
 sub get_fields_for_output {
     qw/
         event_id
@@ -37,10 +36,12 @@ sub get_fields_for_input {
 }
 
 sub get_fkey_fields { qw/series_id/ }
-sub get_relationships { 
+sub get_many_to_manys { 
     [qw/Style styles style_id/],
     [qw/Venue venues venue_id/],
     [qw/Caller callers caller_id/],
+    [qw/Band bands band_id/],
+    [qw/Talent talent talent_id/],
 }
 sub get_one_to_manys { [qw/Series series series_id/] }
 sub get_default_sorting { {-asc=>'start_time'} }

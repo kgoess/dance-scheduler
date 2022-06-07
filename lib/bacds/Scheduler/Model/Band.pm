@@ -20,7 +20,6 @@ use warnings;
 use parent 'bacds::Scheduler::Model';
 
 sub get_model_name { 'Band' }
-sub get_other_table_names { qw/talents/ }
 sub get_fields_for_output {
     qw/
         band_id
@@ -37,7 +36,7 @@ sub get_fields_for_input {
     /
 }
 sub get_fkey_fields { }
-sub get_relationships { 
+sub get_many_to_manys { 
     [qw/Talent talents talent_id/],
 }
 sub get_one_to_manys { }

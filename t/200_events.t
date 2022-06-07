@@ -76,6 +76,8 @@ subtest 'POST /event' => sub {
         series      => [],
         styles      => [],
         venues      => [],
+        bands       => [],
+        talent      => [],
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
@@ -113,6 +115,8 @@ subtest "GET /event/#" => sub{
         series      => [],
         styles      => [],
         venues      => [],
+        bands       => [],
+        talent      => [],
         is_deleted  => 0,
     };
 
@@ -156,6 +160,8 @@ subtest "PUT /event/#" => sub {
         series      => [],
         styles      => [],
         venues      => [],
+        bands       => [],
+        talent      => [],
         is_deleted  => 0,
     };
 
@@ -228,6 +234,8 @@ subtest 'POST /event/# with styles' => sub{
         series      => [],
         venues      => [],
         styles      => [{ id => $Style_Id, name => "test style" }],
+        bands       => [],
+        talent      => [],
         is_deleted  => 0,
     };
 
@@ -266,6 +274,8 @@ subtest "GET /event/# with styles" => sub {
                 name => 'test style',
             }
         ],
+        bands       => [],
+        talent      => [],
         is_deleted  => 0,
     };
 
@@ -327,6 +337,8 @@ subtest "PUT /event/# with styles" => sub {
                 name => 'some other style',
             }
         ],
+        bands       => [],
+        talent      => [],
         is_deleted  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';

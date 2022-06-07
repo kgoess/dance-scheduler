@@ -161,6 +161,16 @@ sub get_fields_for_band_row {
     };
 }
 
+__PACKAGE__->many_to_many(events=> 'event_talent_maps', 'event');
+
+sub get_fields_for_event_row {
+    my ($self) = @_;
+    return {
+        name => $self->name,
+        id   => $self->talent_id,
+    };
+}
+
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 1;

@@ -26,11 +26,6 @@ need to impliment the following functions
 
 This must return a string that can be sent to C<< dbh->resultset() >>, like C<'Event'>.
 
-=item * get_other_table_names()
-
-This must return an array of tablenames that should have their
-relationships checked for single-row output, like C<qw/styles/>.
-
 =item * get_fields_for_output()
 
 This must return an array of fieldnames that should be included in
@@ -48,7 +43,7 @@ Make sure not to include any autoindex fields.
 This must return an array of fieldnames that should be set to
 C<undef> if POST/PUT is sent anything falsey for them.
 
-=item * get_relationships()
+=item * get_many_to_manys()
 
 This must return a nested list of lists of other tables with
 many-to-many relationships like C<[qw/Style styles style_id/],>
@@ -138,16 +133,23 @@ sub get_upcoming_rows {
 =head2 get_row()
 
 Return all information for a single row by primary key. Uses
-get_other_table_names() from the child class to include data from 
-related tables.
+get_many_to_manys() and get_one_to_manys() from the child class to
+include data from related tables.
 
 =cut
 
 sub get_row {
     my ($class, $row_id) = @_;
-    my @other_table_names = $class->get_other_table_names;
+    my @other_table_names = ();
     my $model_name = $class->get_model_name;
     my $dbh = get_dbh();
+
+    my @relationships = $class->get_many_to_manys;
+    push @relationships, $class->get_one_to_manys;
+    foreach my $relationship (@relationships){
+        my ($other_model, $other_table_name, $primary_key) = @$relationship;
+        push @other_table_names, $other_table_name;
+        }
 
     my $row = $dbh->resultset($model_name)->find($row_id)
         or return false; #TODO: actual error message
@@ -299,7 +301,7 @@ For docs on related tables see DBIx::Class::Relationship::Base
 sub _update_relationships {
     my ($class, $row, $incoming_data, $dbh) = @_;
 
-    my @relationships = $class->get_relationships;
+    my @relationships = $class->get_many_to_manys;
     my $other_tables = {};
     foreach my $relationship (@relationships){
         my ($other_model, $other_table_name, $primary_key) = @$relationship;
