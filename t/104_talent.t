@@ -51,6 +51,7 @@ subtest 'POST /talent' => sub{
 
     my ($expected, $res, $decoded, $got);
     my $new_talent = {
+        talent_id   => '', # this should be ignored by the model
         name        => "test talent",
     };
     $ENV{TEST_NOW} = 1651112285;

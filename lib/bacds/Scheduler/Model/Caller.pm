@@ -18,7 +18,6 @@ sub get_fields_for_output {
 }
 sub get_fields_for_input {
     qw/
-        caller_id
         name
         is_deleted
     /

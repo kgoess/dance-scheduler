@@ -33,7 +33,6 @@ sub get_fields_for_output {
 }
 sub get_fields_for_input {
     qw/
-        series_id
         name
         frequency
         is_deleted

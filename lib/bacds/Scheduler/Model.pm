@@ -41,6 +41,8 @@ result output, like C<qw/name start_time end_time/>.
 This must return an array of fieldnames that may be set via POST/PUT,
 like C<qw/name start_time end_time/> 
 
+Make sure not to include any autoindex fields.
+
 =item * get_fkey_fields()
 
 This must return an array of fieldnames that should be set to
@@ -177,9 +179,6 @@ sub post_row {
     my $row = $dbh->resultset($model_name)->new({});
 
     foreach my $column (@fields_for_input) {
-        # don't touch the whatever_id primary key
-        # or DBIx::Class gets unhappy
-        next if List::Util::any { $column eq $_ } $row->primary_columns;
         $row->$column($incoming_data{$column});
     };
 

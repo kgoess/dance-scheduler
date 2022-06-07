@@ -24,7 +24,6 @@ sub get_fields_for_output {
 }
 sub get_fields_for_input {
     qw/
-        event_id
         name
         start_time
         end_time

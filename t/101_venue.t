@@ -47,6 +47,7 @@ subtest 'POST /venue' => sub{
     my ($res, $decoded, $expected, $got);
 
     my $new_venue = {
+        venue_id   => '', # This should be ignored by the model
         vkey       => 'ABC', # this is "vkey" in the schema
         hall_name  => 'test venue name',
         address    => 'test address',

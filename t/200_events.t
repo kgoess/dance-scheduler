@@ -50,6 +50,7 @@ subtest 'POST /event' => sub {
     my ($expected, $created_time, $res, $decoded, $got);
 
     my $new_event = {
+        event_id    => '', # this should be ignored by the model
         start_time  => "2022-05-01T20:00:00",
         end_time    => "2022-05-01T22:00:00",
         is_camp     => 1,
