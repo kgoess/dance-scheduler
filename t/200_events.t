@@ -9,7 +9,7 @@ use JSON qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 9;
+use Test::More tests => 7;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -23,9 +23,8 @@ my $app = bacds::Scheduler->to_app;
 my $test = Plack::Test->create($app);
 my $dbh = get_dbh();
 
-my ($Event, $Styled_Event);
-my ($Event_Id, $Styled_Event_Id);
-my ($Style_Id);
+my ($Event, $Second_Event);
+my ($Event_Id, $Second_Event_Id);
 
 subtest 'Invalid GET /event/1' => sub{
     plan tests=>2;
@@ -143,6 +142,7 @@ subtest "PUT /event/#" => sub {
     $modified_time = get_now();
     $res = $test->request( PUT '/event/1' , content => $edit_event);
     ok( $res->is_success, 'returned success' );
+
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
@@ -164,8 +164,7 @@ subtest "PUT /event/#" => sub {
         talent      => [],
         is_deleted  => 0,
     };
-
-    is_deeply $got, $expected, 'return matches';
+    eq_or_diff $got, $expected, 'return matches';
 
     $res  = $test->request( GET "/event/$Event_Id" );
     $decoded = decode_json($res->content); 
@@ -177,36 +176,19 @@ subtest "PUT /event/#" => sub {
     $Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
 };
 
-# ******* Now adding styles *******
-# TODO: Move this to its own test file.
 
-subtest 'POST /event/# with styles' => sub{
-    plan tests=>4;
+subtest 'POST /event #2' => sub{
+    plan tests=>3;
 
-    my ($expected, $res, $decoded, $got, $created_time);
-
-    $expected = {
-        name        => "test style",
-    };
-    $res = $test->request(POST '/style/', $expected );
-    ok($res->is_success, 'created style');
-    $decoded = decode_json($res->content);
-    $Style_Id = $decoded->{data}{style_id};
-    $got = {};
-    foreach my $key (keys %$expected){
-        $got->{$key} = $decoded->{data}{$key};
-    };
-
-    is_deeply $got, $expected, 'style return matches';
+    my ($expected, $res, $decoded, $got);
 
     my $new_event = {
-        start_time  => "2022-05-03T20:00:00",
-        end_time    => "2022-05-03T22:00:00",
+        start_time  => "2022-05-03T21:00:00",
+        end_time    => "2022-05-03T23:00:00",
         is_camp     => 1,
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
-        style_id   => [$Style_Id],
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
@@ -214,13 +196,12 @@ subtest 'POST /event/# with styles' => sub{
         ->iso8601;
     $res = $test->request(POST '/event/', $new_event );
     ok($res->is_success, 'returned success');
+
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-
-    $Styled_Event_Id = $got->{event_id},
-
+    $Second_Event_Id = $got->{event_id};
     $expected = {
-        event_id    => $Styled_Event_Id,
+        event_id    => $Second_Event_Id,
         start_time  => $new_event->{start_time},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
@@ -233,122 +214,21 @@ subtest 'POST /event/# with styles' => sub{
         callers      => [],
         series      => [],
         venues      => [],
-        styles      => [{ id => $Style_Id, name => "test style" }],
+        styles      => [],
         bands       => [],
         talent      => [],
         is_deleted  => 0,
     };
+    eq_or_diff $got, $expected, 'return from POST matches';
 
-    eq_or_diff $got, $expected, 'return matches';
+    $Second_Event = $dbh->resultset('Event')->find($Second_Event_Id);
 
-    $Styled_Event = $dbh->resultset('Event')->find($Styled_Event_Id);
-};
-
-
-subtest "GET /event/# with styles" => sub {
-    plan tests=>2;
-
-    my ($expected, $res, $decoded, $got);
-
-    $res  = $test->request( GET "/event/$Styled_Event_Id" );
-    ok( $res->is_success, 'returned success' );
-    $decoded = decode_json($res->content); 
-    $got = $decoded->{data};
-    $expected = {
-        created_ts  => '2022-04-28T02:18:05',
-        end_time    => '2022-05-03T22:00:00',
-        event_id    => $Styled_Event_Id,
-        is_camp     => 1,
-        is_template => undef,
-        long_desc   => 'this is the long desc',
-        modified_ts => '2022-04-28T02:18:05',
-        name        => 'saturday night test event',
-        short_desc  => 'itsa shortdesc',
-        start_time  => '2022-05-03T20:00:00',
-        callers      => [],
-        series      => [],
-        venues => [],
-        styles => [
-            {
-                id => 1,
-                name => 'test style',
-            }
-        ],
-        bands       => [],
-        talent      => [],
-        is_deleted  => 0,
-    };
-
-    eq_or_diff $got, $expected, 'matches';
-};
-
-
-subtest "PUT /event/# with styles" => sub {
-    plan tests => 4;
-
-    my ($expected, $created_time, $modified_time, $res, $decoded, $got);
-
-    my $other_style = {
-        name        => "some other style",
-    };
-    $res = $test->request(POST '/style/', $other_style );
-    ok($res->is_success, 'created style');
-
-    $decoded = decode_json($res->content);
-    my $other_style_id = $decoded->{data}{style_id};
-
-    my $edit_event = {
-        start_time  => "2022-05-03T21:00:00",
-        end_time    => "2022-05-03T23:00:00",
-        is_camp     => 0,
-        long_desc   => "this is a new long desc",
-        name        => "new name",
-        short_desc  => "new shortdef",
-        venues      => [],
-        style_id    => [$Style_Id, $other_style_id],
-    };
-    $ENV{TEST_NOW} += 100;
-    $modified_time = get_now();
-    $res = $test->request( PUT "/event/$Styled_Event_Id" , content => $edit_event);
-    ok( $res->is_success, 'returned success' );
+    $res = $test->request(GET '/event/'.$Second_Event_Id);
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
-    $expected = {
-        created_ts  => "2022-04-28T02:18:05",
-        end_time    => "2022-05-03T23:00:00",
-        event_id    => $Styled_Event_Id,
-        is_camp     => 0,
-        is_template => undef,
-        long_desc   => "this is a new long desc",
-        modified_ts => "2022-04-28T02:19:45",
-        name        => "new name",
-        short_desc  => "new shortdef",
-        start_time  => "2022-05-03T21:00:00",
-        callers      => [],
-        series      => [],
-        venues      => [],
-        styles => [
-            {
-                id => $Style_Id,
-                name => 'test style',
-            },
-            {
-                id => $other_style_id,
-                name => 'some other style',
-            }
-        ],
-        bands       => [],
-        talent      => [],
-        is_deleted  => 0,
-    };
-    eq_or_diff $got, $expected, 'return matches';
-
-    $res  = $test->request( GET "/event/$Styled_Event_Id" );
-    $decoded = decode_json($res->content); 
-    $got = $decoded->{data};
-
-    eq_or_diff $got, $expected, 'GET changed after PUT';
+    eq_or_diff $got, $expected, 'return from GET matches';
 };
+
 
 subtest 'GET /eventAll' => sub {
     plan tests => 2;
@@ -374,15 +254,15 @@ subtest 'GET /eventAll' => sub {
         is_deleted  => 0,
       },
       {
-        start_time  => '2022-05-03T21:00:00',
-        end_time    => "2022-05-03T23:00:00",
-        event_id    => $Styled_Event_Id,
-        is_camp     => 0,
-        is_template => undef,
-        long_desc   => "this is a new long desc",
-        modified_ts => '2022-04-28T02:19:45',,
-        name        => "new name",
-        short_desc  => "new shortdef",
+        event_id    => $Second_Event_Id,
+        start_time  => $Second_Event->start_time->iso8601,
+        end_time    => $Second_Event->end_time->iso8601,
+        is_camp     => $Second_Event->is_camp,
+        long_desc   => $Second_Event->long_desc,
+        short_desc  => $Second_Event->short_desc,
+        name        => $Second_Event->name,
+        is_template => $Second_Event->is_template,
+        modified_ts => "2022-04-28T02:18:05",
         created_ts  => "2022-04-28T02:18:05",
         is_deleted  => 0,
       },
@@ -428,7 +308,7 @@ subtest 'GET /eventsUpcoming' => sub {
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     is @$got, 1, "only one event is future from $now";
-    is $got->[0]{event_id}, $Styled_Event_Id, "and it's the 'styled event'";
+    is $got->[0]{event_id}, $Second_Event_Id, "and it's the 'second event'";
 
 
     $now = $now->add(days => 2);
