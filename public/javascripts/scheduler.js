@@ -177,7 +177,7 @@ function fillInItemRowList(currentRow, msg, selections, labelGetter) {
             element.setAttribute('value', escapeHtml(row[name]));
             insertTarget.append(element);
         });
-        if (selections.length) {
+        if (selections && selections.length) {
             insertTarget.val(selections[0]['id']);
             for (var i = 1; i < selections.length; i++) {
                 //const clone = insertTarget.clone();
