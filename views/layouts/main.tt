@@ -12,6 +12,14 @@
 <script type="text/javascript">/* <![CDATA[ */
     !window.jQuery && document.write('<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.js"><\/script>')
 /* ]]> */</script>
+<!-- ...and that again for jquery-ui -->
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery-ui.js"><\/script>')
+/* ]]> */</script>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+
 <script type="text/javascript" src="<% request.uri_base %>/javascripts/scheduler.js"><\/script>
 
 </head>

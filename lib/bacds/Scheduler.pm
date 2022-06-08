@@ -61,6 +61,14 @@ get '/' => sub {
               modelName => 'caller',
               content => template("callers.tt", {}, { layout=> undef }),
             },
+            { label => 'Bands',
+              modelName => 'band',
+              content => template("bands.tt", {}, { layout=> undef }),
+            },
+            { label => 'Talent',
+              modelName => 'talent',
+              content => template("talent.tt", {}, { layout=> undef }),
+            },
         ],
     };
 };

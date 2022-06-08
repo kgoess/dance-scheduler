@@ -28,7 +28,7 @@
     $( '.save-button' ).click(function() {
 
         const [parentContainer, modelName] = getParentAndModelName(this);
-        
+
         const rowId = parentContainer.find(`[name="${modelName}_id"]` ).val();
         const dataString = $( `#${modelName}-display-form` ).serialize();
 
@@ -47,7 +47,7 @@
             method: http_method,
             data: dataString
         })
-        .done( (msg) => { 
+        .done( (msg) => {
             loadListForModel(modelName);
             displayItem(modelName, msg);
          })
@@ -55,7 +55,7 @@
     });
 
     $( '.create-new-button' ).click(function() {
-        
+
         const [parentContainer, modelName] = getParentAndModelName(this);
 
         displayItem(modelName, false);
@@ -79,7 +79,61 @@
     });
 
     $( '.add-multi-select-button' ).click(multiSelectOptionAdd);
-}); 
+
+    const labelGetter = row => getLabelForDisplayInItemListbox('band', row);
+
+    dialog = $( "#add-band-dialog" ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            "Add band to event": () => alert('TODO add a function here'),
+            Cancel: function() {
+                dialog.dialog( "close" );
+            }
+        },
+        close: function() {
+            form[ 0 ].reset();
+        },
+        open: function() {
+            $.ajax({
+                url: 'bandAll',
+                dataType: 'json'
+            })
+            .done(msg => fillInItemRowList( $('#add-band-dialog .display-row'), msg, [], labelGetter));
+
+            // fill in the form on the dialog with the members of the selected band
+            $('select').change(function() {
+                const selectedVal = $(this).val();
+                $.ajax({
+                    url: `band/${selectedVal}`,
+                    dataType: 'json'
+                })
+                .done(msg => {
+                    const spanForNames = $('#add-band-dialog .talent-names');
+                    spanForNames.text('');
+                    const olEl = $(document.createElement('ol'));
+                    spanForNames.append(olEl);
+                    msg.data.talents.forEach((talent, i) => {
+                        const itemEl = document.createElement('li');
+                        itemEl.textContent = talent.name;
+                        olEl.append(itemEl);
+                    });
+                });
+            });
+        }
+    });
+
+    form = dialog.find( "form" ).on( "submit", function( event ) {
+        event.preventDefault();
+        alert('TODO add the displayed talent to the event as individuals');
+    });
+
+    $( "#add-band" ).button().on( "click", function() {
+        dialog.dialog( "open" );
+    });
+});
 
 
 

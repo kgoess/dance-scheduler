@@ -47,6 +47,11 @@ __PACKAGE__->table("band_membership");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 ordering
+
+  data_type: 'integer'
+  is_nullable: 0
+
 =head2 created_ts
 
   data_type: 'datetime'
@@ -67,6 +72,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "talent_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "ordering",
+  { data_type => "integer", is_nullable => 0 },
   "created_ts",
   {
     data_type => "datetime",
@@ -83,6 +90,20 @@ __PACKAGE__->add_columns(
 );
 
 =head1 UNIQUE CONSTRAINTS
+
+=head2 C<band_id>
+
+=over 4
+
+=item * L</band_id>
+
+=item * L</ordering>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("band_id", ["band_id", "ordering"]);
 
 =head2 C<band_membership_idx>
 
@@ -131,8 +152,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:23:49
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:06kvuIFK6ByCAslPa8OW4A
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-07 19:51:39
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Qc6yR4REnQP7h4NGu6n4jQ
 
 
 use Role::Tiny::With;
