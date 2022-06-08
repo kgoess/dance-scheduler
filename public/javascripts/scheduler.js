@@ -73,7 +73,9 @@
     $( '.accordion .label' ).click(function() {
         const [parentContainer, modelName] = getParentAndModelName(this);
         parentContainer.toggleClass('active')
-        loadListForModel(modelName);
+        if (parentContainer.hasClass('active')) {
+            loadListForModel(modelName);
+        }
     });
 
     $( '.add-multi-select-button' ).click(multiSelectOptionAdd);
