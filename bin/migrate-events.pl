@@ -33,6 +33,7 @@ my %Series_Lookup = (
     'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
     'SME-ENGLISH/REGENCY' => 'English Regency',
     'ACC-ENGLISH' => 'Arlington Community Church English',
+    'SPC-ENGLISH' => 'San Francisco English',
 );
 
 my $dbh = get_dbh();
@@ -85,6 +86,10 @@ sub migrate_event {
     $new->short_desc( $old->leader );
 
     my $key = join '-', $old->loc, $old->type;
+    # craig hacking the db :-(
+    if ($key =~ /ENGLISH&#8212;CANCELLED/) {
+        $key = 'ASE-ENGLISH';
+    }
     my $loc_str = $Series_Lookup{$key}
         or die "can't lookup series for '$key'";
 
@@ -127,7 +132,16 @@ sub attach_styles {
     }
 
     my $i = 1;
+
+    # craig hacking the db :-(
+    say "attaching styles @old_styles to ".$new->event_id;
+
     foreach my $style (@old_styles) {
+        # craig hacking the db :-(
+        if ($style =~ /ENGLISH&#8212;CANCELLED/) {
+            say "skipping style for ".$new->name;
+            return;
+        }
         my @rs = $dbh->resultset('Style')->search({
             name => $style,
         });
