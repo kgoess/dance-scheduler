@@ -3,6 +3,7 @@ script_dir=$(dirname "$0")
 tables="
     event_band_map
     event_callers_map
+    event_parent_orgs_map
     event_styles_map
     event_talent_map
     event_venues_map
@@ -14,6 +15,7 @@ tables="
     venues
     callers
     series
+    parent_orgs
 "
 
 for table in $tables; do

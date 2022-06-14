@@ -8,8 +8,10 @@ schema_files="
     talent.sql
     venues.sql
     callers.sql
+    parent_orgs.sql
     event_band_map.sql
     event_callers_map.sql
+    event_parent_orgs_map.sql
     event_styles_map.sql
     event_talent_map.sql
     event_venues_map.sql
