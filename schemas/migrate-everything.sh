@@ -8,5 +8,5 @@ $script_dir/../bin/migrate-series.pl
 $script_dir/../bin/migrate-styles.pl
 $script_dir/../bin/migrate-venues.pl
 $script_dir/../bin/migrate-callers.pl
-$script_dir/../bin/migrate-parent_orgs.pl
+$script_dir/../bin/migrate-parent-orgs.pl
 $script_dir/../bin/migrate-events.pl

@@ -49,6 +49,8 @@ sub list_callers {
 }
 
 sub add_callers {
+    my ($dbh) = @_;
+
     my @callers = (
         'Alan Winston',
         'Alisa Dodson',

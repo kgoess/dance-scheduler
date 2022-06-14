@@ -25,7 +25,7 @@ my $dbh = get_dbh();
 
 my ($Event, $Callered_Event);
 my ($Event_Id, $Callered_Event_Id);
-my ($Caller_Id);
+my ($Parent_Org_Id);
 
 
 # this could just use DBIx::Class to insert it directly
@@ -41,7 +41,6 @@ subtest 'POST /event' => sub {
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
-        caller_id   => undef,
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/event/', $new_event );
@@ -57,8 +56,8 @@ subtest 'POST /event' => sub {
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
         is_template => undef,
-        callers     => [],
         parent_orgs => [],
+        callers     => [],
         series      => [],
         styles      => [],
         venues      => [],
@@ -76,47 +75,48 @@ subtest 'POST /event' => sub {
 };
 
 
-# ******* Now adding Caller *******
+# ******* Now adding ParentOrg *******
 
 
-subtest 'POST /caller' => sub {
+subtest 'POST /parent_org' => sub {
     my ($res, $decoded, $got);
 
-    my $new_caller = {
-        name       => 'Rose Gamgee',
-        frequency  => 'fourth Trewsday',
+    my $new_parent_org = {
+        full_name    => 'Bree Country Dancing',
+        abbreviation => 'BCD',
         
     };
-    $res = $test->request(POST '/caller/', $new_caller );
-    ok($res->is_success, 'created caller');
+    $res = $test->request(POST '/parent_org/', $new_parent_org );
+    ok($res->is_success, 'created parent_org');
     $decoded = decode_json($res->content);
-    $Caller_Id = $decoded->{data}{caller_id};
+    $Parent_Org_Id = $decoded->{data}{parent_org_id};
     $got = $decoded->{data};
 
     my $expected = {
-        caller_id    => $Caller_Id,
-        name        => 'Rose Gamgee',
+        parent_org_id    => $Parent_Org_Id,
+        full_name        => 'Bree Country Dancing',
+        abbreviation     => 'BCD',
         created_ts  => '2022-04-28T02:18:05',
         modified_ts => '2022-04-28T02:18:05',
         is_deleted  => 0,
     };
 
-    eq_or_diff $got, $expected, 'caller return matches';
+    eq_or_diff $got, $expected, 'parent_org return matches';
 };
 
-subtest 'POST /event/# with caller' => sub {
+subtest 'POST /event/# with parent_org' => sub {
     plan tests => 2;
 
     my ($res, $decoded, $got);
 
     my $new_event = {
-        start_time  => "2022-05-03T20:00:00",
-        end_time    => "2022-05-03T22:00:00",
-        is_camp     => 1,
-        long_desc   => "this is the long desc",
-        short_desc  => "itsa shortdesc",
-        name        => "saturday night test event",
-        caller_id   => $Caller_Id,
+        start_time    => "2022-05-03T20:00:00",
+        end_time      => "2022-05-03T22:00:00",
+        is_camp       => 1,
+        long_desc     => "this is the long desc",
+        short_desc    => "itsa shortdesc",
+        name          => "saturday night test event",
+        parent_org_id => $Parent_Org_Id,
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
@@ -130,10 +130,10 @@ subtest 'POST /event/# with caller' => sub {
     $Callered_Event_Id = $got->{event_id},
 
     my $expected = {
-        callers => [
+        parent_orgs => [
           {
             id => 1,
-            name => 'Rose Gamgee'
+            name => 'BCD',
           }
         ],
         event_id    => $Callered_Event_Id,
@@ -146,8 +146,8 @@ subtest 'POST /event/# with caller' => sub {
         is_template => undef,
         created_ts  => $now_ts,
         modified_ts => $now_ts,
+        callers     => [],
         venues      => [],
-        parent_orgs => [],
         series      => [],
         styles      => [],
         bands       => [],
@@ -160,7 +160,7 @@ subtest 'POST /event/# with caller' => sub {
     $Callered_Event = $dbh->resultset('Event')->find($Callered_Event_Id);
 };
 
-subtest "GET /event/# with caller" => sub {
+subtest "GET /event/# with parent_org" => sub {
     plan tests=>2;
 
     my ($expected, $res, $decoded, $got);
@@ -178,17 +178,17 @@ subtest "GET /event/# with caller" => sub {
         long_desc   => 'this is the long desc',
         modified_ts => '2022-04-28T02:18:05',
         name        => 'saturday night test event',
-        callers => [
+        parent_orgs => [
           {
             id => 1,
-            name => 'Rose Gamgee'
+            name => 'BCD'
           }
         ],
         short_desc  => 'itsa shortdesc',
         start_time  => '2022-05-03T20:00:00',
+        callers     => [],
         series      => [],
         styles      => [],
-        parent_orgs => [],
         bands       => [],
         talent      => [],
         venues      => [],
@@ -198,20 +198,20 @@ subtest "GET /event/# with caller" => sub {
     eq_or_diff $got, $expected, 'matches';
 };
 
-subtest "PUT /event/# with caller" => sub {
+subtest "PUT /event/# with parent_org" => sub {
     plan tests => 4;
 
     my ($expected, $modified_time, $res, $decoded, $got);
 
-    my $other_caller = {
-        name        => 'Daffodil Brandybuck',
-        frequency   => 'monthly',
+    my $other_parent_org = {
+        full_name        => 'Rivendell Elvish Dancers',
+        abbreviation   => 'RED',
     };
-    $res = $test->request(POST '/caller/', $other_caller );
-    ok($res->is_success, 'created caller');
+    $res = $test->request(POST '/parent_org/', $other_parent_org );
+    ok($res->is_success, 'created parent_org');
 
     $decoded = decode_json($res->content);
-    my $other_caller_id = $decoded->{data}{caller_id};
+    my $other_parent_org_id = $decoded->{data}{parent_org_id};
 
     my $edit_event = {
         start_time  => "2022-05-03T21:00:00",
@@ -221,8 +221,8 @@ subtest "PUT /event/# with caller" => sub {
         name        => "new name",
         short_desc  => "new shortdef",
         #venue_id    => [],
-        style_id   => [],
-        caller_id   => $other_caller_id,
+        style_id    => [],
+        parent_org_id   => $other_parent_org_id,
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
@@ -239,16 +239,16 @@ subtest "PUT /event/# with caller" => sub {
         long_desc   => "this is a new long desc",
         modified_ts => "2022-04-28T02:19:45",
         name        => "new name",
-        callers => [
+        parent_orgs => [
           {
             id => 2,
-            name => 'Daffodil Brandybuck',
+            name => 'RED',
           }
         ],
         short_desc  => "new shortdef",
         start_time  => "2022-05-03T21:00:00",
+        callers     => [],
         venues      => [],
-        parent_orgs => [],
         series      => [],
         styles      => [],
         bands       => [],

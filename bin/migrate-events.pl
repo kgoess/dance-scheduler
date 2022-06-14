@@ -56,6 +56,8 @@ sub create_events {
         attach_venues($dbh, $old, $new);
 
         attach_callers($dbh, $old, $new);
+
+        attach_parent_org($dbh, $old, $new);
     }
 
 }
@@ -185,6 +187,23 @@ sub attach_callers {
 
     say "attaching caller $caller_name to event ".$new->event_id;
     $new->add_to_callers($rs[0], {
+        ordering => 1, # there is only 1
+    });
+}
+
+sub attach_parent_org {
+    my ($dbh, $old, $new) = @_;
+
+    my $org = 'BACDS';
+
+    # just set them all up as BACDS for now
+    my @rs = $dbh->resultset('ParentOrg')->search({
+        abbreviation => $org,
+    })
+        or return;
+
+    say "attaching org $org to event ".$new->event_id;
+    $new->add_to_parent_orgs($rs[0], {
         ordering => 1, # there is only 1
     });
 }

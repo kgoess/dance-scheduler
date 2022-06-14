@@ -24,10 +24,11 @@ use warnings;
 use Dancer2;
 use Data::Dump qw/dump/;
 
+use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::Event;
+use bacds::Scheduler::Model::ParentOrg;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
-use bacds::Scheduler::Model::Caller;
 
 our $VERSION = '0.1';
 
@@ -65,9 +66,9 @@ get '/' => sub {
               modelName => 'band',
               content => template("bands.tt", {}, { layout=> undef }),
             },
-            { label => 'Talent',
-              modelName => 'talent',
-              content => template("talent.tt", {}, { layout=> undef }),
+            { label => 'Parent Org',
+              modelName => 'parent_org',
+              content => template("parent_org.tt", {}, { layout=> undef }),
             },
         ],
     };
@@ -698,7 +699,7 @@ get '/caller/:caller_id' => sub {
     return $results->format;
 };
 
-=head2 POST /caller
+=head3 POST /caller
 
 Create a new caller.
 
@@ -718,7 +719,7 @@ post '/caller/' => sub {
     return $results->format;
 };
 
-=head2 PUT /caller/:caller_id
+=head3 PUT /caller/:caller_id
 
 Update a caller.
 
@@ -733,6 +734,102 @@ put '/caller/:caller_id' => sub {
     }
     else{
         $results->add_error(3100, "Update failed for new caller");
+    }
+
+    return $results->format;
+};
+
+
+=head2 ParentOrgs
+
+Usually the BACDS, but we want the option to track dances for NBCDS, or Santa
+Cruz, or...
+
+=head3 GET /parentOrgsAll
+
+Returns all of the parent orgs in the db not marked "is_deleted".
+
+    "data": [
+      {
+        "full_name": "Bay Area Country Dance Society",
+        "abbreviation": "BACDS",
+        "parent_org_id": 6
+      },
+      {
+        "full_name": "North Bay Country Dance Society",
+        "abbreviation": "NBCDS",
+        "parent_org_id": 5
+      },
+      ...
+    "errors": [],
+
+=cut
+
+my $parent_org_model = 'bacds::Scheduler::Model::ParentOrg';
+
+get '/parent_orgAll' => sub {
+    my $results = Results->new;
+
+    $results->data($parent_org_model->get_multiple_rows);
+
+    return $results->format;
+};
+
+
+=head3 GET /parent_org/:parent_org_id
+
+=cut
+
+get '/parent_org/:parent_org_id' => sub {
+    my $parent_org_id = params->{parent_org_id};
+    my $results = Results->new;
+
+    my $parent_org = $parent_org_model->get_row($parent_org_id);
+    if($parent_org){
+        $results->data($parent_org)
+    }
+    else{
+        $results->add_error(3200, "Nothing Found for parent_org_id $parent_org_id");
+    }
+
+    return $results->format;
+};
+
+=head3 POST /parent_org
+
+Create a new parent_org.
+
+=cut
+
+post '/parent_org/' => sub {
+    my $parent_org = $parent_org_model->post_row(params);
+    my $results = Results->new;
+
+    if($parent_org){
+        $results->data($parent_org)
+    }
+    else{
+        $results->add_error(3300, "Insert failed for new parent_org");
+    }
+
+    return $results->format;
+};
+
+=head3 PUT /parent_org/:parent_org_id
+
+Update a parent_org.
+
+=cut
+
+put '/parent_org/:parent_org_id' => sub {
+    my $parent_org = $parent_org_model->put_row(params);
+    my $results = Results->new;
+
+    if($parent_org){
+        $results->data($parent_org)
+    }
+    else{
+        $results->add_error(3400, "Update failed for new parent_org");
     }
 
     return $results->format;

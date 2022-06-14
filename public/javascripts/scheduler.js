@@ -163,6 +163,7 @@ function displayItem(modelName, msg) {
  */
 const keyToDisplayInItemRow = {
     venue: 'vkey',
+    parent_org: 'abbreviation',
 };
 function getLabelForDisplayInItemListbox (modelName, data) {
 

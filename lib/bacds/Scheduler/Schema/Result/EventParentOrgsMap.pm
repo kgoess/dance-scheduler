@@ -1,12 +1,12 @@
 use utf8;
-package bacds::Scheduler::Schema::Result::EventCallersMap;
+package bacds::Scheduler::Schema::Result::EventParentOrgsMap;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-bacds::Scheduler::Schema::Result::EventCallersMap
+bacds::Scheduler::Schema::Result::EventParentOrgsMap
 
 =cut
 
@@ -27,11 +27,11 @@ use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime");
 
-=head1 TABLE: C<event_callers_map>
+=head1 TABLE: C<event_parent_orgs_map>
 
 =cut
 
-__PACKAGE__->table("event_callers_map");
+__PACKAGE__->table("event_parent_orgs_map");
 
 =head1 ACCESSORS
 
@@ -41,7 +41,7 @@ __PACKAGE__->table("event_callers_map");
   is_foreign_key: 1
   is_nullable: 0
 
-=head2 caller_id
+=head2 parent_org_id
 
   data_type: 'integer'
   is_foreign_key: 1
@@ -70,7 +70,7 @@ __PACKAGE__->table("event_callers_map");
 __PACKAGE__->add_columns(
   "event_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "caller_id",
+  "parent_org_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "ordering",
   { data_type => "integer", is_nullable => 0 },
@@ -97,13 +97,13 @@ __PACKAGE__->add_columns(
 
 =item * L</event_id>
 
-=item * L</caller_id>
+=item * L</parent_org_id>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint("event_id", ["event_id", "caller_id"]);
+__PACKAGE__->add_unique_constraint("event_id", ["event_id", "parent_org_id"]);
 
 =head2 C<event_id_2>
 
@@ -121,21 +121,6 @@ __PACKAGE__->add_unique_constraint("event_id_2", ["event_id", "ordering"]);
 
 =head1 RELATIONS
 
-=head2 caller
-
-Type: belongs_to
-
-Related object: L<bacds::Scheduler::Schema::Result::Caller>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  "caller",
-  "bacds::Scheduler::Schema::Result::Caller",
-  { caller_id => "caller_id" },
-  { is_deferrable => 1, on_delete => "RESTRICT", on_update => "RESTRICT" },
-);
-
 =head2 event
 
 Type: belongs_to
@@ -151,9 +136,24 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "RESTRICT", on_update => "RESTRICT" },
 );
 
+=head2 parent_org
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-03-23 20:23:49
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9IMcsDY5Xr4wcU4thOhXNw
+Type: belongs_to
+
+Related object: L<bacds::Scheduler::Schema::Result::ParentOrg>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "parent_org",
+  "bacds::Scheduler::Schema::Result::ParentOrg",
+  { parent_org_id => "parent_org_id" },
+  { is_deferrable => 1, on_delete => "RESTRICT", on_update => "RESTRICT" },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-13 19:42:09
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:UwBsmG8xwBkyxJlZ5bxHBQ
 
 
 use Role::Tiny::With;

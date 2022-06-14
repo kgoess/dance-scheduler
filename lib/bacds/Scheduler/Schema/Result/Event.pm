@@ -211,6 +211,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 event_parent_orgs_maps
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::EventParentOrgsMap>
+
+=cut
+
+__PACKAGE__->has_many(
+  "event_parent_orgs_maps",
+  "bacds::Scheduler::Schema::Result::EventParentOrgsMap",
+  { "foreign.event_id" => "self.event_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 event_styles_maps
 
 Type: has_many
@@ -277,14 +292,15 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8E6VPHsU25lbylJDAiJzKg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-13 19:42:09
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FK9UIepAtBgMSWTuozEJkA
 
-__PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
-__PACKAGE__->many_to_many(venues => 'event_venues_maps', 'venue');
-__PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
+__PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');
+__PACKAGE__->many_to_many(parent_orgs => 'event_parent_orgs_maps', 'parent_org');
+__PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
 __PACKAGE__->many_to_many(talent => 'event_talent_maps', 'talent');
+__PACKAGE__->many_to_many(venues => 'event_venues_maps', 'venue');
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
