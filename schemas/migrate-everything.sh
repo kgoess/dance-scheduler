@@ -1,9 +1,11 @@
 #!/bin/sh -x
 
-export PERL5LIB=../lib:$PERL5LIB
+script_dir=$(dirname "$0")
 
-../bin/migrate-series.pl
-../bin/migrate-styles.pl
-../bin/migrate-venues.pl
-../bin/migrate-callers.pl
-../bin/migrate-events.pl
+export PERL5LIB=$script_dir/../lib:$PERL5LIB
+
+$script_dir/../bin/migrate-series.pl
+$script_dir/../bin/migrate-styles.pl
+$script_dir/../bin/migrate-venues.pl
+$script_dir/../bin/migrate-callers.pl
+$script_dir/../bin/migrate-events.pl

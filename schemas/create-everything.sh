@@ -1,4 +1,22 @@
-for table in series.sql events.sql bands.sql styles.sql talent.sql venues.sql callers.sql event_band_map.sql event_callers_map.sql event_styles_map.sql event_talent_map.sql event_venues_map.sql band_membership.sql; do
-	echo $table
-	mysql -uscheduler --password=`cat ~/.mysql-password` schedule < $table
+script_dir=$(dirname "$0")
+
+schema_files="
+    series.sql
+    events.sql
+    bands.sql
+    styles.sql
+    talent.sql
+    venues.sql
+    callers.sql
+    event_band_map.sql
+    event_callers_map.sql
+    event_styles_map.sql
+    event_talent_map.sql
+    event_venues_map.sql
+    band_membership.sql
+"
+
+for schema_file in $schema_files ; do
+	echo $schema_file
+	mysql -uscheduler --password=`cat ~/.mysql-password` schedule < $script_dir/$schema_file
 done
