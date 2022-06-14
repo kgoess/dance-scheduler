@@ -32,6 +32,7 @@ my %Series_Lookup = (
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
     'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
     'SME-ENGLISH/REGENCY' => 'English Regency',
+    'STM-ENGLISH/REGENCY' => 'English Regency',
     'ACC-ENGLISH' => 'Arlington Community Church English',
     'SPC-ENGLISH' => 'San Francisco English',
 );
