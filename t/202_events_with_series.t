@@ -5,7 +5,7 @@ use Data::Dump qw/dump/;
 use DateTime::Format::Strptime qw/strptime/;
 use DateTime;
 use HTTP::Request::Common;
-use JSON qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
@@ -94,12 +94,19 @@ subtest 'POST /series' => sub {
     $got = $decoded->{data};
 
     my $expected = {
-        series_id    => $Series_Id,
-        name        => 'Bree Trewsday English',
-        frequency   => 'fourth Trewsday',
-        created_ts  => '2022-04-28T02:18:05',
-        modified_ts => '2022-04-28T02:18:05',
-        is_deleted  => 0,
+        series_id             => $Series_Id,
+        name                  => 'Bree Trewsday English',
+        frequency             => 'fourth Trewsday',
+        default_end_time      => undef,
+        default_parent_org_id => undef,
+        default_start_time    => undef,
+        default_style_id      => undef,
+        default_venue_id      => undef,
+        display_notes         => undef,
+        programmer_notes      => undef,
+        created_ts            => '2022-04-28T02:18:05',
+        modified_ts           => '2022-04-28T02:18:05',
+        is_deleted            => 0,
     };
 
     eq_or_diff $got, $expected, 'series return matches';

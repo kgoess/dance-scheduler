@@ -1,13 +1,13 @@
 script_dir=$(dirname "$0")
 
 schema_files="
-    series.sql
-    events.sql
     bands.sql
     styles.sql
     talent.sql
     venues.sql
     callers.sql
+    series.sql
+    events.sql
     parent_orgs.sql
     event_band_map.sql
     event_callers_map.sql

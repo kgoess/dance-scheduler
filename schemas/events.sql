@@ -4,7 +4,7 @@ CREATE TABLE events (
     start_time DATETIME NOT NULL,
     end_time DATETIME,
     is_camp BOOLEAN,
-    long_desc VARCHAR(32766),
+    long_desc TEXT(32766),
     short_desc VARCHAR(1024),    
     is_template BOOLEAN,
     series_id INT,

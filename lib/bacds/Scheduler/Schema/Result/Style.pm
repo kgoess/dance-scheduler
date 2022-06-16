@@ -132,9 +132,24 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 series
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:an0LBSfPRGJzrbsa3l4dVg
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::Series>
+
+=cut
+
+__PACKAGE__->has_many(
+  "series",
+  "bacds::Scheduler::Schema::Result::Series",
+  { "foreign.default_style_id" => "self.style_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-14 20:26:54
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PGD4eQjMcRAx2WBaA8NQZw
 
 
 

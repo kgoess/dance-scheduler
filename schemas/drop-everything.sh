@@ -9,12 +9,12 @@ tables="
     event_venues_map
     band_membership
     events
+    series
     bands
     styles
     talent
     venues
     callers
-    series
     parent_orgs
 "
 

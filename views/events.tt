@@ -24,6 +24,16 @@
                 <input class="row-edit" name="<% column.0 %>" hidden />
             </div>
         <% END %>
+        <div name="series_id" class="display-row" column-type="list-item" model-name="series" table-name="series" >
+            <div class="multi-select-wrapper">
+                <span class="row-label">Series</span>
+                <select name="series_id" class="series-for-event">
+                </select>
+                <!-- series is one-to-one with events, so no +
+                     <span class="add-multi-select-button">+</span>
+                 -->
+            </div>
+        </div>
         <div name="style_id" class="display-row" column-type="list-item" model-name="style" table-name="styles" >
             <div class="multi-select-wrapper">
                 <span class="row-label">Style</span>
@@ -38,16 +48,6 @@
                 <select name="venue_id">
                 </select>
                 <span class="add-multi-select-button">+</span>
-            </div>
-        </div>
-        <div name="series_id" class="display-row" column-type="list-item" model-name="series" table-name="series" >
-            <div class="multi-select-wrapper">
-                <span class="row-label">Series</span>
-                <select name="series_id">
-                </select>
-                <!-- series is one-to-one with events, so no +
-                     <span class="add-multi-select-button">+</span>
-                 -->
             </div>
         </div>
         <div name="caller_id" class="display-row" column-type="list-item" model-name="caller" table-name="callers" >

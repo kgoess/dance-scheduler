@@ -4,7 +4,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use DateTime;
 use DateTime::Format::Strptime qw/strptime/;
-use JSON qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use HTTP::Request::Common;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;

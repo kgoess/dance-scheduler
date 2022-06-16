@@ -5,7 +5,7 @@ use Data::Dump qw/dump/;
 use DateTime::Format::Strptime qw/strptime/;
 use DateTime;
 use HTTP::Request::Common;
-use JSON qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;

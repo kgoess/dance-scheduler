@@ -73,9 +73,8 @@ __PACKAGE__->table("venues");
 
 =head2 comment
 
-  data_type: 'varchar'
+  data_type: 'mediumtext'
   is_nullable: 1
-  size: 32766
 
 =head2 is_deleted
 
@@ -111,7 +110,7 @@ __PACKAGE__->add_columns(
   "zip",
   { data_type => "char", is_nullable => 1, size => 10 },
   "comment",
-  { data_type => "varchar", is_nullable => 1, size => 32766 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -173,8 +172,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LRCdL+ARtoyFYCcKEkgVXA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-14 20:20:47
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:hexV2uqHlIph9+mGipPYyQ
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

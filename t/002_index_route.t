@@ -1,6 +1,6 @@
 use 5.16.0;
 use warnings;
-use JSON qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use Data::Dump qw/dump/;
 
 use bacds::Scheduler;

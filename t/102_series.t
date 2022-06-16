@@ -4,7 +4,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use DateTime;
 use DateTime::Format::Strptime qw/strptime/;
-use JSON qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use HTTP::Request::Common;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
@@ -58,12 +58,19 @@ subtest 'POST /series' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        series_id    => 1,
-        name        => 'Bree Trewsday English',
-        frequency  => 'second and fourth Trewday',
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:18:05",
-        is_deleted  => 0,
+        series_id             => 1,
+        name                  => 'Bree Trewsday English',
+        frequency             => 'second and fourth Trewday',
+        default_end_time      => undef,
+        default_parent_org_id => undef,
+        default_start_time    => undef,
+        default_style_id      => undef,
+        default_venue_id      => undef,
+        display_notes         => undef,
+        programmer_notes      => undef,
+        created_ts            => "2022-04-28T02:18:05",
+        modified_ts           => "2022-04-28T02:18:05",
+        is_deleted            => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -82,12 +89,19 @@ subtest 'GET /series/#' => sub {
     $decoded = decode_json($res->content); 
     $got = $decoded->{data};
     $expected = {
-        series_id    => 1,
-        name        => 'Bree Trewsday English',
-        frequency  => 'second and fourth Trewday',
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:18:05",
-        is_deleted  => 0,
+        series_id             => 1,
+        name                  => 'Bree Trewsday English',
+        frequency             => 'second and fourth Trewday',
+        default_end_time      => undef,
+        default_parent_org_id => undef,
+        default_start_time    => undef,
+        default_style_id      => undef,
+        default_venue_id      => undef,
+        display_notes         => undef,
+        programmer_notes      => undef,
+        created_ts            => "2022-04-28T02:18:05",
+        modified_ts           => "2022-04-28T02:18:05",
+        is_deleted            => 0,
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -109,12 +123,19 @@ subtest 'PUT /series/1' => sub {
     $decoded = decode_json($res->content);
 
     $expected = {
-        series_id   => 1,
-        name        => 'Bree Trewsday WEEKLY English',
-        frequency   => 'second and fourth Trewsday',
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:19:45",
-        is_deleted  => 0,
+        series_id             => 1,
+        name                  => 'Bree Trewsday WEEKLY English',
+        frequency             => 'second and fourth Trewsday',
+        default_end_time      => undef,
+        default_parent_org_id => undef,
+        default_start_time    => undef,
+        default_style_id      => undef,
+        default_venue_id      => undef,
+        display_notes         => undef,
+        programmer_notes      => undef,
+        created_ts            => "2022-04-28T02:18:05",
+        modified_ts           => "2022-04-28T02:19:45",
+        is_deleted            => 0,
     };
 
     $got = $decoded->{data};
@@ -140,12 +161,19 @@ subtest 'GET /seriesAll' => sub {
     $got = $decoded->{data};
     $expected = [
         {
-            series_id    => 1,
-            name        => 'Bree Trewsday WEEKLY English',
-            frequency  => 'second and fourth Trewsday',
-            created_ts  => "2022-04-28T02:18:05",
-            modified_ts => "2022-04-28T02:19:45",
-            is_deleted  => 0,
+            series_id             => 1,
+            name                  => 'Bree Trewsday WEEKLY English',
+            frequency             => 'second and fourth Trewsday',
+            default_end_time      => undef,
+            default_parent_org_id => undef,
+            default_start_time    => undef,
+            default_style_id      => undef,
+            default_venue_id      => undef,
+            display_notes         => undef,
+            programmer_notes      => undef,
+            created_ts            => "2022-04-28T02:18:05",
+            modified_ts           => "2022-04-28T02:19:45",
+            is_deleted            => 0,
         }
     ];
 

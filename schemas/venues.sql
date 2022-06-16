@@ -5,7 +5,7 @@ CREATE TABLE venues (
     address VARCHAR(256),
     city VARCHAR(64),
     zip CHAR(10),
-    comment VARCHAR(32766),
+    comment TEXT(32766),
     is_deleted BOOLEAN,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,

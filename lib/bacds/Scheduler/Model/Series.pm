@@ -22,18 +22,32 @@ use parent 'bacds::Scheduler::Model';
 sub get_model_name { 'Series' }
 sub get_fields_for_output {
     qw/
-        series_id
-        name
-        frequency
         created_ts
-        modified_ts
+        default_start_time
+        default_end_time
+        default_parent_org_id
+        default_style_id
+        default_venue_id
+        display_notes
+        frequency
         is_deleted
+        modified_ts
+        name
+        programmer_notes
+        series_id
     /
 }
 sub get_fields_for_input {
     qw/
         name
         frequency
+        default_venue_id
+        default_parent_org_id
+        default_parent_org_id
+        default_start_time
+        default_end_time
+        display_notes
+        programmer_notes
         is_deleted
     /
 }
