@@ -66,7 +66,7 @@ __PACKAGE__->table("events");
 
 =head2 long_desc
 
-  data_type: 'mediumtext'
+  data_type: 'text'
   is_nullable: 1
 
 =head2 short_desc
@@ -126,7 +126,7 @@ __PACKAGE__->add_columns(
   "is_camp",
   { data_type => "tinyint", is_nullable => 1 },
   "long_desc",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "text", is_nullable => 1 },
   "short_desc",
   { data_type => "varchar", is_nullable => 1, size => 1024 },
   "is_template",
@@ -291,8 +291,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-14 20:20:47
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:q6qPndHJKspoTWBn/S1O9A
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-15 20:12:06
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9F86frPRqYVAIHqjjBf1bQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

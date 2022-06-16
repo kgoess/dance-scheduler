@@ -81,12 +81,12 @@ __PACKAGE__->table("series");
 
 =head2 display_notes
 
-  data_type: 'mediumtext'
+  data_type: 'text'
   is_nullable: 1
 
 =head2 programmer_notes
 
-  data_type: 'mediumtext'
+  data_type: 'text'
   is_nullable: 1
 
 =head2 is_deleted
@@ -127,9 +127,9 @@ __PACKAGE__->add_columns(
   "default_end_time",
   { data_type => "time", is_nullable => 1 },
   "display_notes",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "text", is_nullable => 1 },
   "programmer_notes",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "text", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -197,8 +197,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-14 20:26:54
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GTepN57XdX76XP5/ZoRI/Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-15 20:12:06
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lw5WrdnEMQZi1ClyiNtGcg
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
