@@ -9,7 +9,7 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -264,6 +264,22 @@ subtest "PUT /event/# with series" => sub {
 
     eq_or_diff $got, $expected, 'GET changed after PUT';
 };
+
+
+subtest 'GET /event/#/template_event for series when empty' => sub {
+    plan tests => 2;
+
+    my ($res, $decoded, $got);
+
+    $res = $test->request(GET "/series/$Series_Id/template-event");
+    ok($res->is_success, 'returned success');
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+
+    is $got, undef, 'return matches';
+
+};
+
 
 subtest 'POST /event/# template for series' => sub {
     plan tests => 4;

@@ -433,12 +433,10 @@ get '/series/:series_id/template-event' => sub {
     my $results = Results->new;
 
     my $event = $series_model->get_template_event($series_id);
-    if($event){
-        $results->data($event)
-    }
-    else{
-        $results->add_error(2050, "Nothing Found for series_id $series_id");
-    }
+
+    #This can be empty, indicating that there isn't a template for this
+    #series_id
+    $results->data($event);
 
     return $results->format;
 };
