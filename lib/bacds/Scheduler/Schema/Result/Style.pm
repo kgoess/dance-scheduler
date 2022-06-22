@@ -132,24 +132,9 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 series
 
-Type: has_many
-
-Related object: L<bacds::Scheduler::Schema::Result::Series>
-
-=cut
-
-__PACKAGE__->has_many(
-  "series",
-  "bacds::Scheduler::Schema::Result::Series",
-  { "foreign.default_style_id" => "self.style_id" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-15 20:12:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:mBkaVyhCBEpV5NyHKjDBZg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-21 19:08:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cL4yHT69RMKog6RHZJ7BUQ
 
 
 

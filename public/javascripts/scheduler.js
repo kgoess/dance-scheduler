@@ -11,19 +11,6 @@
         .done( (msg) => { displayItem(modelName, msg) });
     });
 
-    /* series-for-event is the listbox for the events. When they change
-     * "series" we want to change the default entries for other things
-     *
-     */
-    $( '.series-for-event' ).change(function() {
-        const series_id = $(this).val();
-        $.ajax({
-            url: `series/${series_id}`,
-            dataType: 'json'
-        })
-        .done( (msg) => { updateEventDefaults($(this), msg.data) });
-    });
-
     $( '.display-row' ).click(function() {
         const display = $(this).find('.row-contents');
         if (display.is(':hidden')) {
@@ -239,23 +226,19 @@ function fillInItemRowList(currentRow, msg, selections, labelGetter) {
         insertTarget.find('option').remove();
         currentRow.find('[cloned-selectlist=1]').remove();
         rows.forEach((row, i) => {
-            const optionEl = document.createElement('option');
+            const element = document.createElement('option');
             const label = labelGetter(row);
-            optionEl.innerHTML = escapeHtml(label);
-            optionEl.setAttribute('value', escapeHtml(row[name]));
-            insertTarget.append(optionEl);
+            element.innerHTML = escapeHtml(label);
+            element.setAttribute('value', escapeHtml(row[name]));
+            insertTarget.append(element);
         });
-        if (selections && Array.isArray(selections) && selections.length) {
+        if (selections && selections.length) {
             insertTarget.val(selections[0]['id']);
             for (var i = 1; i < selections.length; i++) {
                 //const clone = insertTarget.clone();
                 const clone = multiSelectOptionAdd.call(insertTarget);
                 clone.val(selections[i]['id']);
             }
-        } else if (selections &&
-                   (typeof selections === 'string' || typeof selections === 'number')
-        ) {
-            insertTarget.val(selections);
         } else {
             insertTarget.val('');
         }
@@ -336,15 +319,4 @@ function multiSelectOptionAdd() {
     });
     newSelectBoxDiv.attr('cloned-selectlist', 1);
     return newSelectBox;
-}
-
-function updateEventDefaults(jqThis, seriesData) {
-    console.log(jqThis, seriesData, seriesData.default_style_id);
-
-    $("select[name=style_id]").val(seriesData.default_style_id);
-    $("select[name=venue_id]").val(seriesData.default_venue_id);
-    $("select[name=parent_org_id]").val(seriesData.default_parent_org_id);
-
-    // TODO also update start time when we have that as a separate field
-
 }

@@ -53,42 +53,6 @@ __PACKAGE__->table("series");
   is_nullable: 1
   size: 128
 
-=head2 default_style_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 1
-
-=head2 default_venue_id
-
-  data_type: 'integer'
-  is_nullable: 1
-
-=head2 default_parent_org_id
-
-  data_type: 'integer'
-  is_nullable: 1
-
-=head2 default_start_time
-
-  data_type: 'time'
-  is_nullable: 1
-
-=head2 default_end_time
-
-  data_type: 'time'
-  is_nullable: 1
-
-=head2 display_notes
-
-  data_type: 'text'
-  is_nullable: 1
-
-=head2 programmer_notes
-
-  data_type: 'text'
-  is_nullable: 1
-
 =head2 is_deleted
 
   data_type: 'tinyint'
@@ -116,20 +80,6 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 256 },
   "frequency",
   { data_type => "varchar", is_nullable => 1, size => 128 },
-  "default_style_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
-  "default_venue_id",
-  { data_type => "integer", is_nullable => 1 },
-  "default_parent_org_id",
-  { data_type => "integer", is_nullable => 1 },
-  "default_start_time",
-  { data_type => "time", is_nullable => 1 },
-  "default_end_time",
-  { data_type => "time", is_nullable => 1 },
-  "display_notes",
-  { data_type => "text", is_nullable => 1 },
-  "programmer_notes",
-  { data_type => "text", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -161,26 +111,6 @@ __PACKAGE__->set_primary_key("series_id");
 
 =head1 RELATIONS
 
-=head2 default_style
-
-Type: belongs_to
-
-Related object: L<bacds::Scheduler::Schema::Result::Style>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  "default_style",
-  "bacds::Scheduler::Schema::Result::Style",
-  { style_id => "default_style_id" },
-  {
-    is_deferrable => 1,
-    join_type     => "LEFT",
-    on_delete     => "RESTRICT",
-    on_update     => "RESTRICT",
-  },
-);
-
 =head2 events
 
 Type: has_many
@@ -197,8 +127,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-15 20:12:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lw5WrdnEMQZi1ClyiNtGcg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-21 19:08:36
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:L7z2wUaJSqgki14lLCH3BQ
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

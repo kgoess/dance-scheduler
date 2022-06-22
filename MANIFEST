@@ -43,8 +43,8 @@ README.md
 schemas/band_membership.sql
 schemas/bands.sql
 schemas/callers.sql
-schemas/create_everything.sh
-schemas/drop_everything.sh
+schemas/create-everything.sh
+schemas/drop-everything.sh
 schemas/event_band_map.sql
 schemas/event_callers_map.sql
 schemas/event_styles_map.sql

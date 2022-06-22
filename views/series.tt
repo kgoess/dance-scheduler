@@ -8,83 +8,17 @@
 <div class="model-display" hidden>
     <form id="series-display-form">
         <% series_column_types = [
-            {
-                name => "name",
-                label => "Name",
-            },
-            {
-                name => "frequency",
-                label => "Frequency",
-            },
-            {
-                name => "default_start_time",
-                label => "Default Start Time",
-            },
-            {
-                name => "default_end_time",
-                label => "Default End Time",
-            },
-            {
-                field_name => "default_venue_id",
-                model_pk_name => "venue_id",
-                label => "Default Venue",
-                is_list => 1,
-                model_name => "venue",
-                selectbox_value_from => "default_venue_id",
-            },
-            {
-                field_name => "default_style_id",
-                model_pk_name => "style_id",
-                label => "Default Style",
-                is_list => 1,
-                model_name => "style",
-                selectbox_value_from => "default_style_id",
-            },
-            {
-                name => "display_notes",
-                label => "Display Notes",
-            },
-            {
-                name => "programmer_notes",
-                label => "Programmer Notes",
-            },
-            {
-                field_name => "default_parent_org_id",
-                model_pk_name => "parent_org_id",
-                label => "Default Parent Org",
-                is_list => 1,
-                model_name => "parent_org",
-                selectbox_value_from => "default_parent_org_id",
-            },
-            {
-                name => "is_deleted",
-                label => "Is Deleted",
-            },
+            [ "name", "Name" ],
+            [ "frequency", "Frequency" ],
+            [ "is_deleted", "Is Deleted" ],
            ]
         %>
         <% FOREACH column IN series_column_types %>
-            <% IF column.is_list %>
-                <div
-                     name="<% column.model_pk_name %>"
-                     class="display-row"
-                     column-type="list-item"
-                     model-name="<% column.model_name %>"
-                     table-name="<% column.selectbox_value_from %>"
-                 >
-                    <div class="multi-select-wrapper">
-                        <span class="row-label"><% column.label %></span>
-                        <select name="<% column.field_name %>">
-                        </select>
-                        <!-- <span class="add-multi-select-button">+</span> -->
-                    </div>
-                </div>
-            <% ELSE %>
-                <div name="<% column.name %>" class="display-row" column-type="text-item">
-                    <span class="row-label"><% column.label %></span>
-                    <span class="row-contents"></span>
-                    <input class="row-edit" name="<% column.name %>" hidden />
-                </div>
-            <% END %>
+            <div name="<% column.0 %>" class="display-row" column-type="text-item">
+                <span class="row-label"><% column.1 %></span>
+                <span class="row-contents"></span>
+                <input class="row-edit" name="<% column.0 %>" hidden />
+            </div>
         <% END %>
         <input type="hidden" name="series_id"/>
         <span class="button-container">
