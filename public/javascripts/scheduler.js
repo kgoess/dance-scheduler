@@ -54,6 +54,19 @@
         .fail( () => { alert('something bad happened, update failed') }); // FIXME later
     });
 
+    /* this is the button on the series' accordion to access the default event
+     * for the series */
+    $( '.select-template-button' ).click(function() {
+        const form = this.form;
+        const seriesId = $(form).find('[name="series_id"]').val();
+        $( '.accordion .container[modelname="event"] .accordion-label' ).click();
+        $.ajax({
+            url: `series/${seriesId}/template-event`,
+            dataType: 'json'
+        })
+        .done( (msg) => { displayItem('event', msg) });
+    });
+
     $( '.create-new-button' ).click(function() {
 
         const [parentContainer, modelName] = getParentAndModelName(this);
@@ -70,7 +83,7 @@
         );
     });
 
-    $( '.accordion .label' ).click(function() {
+    $( '.accordion .accordion-label' ).click(function() {
         const [parentContainer, modelName] = getParentAndModelName(this);
         parentContainer.toggleClass('active')
         if (parentContainer.hasClass('active')) {
@@ -192,6 +205,12 @@ function displayItemRow(currentRow, targetObj) {
                 : '';
             currentRow.children('.row-contents').text(theText);
             currentRow.children('.row-edit').val(theText);
+            break;
+        case 'hidden-item':
+            const theValue = targetObj
+                ? targetObj[currentRow.attr('name')]
+                : '';
+            currentRow.children('.row-edit').val(theValue);
             break;
         case 'list-item':
             const modelName = currentRow.attr('model-name');

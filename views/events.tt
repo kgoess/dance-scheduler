@@ -8,6 +8,9 @@
 </span>
 <div class="model-display" hidden>
     <form id="event-display-form">
+        <div name="is_template" class="display-row" column-type="hidden-item" >
+            <input type="hidden" class="row-edit" name="is_template">
+        </div>
         <% event_column_types = [
               [ "name", "Name" ],
               [ "start_time", "Start" ],

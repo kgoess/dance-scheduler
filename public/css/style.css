@@ -200,6 +200,11 @@ font-size: 10px;
 .display-row:hover {
     background: salmon;
 }
+
+.display-row[column-type="hidden-item"] {
+    display: none;
+}
+    
 .button-container {
     display: flex;
     justify-content: center;
@@ -228,7 +233,7 @@ font-size: 10px;
     margin: 10px 10px;
 }
 
-.accordion .label {
+.accordion .accordion-label {
     position: relative;
     padding: 10px 0;
     font-size: 30px;
@@ -236,7 +241,7 @@ font-size: 10px;
     cursor: pointer;
 }
 
-.accordion .label::before {
+.accordion .accordion-label::before {
     content: '+';
     color: black;
     position: absolute;
@@ -268,7 +273,7 @@ font-size: 10px;
 
 /* Changes from plus sign to negative sign once active */
 
-.accordion .container.active .label::before {
+.accordion .container.active .accordion-label::before {
   content: '-';
   font-size: 30px;
 }
