@@ -424,6 +424,25 @@ get '/series/:series_id' => sub {
     return $results->format;
 };
 
+=head3 GET '/series/:series_id/template-event'
+
+=cut
+
+get '/series/:series_id/template-event' => sub {
+    my $series_id = params->{series_id};
+    my $results = Results->new;
+
+    my $event = $series_model->get_template_event($series_id);
+    if($event){
+        $results->data($event)
+    }
+    else{
+        $results->add_error(2050, "Nothing Found for series_id $series_id");
+    }
+
+    return $results->format;
+};
+
 =head3 POST /series/
 
 Create a new series

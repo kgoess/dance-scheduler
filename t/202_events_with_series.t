@@ -9,7 +9,7 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -263,6 +263,70 @@ subtest "PUT /event/# with series" => sub {
     $got = $decoded->{data};
 
     eq_or_diff $got, $expected, 'GET changed after PUT';
+};
+
+subtest 'POST /event/# template for series' => sub {
+    plan tests => 4;
+
+    my ($res, $decoded, $got);
+
+    my $new_event = {
+        start_time  => "2022-05-03T20:00:00",
+        end_time    => "2022-05-03T22:00:00",
+        is_camp     => 1,
+        long_desc   => "this is the long desc",
+        short_desc  => "itsa shortdesc",
+        name        => "saturday night test event",
+        series_id   => $Series_Id,
+        is_template => 1,
+    };
+    $ENV{TEST_NOW} = 1651112285;
+    my $now_ts = DateTime
+        ->from_epoch(epoch => $ENV{TEST_NOW})
+        ->iso8601;
+    $res = $test->request(POST '/event/', $new_event );
+    ok($res->is_success, 'returned success');
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+
+    $Seriesed_Event_Id = $got->{event_id},
+
+    my $expected = {
+        series => [
+          {
+            id => 1,
+            name => 'Bree Trewsday English'
+          }
+        ],
+        event_id    => $Seriesed_Event_Id,
+        start_time  => $new_event->{start_time},
+        end_time    => $new_event->{end_time},
+        is_camp     => $new_event->{is_camp},
+        long_desc   => $new_event->{long_desc},
+        short_desc  => $new_event->{short_desc},
+        name        => $new_event->{name},
+        is_template => 1,
+        created_ts  => $now_ts,
+        modified_ts => $now_ts,
+        callers     => [],
+        parent_orgs => [],
+        venues      => [],
+        styles      => [],
+        bands       => [],
+        talent      => [],
+        is_deleted  => 0,
+    };
+
+    eq_or_diff $got, $expected, 'return matches';
+
+    $Seriesed_Event = $dbh->resultset('Event')->find($Seriesed_Event_Id);
+
+    $res = $test->request(GET "/series/$Series_Id/template-event");
+    ok($res->is_success, 'returned success');
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+
+    eq_or_diff $got, $expected, 'return matches';
 };
 
 
