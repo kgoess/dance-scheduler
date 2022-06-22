@@ -436,7 +436,7 @@ get '/series/:series_id/template-event' => sub {
 
     #This can be empty, indicating that there isn't a template for this
     #series_id
-    $results->data($event);
+    $results->data($event // '');
 
     return $results->format;
 };
@@ -871,6 +871,7 @@ A little internal class to collect any errors and format the results:
 
 package Results {
     use Dancer2;
+    use Data::Dump qw/dump/;
     use Class::Accessor::Lite (
         new => 0,
         rw => [ qw(data errors) ],
@@ -891,13 +892,13 @@ package Results {
     sub format {
         my ($self) = @_;
         return encode_json({
-            $self->data ? (data => $self->data) : (),
-            $self->errors ? (errors => [
+            data => $self->data,
+            errors => [
                 map { {
                     msg => $_->{msg},
                     num => $_->{num},
                 } } @{$self->errors}
-            ]) : (),
+            ],
         });
     }
 }

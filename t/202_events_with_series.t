@@ -274,9 +274,12 @@ subtest 'GET /event/#/template_event for series when empty' => sub {
     $res = $test->request(GET "/series/$Series_Id/template-event");
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
-    $got = $decoded->{data};
+    my $expected = {
+        data => '',
+        errors => [],
+    };
 
-    is $got, undef, 'return matches';
+    eq_or_diff $decoded, $expected, 'return matches';
 
 };
 
