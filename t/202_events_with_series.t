@@ -277,6 +277,7 @@ subtest 'GET /event/#/template_event for series when empty' => sub {
     my $expected = {
         data => {
             series => [{id=>$Series_Id}],
+            is_template => 1,
         },
         errors => [],
     };

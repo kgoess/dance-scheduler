@@ -440,7 +440,10 @@ get '/series/:series_id/template-event' => sub {
         $results->data($event);
     }
     else {
-        $results->data({series => [{id => $series_id}]});
+        $results->data({
+            series => [{id => $series_id}],
+            is_template => 1,
+        });
     }
 
     return $results->format;
