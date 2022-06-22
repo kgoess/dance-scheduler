@@ -275,7 +275,9 @@ subtest 'GET /event/#/template_event for series when empty' => sub {
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     my $expected = {
-        data => '',
+        data => {
+            series_id => $Series_Id,
+        },
         errors => [],
     };
 

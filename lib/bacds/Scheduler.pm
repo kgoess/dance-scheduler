@@ -436,7 +436,12 @@ get '/series/:series_id/template-event' => sub {
 
     #This can be empty, indicating that there isn't a template for this
     #series_id
-    $results->data($event // '');
+    if ($event) {
+        $results->data($event);
+    }
+    else {
+        $results->data({series_id => $series_id});
+    }
 
     return $results->format;
 };
