@@ -59,7 +59,7 @@
     $( '.select-template-button' ).click(function() {
         const form = this.form;
         const seriesId = $(form).find('[name="series_id"]').val();
-        $( '.accordion .container[modelname="event"] .accordion-label' ).click();
+        $( '.accordion .accordion-container[modelname="event"] .accordion-label' ).click();
         $.ajax({
             url: `series/${seriesId}/template-event`,
             dataType: 'json'
@@ -84,6 +84,7 @@
     });
 
     $( '.accordion .accordion-label' ).click(function() {
+        $( '.accordion-container' ).removeClass('active');
         const [parentContainer, modelName] = getParentAndModelName(this);
         parentContainer.toggleClass('active')
         if (parentContainer.hasClass('active')) {
@@ -95,13 +96,13 @@
 
     const labelGetter = row => getLabelForDisplayInItemListbox('band', row);
 
-    dialog = $( "#add-band-dialog" ).dialog({
+    dialog = $( '#add-band-dialog' ).dialog({
         autoOpen: false,
         height: 400,
         width: 350,
         modal: true,
         buttons: {
-            "Add band to event": () => alert('TODO add a function here'),
+            'Add band to event': () => alert('TODO add a function here'),
             Cancel: function() {
                 dialog.dialog( "close" );
             }
@@ -138,13 +139,37 @@
         }
     });
 
-    form = dialog.find( "form" ).on( "submit", function( event ) {
+    form = dialog.find( 'form' ).on( 'submit', function( event ) {
         event.preventDefault();
         alert('TODO add the displayed talent to the event as individuals');
     });
 
-    $( "#add-band" ).button().on( "click", function() {
-        dialog.dialog( "open" );
+    $( '#add-band' ).button().on( 'click', function() {
+        dialog.dialog( 'open' );
+    });
+
+    /*
+     * this sets values for this new event to the default values from the series'
+     * default event template
+     */
+    $( '.series-for-event' ).change(function() {
+        const [parentContainer, modelName] = getParentAndModelName(this);
+        // don't update the defaults when editing an existing event, just for a new one
+        if (parentContainer.find('[name="event_id"]').val()) {
+            return;
+        }
+        const seriesId = $(this).val();
+        $.ajax({
+            url: `series/${seriesId}/template-event`,
+            dataType: 'json'
+        })
+        .done( (msg) => {
+            displayItem('event', msg);
+            const eventContainer = getContainerForModelName('event');
+            // keep them from editing an existing event_id, because this is
+            // only for *new* events
+            eventContainer.find('[name="event_id"]').val('');
+        });
     });
 });
 
@@ -156,7 +181,9 @@
 
 function displayItem(modelName, msg) {
 
-    if (msg['data'] || msg === false) {
+    if (msg['error']) {
+        alert('error: ' + msg['error']);
+    } else {
         const parentContainer = getContainerForModelName(modelName);
         const targetObj = msg ? msg['data'] : false;
         parentContainer.find('.display-row').each(
@@ -164,8 +191,6 @@ function displayItem(modelName, msg) {
         );
         parentContainer.find( `[name="${modelName}_id"]` ).val(targetObj ? targetObj[`${modelName}_id`] : '');
         parentContainer.find('.model-display').show();
-    } else {
-        alert('error: ' + msg['error']);
     }
 }
 
@@ -318,12 +343,12 @@ function escapeHtml(unsafe) {
 }
 
 function getParentAndModelName(element) {
-    const parentContainer = $(element).closest('.container');
+    const parentContainer = $(element).closest('.accordion-container');
     const modelName = parentContainer.attr('modelName');
     return [parentContainer, modelName];
 }
 function getContainerForModelName(modelName) {
-    return $( `.container[modelName="${modelName}"]` );
+    return $( `.accordion-container[modelName="${modelName}"]` );
 }
 
 function multiSelectOptionAdd() {
