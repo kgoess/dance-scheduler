@@ -6,7 +6,7 @@
     <button class="button create-new-button">Create New</button>
 </span>
 <div class="model-display" hidden>
-    <form id="venue-display-form">
+    <form id="venue-display-form" class="display-form">
         <% venue_column_types = [
             [ "vkey", "vkey" ],
             [ "hall_name", "Hall Name" ],

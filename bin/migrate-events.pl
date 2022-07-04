@@ -27,6 +27,7 @@ my %Series_Lookup = (
     'ONLINE-ENGLISH' => 'Odd Sundays Online',
     'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
     'ONLINE-ONLINE Concert &amp; Dance' => 'Online Concert',
+    'ONLINE-ONLINE Concert & Dance' => 'Online Concert',
     'SSU-ENGLISH/CAMP' => 'Hey Days English Week',
     'MON-FAMILY/CAMP' => 'Family Week',
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
@@ -87,6 +88,7 @@ sub migrate_event {
     $new->is_camp( $old->type ? 1 : 0 );
     $new->long_desc( $old->leader . ' with ' .$old->band );
     $new->short_desc( $old->leader );
+    $new->is_template(0);
 
     my $key = join '-', $old->loc, $old->type;
     # craig hacking the db :-(

@@ -18,10 +18,10 @@ CREATE TABLE events (
 
     FOREIGN KEY (series_id)
         REFERENCES series(series_id)
-      ON DELETE RESTRICT,
+      ON DELETE RESTRICT
 
-
-    UNIQUE KEY (series_id, is_template)
+    -- nope, that only works if is_template is either 1 or null
+    -- UNIQUE KEY (series_id, is_template)
 );
 
 

@@ -8,7 +8,13 @@
             url: `${modelName}/${rowId}`,
             dataType: 'json'
         })
-        .done( (msg) => { displayItem(modelName, msg) });
+        .done( (msg) => {
+            // Only the "series" container has this. If they started
+            // creating a new series template but didn't, then we need
+            // to turn the button back on.
+            parentContainer.find('.select-template-button').prop('disabled', false);
+            displayItem(modelName, msg)
+        });
     });
 
     $( '.display-row' ).click(function() {
@@ -25,47 +31,14 @@
         e.preventDefault();
     });
 
-    $( '.save-button' ).click(function() {
+    $( '.save-button' ).click( function() {
+        saveAction(this)
 
-        const [parentContainer, modelName] = getParentAndModelName(this);
-
-        const rowId = parentContainer.find(`[name="${modelName}_id"]` ).val();
-        const dataString = $( `#${modelName}-display-form` ).serialize();
-
-        let http_method;
-        let url;
-        if (rowId) {
-            http_method = 'put';
-            url = `${modelName}/${rowId}`
-        } else {
-            http_method = 'post';
-            url = `${modelName}/`;
-        }
-        $.ajax({
-            url,
-            dataType: 'json',
-            method: http_method,
-            data: dataString
-        })
-        .done( (msg) => {
-            loadListForModel(modelName);
-            displayItem(modelName, msg);
-         })
-        .fail( () => { alert('something bad happened, update failed') }); // FIXME later
+        // Only the "series" container has this. If they created a new series
+        // template then we can turn the button back on
+        parentContainer.find('.select-template-button').prop('disabled', false);
     });
 
-    /* this is the button on the series' accordion to access the default event
-     * for the series */
-    $( '.select-template-button' ).click(function() {
-        const form = this.form;
-        const seriesId = $(form).find('[name="series_id"]').val();
-        $( '.accordion .accordion-container[modelname="event"] .accordion-label' ).click();
-        $.ajax({
-            url: `series/${seriesId}/template-event`,
-            dataType: 'json'
-        })
-        .done( (msg) => { displayItem('event', msg) });
-    });
 
     $( '.create-new-button' ).click(function() {
 
@@ -81,6 +54,13 @@
                 $(this).find('.row-edit').val('');
             }
         );
+        // De-select anything they might have clicked on in the list
+        parentContainer.find('select option').prop('selected', false);
+
+        // Only the "series" container has this. we need to turn off the button
+        // until they save the new series, otherwise it doesn't make any sense
+        parentContainer.find('.select-template-button').prop('disabled', true);
+
     });
 
     $( '.accordion .accordion-label' ).click(function() {
@@ -96,7 +76,7 @@
 
     const labelGetter = row => getLabelForDisplayInItemListbox('band', row);
 
-    dialog = $( '#add-band-dialog' ).dialog({
+    bandDialog = $( '#add-band-dialog' ).dialog({
         autoOpen: false,
         height: 400,
         width: 350,
@@ -104,7 +84,7 @@
         buttons: {
             'Add band to event': () => alert('TODO add a function here'),
             Cancel: function() {
-                dialog.dialog( "close" );
+                bandDialog.dialog( "close" );
             }
         },
         close: function() {
@@ -139,17 +119,17 @@
         }
     });
 
-    form = dialog.find( 'form' ).on( 'submit', function( event ) {
+    form = bandDialog.find( 'form' ).on( 'submit', function( event ) {
         event.preventDefault();
         alert('TODO add the displayed talent to the event as individuals');
     });
 
     $( '#add-band' ).button().on( 'click', function() {
-        dialog.dialog( 'open' );
+        bandDialog.dialog( 'open' );
     });
 
     /*
-     * this sets values for this new event to the default values from the series'
+     * This sets values for this new event to the default values from the series'
      * default event template
      */
     $( '.series-for-event' ).change(function() {
@@ -166,10 +146,95 @@
         .done( (msg) => {
             displayItem('event', msg);
             const eventContainer = getContainerForModelName('event');
+
             // keep them from editing an existing event_id, because this is
             // only for *new* events
             eventContainer.find('[name="event_id"]').val('');
+
+            // copying this in from create-new-button, should we re-use it instead?
+            eventContainer.each(
+                function(index) {
+                    $(this).find('.row-contents').hide();
+                    $(this).find('.row-contents').text('');
+                    $(this).find('.row-edit').show();
+                    $(this).find('.row-edit').val('');
+                }
+            );
+
+            // this is not a template
+            eventContainer.find('[name="is_template"]').attr('0');
+
         });
+    });
+
+    /* This is from the button on the series accordion to popup the default
+     * event for the series in a modal.  We copy the container for "event" and
+     * re-use it in the popup.
+    */
+    const eventContainer = getContainerForModelName('event');
+    const templateEventPopup = $('#series-template');
+    templateEventPopup.attr('title', 'Defaults for new event in this series');
+    eventContainer.find('#event-display-form').clone(true).appendTo(templateEventPopup).attr('id', 'template-event-popup');
+    templateEventPopup.find('button').remove();
+    const seriesSelectboxParent = templateEventPopup.find('select[name="series_id"]').parent();
+    templateEventPopup.find('select[name="series_id"]').remove();
+    templateEventPopup.attr('modelName', 'event');
+    eventTemplateDialog = $( '#series-template' ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            Save: function() {
+                saveAction(
+                    templateEventPopup,
+                    () => alert(`Template saved for series "${getContainerForModelName('series').find('select option:selected').text()}"`)
+                )
+            },
+            Cancel: function() {
+                eventTemplateDialog.dialog("close");
+            },
+        },
+        close: function() {
+
+            // remove the hidden seriesId input we added in open()
+            seriesSelectboxParent.find('input[type="hidden"][name="series_id"]').remove();
+
+            // remove series name label we added in open()
+            seriesSelectboxParent.contents().filter(function() {
+                return this.nodeType === 3; //Node.TEXT_NODE
+            }).remove();
+
+            templateEventPopup.find('form').get(0).reset();
+        },
+        open: function() {
+            const seriesContainer = getContainerForModelName('series');
+            const seriesId = seriesContainer.find('[name="series_id"]').val();
+
+            // the series shouldn't be editable in this popup, so...
+            // get our seriesId and put it in a hidden input
+            const hiddenSeriesIdEl = document.createElement('input');
+            hiddenSeriesIdEl.setAttribute('type', 'hidden');
+            hiddenSeriesIdEl.setAttribute('name', 'series_id');
+            hiddenSeriesIdEl.setAttribute('value', escapeHtml(seriesId));
+            seriesSelectboxParent.append(hiddenSeriesIdEl);
+
+            // get the series name and display it
+            const seriesName = seriesContainer.find('select option:selected').text();
+            const seriesNameEl = document.createTextNode(seriesName);
+            seriesSelectboxParent.append(seriesNameEl);
+
+            $.ajax({
+                url: `series/${seriesId}/template-event`,
+                dataType: 'json'
+            })
+            .done( (msg) => {
+                displayItem(templateEventPopup, msg);
+            });
+        },
+    });
+    $( '.select-template-button' ).click(function() {
+        eventTemplateDialog.dialog( 'open' );
     });
 });
 
@@ -179,16 +244,29 @@
 // other functions
 // ********************************************
 
-function displayItem(modelName, msg) {
+/* displayItem
+ *
+ * They've clicked on an item ("e.g. Berkeley Contra") in the model's (e.g.
+ * "Series") select box and we want to show the details for that item.
+ */
+function displayItem(target, msg) {
 
     if (msg['error']) {
         alert('error: ' + msg['error']);
     } else {
-        const parentContainer = getContainerForModelName(modelName);
+        let parentContainer, modelName;
+        if (typeof target === "string") {
+            parentContainer = getContainerForModelName(target);
+            modelName = target;
+        } else {
+            parentContainer = $(target);
+            modelName = parentContainer.attr('modelName');
+        }
         const targetObj = msg ? msg['data'] : false;
         parentContainer.find('.display-row').each(
             (index, currentRow) => displayItemRow($(currentRow), targetObj)
         );
+        // this is the <input type=hidden name=${modelName}_id
         parentContainer.find( `[name="${modelName}_id"]` ).val(targetObj ? targetObj[`${modelName}_id`] : '');
         parentContainer.find('.model-display').show();
     }
@@ -216,8 +294,8 @@ function getLabelForDisplayInItemListbox (modelName, data) {
 /* displayItemRow
  *
  * The "item" is the thing we're displaying, like an event or a venue. This
- * "row" is one thing for that, like "long_desc" or a listbox like "style" or
- * "venue".
+ * "currentRow" is one thing for that, like "long_desc" or a listbox like
+ * "style" or "venue".
  */
 function displayItemRow(currentRow, targetObj) {
 
@@ -343,7 +421,7 @@ function escapeHtml(unsafe) {
 }
 
 function getParentAndModelName(element) {
-    const parentContainer = $(element).closest('.accordion-container');
+    const parentContainer = $(element).closest('[modelName]');
     const modelName = parentContainer.attr('modelName');
     return [parentContainer, modelName];
 }
@@ -363,4 +441,40 @@ function multiSelectOptionAdd() {
     });
     newSelectBoxDiv.attr('cloned-selectlist', 1);
     return newSelectBox;
+}
+
+
+/* saveAction
+ * action for the "Save" button on any of the forms
+ */
+function saveAction(target, onSuccess) {
+
+    const [parentContainer, modelName] = getParentAndModelName(target);
+
+    const rowId = parentContainer.find(`[name="${modelName}_id"]` ).val();
+    const dataString = parentContainer.find( '.display-form' ).serialize();
+
+    let http_method;
+    let url;
+    if (rowId) {
+        http_method = 'put';
+        url = `${modelName}/${rowId}`
+    } else {
+        http_method = 'post';
+        url = `${modelName}/`;
+    }
+    $.ajax({
+        url,
+        dataType: 'json',
+        method: http_method,
+        data: dataString
+    })
+    .done( (msg) => {
+        loadListForModel(modelName);
+        displayItem(modelName, msg);
+        if (onSuccess) {
+            onSuccess();
+        }
+     })
+    .fail( () => { alert('something bad happened, update failed') }); // FIXME later
 }

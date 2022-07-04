@@ -6,7 +6,7 @@
     <button class="button create-new-button">Create New</button>
 </span>
 <div class="model-display" hidden>
-    <form id="band-display-form">
+    <form id="band-display-form" class="display-form">
         <% band_column_types = [
             [ "name", "Name" ],
            ]

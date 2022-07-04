@@ -7,26 +7,10 @@
     <button class="button create-new-button">Create New</button>
 </span>
 <div class="model-display" hidden>
-    <form id="event-display-form">
+    <form id="event-display-form" class="display-form">
         <div name="is_template" class="display-row" column-type="hidden-item" >
             <input type="hidden" class="row-edit" name="is_template">
         </div>
-        <% event_column_types = [
-              [ "name", "Name" ],
-              [ "start_time", "Start" ],
-              [ "end_time", "End" ],
-              [ "is_camp", "Is Camp?" ],
-              [ "long_desc", "" ],
-              [ "short_desc", "" ],
-          ]
-         %>
-        <% FOREACH column IN event_column_types %>
-            <div name="<% column.0 %>" class="display-row" column-type="text-item">
-                <span class="row-label"><% column.1 %></span>
-                <span class="row-contents"></span>
-                <input class="row-edit" name="<% column.0 %>" hidden />
-            </div>
-        <% END %>
         <div name="series_id" class="display-row" column-type="list-item" model-name="series" table-name="series" >
             <div class="multi-select-wrapper">
                 <span class="row-label">Series</span>
@@ -69,6 +53,22 @@
                 <span class="add-multi-select-button">+</span>
             </div>
         </div>
+        <% event_column_types = [
+              [ "name", "Name" ],
+              [ "start_time", "Start" ],
+              [ "end_time", "End" ],
+              [ "is_camp", "Is Camp?" ],
+              [ "long_desc", "" ],
+              [ "short_desc", "" ],
+          ]
+         %>
+        <% FOREACH column IN event_column_types %>
+            <div name="<% column.0 %>" class="display-row" column-type="text-item">
+                <span class="row-label"><% column.1 %></span>
+                <span class="row-contents"></span>
+                <input class="row-edit" name="<% column.0 %>" hidden />
+            </div>
+        <% END %>
         <input type="hidden" name="event_id"/>
         <span class="button-container">
             <button class="button save-button">Save</button>

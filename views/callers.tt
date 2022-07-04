@@ -6,7 +6,7 @@
     <button class="button create-new-button">Create New</button>
 </span>
 <div class="model-display" hidden>
-    <form id="caller-display-form">
+    <form id="caller-display-form" class="display-form">
         <% caller_column_types = [
             [ "name", "Name" ],
            ]

@@ -6,7 +6,7 @@
     <button class="button create-new-button">Create New</button>
 </span>
 <div class="model-display" hidden>
-    <form id="parent_org-display-form">
+    <form id="parent_org-display-form" class="display-form">
         <% parent_org_column_types = [
             [ "full_name", "Name" ],
             [ "abbreviation", "Abbreviation" ],

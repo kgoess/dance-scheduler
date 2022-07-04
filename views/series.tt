@@ -6,7 +6,7 @@
     <button class="button create-new-button">Create New</button>
 </span>
 <div class="model-display" hidden>
-    <form id="series-display-form">
+    <form id="series-display-form" class="display-form">
         <% series_column_types = [
             [ "name", "Name" ],
             [ "frequency", "Frequency" ],
@@ -23,7 +23,9 @@
         <input type="hidden" name="series_id"/>
         <span class="button-container">
             <button class="button save-button">Save</button>
-            <button class="button select-template-button">Select Template</button>
+            <button class="button select-template-button">Manage Template</button>
         </span>
     </form>
+</div>
+<div id="series-template">
 </div>
