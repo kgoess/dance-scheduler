@@ -38,6 +38,7 @@ subtest 'Invalid GET /style/1' => sub{
 
     $decoded = decode_json($res->content);
     $expected = {
+        data => '',
         errors => [{
             msg => 'Nothing Found for style_id 1',
             num => 1400,

@@ -38,6 +38,7 @@ subtest 'Invalid GET /caller/1' => sub{
 
     $decoded = decode_json($res->content);
     $expected = {
+        data => '',
         errors => [{
             msg => 'Nothing Found for caller_id 1',
             num => 2900,

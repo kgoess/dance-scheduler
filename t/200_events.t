@@ -35,6 +35,7 @@ subtest 'Invalid GET /event/1' => sub{
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $expected = {
+        data => '',
         errors => [{
             msg => 'Nothing Found for event_id 1',
             num => 1100,

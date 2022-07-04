@@ -34,6 +34,7 @@ subtest 'Invalid GET /series/1' => sub{
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $expected = {
+        data => '',
         errors => [{
             msg => 'Nothing Found for series_id 1',
             num => 2000,
