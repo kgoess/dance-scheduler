@@ -162,22 +162,6 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("event_id");
 
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<series_id>
-
-=over 4
-
-=item * L</series_id>
-
-=item * L</is_template>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("series_id", ["series_id", "is_template"]);
-
 =head1 RELATIONS
 
 =head2 event_band_maps
@@ -291,8 +275,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-15 20:12:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9F86frPRqYVAIHqjjBf1bQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-04 15:29:38
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eYVM6H+qRk/yXAJ8vXLmdQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

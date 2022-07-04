@@ -8,16 +8,48 @@
 <div class="model-display" hidden>
     <form id="series-display-form" class="display-form">
         <% series_column_types = [
-            [ "name", "Name" ],
-            [ "frequency", "Frequency" ],
-            [ "is_deleted", "Is Deleted" ],
+            {
+                name => "name",
+                label => "Name",
+            },
+            {
+                name => "frequency",
+                label => "Frequency",
+            },
+            {
+                name => "default_start_time",
+                label => "Default Start Time",
+            },
+            {
+                name => "default_end_time",
+                label => "Default End Time",
+            },
+            {
+                name => "display_notes",
+                label => "Display Notes",
+                is_textarea => 1,
+            },
+            {
+                name => "programmer_notes",
+                label => "Programmer Notes",
+                is_textarea => 1,
+            },
+            {
+                name => "is_deleted",
+                label => "Is Deleted",
+            },
            ]
         %>
         <% FOREACH column IN series_column_types %>
-            <div name="<% column.0 %>" class="display-row" column-type="text-item">
-                <span class="row-label"><% column.1 %></span>
+            <div name="<% column.name %>" class="display-row" column-type="text-item">
+                <span class="row-label"><% column.label %></span>
                 <span class="row-contents"></span>
-                <input class="row-edit" name="<% column.0 %>" hidden />
+                <% IF column.is_textarea %>
+                    <textarea class="row-edit" name="<% column.name %>" rows="4" cols="50" hidden/>
+                    </textarea>
+                <% ELSE %>
+                    <input class="row-edit" name="<% column.name %>" hidden />
+                <% END %>
             </div>
         <% END %>
         <input type="hidden" name="series_id"/>

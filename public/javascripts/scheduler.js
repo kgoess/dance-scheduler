@@ -306,7 +306,9 @@ function displayItemRow(currentRow, targetObj) {
             const theText = targetObj
                 ? targetObj[currentRow.attr('name')]
                 : '';
-            currentRow.children('.row-contents').text(theText);
+            let displayText = escapeHtml(theText);
+            displayText = displayText.replace(/\n/g, '<br/>');
+            currentRow.children('.row-contents').html(displayText);
             currentRow.children('.row-edit').val(theText);
             break;
         case 'hidden-item':
