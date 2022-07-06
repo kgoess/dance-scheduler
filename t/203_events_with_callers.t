@@ -35,8 +35,10 @@ subtest 'POST /event' => sub {
     my ($expected, $res, $decoded, $got);
 
     my $new_event = {
-        start_time  => "2022-05-01T20:00:00",
-        end_time    => "2022-05-01T22:00:00",
+        start_date  => "2022-05-01",
+        start_time  => "20:00",
+        end_date    => "2022-05-01",
+        end_time    => "22:00",
         is_camp     => 1,
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
@@ -50,7 +52,9 @@ subtest 'POST /event' => sub {
     $got = $decoded->{data};
     $expected = {
         event_id    => 1,
+        start_date  => $new_event->{start_date},
         start_time  => $new_event->{start_time},
+        end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
         long_desc   => $new_event->{long_desc},
@@ -110,8 +114,10 @@ subtest 'POST /event/# with caller' => sub {
     my ($res, $decoded, $got);
 
     my $new_event = {
-        start_time  => "2022-05-03T20:00:00",
-        end_time    => "2022-05-03T22:00:00",
+        start_date  => "2022-05-03",
+        start_time  => "20:00",
+        end_date    => "2022-05-03",
+        end_time    => "22:00",
         is_camp     => 1,
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
@@ -137,7 +143,9 @@ subtest 'POST /event/# with caller' => sub {
           }
         ],
         event_id    => $Callered_Event_Id,
+        start_date  => $new_event->{start_date},
         start_time  => $new_event->{start_time},
+        end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
         long_desc   => $new_event->{long_desc},
@@ -171,7 +179,8 @@ subtest "GET /event/# with caller" => sub {
     $got = $decoded->{data};
     $expected = {
         created_ts  => '2022-04-28T02:18:05',
-        end_time    => '2022-05-03T22:00:00',
+        end_date    => '2022-05-03',
+        end_time    => '22:00',
         event_id    => $Callered_Event_Id,
         is_camp     => 1,
         is_template => undef,
@@ -185,7 +194,8 @@ subtest "GET /event/# with caller" => sub {
           }
         ],
         short_desc  => 'itsa shortdesc',
-        start_time  => '2022-05-03T20:00:00',
+        start_date  => '2022-05-03',
+        start_time  => '20:00',
         series      => [],
         styles      => [],
         parent_orgs => [],
@@ -214,8 +224,10 @@ subtest "PUT /event/# with caller" => sub {
     my $other_caller_id = $decoded->{data}{caller_id};
 
     my $edit_event = {
-        start_time  => "2022-05-03T21:00:00",
-        end_time    => "2022-05-03T23:00:00",
+        start_date  => "2022-05-03",
+        start_time  => "21:00",
+        end_date    => "2022-05-03",
+        end_time    => "23:00",
         is_camp     => 0,
         long_desc   => "this is a new long desc",
         name        => "new name",
@@ -232,7 +244,8 @@ subtest "PUT /event/# with caller" => sub {
     $got = $decoded->{data};
     $expected = {
         created_ts  => "2022-04-28T02:18:05",
-        end_time    => "2022-05-03T23:00:00",
+        end_date    => "2022-05-03",
+        end_time    => "23:00",
         event_id    => $Callered_Event_Id,
         is_camp     => 0,
         is_template => undef,
@@ -246,7 +259,8 @@ subtest "PUT /event/# with caller" => sub {
           }
         ],
         short_desc  => "new shortdef",
-        start_time  => "2022-05-03T21:00:00",
+        start_date  => "2022-05-03",
+        start_time  => "21:00",
         venues      => [],
         parent_orgs => [],
         series      => [],

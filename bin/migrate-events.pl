@@ -82,8 +82,8 @@ sub migrate_event {
         # series don't really have a name in the old schema
         $new->name($name);
     }
-    $new->start_time( $old->startday );
-    $new->end_time( $old->endday )
+    $new->start_date( $old->startday );
+    $new->end_date( $old->endday )
         if $old->endday;
     $new->is_camp( $old->type ? 1 : 0 );
     $new->long_desc( $old->leader . ' with ' .$old->band );

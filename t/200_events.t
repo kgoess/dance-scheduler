@@ -51,8 +51,10 @@ subtest 'POST /event' => sub {
 
     my $new_event = {
         event_id    => '', # this should be ignored by the model
-        start_time  => "2022-05-01T20:00:00",
-        end_time    => "2022-05-01T22:00:00",
+        start_date  => "2022-05-01",
+        start_time  => "20:00",
+        end_date    => "2022-05-01",
+        end_time    => "22:00",
         is_camp     => 1,
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
@@ -65,7 +67,9 @@ subtest 'POST /event' => sub {
     $got = $decoded->{data};
     $expected = {
         event_id    => 1,
+        start_date  => $new_event->{start_date},
         start_time  => $new_event->{start_time},
+        end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
         long_desc   => $new_event->{long_desc},
@@ -103,8 +107,10 @@ subtest "GET /event/#" => sub{
 
     $expected = {
         event_id    => $Event->event_id,
-        start_time  => $Event->start_time->iso8601,
-        end_time    => $Event->end_time->iso8601,
+        start_date  => $Event->start_date->ymd('-'),
+        start_time  => $Event->start_time =~ s/:00$//r,
+        end_date    => $Event->end_date->ymd('-'),
+        end_time    => $Event->end_time =~ s/:00$//r,
         is_camp     => $Event->is_camp,
         long_desc   => $Event->long_desc,
         short_desc  => $Event->short_desc,
@@ -134,8 +140,10 @@ subtest "PUT /event/#" => sub {
     $created_time = get_now();
 
     my $edit_event = {
-        start_time  => "2022-05-01T21:00:00",
-        end_time    => "2022-05-01T23:00:00",
+        start_date  => "2022-05-01",
+        start_time  => "21:00",
+        end_date    => "2022-05-01",
+        end_time    => "23:00",
         is_camp     => 0,
         long_desc   => "this is a new long desc",
         name        => "new name",
@@ -151,8 +159,10 @@ subtest "PUT /event/#" => sub {
     $expected = {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:19:45",
-        start_time  => "2022-05-01T21:00:00",
-        end_time    => "2022-05-01T23:00:00",
+        start_date  => "2022-05-01",
+        start_time  => "21:00",
+        end_date    => "2022-05-01",
+        end_time    => "23:00",
         event_id    => $Event_Id,
         is_camp     => 0,
         is_template => undef,
@@ -187,8 +197,10 @@ subtest 'POST /event #2' => sub{
     my ($expected, $res, $decoded, $got);
 
     my $new_event = {
-        start_time  => "2022-05-03T21:00:00",
-        end_time    => "2022-05-03T23:00:00",
+        start_date  => "2022-05-03",
+        start_time  => "21:00",
+        end_date    => "2022-05-03",
+        end_time    => "23:00",
         is_camp     => 1,
         long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
@@ -206,7 +218,9 @@ subtest 'POST /event #2' => sub{
     $Second_Event_Id = $got->{event_id};
     $expected = {
         event_id    => $Second_Event_Id,
+        start_date  => $new_event->{start_date},
         start_time  => $new_event->{start_time},
+        end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
         is_camp     => $new_event->{is_camp},
         long_desc   => $new_event->{long_desc},
@@ -246,8 +260,10 @@ subtest 'GET /eventAll' => sub {
     $got = $decoded->{data};
     $expected = [
       {
-        start_time  => "2022-05-01T21:00:00",
-        end_time    => "2022-05-01T23:00:00",
+        start_date  => "2022-05-01",
+        start_time  => "21:00",
+        end_date    => "2022-05-01",
+        end_time    => "23:00",
         event_id    => $Event_Id,
         is_camp     => 0,
         is_template => undef,
@@ -260,8 +276,10 @@ subtest 'GET /eventAll' => sub {
       },
       {
         event_id    => $Second_Event_Id,
-        start_time  => $Second_Event->start_time->iso8601,
-        end_time    => $Second_Event->end_time->iso8601,
+        start_date  => $Second_Event->start_date->ymd('-'),
+        start_time  => $Second_Event->start_time =~ s/:00$//r,
+        end_date    => $Second_Event->end_date->ymd('-'),
+        end_time    => $Second_Event->end_time =~ s/:00$//r,
         is_camp     => $Second_Event->is_camp,
         long_desc   => $Second_Event->long_desc,
         short_desc  => $Second_Event->short_desc,

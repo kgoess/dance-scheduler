@@ -90,7 +90,8 @@ Returns the flat list of all events in the database
         "is_deleted": 0,
         "short_desc": "Sharon Green",
         "long_desc": "Sharon Green with out-of-town special guests...",
-        "start_time": "2022-06-08T00:00:00",
+        "start_date": "2022-06-08",
+        "start_time": "00:00:00",
         ...
       },
       ...
@@ -132,7 +133,8 @@ the nested data structures.
     "data": {
       "event_id": 45,
       "name": "2022-06-22 ENGLISH CCB Bruce Hamilton",
-      "start_time": "2022-06-22T00:00:00",
+      "start_date": "2022-06-08",
+      "start_time": "00:00:00",
       "short_desc": "Bruce Hamilton",
       "long_desc": "Bruce Hamilton with Craig Johnson, Judy Linsenberg...",
       "venues": [ {

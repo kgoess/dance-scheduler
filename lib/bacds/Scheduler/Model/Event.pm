@@ -10,7 +10,9 @@ sub get_fields_for_output {
     qw/
         event_id
         name
+        start_date
         start_time
+        end_date
         end_time
         is_camp
         long_desc
@@ -24,7 +26,9 @@ sub get_fields_for_output {
 sub get_fields_for_input {
     qw/
         name
+        start_date
         start_time
+        end_date
         end_time
         is_camp
         long_desc
@@ -45,6 +49,18 @@ sub get_many_to_manys {
     [qw/Venue venues venue_id/],
 }
 sub get_one_to_manys { [qw/Series series series_id/] }
-sub get_default_sorting { {-asc=>'start_time'} }
+sub get_default_sorting { {-asc => [qw/start_date start_time/]} }
+
+sub filter_input {
+    my ($class, $field, $value) = @_;
+
+    if ($field eq 'start_time' or $field eq 'end_time') {
+        if (($value =~ tr/:/:/) == 1) { # change 7:30 to 7:30:00
+            $value .= ':00';
+        }
+    }
+
+    return $value;
+}
 
 1;

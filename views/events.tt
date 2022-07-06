@@ -55,8 +55,10 @@
         </div>
         <% event_column_types = [
               [ "name", "Name" ],
-              [ "start_time", "Start" ],
-              [ "end_time", "End" ],
+              [ "start_date", "Start Date" ],
+              [ "start_time", "Start Time" ],
+              [ "end_date", "End Date (optional)" ],
+              [ "end_time", "End Time (optional)" ],
               [ "is_camp", "Is Camp?" ],
               [ "long_desc", "" ],
               [ "short_desc", "" ],

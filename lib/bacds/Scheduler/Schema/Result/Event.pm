@@ -47,16 +47,26 @@ __PACKAGE__->table("events");
   is_nullable: 1
   size: 256
 
-=head2 start_time
+=head2 start_date
 
-  data_type: 'datetime'
+  data_type: 'date'
   datetime_undef_if_invalid: 1
   is_nullable: 0
 
+=head2 start_time
+
+  data_type: 'time'
+  is_nullable: 0
+
+=head2 end_date
+
+  data_type: 'date'
+  datetime_undef_if_invalid: 1
+  is_nullable: 1
+
 =head2 end_time
 
-  data_type: 'datetime'
-  datetime_undef_if_invalid: 1
+  data_type: 'time'
   is_nullable: 1
 
 =head2 is_camp
@@ -111,18 +121,14 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
   { data_type => "varchar", is_nullable => 1, size => 256 },
+  "start_date",
+  { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 0 },
   "start_time",
-  {
-    data_type => "datetime",
-    datetime_undef_if_invalid => 1,
-    is_nullable => 0,
-  },
+  { data_type => "time", is_nullable => 0 },
+  "end_date",
+  { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 1 },
   "end_time",
-  {
-    data_type => "datetime",
-    datetime_undef_if_invalid => 1,
-    is_nullable => 1,
-  },
+  { data_type => "time", is_nullable => 1 },
   "is_camp",
   { data_type => "tinyint", is_nullable => 1 },
   "long_desc",
@@ -275,8 +281,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-04 15:29:38
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eYVM6H+qRk/yXAJ8vXLmdQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-05 20:51:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:p99GRvxbdQeHlhPAwKwBQQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

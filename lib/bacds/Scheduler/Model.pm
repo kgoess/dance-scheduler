@@ -18,7 +18,7 @@ bacds::Scheduler::Model - Parent class for all Model:: classes
 =head1 REQUIREMENTS
 
 In order to successfully inherit from this class, a decendant will
-need to impliment the following functions
+need to implement the following functions
 
 =over 4
 
@@ -29,12 +29,12 @@ This must return a string that can be sent to C<< dbh->resultset() >>, like C<'E
 =item * get_fields_for_output()
 
 This must return an array of fieldnames that should be included in
-result output, like C<qw/name start_time end_time/>.
+result output, like C<qw/name start_date start_time />.
 
 =item * get_fields_for_input()
 
 This must return an array of fieldnames that may be set via POST/PUT,
-like C<qw/name start_time end_time/> 
+like C<qw/name start_date start_time />
 
 Make sure not to include any autoindex fields.
 
@@ -116,7 +116,7 @@ sub get_upcoming_rows {
 
     my $model_name = $class->get_model_name;
     my $resultset = $dbh->resultset($model_name)->search({
-        start_time => { '>=' => $dtf->format_datetime($yesterday) }
+        start_date => { '>=' => $dtf->format_date($yesterday) }
     });
 
     $resultset or die "empty set"; #TODO: More gracefully
@@ -181,7 +181,8 @@ sub post_row {
     my $row = $dbh->resultset($model_name)->new({});
 
     foreach my $column (@fields_for_input) {
-        $row->$column($incoming_data{$column});
+        my $filtered_input = $class->filter_input($column, $incoming_data{$column});
+        $row->$column($filtered_input);
     };
 
     foreach my $column (@fkey_fields) {
@@ -234,7 +235,8 @@ sub put_row {
 
     my @fields_for_input = $class->get_fields_for_input;
     foreach my $column (@fields_for_input) {
-        $row->$column($incoming_data{$column});
+        my $filtered_input = $class->filter_input($column, $incoming_data{$column});
+        $row->$column($filtered_input);
     };
 
     my @fkey_fields = $class->get_fkey_fields;
@@ -252,6 +254,19 @@ sub put_row {
     return $class->_row_to_result($row, $other_tables);
 };
 
+=head2 filter_input($field, $value)
+
+Optional in subclasses, can be used to munge the incoming data to post_row
+or put_row.
+
+=cut
+
+sub filter_input {
+    my ($class, $field, $value) = @_;
+    return $value;
+}
+
+
 =head2 _row_to_result()
 
 Returns a dict of all applicable information from a row.  Uses
@@ -267,7 +282,14 @@ sub _row_to_result {
     foreach my $field (@fields_for_output) {
         my $value = $row->$field;
         if (defined blessed($value) && $value->isa('DateTime')) {
-            $result->{$field} = $value->iso8601;
+            if ($field =~ /_ts$/) { # timestamps get the full thing
+                $result->{$field} = $value->iso8601;
+            } else { # start_date, end_date just yyyy-mm-dd
+                $result->{$field} = $value->ymd('-');
+            }
+        } elsif ($value && $field =~ /_time$/) { # start_time, end_time change 19:00:00 to 19:00
+            $value =~ s/:..$//;
+            $result->{$field} = $value;
         } else {
             $result->{$field} = $value;
         }

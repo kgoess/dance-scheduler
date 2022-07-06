@@ -1,8 +1,10 @@
 CREATE TABLE events (
     event_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(256),
-    start_time DATETIME NOT NULL,
-    end_time DATETIME,
+    start_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_date DATE,
+    end_time TIME,
     is_camp BOOLEAN,
     long_desc TEXT(32766),
     short_desc VARCHAR(1024),    
