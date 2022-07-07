@@ -36,6 +36,7 @@
 
         // Only the "series" container has this. If they created a new series
         // template then we can turn the button back on
+        const [parentContainer, modelName] = getParentAndModelName(this);
         parentContainer.find('.select-template-button').prop('disabled', false);
     });
 
@@ -233,6 +234,14 @@
             });
         },
     });
+
+    $( '.datepicker' ).datepicker({
+          dateFormat: "yy-mm-dd"
+    });
+
+    /* this is the button on the series accordion the starts the popup with the
+    * series' default event
+    */
     $( '.select-template-button' ).click(function() {
         eventTemplateDialog.dialog( 'open' );
     });

@@ -54,21 +54,49 @@
             </div>
         </div>
         <% event_column_types = [
-              [ "name", "Name" ],
-              [ "start_date", "Start Date" ],
-              [ "start_time", "Start Time" ],
-              [ "end_date", "End Date (optional)" ],
-              [ "end_time", "End Time (optional)" ],
-              [ "is_camp", "Is Camp?" ],
-              [ "long_desc", "" ],
-              [ "short_desc", "" ],
+              { name  => "name",
+                label => "Name",
+              },
+              { name  => "start_date",
+                label => "Start Date",
+                type  => "date",
+              },
+              { name  => "start_time",
+                label => "Start Time",
+                type  => "time",
+              },
+              { name  => "end_date",
+                label => "End Date (optional)",
+                type  => "date",
+              },
+              { name  => "end_time",
+                label => "End Time (optional)",
+                type  => "time",
+              },
+              { name  => "is_camp",
+                label => "Is Camp?",
+              },
+              { name  => "long_desc",
+                label => "Long Desc.",
+                type  => "textarea",
+              },
+              { name  => "short_desc",
+                label => "Short Desc. (one line)",
+              },
           ]
          %>
         <% FOREACH column IN event_column_types %>
-            <div name="<% column.0 %>" class="display-row" column-type="text-item">
-                <span class="row-label"><% column.1 %></span>
+            <div name="<% column.name %>" class="display-row" column-type="text-item">
+                <span class="row-label"><% column.label %></span>
                 <span class="row-contents"></span>
-                <input class="row-edit" name="<% column.0 %>" hidden />
+                <% IF column.type == "textarea" %>
+                    <textarea class="row-edit" name="<% column.name %>" rows="4" cols="50" hidden >
+                    </textarea>
+                <% ELSIF column.type == "date" %>
+                    <input class="row-edit datepicker" name="<% column.name %>" hidden />
+                <% ELSE %>
+                    <input class="row-edit" name="<% column.name %>" hidden />
+                <% END %>
             </div>
         <% END %>
         <input type="hidden" name="event_id"/>
