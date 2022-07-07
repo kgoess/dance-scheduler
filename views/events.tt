@@ -90,12 +90,14 @@
                 <span class="row-label"><% column.label %></span>
                 <span class="row-contents"></span>
                 <% IF column.type == "textarea" %>
-                    <textarea class="row-edit" name="<% column.name %>" rows="4" cols="50" hidden >
+                    <textarea class="row-edit" name="<% column.name %>" rows="8" cols="70" hidden >
                     </textarea>
                 <% ELSIF column.type == "date" %>
-                    <input class="row-edit datepicker" name="<% column.name %>" hidden />
+                    <input class="row-edit datepicker" name="<% column.name %>" size="10" maxlength="10" hidden />
+                <% ELSIF column.type == "time" %>
+                    <input class="row-edit" name="<% column.name %>" size="5" maxlength="5" hidden />
                 <% ELSE %>
-                    <input class="row-edit" name="<% column.name %>" hidden />
+                    <input class="row-edit" name="<% column.name %>" size="40" hidden />
                 <% END %>
             </div>
         <% END %>
