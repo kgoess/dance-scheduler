@@ -64,9 +64,16 @@
 
     });
 
+    /* when they click the line with the '+' on an accordion, toggle the
+     * open/close
+     */
     $( '.accordion .accordion-label' ).click(function() {
-        $( '.accordion-container' ).removeClass('active');
         const [parentContainer, modelName] = getParentAndModelName(this);
+        const thisWasActive = parentContainer.hasClass('active');
+        $( '.accordion-container' ).removeClass('active');
+        if (thisWasActive) {
+            return;
+        }
         parentContainer.toggleClass('active')
         if (parentContainer.hasClass('active')) {
             loadListForModel(modelName);
