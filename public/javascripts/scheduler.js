@@ -190,7 +190,7 @@
     eventTemplateDialog = $( '#series-template' ).dialog({
         autoOpen: false,
         height: 400,
-        width: 350,
+        width: 400,
         modal: true,
         buttons: {
             Save: function() {
