@@ -163,9 +163,7 @@
             eventContainer.each(
                 function(index) {
                     $(this).find('.row-contents').hide();
-                    $(this).find('.row-contents').text('');
                     $(this).find('.row-edit').show();
-                    $(this).find('.row-edit').val('');
                 }
             );
 
