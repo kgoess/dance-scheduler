@@ -259,9 +259,10 @@ font-size: 10px;
 .accordion .content {
     position: relative;
     background: white;
-    height: 0;
     overflow: hidden;
-    transition: 0.5s;
+    height: 0;
+    //transition: max-height 0s ease-out ;
+    //max-height: 0;
 }
 
 .accordion hr {
@@ -273,7 +274,9 @@ font-size: 10px;
 /* Unhides the content part when active. Sets the height */
 
 .accordion .accordion-container.active .content {
-  height: 100%;
+    //transition: max-height 0.5s ease-in ;
+    //max-height: 35em;
+    height: 100%
 }
 
 /* Changes from plus sign to negative sign once active */
