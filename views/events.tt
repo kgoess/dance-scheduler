@@ -101,45 +101,35 @@
                 <% END %>
             </div>
         <% END %>
+        <div name="band_id" class="display-row" column-type="list-item" model-name="band" table-name="bands" >
+            <div class="multi-select-wrapper">
+                <span class="row-label">Band</span>
+                <select  id="band-selector" name="band_id">
+                </select>
+                <span class="add-multi-select-button">+</span>
+            </div>
+        </div>
+        <div id="talent-for-event" name="talent_id" class="display-row" column-type="list-item" model-name="talent" table-name="talent" >
+            <div class="multi-select-wrapper">
+                <span class="row-label">Talent</span>
+                <select name="talent_id">
+                </select>
+                <span class="add-multi-select-button">+</span>
+            </div>
+        </div>
         <input type="hidden" name="event_id"/>
         <span class="button-container">
             <button class="button save-button">Save</button>
         </span>
     </form>
-    <div id="users-contain" class="ui-widget">
-      <h1>Band Members</h1>
-      <table id="talent" class="ui-widget ui-widget-content">
-        <thead>
-          <tr class="ui-widget-header ">
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>John Doe</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <button id="add-band">Add Band</button>
 </div>
 
-<div id="add-band-dialog" title="Add A Band">
-  <!-- <p class="validateTips">All form fields are required.</p> -->
-    <form>
-    <fieldset>
-        <label for="name">Band Name</label>
-        <div name="band_id" class="display-row" column-type="list-item" model-name="band" table-name="bands" >
-            <select name="band_id">
-            </select>
-        </div>
-
-        <!-- Allow form submission with keyboard without duplicating the dialog button -->
-        <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-    </fieldset>
-    </form>
+<div id="add-band-dialog" title="Band Membership">
     <!-- when they pick a band we generate an <ol> with the members and
          drop it into this div -->
+    <p>
+        Would you like to add these members of <span id="band-name-in-popup"></span> to your event?
+    </p>
     <div class="talent-names">
     </div>
 </div>

@@ -84,57 +84,6 @@
 
     const labelGetter = row => getLabelForDisplayInItemListbox('band', row);
 
-    bandDialog = $( '#add-band-dialog' ).dialog({
-        autoOpen: false,
-        height: 400,
-        width: 350,
-        modal: true,
-        buttons: {
-            'Add band to event': () => alert('TODO add a function here'),
-            Cancel: function() {
-                bandDialog.dialog( "close" );
-            }
-        },
-        close: function() {
-            form[ 0 ].reset();
-        },
-        open: function() {
-            $.ajax({
-                url: 'bandAll',
-                dataType: 'json'
-            })
-            .done(msg => fillInItemRowList( $('#add-band-dialog .display-row'), msg, [], labelGetter));
-
-            // fill in the form on the dialog with the members of the selected band
-            $('select').change(function() {
-                const selectedVal = $(this).val();
-                $.ajax({
-                    url: `band/${selectedVal}`,
-                    dataType: 'json'
-                })
-                .done(msg => {
-                    const spanForNames = $('#add-band-dialog .talent-names');
-                    spanForNames.text('');
-                    const olEl = $(document.createElement('ol'));
-                    spanForNames.append(olEl);
-                    msg.data.talents.forEach((talent, i) => {
-                        const itemEl = document.createElement('li');
-                        itemEl.textContent = talent.name;
-                        olEl.append(itemEl);
-                    });
-                });
-            });
-        }
-    });
-
-    form = bandDialog.find( 'form' ).on( 'submit', function( event ) {
-        event.preventDefault();
-        alert('TODO add the displayed talent to the event as individuals');
-    });
-
-    $( '#add-band' ).button().on( 'click', function() {
-        bandDialog.dialog( 'open' );
-    });
 
     /*
      * This sets values for this new event to the default values from the series'
@@ -249,6 +198,58 @@
     */
     $( '.select-template-button' ).click(function() {
         eventTemplateDialog.dialog( 'open' );
+    });
+
+    const bandDialog = $( '#add-band-dialog' ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            Yes: function() {
+                const found = {};
+                $( 'select[name="talent_id"]' ).each(function() {
+                    found[$(this).val()] = 1;
+                });
+                bandDialog.talentIds.forEach((incomingTalentId, i) => {
+                    if (found[incomingTalentId]) {
+                        return;
+                    }
+// definitely adding them, just not to the right place
+                    const insertTarget = $( '#talent-for-event select' ).last();
+                    const clone = multiSelectOptionAdd.call(insertTarget);
+                    clone.val(incomingTalentId);
+
+                });
+            },
+            No: function() {
+                bandDialog.dialog( "close" );
+            }
+        },
+        open: function() {
+            $.ajax({
+                url: `band/${bandDialog.bandId}`,
+                dataType: 'json'
+            })
+            .done(msg => {
+                $('#band-name-in-popup').text(msg.data.name);
+                const spanForNames = $('#add-band-dialog .talent-names');
+                spanForNames.text('');
+                const olEl = $(document.createElement('ol'));
+                spanForNames.append(olEl);
+                bandDialog.talentIds = [];
+                msg.data.talents.forEach((talent, i) => {
+                    const itemEl = document.createElement('li');
+                    itemEl.textContent = talent.name;
+                    olEl.append(itemEl);
+                    bandDialog.talentIds.push(talent.id);
+                });
+            });
+        }
+    });
+    $( '#band-selector' ).change(function() {
+        bandDialog.bandId = $(this).val();
+        bandDialog.dialog( 'open' );
     });
 });
 
