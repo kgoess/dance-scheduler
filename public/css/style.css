@@ -226,7 +226,7 @@ font-size: 10px;
     height: 100%;
 }
 .multi-select-wrapper {
-    display: inline-block;
+    display: inherit;
 }
 
 /* 
