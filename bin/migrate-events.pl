@@ -83,6 +83,7 @@ sub migrate_event {
         $new->name($name);
     }
     $new->start_date( $old->startday );
+    $new->start_time( '23:59:59' );
     $new->end_date( $old->endday )
         if $old->endday;
     $new->is_camp( $old->type ? 1 : 0 );
