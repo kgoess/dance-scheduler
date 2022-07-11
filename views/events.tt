@@ -86,7 +86,7 @@
           ]
          %>
         <% FOREACH column IN event_column_types %>
-            <div name="<% column.name %>" class="display-row" column-type="text-item">
+            <div name="<% column.name %>" class="display-row <% IF column.type == "textarea" %>has-textarea<% END %>" column-type="text-item">
                 <span class="row-label"><% column.label %></span>
                 <span class="row-contents"></span>
                 <% IF column.type == "textarea" %>
