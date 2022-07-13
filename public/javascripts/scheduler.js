@@ -215,12 +215,25 @@
                     if (found[incomingTalentId]) {
                         return;
                     }
-// definitely adding them, just not to the right place
-                    const insertTarget = $( '#talent-for-event select' ).last();
-                    const clone = multiSelectOptionAdd.call(insertTarget);
+                    const lastTalentSelectbox = $( '#event-display-form #talent-for-event select' ).last();
+                    const clone = multiSelectOptionAdd.call(lastTalentSelectbox);
                     clone.val(incomingTalentId);
-
                 });
+
+/* nope, if we remove it like this then it's gone from all future views in the
+ * event accordion
+                // if the top one is empty we need to remove it
+                const firstTalentSelectbox = $( '#event-display-form #talent-for-event select' ).first();
+                if (!firstTalentSelectbox.val()) {
+                    console.log(firstTalentSelectbox);
+                    firstTalentSelectbox.closest('.multi-select-wrapper').remove();
+                    // and then we need to make the new top one non-removable,
+                    // otherwise they can hork the UI (this is clunky)
+                    const newFirstTalentSelectbox = $( '#event-display-form #talent-for-event select' ).first();
+                    const removalButton = newFirstTalentSelectbox.siblings('.remove-multi-select-button');
+                    removalButton.remove();
+                }
+*/
             },
             No: function() {
                 bandDialog.dialog( "close" );
@@ -456,6 +469,7 @@ function multiSelectOptionAdd() {
     newSelectBoxDiv.find('.remove-multi-select-button' ).click(function() {
         $(this).closest('.multi-select-wrapper').remove();
     });
+    newSelectBoxDiv.find('.add-multi-select-button').click(multiSelectOptionAdd);
     newSelectBoxDiv.attr('cloned-selectlist', 1);
     return newSelectBox;
 }
