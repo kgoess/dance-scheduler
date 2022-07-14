@@ -109,7 +109,7 @@
                 <span class="add-multi-select-button">+</span>
             </div>
         </div>
-        <div id="talent-for-event" name="talent_id" class="display-row" column-type="list-item" model-name="talent" table-name="talent" >
+        <div name="talent_id" class="display-row" column-type="list-item" model-name="talent" table-name="talent" >
             <div class="multi-select-wrapper">
                 <span class="row-label">Talent</span>
                 <select name="talent_id">

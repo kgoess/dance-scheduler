@@ -211,32 +211,27 @@
                 $( 'select[name="talent_id"]' ).each(function() {
                     found[$(this).val()] = 1;
                 });
+                const emptyTalentSelectboxes = $.makeArray($( '#event-display-form [model-name="talent"] select' ))
+                    .filter(item => !$(item).val()) ;
+
                 bandDialog.talentIds.forEach((incomingTalentId, i) => {
                     if (found[incomingTalentId]) {
                         return;
                     }
-                    const lastTalentSelectbox = $( '#event-display-form #talent-for-event select' ).last();
-                    const clone = multiSelectOptionAdd.call(lastTalentSelectbox);
-                    clone.val(incomingTalentId);
+                    let firstEmptyTalentSelectbox;
+                    if (firstEmptyTalentSelectbox = emptyTalentSelectboxes.shift()) {
+                        $(firstEmptyTalentSelectbox).val(incomingTalentId);
+                    } else {
+                        const lastTalentSelectbox = $( '#event-display-form [model-name="talent"] select' ).last();
+                        const clone = multiSelectOptionAdd.call(lastTalentSelectbox);
+                        clone.val(incomingTalentId);
+                    }
                 });
 
-/* nope, if we remove it like this then it's gone from all future views in the
- * event accordion
-                // if the top one is empty we need to remove it
-                const firstTalentSelectbox = $( '#event-display-form #talent-for-event select' ).first();
-                if (!firstTalentSelectbox.val()) {
-                    console.log(firstTalentSelectbox);
-                    firstTalentSelectbox.closest('.multi-select-wrapper').remove();
-                    // and then we need to make the new top one non-removable,
-                    // otherwise they can hork the UI (this is clunky)
-                    const newFirstTalentSelectbox = $( '#event-display-form #talent-for-event select' ).first();
-                    const removalButton = newFirstTalentSelectbox.siblings('.remove-multi-select-button');
-                    removalButton.remove();
-                }
-*/
+                bandDialog.dialog('close');
             },
             No: function() {
-                bandDialog.dialog( "close" );
+                bandDialog.dialog('close');
             }
         },
         open: function() {
@@ -461,7 +456,7 @@ function getContainerForModelName(modelName) {
 
 function multiSelectOptionAdd() {
     const displayRow = $(this).closest('.display-row')
-    const newSelectBoxDiv = displayRow.find('.multi-select-wrapper:first').clone();
+    const newSelectBoxDiv = displayRow.find('.multi-select-wrapper:first').clone(true);
     displayRow.append(newSelectBoxDiv);
     const newSelectBox = newSelectBoxDiv.find('select').first();
     newSelectBox.val('');
@@ -469,7 +464,6 @@ function multiSelectOptionAdd() {
     newSelectBoxDiv.find('.remove-multi-select-button' ).click(function() {
         $(this).closest('.multi-select-wrapper').remove();
     });
-    newSelectBoxDiv.find('.add-multi-select-button').click(multiSelectOptionAdd);
     newSelectBoxDiv.attr('cloned-selectlist', 1);
     return newSelectBox;
 }
