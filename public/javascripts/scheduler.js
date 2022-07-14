@@ -175,7 +175,7 @@
             seriesSelectboxParent.append(hiddenSeriesIdEl);
 
             // get the series name and display it
-            const seriesName = seriesContainer.find('select option:selected').text();
+            const seriesName = seriesContainer.find('[name="name"] .row-contents').text();
             const seriesNameEl = document.createTextNode(seriesName);
             seriesSelectboxParent.append(seriesNameEl);
 
@@ -505,5 +505,5 @@ function saveAction(target, onSuccess) {
             onSuccess();
         }
      })
-    .fail( () => { alert('something bad happened, update failed') }); // FIXME later
+    .fail( () => { alert('something bad happened, update failed, see the server logs') }); // FIXME later
 }
