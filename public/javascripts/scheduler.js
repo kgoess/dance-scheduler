@@ -70,7 +70,7 @@
     $( '.accordion .accordion-label' ).click(function() {
         const [parentContainer, modelName] = getParentAndModelName(this);
         const thisWasActive = parentContainer.hasClass('active');
-        $( '.accordion-container' ).removeClass('active');
+        $( '.accordion-container' ).removeClass('active').find('.model-display').hide();
         if (thisWasActive) {
             return;
         }
