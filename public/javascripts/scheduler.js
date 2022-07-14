@@ -372,6 +372,10 @@ function fillInItemRowList(currentRow, msg, selections, labelGetter) {
         const insertTarget = currentRow.find('select');
         insertTarget.find('option').remove();
         currentRow.find('[cloned-selectlist=1]').remove();
+        const emptyOption = document.createElement('option');
+        emptyOption.innerHTML = '--';
+        emptyOption.setAttribute('value', '');
+        insertTarget.append(emptyOption);
         rows.forEach((row, i) => {
             const element = document.createElement('option');
             const label = labelGetter(row);
