@@ -17,14 +17,6 @@
                 label => "Frequency",
             },
             {
-                name => "default_start_time",
-                label => "Default Start Time",
-            },
-            {
-                name => "default_end_time",
-                label => "Default End Time",
-            },
-            {
                 name => "display_notes",
                 label => "Display Notes",
                 is_textarea => 1,
