@@ -14,12 +14,11 @@ sub get_fields_for_output {
         start_time
         end_date
         end_time
-        is_camp
-        long_desc
         short_desc
         is_template
         created_ts
         modified_ts
+        is_canceled
         is_deleted
     /
 }
@@ -30,10 +29,9 @@ sub get_fields_for_input {
         start_time
         end_date
         end_time
-        is_camp
-        long_desc
         short_desc
         is_template
+        is_canceled
         is_deleted
         series_id
     /

@@ -41,9 +41,8 @@ subtest 'POST /event' => sub {
         end_date => "2022-05-01",
         end_time => "22:00",
 
-        is_camp     => 1,
-        long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
+        is_canceled => 0,
         name        => "saturday night test event",
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -57,8 +56,6 @@ subtest 'POST /event' => sub {
         start_time  => $new_event->{start_time},
         end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
-        is_camp     => $new_event->{is_camp},
-        long_desc   => $new_event->{long_desc},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
         is_template => undef,
@@ -72,6 +69,7 @@ subtest 'POST /event' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
+        is_canceled  => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -120,11 +118,11 @@ subtest 'POST /event/# with parent_org' => sub {
         start_time    => "20:00",
         end_date      => "2022-05-03",
         end_time      => "22:00",
-        is_camp       => 1,
-        long_desc     => "this is the long desc",
         short_desc    => "itsa shortdesc",
         name          => "saturday night test event",
         parent_org_id => $Parent_Org_Id,
+        is_deleted    => 0,
+        is_canceled   => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
@@ -149,8 +147,6 @@ subtest 'POST /event/# with parent_org' => sub {
         start_time  => $new_event->{start_time},
         end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
-        is_camp     => $new_event->{is_camp},
-        long_desc   => $new_event->{long_desc},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
         is_template => undef,
@@ -163,12 +159,14 @@ subtest 'POST /event/# with parent_org' => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        is_canceled => 0,
     };
 
     eq_or_diff $got, $expected, 'return matches';
 
     $Callered_Event = $dbh->resultset('Event')->find($Callered_Event_Id);
 };
+
 
 subtest "GET /event/# with parent_org" => sub {
     plan tests=>2;
@@ -184,9 +182,7 @@ subtest "GET /event/# with parent_org" => sub {
         end_date    => '2022-05-03',
         end_time    => '22:00',
         event_id    => $Callered_Event_Id,
-        is_camp     => 1,
         is_template => undef,
-        long_desc   => 'this is the long desc',
         modified_ts => '2022-04-28T02:18:05',
         name        => 'saturday night test event',
         parent_orgs => [
@@ -205,6 +201,7 @@ subtest "GET /event/# with parent_org" => sub {
         talent      => [],
         venues      => [],
         is_deleted  => 0,
+        is_canceled => 0,
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -230,13 +227,12 @@ subtest "PUT /event/# with parent_org" => sub {
         start_time  => "21:00",
         end_date    => "2022-05-03",
         end_time    => "23:00",
-        is_camp     => 0,
-        long_desc   => "this is a new long desc",
         name        => "new name",
         short_desc  => "new shortdef",
         #venue_id    => [],
         style_id    => [],
         parent_org_id   => $other_parent_org_id,
+        is_canceled => 0,
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
@@ -250,9 +246,7 @@ subtest "PUT /event/# with parent_org" => sub {
         end_time => "23:00",
 
         event_id    => $Callered_Event_Id,
-        is_camp     => 0,
         is_template => undef,
-        long_desc   => "this is a new long desc",
         modified_ts => "2022-04-28T02:19:45",
         name        => "new name",
         parent_orgs => [
@@ -272,6 +266,7 @@ subtest "PUT /event/# with parent_org" => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        is_canceled => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
