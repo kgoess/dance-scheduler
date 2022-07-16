@@ -25,7 +25,7 @@ my $dbh = get_dbh();
 
 my ($Event, $Venued_Event);
 my ($Event_Id, $Venued_Event_Id);
-my ($Venue_Id, $Venue_Name);
+my ($Venue_Id, $Venue_Vkey);
 
 
 # We've already tested POST /event in 200_events.t, so
@@ -101,7 +101,7 @@ subtest 'POST /event/# with venues' => sub{
     ok($res->is_success, 'created venue');
     $decoded = decode_json($res->content);
     $Venue_Id = $decoded->{data}{venue_id};
-    $Venue_Name = $decoded->{data}{vkey} . ' | ' . $decoded->{data}{hall_name};
+    $Venue_Vkey = $decoded->{data}{vkey};
     $got = {};
     foreach my $key (keys %{$decoded->{data}}){
         $got->{$key} = $decoded->{data}{$key};
@@ -109,7 +109,7 @@ subtest 'POST /event/# with venues' => sub{
 
     my $expected = {
         venue_id    => $Venue_Id,
-        vkey        => $new_venue->{vkey},
+        vkey        => $Venue_Vkey,
         hall_name   => $new_venue->{hall_name},
         address     => $new_venue->{address},
         city        => $new_venue->{city},
@@ -137,7 +137,7 @@ subtest 'POST /event/# with venues' => sub{
         venues     => [
             {
                 id => $Venue_Id,
-                name  => $Venue_Name,
+                name  => $Venue_Vkey,
             }
         ],
     };
@@ -169,7 +169,7 @@ subtest 'POST /event/# with venues' => sub{
         modified_ts => $now_ts,
         venues      => [{
             id   => $Venue_Id,
-            name => $Venue_Name,
+            name => $Venue_Vkey,
         }],
         styles      => [],
         bands       => [],
@@ -208,7 +208,7 @@ subtest "GET /event/# with venues" => sub {
         start_time  => '20:00',
         venues      => [{
             id   => $Venue_Id,
-            name => $Venue_Name,
+            name => $Venue_Vkey,
         }],
         styles => [],
         bands       => [],
@@ -239,7 +239,6 @@ subtest "PUT /event/# with venues" => sub {
 
     $decoded = decode_json($res->content);
     my $other_venue_id = $decoded->{data}{venue_id};
-    my $other_venue_name = $decoded->{data}{vkey} . ' | ' . $decoded->{data}{hall_name};
 
     my $edit_event = {
         start_date  => "2022-05-03",
@@ -276,11 +275,11 @@ subtest "PUT /event/# with venues" => sub {
         venues      => [
             {
                 id => 1,
-                name => $Venue_Name,
+                name => 'VXX',
             },
             {
                 id => 2,
-                name => $other_venue_name,
+                name => 'VZZ',
             }
         ],
         styles      => [],

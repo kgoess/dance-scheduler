@@ -198,7 +198,7 @@ sub get_fields_for_event_row {
     my ($self) = @_;
     return {
         id   => $self->venue_id,
-        name => $self->vkey . ' | ' . $self->hall_name,
+        name => $self->vkey,
     };
 };
 

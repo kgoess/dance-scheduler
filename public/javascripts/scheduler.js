@@ -298,14 +298,18 @@ function displayItem(target, msg) {
  * pick the 'name' attribute to display, but in some cases we don't:
  */
 const keyToDisplayInItemRow = {
-    venue: 'vkey',
+    venue: ['vkey', 'hall_name'],
     parent_org: 'abbreviation',
 };
 function getLabelForDisplayInItemListbox (modelName, data) {
 
     let keyname;
-    if (keyName = keyToDisplayInItemRow[modelName]) {
-        return data[keyName];
+    if (keyname = keyToDisplayInItemRow[modelName]) {
+        if (Array.isArray(keyname)) {
+            return keyname.map(item => data[item]).join(' - ');
+        } else {
+            return data[keyname];
+        }
     } else {
         return data['name'];
     }
