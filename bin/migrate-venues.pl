@@ -44,7 +44,7 @@ sub create_venues {
         # we might want an is_active column
         #$new->is_active( $old->is_active );
 
-        $new->comment( $comment . "\n". $old->comment );
+        $new->programmer_notes ( $comment . "\n". $old->comment );
 
         $new->insert;
 

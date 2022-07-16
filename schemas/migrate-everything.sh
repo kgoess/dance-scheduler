@@ -1,4 +1,5 @@
 #!/bin/sh -x
+set -e
 
 script_dir=$(dirname "$0")
 

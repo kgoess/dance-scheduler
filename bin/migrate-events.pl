@@ -18,11 +18,13 @@ my %Series_Lookup = (
     'FSJ-CONTRA' => 'South Bay Contra',
     'ASE-ENGLISH' => 'Peninsula English',
     'CCB-ENGLISH' => 'Berkeley English',
+    'STM-ENGLISH' => 'Palo Alto English',
     # ???
     #'CCB-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
     'SJP-ENGLISH' => 'San Francisco English',
     'FSJ-ENGLISH' => 'San Jose English',
     'HPP-WOODSHED' => 'Atherton Woodshed',
+    'ONLINE-ONLINE' => 'Odd Sundays Online',
     'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
     'ONLINE-ENGLISH' => 'Odd Sundays Online',
     'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
@@ -86,9 +88,7 @@ sub migrate_event {
     $new->start_time( '23:59:59' );
     $new->end_date( $old->endday )
         if $old->endday;
-    $new->is_camp( $old->type ? 1 : 0 );
-    $new->long_desc( $old->leader . ' with ' .$old->band );
-    $new->short_desc( $old->leader );
+    $new->short_desc( $old->leader . ' with ' .$old->band );
     $new->is_template(0);
 
     my $key = join '-', $old->loc, $old->type;

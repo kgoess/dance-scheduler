@@ -21,14 +21,14 @@ county for series/event? link to covid policies?
 should events.start_time be not-null? what about camps?
 
 phase I:
- - events just needs a short desc
- - series needs a short desc for the top of the page, and an optional long desc
+ DONE events just needs a short desc
+ DONE series needs a short desc for the top of the page, and an optional long desc
    for the body, see sf contra currently
- - series needs a sidebar field (big textbox)
- - location also needs a sidebar field for the series pages and for the
+ DONE series needs a sidebar field (big textbox)
+ DONE location also needs a sidebar field for the series pages and for the
    /directions/ page (ultimately)
- - dance cancelled
- - make start/end times raw text, just "times" like "dance is from 6 to 7 with
+ DONE dance cancelled
+ NOPE make start/end times raw text, just "times" like "dance is from 6 to 7 with
    food in the middle"
  - work out authentication
  - work out that is_deleted field--it shouldn't be exposed (there should be a

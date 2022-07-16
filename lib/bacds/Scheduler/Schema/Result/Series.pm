@@ -53,7 +53,18 @@ __PACKAGE__->table("series");
   is_nullable: 1
   size: 128
 
-=head2 display_notes
+=head2 short_desc
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 2048
+
+=head2 sidebar
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 display_text
 
   data_type: 'text'
   is_nullable: 1
@@ -90,7 +101,11 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 256 },
   "frequency",
   { data_type => "varchar", is_nullable => 1, size => 128 },
-  "display_notes",
+  "short_desc",
+  { data_type => "varchar", is_nullable => 1, size => 2048 },
+  "sidebar",
+  { data_type => "text", is_nullable => 1 },
+  "display_text",
   { data_type => "text", is_nullable => 1 },
   "programmer_notes",
   { data_type => "text", is_nullable => 1 },
@@ -141,8 +156,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-04 15:40:50
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:NPxSXR3CkNb6VOeU6+Z0hw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-15 19:47:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:j1mgEYYQTUCWEu8LxjpXAA
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

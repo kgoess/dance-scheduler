@@ -71,7 +71,17 @@ __PACKAGE__->table("venues");
   is_nullable: 1
   size: 10
 
-=head2 comment
+=head2 sidebar
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 directions
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 programmer_notes
 
   data_type: 'text'
   is_nullable: 1
@@ -109,7 +119,11 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 64 },
   "zip",
   { data_type => "char", is_nullable => 1, size => 10 },
-  "comment",
+  "sidebar",
+  { data_type => "text", is_nullable => 1 },
+  "directions",
+  { data_type => "text", is_nullable => 1 },
+  "programmer_notes",
   { data_type => "text", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
@@ -172,8 +186,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-15 20:12:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T5NLDMUMrrDo8ly//yNsiw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-15 19:47:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1rSgJefZv6GfHnVkMuGwEw
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

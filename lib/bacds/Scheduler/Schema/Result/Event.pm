@@ -69,21 +69,11 @@ __PACKAGE__->table("events");
   data_type: 'time'
   is_nullable: 1
 
-=head2 is_camp
-
-  data_type: 'tinyint'
-  is_nullable: 1
-
-=head2 long_desc
-
-  data_type: 'text'
-  is_nullable: 1
-
 =head2 short_desc
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 1024
+  size: 2048
 
 =head2 is_template
 
@@ -94,6 +84,11 @@ __PACKAGE__->table("events");
 
   data_type: 'integer'
   is_foreign_key: 1
+  is_nullable: 1
+
+=head2 is_canceled
+
+  data_type: 'tinyint'
   is_nullable: 1
 
 =head2 is_deleted
@@ -129,16 +124,14 @@ __PACKAGE__->add_columns(
   { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 1 },
   "end_time",
   { data_type => "time", is_nullable => 1 },
-  "is_camp",
-  { data_type => "tinyint", is_nullable => 1 },
-  "long_desc",
-  { data_type => "text", is_nullable => 1 },
   "short_desc",
-  { data_type => "varchar", is_nullable => 1, size => 1024 },
+  { data_type => "varchar", is_nullable => 1, size => 2048 },
   "is_template",
   { data_type => "tinyint", is_nullable => 1 },
   "series_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
+  "is_canceled",
+  { data_type => "tinyint", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -281,8 +274,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-05 20:51:56
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:p99GRvxbdQeHlhPAwKwBQQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-15 19:47:11
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GD3WJqI6PrRrYoyL6sBGDA
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

@@ -17,28 +17,41 @@
                 label => "Frequency",
             },
             {
-                name => "display_notes",
-                label => "Display Notes",
-                is_textarea => 1,
+                name => "short_desc",
+                label => "Short Description",
+                type  => "textarea",
+            },
+            {
+                name => "sidebar",
+                label => "Sidebar",
+                type  => "textarea",
+            },
+            {
+                name => "display_text",
+                label => "Display Text",
+                type  => "textarea",
             },
             {
                 name => "programmer_notes",
                 label => "Programmer Notes",
-                is_textarea => 1,
+                type  => "textarea",
             },
             {
                 name => "is_deleted",
                 label => "Is Deleted",
+                type => "checkbox",
             },
            ]
         %>
         <% FOREACH column IN series_column_types %>
             <div name="<% column.name %>" class="display-row" column-type="text-item">
-                <span class="row-label"><% column.label %></span>
+                <label for="<% column.name %>" class="row-label"><% column.label %></label>
                 <span class="row-contents"></span>
-                <% IF column.is_textarea %>
-                    <textarea class="row-edit" name="<% column.name %>" rows="8" cols="70" hidden/>
+                <% IF column.type == "textarea" %>
+                    <textarea class="row-edit" name="<% column.name %>" rows="8" cols="70" hidden >
                     </textarea>
+                <% ELSIF column.type == "checkbox" %>
+                    <input type="checkbox" class="row-edit" name="<% column.name %>" value="1" hidden />
                 <% ELSE %>
                     <input class="row-edit" name="<% column.name %>" size="40" hidden />
                 <% END %>

@@ -32,6 +32,11 @@ sub create_series {
             is_deleted => 0,
         },
         {
+            name => 'Palo Alto English',
+            frequency => 'first, third, and fifth Fridays',
+            is_deleted => 0,
+        },
+        {
             name => 'South Bay Contra',
             frequency => 'third Sunday afternoons, 3:00–6:00, lesson at 2:30',
             is_deleted => 0,

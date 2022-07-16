@@ -73,21 +73,19 @@
                 label => "End Time (optional)",
                 type  => "time",
               },
-              { name  => "is_camp",
-                label => "Is Camp?",
-              },
-              { name  => "long_desc",
-                label => "Long Desc.",
+              { name  => "short_desc",
+                label => "Short Desc.",
                 type  => "textarea",
               },
-              { name  => "short_desc",
-                label => "Short Desc. (one line)",
+              { name  => "is_canceled",
+                label => "Canceled",
+                type  => "checkbox",
               },
           ]
          %>
         <% FOREACH column IN event_column_types %>
             <div name="<% column.name %>" class="display-row <% IF column.type == "textarea" %>has-textarea<% END %>" column-type="text-item">
-                <span class="row-label"><% column.label %></span>
+                <label for="<% column.name %>" class="row-label"><% column.label %></label>
                 <span class="row-contents"></span>
                 <% IF column.type == "textarea" %>
                     <textarea class="row-edit" name="<% column.name %>" rows="8" cols="70" hidden >
@@ -96,6 +94,8 @@
                     <input class="row-edit datepicker" name="<% column.name %>" size="10" maxlength="10" hidden />
                 <% ELSIF column.type == "time" %>
                     <input class="row-edit" name="<% column.name %>" size="5" maxlength="5" hidden />
+                <% ELSIF column.type == "checkbox" %>
+                    <input type="checkbox" class="row-edit" name="<% column.name %>" value="1" hidden />
                 <% ELSE %>
                     <input class="row-edit" name="<% column.name %>" size="40" hidden />
                 <% END %>
