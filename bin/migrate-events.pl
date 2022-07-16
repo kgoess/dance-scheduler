@@ -107,7 +107,7 @@ sub migrate_event {
         $new->series_id( $series_obj->series_id );
     } else {
         # ACC has no series ?
-        warn "no next for $loc_str";
+        warn "no series for $loc_str";
     }
 
     $new->insert;

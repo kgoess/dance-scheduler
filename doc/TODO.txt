@@ -35,6 +35,7 @@ phase I:
    'delete' button), and it should do something on the backend
  - add description to venue list, not just the three-letter thing
  - sort out abuse of the 'band' column
+ - event.name on the UI use event.name if present otherwise generate one
 
 phase II:
 

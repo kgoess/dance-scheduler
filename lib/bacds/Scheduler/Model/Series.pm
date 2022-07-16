@@ -27,22 +27,26 @@ sub get_model_name { 'Series' }
 sub get_fields_for_output {
     qw/
         created_ts
-        display_notes
+        display_text
         frequency
         is_deleted
         modified_ts
         name
         programmer_notes
         series_id
+        short_desc
+        sidebar
     /
 }
 sub get_fields_for_input {
     qw/
-        display_notes
+        display_text
         frequency
         is_deleted
         name
         programmer_notes
+        short_desc
+        sidebar
     /
 }
 sub get_fkey_fields { }
