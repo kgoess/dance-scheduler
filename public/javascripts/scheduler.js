@@ -141,10 +141,7 @@
         modal: true,
         buttons: {
             Save: function() {
-                saveAction(
-                    templateEventPopup,
-                    () => alert(`Template saved for series "${getContainerForModelName('series').find('select option:selected').text()}"`)
-                )
+                saveAction(templateEventPopup, () => eventTemplateDialog.dialog("close"))
             },
             Cancel: function() {
                 eventTemplateDialog.dialog("close");
