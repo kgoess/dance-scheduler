@@ -39,11 +39,10 @@ subtest 'POST /event' => sub {
         start_time  => "20:00",
         end_date    => "2022-05-01",
         end_time    => "22:00",
-        is_camp     => 1,
-        long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
         series_id   => undef,
+        is_canceled => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/event/', $new_event );
@@ -56,8 +55,6 @@ subtest 'POST /event' => sub {
         start_time  => $new_event->{start_time},
         end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
-        is_camp     => $new_event->{is_camp},
-        long_desc   => $new_event->{long_desc},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
         is_template => undef,
@@ -71,6 +68,7 @@ subtest 'POST /event' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
+        is_canceled => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -121,11 +119,10 @@ subtest 'POST /event/# with series' => sub {
         start_time  => "20:00",
         end_date    => "2022-05-03",
         end_time    => "22:00",
-        is_camp     => 1,
-        long_desc   => "this is the long desc",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
         series_id   => $Series_Id,
+        is_canceled => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
@@ -150,8 +147,6 @@ subtest 'POST /event/# with series' => sub {
         start_time  => $new_event->{start_time},
         end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
-        is_camp     => $new_event->{is_camp},
-        long_desc   => $new_event->{long_desc},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
         is_template => undef,
@@ -164,6 +159,7 @@ subtest 'POST /event/# with series' => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        is_canceled => 0,
     };
 
     eq_or_diff $got, $expected, 'return matches';
@@ -185,9 +181,7 @@ subtest "GET /event/# with series" => sub {
         end_date    => '2022-05-03',
         end_time    => '22:00',
         event_id    => $Seriesed_Event_Id,
-        is_camp     => 1,
         is_template => undef,
-        long_desc   => 'this is the long desc',
         modified_ts => '2022-04-28T02:18:05',
         name        => 'saturday night test event',
         series => [
@@ -206,6 +200,7 @@ subtest "GET /event/# with series" => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        is_canceled => 0,
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -231,13 +226,12 @@ subtest "PUT /event/# with series" => sub {
         start_time  => "21:00",
         end_date    => "2022-05-03",
         end_time    => "23:00",
-        is_camp     => 0,
-        long_desc   => "this is a new long desc",
         name        => "new name",
         short_desc  => "new shortdef",
         #venue_id    => [],
         style_id   => [],
         series_id   => $other_series_id,
+        is_canceled => 0,
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
@@ -250,9 +244,7 @@ subtest "PUT /event/# with series" => sub {
         end_date    => "2022-05-03",
         end_time    => "23:00",
         event_id    => $Seriesed_Event_Id,
-        is_camp     => 0,
         is_template => undef,
-        long_desc   => "this is a new long desc",
         modified_ts => "2022-04-28T02:19:45",
         name        => "new name",
         series => [
@@ -271,6 +263,7 @@ subtest "PUT /event/# with series" => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        is_canceled => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
