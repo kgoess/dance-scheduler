@@ -99,7 +99,9 @@ subtest 'POST /series' => sub {
         series_id             => $Series_Id,
         name                  => 'Bree Trewsday English',
         frequency             => 'fourth Trewsday',
-        display_notes         => undef,
+        display_text          => undef,
+        short_desc            => undef,
+        sidebar               => undef,
         programmer_notes      => undef,
         created_ts            => '2022-04-28T02:18:05',
         modified_ts           => '2022-04-28T02:18:05',
@@ -312,6 +314,7 @@ subtest 'POST /event/# template for series' => sub {
         name        => "saturday night test event",
         series_id   => $Series_Id,
         is_template => 1,
+        is_canceled => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
@@ -336,8 +339,6 @@ subtest 'POST /event/# template for series' => sub {
         start_time  => $new_event->{start_time},
         end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
-        is_camp     => $new_event->{is_camp},
-        long_desc   => $new_event->{long_desc},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
         is_template => 1,
@@ -350,6 +351,7 @@ subtest 'POST /event/# template for series' => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        is_canceled => 0,
     };
 
     eq_or_diff $got, $expected, 'return matches';
