@@ -28,7 +28,9 @@ sub get_fields_for_output {
         address
         city
         zip
-        comment
+        programmer_notes
+        directions
+        sidebar
         is_deleted
         created_ts
         modified_ts
@@ -41,7 +43,9 @@ sub get_fields_for_input {
         address
         city
         zip
-        comment
+        programmer_notes
+        directions
+        sidebar
         is_deleted
     /
 }

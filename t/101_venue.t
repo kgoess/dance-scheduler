@@ -48,14 +48,16 @@ subtest 'POST /venue' => sub{
     my ($res, $decoded, $expected, $got);
 
     my $new_venue = {
-        venue_id   => '', # This should be ignored by the model
-        vkey       => 'ABC', # this is "vkey" in the schema
-        hall_name  => 'test venue name',
-        address    => 'test address',
-        city       => 'test city',
-        zip        => '12345-1234',
-        comment    => 'test comment',
-        is_deleted => 0,
+        venue_id           => '', # This should be ignored by the model
+        vkey               => 'ABC', # this is "vkey" in the schema
+        hall_name          => 'test venue name',
+        address            => 'test address',
+        city               => 'test city',
+        zip                => '12345-1234',
+        programmer_notes    => 'test note',
+        directions         => 'test directions',
+        sidebar            => 'test sidebar',
+        is_deleted         => 0,
         # the webapp doesn't have a problem with venue_id here like the other
         # models, not sure why
     };
@@ -65,17 +67,19 @@ subtest 'POST /venue' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        venue_id    => 1,
-        vkey        => $new_venue->{vkey},
-        hall_name   => $new_venue->{hall_name},
-        address     => $new_venue->{address},
-        city        => $new_venue->{city},
-        zip         => $new_venue->{zip},
-        comment     => $new_venue->{comment},
-        is_deleted  => $new_venue->{is_deleted},
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:18:05",
-        is_deleted  => 0, # FIXME is that right? test 1
+        venue_id             => 1,
+        vkey                 => $new_venue->{vkey},
+        hall_name            => $new_venue->{hall_name},
+        address              => $new_venue->{address},
+        city                 => $new_venue->{city},
+        zip                  => $new_venue->{zip},
+        programmer_notes     => $new_venue->{programmer_notes},
+        directions           => $new_venue->{directions},
+        sidebar              => $new_venue->{sidebar},
+        is_deleted           => $new_venue->{is_deleted},
+        created_ts           => "2022-04-28T02:18:05",
+        modified_ts          => "2022-04-28T02:18:05",
+        is_deleted           => 0, # FIXME is that right? test 1
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -94,16 +98,18 @@ subtest 'GET /venue/#' => sub {
     $decoded = decode_json($res->content); 
     $got = $decoded->{data};
     $expected = {
-        venue_id    => 1,
-        vkey        => $Venue->vkey,
-        hall_name   => $Venue->hall_name,
-        address     => $Venue->address,
-        city        => $Venue->city,
-        zip         => $Venue->zip,
-        comment     => $Venue->comment,
-        is_deleted   => $Venue->is_deleted,
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:18:05",
+        venue_id         => 1,
+        vkey             => $Venue->vkey,
+        hall_name        => $Venue->hall_name,
+        address          => $Venue->address,
+        city             => $Venue->city,
+        zip              => $Venue->zip,
+        programmer_notes => $Venue->programmer_notes,
+        directions       => $Venue->directions,
+        sidebar          => $Venue->sidebar,
+        is_deleted       => $Venue->is_deleted,
+        created_ts       => "2022-04-28T02:18:05",
+        modified_ts      => "2022-04-28T02:18:05",
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -117,29 +123,33 @@ subtest 'PUT /venue/1' => sub {
     $ENV{TEST_NOW} += 100;
 
     my $edit_venue = {
-        vkey       => 'BCD',
-        hall_name  => 'test change name',
-        address    => 'test new address',
-        city       => 'test altered city',
-        zip        => '54321-1234',
-        comment    => 'test different comment',
-        is_deleted => 1,
+        vkey                => 'BCD',
+        hall_name           => 'test change name',
+        address             => 'test new address',
+        city                => 'test altered city',
+        zip                 => '54321-1234',
+        programmer_notes    => 'test different comment',
+        directions          => 'new directions',
+        sidebar             => 'new sidebar',
+        is_deleted          => 1,
     };
     $res = $test->request( PUT '/venue/1' , content => $edit_venue);
     ok( $res->is_success, 'returned success' );
     $decoded = decode_json($res->content);
 
     $expected = {
-        venue_id    => 1,
-        vkey        => $edit_venue->{vkey},
-        hall_name   => $edit_venue->{hall_name},
-        address     => $edit_venue->{address},
-        city        => $edit_venue->{city},
-        zip         => $edit_venue->{zip},
-        comment     => $edit_venue->{comment},
-        is_deleted  => 1,
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:19:45",
+        venue_id          => 1,
+        vkey              => $edit_venue->{vkey},
+        hall_name         => $edit_venue->{hall_name},
+        address           => $edit_venue->{address},
+        city              => $edit_venue->{city},
+        zip               => $edit_venue->{zip},
+        programmer_notes  => $edit_venue->{programmer_notes},
+        directions        => $edit_venue->{directions},
+        sidebar           => $edit_venue->{sidebar},
+        is_deleted        => 1,
+        created_ts        => "2022-04-28T02:18:05",
+        modified_ts       => "2022-04-28T02:19:45",
     };
 
     $got = $decoded->{data};
@@ -170,16 +180,18 @@ subtest 'GET /venueAll' => sub {
     $got = $decoded->{data};
     $expected = [
         {
-            venue_id    => 1,
-            vkey        => 'BCD',
-            hall_name   => $Venue->hall_name,
-            address     => $Venue->address,
-            city        => $Venue->city,
-            zip         => $Venue->zip,
-            comment     => $Venue->comment,
-            is_deleted  => $Venue->is_deleted,
-            created_ts  => "2022-04-28T02:18:05",
-            modified_ts => "2022-04-28T02:19:45",
+            venue_id         => 1,
+            vkey             => 'BCD',
+            hall_name        => $Venue->hall_name,
+            address          => $Venue->address,
+            city             => $Venue->city,
+            zip              => $Venue->zip,
+            programmer_notes => $Venue->programmer_notes,
+            directions       => $Venue->directions,
+            sidebar          => $Venue->sidebar,
+            is_deleted       => $Venue->is_deleted,
+            created_ts       => "2022-04-28T02:18:05",
+            modified_ts      => "2022-04-28T02:19:45",
         }
     ];
 
