@@ -38,6 +38,7 @@ phase I:
  - event.name on the UI use event.name if present otherwise generate one
  - return a fresh object from the db, not the one that was submitted
  - find other TODOs/FIXMEs in the code
+ - set up in apache
 
 phase II:
 
