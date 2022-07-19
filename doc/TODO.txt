@@ -33,9 +33,11 @@ phase I:
  - work out authentication
  - work out that is_deleted field--it shouldn't be exposed (there should be a
    'delete' button), and it should do something on the backend
- - add description to venue list, not just the three-letter thing
+ DONE add description to venue list, not just the three-letter thing
  - sort out abuse of the 'band' column
  - event.name on the UI use event.name if present otherwise generate one
+ - return a fresh object from the db, not the one that was submitted
+ - find other TODOs/FIXMEs in the code
 
 phase II:
 

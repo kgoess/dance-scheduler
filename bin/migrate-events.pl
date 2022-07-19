@@ -72,7 +72,7 @@ sub migrate_event {
 
     my $name = join ' ', map { $old->$_ } qw/startday type loc leader/ ;
 
-    say "doing $name";
+    say "doing event $name";
 
     if ($old->type eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
         $new->name('Balance the Bay');
