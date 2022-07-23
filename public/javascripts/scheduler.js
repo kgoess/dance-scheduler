@@ -1,6 +1,9 @@
 
  $( document ).ready(function() {
 
+    // Create empty lists for adding helper functions
+    $('.display-form').each(function() {this.saveHelper = []});
+
     $( '.clickable-list' ).change(function() {
         const rowId = $(this).val();
         const [parentContainer, modelName] = getParentAndModelName(this);
@@ -197,65 +200,6 @@
         eventTemplateDialog.dialog( 'open' );
     });
 
-    const bandDialog = $( '#add-band-dialog' ).dialog({
-        autoOpen: false,
-        height: 400,
-        width: 350,
-        modal: true,
-        buttons: {
-            Yes: function() {
-                const found = {};
-                $( 'select[name="talent_id"]' ).each(function() {
-                    found[$(this).val()] = 1;
-                });
-                const emptyTalentSelectboxes = $.makeArray($( '#event-display-form [model-name="talent"] select' ))
-                    .filter(item => !$(item).val()) ;
-
-                bandDialog.talentIds.forEach((incomingTalentId, i) => {
-                    if (found[incomingTalentId]) {
-                        return;
-                    }
-                    let firstEmptyTalentSelectbox;
-                    if (firstEmptyTalentSelectbox = emptyTalentSelectboxes.shift()) {
-                        $(firstEmptyTalentSelectbox).val(incomingTalentId);
-                    } else {
-                        const lastTalentSelectbox = $( '#event-display-form [model-name="talent"] select' ).last();
-                        const clone = multiSelectOptionAdd.call(lastTalentSelectbox);
-                        clone.val(incomingTalentId);
-                    }
-                });
-
-                bandDialog.dialog('close');
-            },
-            No: function() {
-                bandDialog.dialog('close');
-            }
-        },
-        open: function() {
-            $.ajax({
-                url: `band/${bandDialog.bandId}`,
-                dataType: 'json'
-            })
-            .done(msg => {
-                $('#band-name-in-popup').text(msg.data.name);
-                const spanForNames = $('#add-band-dialog .talent-names');
-                spanForNames.text('');
-                const olEl = $(document.createElement('ol'));
-                spanForNames.append(olEl);
-                bandDialog.talentIds = [];
-                msg.data.talents.forEach((talent, i) => {
-                    const itemEl = document.createElement('li');
-                    itemEl.textContent = talent.name;
-                    olEl.append(itemEl);
-                    bandDialog.talentIds.push(talent.id);
-                });
-            });
-        }
-    });
-    $( '#band-selector' ).change(function() {
-        bandDialog.bandId = $(this).val();
-        bandDialog.dialog( 'open' );
-    });
 });
 
 
@@ -298,6 +242,7 @@ function displayItem(target, msg) {
  * pick the 'name' attribute to display, but in some cases we don't:
  */
 const keyToDisplayInItemRow = {
+    event: ['start_date', 'synthetic_name'],
     venue: ['vkey', 'hall_name'],
     parent_org: 'abbreviation',
 };
@@ -482,7 +427,12 @@ function saveAction(target, onSuccess) {
     const [parentContainer, modelName] = getParentAndModelName(target);
 
     const rowId = parentContainer.find(`[name="${modelName}_id"]` ).val();
-    const dataString = parentContainer.find( '.display-form' ).serialize();
+    const activeForm = parentContainer.find( '.display-form' );
+    
+    // Run any helper functions that have been attached to the form
+    activeForm[0].saveHelper.forEach(func => func(activeForm));
+
+    const dataString = activeForm.serialize();
 
     let http_method;
     let url;

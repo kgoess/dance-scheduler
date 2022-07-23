@@ -10,6 +10,7 @@ sub get_fields_for_output {
     qw/
         event_id
         name
+        synthetic_name
         start_date
         start_time
         end_date
@@ -25,6 +26,7 @@ sub get_fields_for_output {
 sub get_fields_for_input {
     qw/
         name
+        synthetic_name
         start_date
         start_time
         end_date

@@ -1,6 +1,7 @@
 CREATE TABLE events (
     event_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(256),
+    synthetic_name varchar(256),
     start_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_date DATE,

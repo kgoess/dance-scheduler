@@ -47,6 +47,12 @@ __PACKAGE__->table("events");
   is_nullable: 1
   size: 256
 
+=head2 synthetic_name
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 256
+
 =head2 start_date
 
   data_type: 'date'
@@ -115,6 +121,8 @@ __PACKAGE__->add_columns(
   "event_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
+  { data_type => "varchar", is_nullable => 1, size => 256 },
+  "synthetic_name",
   { data_type => "varchar", is_nullable => 1, size => 256 },
   "start_date",
   { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 0 },
@@ -274,8 +282,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-15 19:47:11
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GD3WJqI6PrRrYoyL6sBGDA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-22 20:12:03
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vAvLrrZhdhDnGE0hvJYvrg
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

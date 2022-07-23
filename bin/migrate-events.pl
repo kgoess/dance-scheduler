@@ -14,6 +14,7 @@ my %Series_Lookup = (
     'CCB-CONTRA' => 'Berkeley Contra',
     'SF-CONTRA' => 'San Francisco Contra',
     'FUM-CONTRA' => 'Palo Alto Contra', # ?
+    'FUM-CONTRA/SPECIAL' => 'Palo Alto Contra',
     'HVC-CONTRA' => 'Hayward Contra',
     'FSJ-CONTRA' => 'South Bay Contra',
     'ASE-ENGLISH' => 'Peninsula English',
@@ -33,6 +34,7 @@ my %Series_Lookup = (
     'SSU-ENGLISH/CAMP' => 'Hey Days English Week',
     'MON-FAMILY/CAMP' => 'Family Week',
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
+    'JPC-CONTRA/SPECIAL' => 'Balance the Bay',
     'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
     'SME-ENGLISH/REGENCY' => 'English Regency',
     'STM-ENGLISH/REGENCY' => 'English Regency',
@@ -70,9 +72,7 @@ sub migrate_event {
 
     my $new = $dbh->resultset('Event')->new({});
 
-    my $name = join ' ', map { $old->$_ } qw/startday type loc leader/ ;
 
-    say "doing event $name";
 
     if ($old->type eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
         $new->name('Balance the Bay');
@@ -80,10 +80,10 @@ sub migrate_event {
         $new->name('Hey Days English Week');
     } elsif ($old->type eq 'FAMILY/CAMP') {
         $new->name('Family Camp');
-    } else {
-        # series don't really have a name in the old schema
-        $new->name($name);
     }
+    my $synthetic_name = join ' ', map { $old->$_ } qw/type loc leader/ ;
+    $new->synthetic_name($new->name or $synthetic_name);
+    say "doing event ".$new->synthetic_name;
     $new->start_date( $old->startday );
     $new->start_time( '23:59:59' );
     $new->end_date( $old->endday )
@@ -133,6 +133,8 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'REGENCY';
     } elsif ($old_style eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
         push @old_styles, 'CONTRA', 'CAMP';
+    } elsif ($old_style eq 'CONTRA/SPECIAL') {
+        push @old_styles, 'CONTRA';
     } else {
         push @old_styles, $old_style;
     }
