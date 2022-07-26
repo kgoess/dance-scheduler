@@ -96,8 +96,10 @@ subtest 'POST /caller' => sub {
     $got = $decoded->{data};
 
     my $expected = {
-        caller_id    => $Caller_Id,
+        caller_id   => $Caller_Id,
         name        => 'Rose Gamgee',
+        url         => undef,
+        photo_url   => undef,
         created_ts  => '2022-04-28T02:18:05',
         modified_ts => '2022-04-28T02:18:05',
         is_deleted  => 0,

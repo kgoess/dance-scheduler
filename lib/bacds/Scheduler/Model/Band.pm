@@ -24,6 +24,8 @@ sub get_fields_for_output {
     qw/
         band_id
         name
+        url
+        photo_url
         is_deleted
         created_ts
         modified_ts
@@ -32,6 +34,8 @@ sub get_fields_for_output {
 sub get_fields_for_input {
     qw/
         name
+        url
+        photo_url
         is_deleted
     /
 }

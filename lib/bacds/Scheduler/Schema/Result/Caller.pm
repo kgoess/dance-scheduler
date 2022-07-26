@@ -47,6 +47,18 @@ __PACKAGE__->table("callers");
   is_nullable: 0
   size: 256
 
+=head2 url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 256
+
+=head2 photo_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 256
+
 =head2 is_deleted
 
   data_type: 'tinyint'
@@ -72,6 +84,10 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
   { data_type => "varchar", is_nullable => 0, size => 256 },
+  "url",
+  { data_type => "varchar", is_nullable => 1, size => 256 },
+  "photo_url",
+  { data_type => "varchar", is_nullable => 1, size => 256 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -133,8 +149,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-04-27 19:52:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cbHWyPUGTVjskXRp4vQV+w
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-25 21:11:59
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:19o1zKah6xZcPLCVPSEgnQ
 
 
 use Role::Tiny::With;

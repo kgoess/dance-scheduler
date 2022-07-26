@@ -53,6 +53,7 @@ subtest 'POST /caller' => sub{
     my ($expected, $res, $decoded, $got);
     my $new_caller = {
         name        => "test caller",
+        url         => "http://caller2-url",
         caller_id   => '', # the webapp sends name=test+caller&caller_id=
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -63,8 +64,10 @@ subtest 'POST /caller' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        caller_id    => 1,
+        caller_id   => 1,
         name        => $new_caller->{name},
+        url         => $new_caller->{url},
+        photo_url   => undef,
         created_ts  => $Created_Time,
         modified_ts => $Created_Time,
         is_deleted  => 0,
@@ -88,8 +91,10 @@ subtest 'GET /caller/#' => sub{
     $decoded = decode_json($res->content); 
     $got = $decoded->{data};
     $expected = {
-        caller_id    => $Caller_Id,
+        caller_id   => $Caller_Id,
         name        => $Caller->name,
+        url         => $Caller->url,
+        photo_url   => $Caller->photo_url,
         created_ts  => $Created_Time,
         modified_ts => $Created_Time,
         is_deleted  => 0,
@@ -104,6 +109,8 @@ subtest 'PUT /caller/#' => sub {
     my ($res, $decoded, $got, $expected);
     my $edit_caller = {
         name        => "new name",
+        url         => "http://new-url",
+        photo_url   => $Caller->photo_url,
     };
     $ENV{TEST_NOW} += 100;
     $Modified_Time = get_now()->iso8601;
@@ -113,8 +120,10 @@ subtest 'PUT /caller/#' => sub {
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        caller_id    => $Caller_Id,
+        caller_id   => $Caller_Id,
         name        => $edit_caller->{name},
+        url         => $edit_caller->{url},
+        photo_url   => '',
         created_ts  => $Created_Time,
         modified_ts => $Modified_Time,
         is_deleted  => 0,
@@ -144,6 +153,8 @@ subtest 'GET /callerAll' => sub{
       {
         caller_id    => $Caller_Id,
         name        => $Caller->name,
+        url         => $Caller->url,
+        photo_url   => $Caller->photo_url,
         created_ts  => $Created_Time,
         modified_ts => $Modified_Time,
         is_deleted  => 0,

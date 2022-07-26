@@ -82,7 +82,7 @@ subtest 'POST /event' => sub {
 # ******* Now adding venues *******
 
 subtest 'POST /event/# with venues' => sub{
-    plan tests=>4;
+    plan tests => 5;
 
     my ($new_venue, $res, $decoded, $got, $created_time);
 
@@ -183,7 +183,7 @@ subtest 'POST /event/# with venues' => sub{
 };
 
 subtest "GET /event/# with venues" => sub {
-    plan tests=>2;
+    plan tests => 3;
 
     my ($expected, $res, $decoded, $got);
 
