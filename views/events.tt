@@ -24,16 +24,20 @@
         <div name="style_id" class="display-row" column-type="list-item" model-name="style" table-name="styles" >
             <div class="multi-select-wrapper">
                 <span class="row-label">Style</span>
-                <select name="style_id">
-                </select>
+                <div class="select-shortener">
+                    <select name="style_id">
+                    </select>
+                </div>
                 <span class="add-multi-select-button">+</span>
             </div>
         </div>
         <div name="venue_id" class="display-row" column-type="list-item" model-name="venue" table-name="venues" >
             <div class="multi-select-wrapper">
                 <span class="row-label">Venue</span>
-                <select name="venue_id">
-                </select>
+                <div class="select-shortener">
+                    <select name="venue_id">
+                    </select>
+                </div>
                 <span class="add-multi-select-button">+</span>
             </div>
         </div>
@@ -55,7 +59,7 @@
         </div>
         <% event_column_types = [
               { name  => "name",
-                label => "Name",
+                label => "Name (for camps, special events)",
               },
               { name  => "start_date",
                 label => "Start Date",
