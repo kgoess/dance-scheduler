@@ -8,6 +8,7 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 my $dbh = get_dbh();
 
 create_series($dbh);
+setup_event_templates($dbh);
 
 sub create_series {
     my ($dbh) = @_;
@@ -128,3 +129,84 @@ sub create_series {
     }
 }
 
+
+sub setup_event_templates {
+    my ($dbh) = @_;
+
+    my @templates = (
+        {
+            series_name => "Berkeley Contra",
+            start_time =>'19:30',
+            style =>  'CONTRA',
+            venue =>  'CCB',
+            parent_org => 'BACDS',
+            is_template => 1,
+        },
+        {
+            series_name => "Berkeley English",
+            start_time =>'19:30',
+            style =>  'ENGLISH',
+            venue =>  'CCB',
+            parent_org => 'BACDS',
+            is_template => 1,
+        },
+        {
+            series_name => "Berkeley Fourth Saturday Experienced Dance",
+            start_time =>'19:30',
+            style =>  'ENGLISH',
+            venue =>  'CCB',
+            parent_org => 'BACDS',
+            is_template => 1,
+        },
+        {
+            series_name => "San Francisco English",
+            start_time =>'19:30',
+            style =>  'ENGLISH',
+            venue =>  'SJP',
+            parent_org => 'BACDS',
+            is_template => 1,
+        },
+    );
+
+    foreach my $template (@templates) {
+
+        my $event = $dbh->resultset('Event')->new({});
+        $event->is_deleted(0);
+        $event->is_template(1);
+        $event->start_time($template->{start_time});
+        $event->insert;
+
+        my $rs;
+
+        $rs = $dbh->resultset('Series')->search({
+            name => $template->{series_name}
+        });
+        my $series = $rs->single or die "can't find series for $template->{series_name}";
+        $event->series_id($series->id);
+        $event->update;
+
+        $rs = $dbh->resultset('Style')->search({
+            name => $template->{style}
+        });
+        my $style = $rs->single or die "can't find style for $template->{style}";
+        $event->add_to_styles($style, {
+            ordering => 1,
+        });
+
+        $rs = $dbh->resultset('Venue')->search({
+            vkey => $template->{venue}
+        });
+        my $venue = $rs->single or die "can't find venue for $template->{venue}";
+        $event->add_to_venues($venue, {
+            ordering => 1,
+        });
+
+        $rs = $dbh->resultset('ParentOrg')->search({
+           abbreviation  => $template->{parent_org}
+        });
+        my $parent_org = $rs->single or die "can't find parent_org for $template->{parent_org}";
+        $event->add_to_parent_orgs($parent_org, {
+            ordering => 1,
+        });
+    }
+}
