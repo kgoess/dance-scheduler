@@ -70,6 +70,7 @@ subtest 'POST /event' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
+        synthetic_name => undef,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -153,31 +154,14 @@ subtest 'POST /event/# with venues' => sub{
     $Venued_Event_Id = $got->{event_id},
 
     $expected = {
-        event_id    => $Venued_Event_Id,
-        start_date  => $new_event->{start_date},
-        start_time  => $new_event->{start_time},
-        end_date    => $new_event->{end_date},
-        end_time    => $new_event->{end_time},
-        is_canceled     => $new_event->{is_canceled},
-        short_desc   => $new_event->{short_desc},
-        name        => $new_event->{name},
-        callers     => [],
-        parent_orgs => [],
-        series      => [],
-        is_template => undef,
-        created_ts  => $now_ts,
-        modified_ts => $now_ts,
         venues      => [{
             id   => $Venue_Id,
             name => $Venue_Vkey,
         }],
-        styles      => [],
-        bands       => [],
-        talent      => [],
-        is_deleted  => 0,
     };
 
-    eq_or_diff $got, $expected, 'return matches';
+    is $got->{event_id}, $Venued_Event_Id, "that's the right event";
+    eq_or_diff $got->{venues}, $expected->{venues}, 'return matches';
 
     $Venued_Event = $dbh->resultset('Event')->find($Venued_Event_Id);
 };
@@ -192,36 +176,19 @@ subtest "GET /event/# with venues" => sub {
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        created_ts  => '2022-04-28T02:18:05',
-        end_date    => '2022-05-03',
-        end_time    => '22:00',
-        event_id    => $Venued_Event_Id,
-        is_canceled     => 1,
-        is_template => undef,
-        short_desc   => 'this is the short desc',
-        modified_ts => '2022-04-28T02:18:05',
-        name        => 'saturday night test event',
-        callers     => [],
-        parent_orgs => [],
-        series      => [],
-        start_date  => '2022-05-03',
-        start_time  => '20:00',
         venues      => [{
             id   => $Venue_Id,
             name => $Venue_Vkey,
         }],
-        styles => [],
-        bands       => [],
-        talent      => [],
-        is_deleted  => 0,
     };
 
-    eq_or_diff $got, $expected, 'matches';
+    is $got->{event_id}, $Venued_Event_Id, "that's the right event";
+    eq_or_diff $got->{venues}, $expected->{venues}, 'return matches';
 };
 
 
 subtest "PUT /event/# with venues" => sub {
-    plan tests => 4;
+    plan tests => 5;
 
     my ($expected, $created_time, $modified_time, $res, $decoded, $got);
 
@@ -258,20 +225,6 @@ subtest "PUT /event/# with venues" => sub {
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        created_ts  => "2022-04-28T02:18:05",
-        end_date    => "2022-05-03",
-        end_time    => "23:00",
-        event_id    => $Venued_Event_Id,
-        is_canceled     => 0,
-        is_template => undef,
-        short_desc   => "this is a new short desc",
-        modified_ts => "2022-04-28T02:19:45",
-        name        => "new name",
-        callers     => [],
-        parent_orgs => [],
-        series      => [],
-        start_date  => "2022-05-03",
-        start_time  => "21:00",
         venues      => [
             {
                 id => 1,
@@ -282,18 +235,15 @@ subtest "PUT /event/# with venues" => sub {
                 name => 'VZZ',
             }
         ],
-        styles      => [],
-        bands       => [],
-        talent      => [],
-        is_deleted  => 0,
     };
-    eq_or_diff $got, $expected, 'return matches';
+    is $got->{event_id}, $Venued_Event_Id, "that's the right event";
+    eq_or_diff $got->{venues}, $expected->{venues}, 'return matches';
 
     $res  = $test->request( GET "/event/$Venued_Event_Id" );
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
 
-    eq_or_diff $got, $expected, 'GET changed after PUT';
+    eq_or_diff $got->{venues}, $expected->{venues}, 'GET changed after PUT';
 };
 
 

@@ -58,6 +58,7 @@ subtest 'POST /event' => sub {
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
         is_canceled => 0,
+        synthetic_name => 'Saturday Night Test',
     };
     $ENV{TEST_NOW} = 1651112285;
     $res = $test->request(POST '/event/', $new_event );
@@ -84,6 +85,7 @@ subtest 'POST /event' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
+        synthetic_name => 'Saturday Night Test',
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -123,6 +125,7 @@ subtest "GET /event/#" => sub{
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        synthetic_name => 'Saturday Night Test',
     };
 
     eq_or_diff $got, $expected, 'matches';
@@ -144,6 +147,7 @@ subtest "PUT /event/#" => sub {
         name        => "new name",
         short_desc  => "new shortdef",
         is_canceled => 1,
+        synthetic_name => 'Saturday Night Test',
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
@@ -172,6 +176,7 @@ subtest "PUT /event/#" => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        synthetic_name => 'Saturday Night Test',
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -230,6 +235,7 @@ subtest 'POST /event #2' => sub{
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        synthetic_name => undef,
     };
     eq_or_diff $got, $expected, 'return from POST matches';
 
@@ -265,6 +271,7 @@ subtest 'GET /eventAll' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:19:45",
         is_deleted  => 0,
+        synthetic_name => "Saturday Night Test",
       },
       {
         event_id    => $Second_Event_Id,
@@ -279,6 +286,7 @@ subtest 'GET /eventAll' => sub {
         modified_ts => "2022-04-28T02:18:05",
         created_ts  => "2022-04-28T02:18:05",
         is_deleted  => 0,
+        synthetic_name => undef,
       },
     ];
 
