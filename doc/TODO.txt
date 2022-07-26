@@ -35,10 +35,14 @@ phase I:
    'delete' button), and it should do something on the backend
  DONE add description to venue list, not just the three-letter thing
  - sort out abuse of the 'band' column
- - event.name on the UI use event.name if present otherwise generate one
+ DONE event.name on the UI use event.name if present otherwise generate one
  - return a fresh object from the db, not the one that was submitted
  - find other TODOs/FIXMEs in the code
  - set up in apache
+ DONE add leader_url and band_url to bands (performer_url isn't currently used
+   anywhere)
+ DONE add photo_url to talent
+ - add "manager" to series
  - merge to master
 
 phase II:
@@ -47,6 +51,3 @@ phase II:
  - make /directions/content.html a dynamic page
  - the listbox showing existing things would be completely retooled, with
    filtering and who knows
- - add leader_url and band_url to bands (performer_url isn't currently used
-   anywhere)
- - add photo_url to talent
