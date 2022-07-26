@@ -131,12 +131,24 @@
     */
     const eventContainer = getContainerForModelName('event');
     const templateEventPopup = $('#series-template');
+
     templateEventPopup.attr('title', 'Defaults for new event in this series');
-    eventContainer.find('#event-display-form').clone(true).appendTo(templateEventPopup).attr('id', 'template-event-popup');
+
+    const eventDisplayForm = eventContainer.find('#event-display-form').first();
+    const popupForm = eventDisplayForm.clone(true);
+    popupForm[0].saveHelper = eventDisplayForm[0].saveHelper;
+    popupForm.appendTo(templateEventPopup).attr('id', 'template-event-popup');
+
     templateEventPopup.find('button').remove();
-    const seriesSelectboxParent = templateEventPopup.find('select[name="series_id"]').parent();
+
+    const seriesSelectboxParent = templateEventPopup
+        .find('select[name="series_id"]')
+        .parent();
+
     templateEventPopup.find('select[name="series_id"]').remove();
+
     templateEventPopup.attr('modelName', 'event');
+
     eventTemplateDialog = $( '#series-template' ).dialog({
         autoOpen: false,
         height: 400,
