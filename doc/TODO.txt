@@ -42,7 +42,9 @@ phase I:
  DONE add leader_url and band_url to bands (performer_url isn't currently used
    anywhere)
  DONE add photo_url to talent
+ - add a "pricing" textbox to events
  - add "manager" to series
+ - fill in TOS, privacy urls from google auth
  - merge to master
 
 phase II:

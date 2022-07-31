@@ -8,7 +8,7 @@
         const rowId = $(this).val();
         const [parentContainer, modelName] = getParentAndModelName(this);
         $.ajax({
-            url: `${modelName}/${rowId}`,
+            url: `${appUriBase}/${modelName}/${rowId}`,
             dataType: 'json'
         })
         .done( (msg) => {
@@ -100,7 +100,7 @@
         }
         const seriesId = $(this).val();
         $.ajax({
-            url: `series/${seriesId}/template-event`,
+            url: `${appUriBase}/series/${seriesId}/template-event`,
             dataType: 'json'
         })
         .done( (msg) => {
@@ -192,7 +192,7 @@
             seriesSelectboxParent.append(seriesNameEl);
 
             $.ajax({
-                url: `series/${seriesId}/template-event`,
+                url: `${appUriBase}/series/${seriesId}/template-event`,
                 dataType: 'json'
             })
             .done( (msg) => {
@@ -306,7 +306,7 @@ function displayItemRow(currentRow, targetObj) {
                 : '';
             const labelGetter = row => getLabelForDisplayInItemListbox(modelName, row);
             $.ajax({
-                url: `${modelName}All`,
+                url: `${appUriBase}/${modelName}All`,
                 dataType: 'json'
             })
             .done((msg) => fillInItemRowList(currentRow, msg, selections, labelGetter));
@@ -391,7 +391,7 @@ function loadListForModel(modelName) {
     $( `#${modelName}-display` ).first().hide();
 
     $.ajax({
-        url: url,
+        url: `${appUriBase}/${url}`,
         dataType: 'json'
     })
     .done( (msg) => { displayListForModel(modelName, msg) });

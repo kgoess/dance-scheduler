@@ -44,3 +44,42 @@ WriteMakefile(
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'bacds-Scheduler-*' },
 );
+
+# this should eventually go into the rpm .spec file, but doing it this way will
+# let us iterate on it faster
+sub MY::postamble {
+    return <<'MAKE_FRAG';
+
+# install the .psgi and other dancer2 supporting files
+
+APPDIR=/var/www/bacds.org/dance-scheduler
+
+app-install:
+	install -d $(APPDIR) --mode 2755
+	install bin/app.psgi $(APPDIR)
+	install config.yml   $(APPDIR)
+	install README.md    $(APPDIR)
+	install -d $(APPDIR)/environments --mode 2755
+	install -d $(APPDIR)/view         --mode 2755
+	install -d $(APPDIR)/public       --mode 2755
+	install -d $(APPDIR)/private      --mode 2750
+	cp -r environments   $(APPDIR)
+	cp -r views          $(APPDIR)
+	cp -r public         $(APPDIR)
+	@if [ ! -e $(APPDIR)/private/mysql-password ]; then \
+	    echo -e "\n***************"; \
+	    echo "Please put the mysql password into $(APPDIR)/private/mysql-password"; \
+	    echo "and chown apache.apache, chmod 440."; \
+	    echo -e "***************\n"; \
+	    false; \
+	fi
+
+# the httpd.conf requires sudo, so keeping it separate (it won't change often)
+httpd-conf-install:
+	@if [ ! $$(id -u) = 0 ]; then  echo -e "\n*****************\n*** You need to run this with sudo: 'sudo make httpd-conf-install'***\n*******************\n" ; false; fi
+	install apache/dance-scheduler.conf /etc/httpd/conf.d/dance-scheduler.conf
+	@echo -e "\n*****************\n*** Done! Now do 'sudo service httpd restart'***\n*******************\n"
+
+MAKE_FRAG
+}
+

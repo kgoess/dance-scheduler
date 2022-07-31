@@ -4,10 +4,21 @@
 log: "warning"
 
 # log message to a file in logs/
-logger: "file"
+#logger: "file"
+# apache will send these to /var/log/httpd/*
+logger: "console"
 
 # hide errors
 show_errors: 0
 
 # disable server tokens in production environments
 no_server_tokens: 1
+
+
+# appdir documentation says
+#   This is the path where your application will live. It's where
+#   Dancer2 will look by default for your config files, templates and
+#   static content.
+# and yet I still had to set DANCER_VIEWS, DANCER_ENVDIR,
+# DANCER_PUBLIC in the httpd.conf?
+appdir: /var/www/bacds.org/dance-scheduler

@@ -20,7 +20,10 @@
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 
-<script type="text/javascript" src="<% request.uri_base %>/javascripts/scheduler.js"></script>
+<script>
+var appUriBase = "<% request.uri_base %>";
+</script>
+<script src="<% request.uri_base %>/javascripts/scheduler.js"></script>
 
 </head>
 <body>

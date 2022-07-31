@@ -1,0 +1,24 @@
+System Setup Notes for the dance-scheduler app
+
+The perl libs are all installed in /var/lib/dance-scheduler, instead of the
+system perl libraries, which is the recommended way to do it.
+
+To add that directory to your PERL5LIB in your shell, run this:
+
+    eval $(perl -Mlocal::lib=/var/lib/dance-scheduler)
+
+If you want to install things in there, after that you can just do
+
+    cpanm Some::Module
+
+In order to grant apache the ability to read that directory under selinux, I
+did this:
+
+    sudo semanage fcontext -a -t lib_t "/var/lib/dance-scheduler/lib(/.*)?" 
+    sudo restorecon -R -v /var/lib/dance-scheduler/lib/
+    # (see https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/selinux_users_and_administrators_guide/sect-managing_confined_services-the_apache_http_server-configuration_examples)
+
+A cgi script would need this at the beginning
+
+    use local::lib qw(/var/lib/dance-scheduler);
+
