@@ -450,10 +450,10 @@ function saveAction(target, onSuccess) {
     let url;
     if (rowId) {
         http_method = 'put';
-        url = `${modelName}/${rowId}`
+        url = `${appUriBase}/${modelName}/${rowId}`
     } else {
         http_method = 'post';
-        url = `${modelName}/`;
+        url = `${appUriBase}/${modelName}/`;
     }
     $.ajax({
         url,

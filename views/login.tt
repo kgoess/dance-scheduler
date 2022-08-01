@@ -1,0 +1,7 @@
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<div id="g_id_onload"
+     data-client_id="1098017941996-inv98s0als8ikk474e2tm6b2necuna1g.apps.googleusercontent.com"
+     data-ux_mode="redirect"
+     data-login_uri="https://www.bacds.org/dance-scheduler/google-signin">
+</div>
+<div class="g_id_signin" data-type="standard"></div>

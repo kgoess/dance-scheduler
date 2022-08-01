@@ -38,7 +38,7 @@ $( document ).ready(function() {
         },
         open: function() {
             $.ajax({
-                url: `band/${bandDialog.bandId}`,
+                url: `${appUriBase}/band/${bandDialog.bandId}`,
                 dataType: 'json'
             })
             .done(msg => {
