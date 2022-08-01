@@ -42,14 +42,14 @@ sub _get_password {
     #     checked into source control. For instance, database credentials could be
     #     stored in this file.
     my $system_pw_file = '/var/www/bacds.org/dance-scheduler/private/mysql-password';
-    my $user_pw_file = "$ENV{HOME}/.mysql-password";
+    my $user_pw_file = $ENV{HOME} ? "$ENV{HOME}/.mysql-password" : undef;
 
     if (-r $system_pw_file) {
         open my $fh, "<", $system_pw_file
             or die "can't read $system_pw_file: $!";
         $_password = <$fh>;
         chomp $_password;
-    } elsif (-e $user_pw_file) {
+    } elsif ($user_pw_file and -e $user_pw_file) {
         open my $fh, "<", $user_pw_file
             or die "can't read $user_pw_file: $!";
         $_password = <$fh>;
