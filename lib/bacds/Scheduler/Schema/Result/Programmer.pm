@@ -41,6 +41,12 @@ __PACKAGE__->table("programmers");
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 name
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 256
+
 =head2 email
 
   data_type: 'varchar'
@@ -81,6 +87,8 @@ __PACKAGE__->table("programmers");
 __PACKAGE__->add_columns(
   "programmer_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
+  "name",
+  { data_type => "varchar", is_nullable => 0, size => 256 },
   "email",
   { data_type => "varchar", is_nullable => 0, size => 256 },
   "password_hash",
@@ -148,8 +156,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-05 19:21:08
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:lBSm7pyEKMURwB917xX3tQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-05 20:20:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zKZj10xreCN0QPB9K4PXLQ
 
 
 __PACKAGE__->many_to_many(series => 'programmer_series_maps', 'series');

@@ -23,6 +23,7 @@ sub get_model_name { 'Programmer' }
 sub get_fields_for_output {
     qw/
         programmer_id
+        name
         email
         is_superuser
         is_deleted
@@ -33,6 +34,7 @@ sub get_fields_for_output {
 sub get_fields_for_input {
     qw/
         email
+        name
         is_superuser
         is_deleted
     /

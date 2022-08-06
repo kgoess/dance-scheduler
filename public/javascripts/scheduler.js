@@ -256,7 +256,6 @@ function displayItem(target, msg) {
 const keyToDisplayInItemRow = {
     event: ['start_date', 'synthetic_name'],
     parent_org: 'abbreviation',
-    programmer: 'email',
     venue: ['vkey', 'hall_name'],
 };
 function getLabelForDisplayInItemListbox (modelName, data) {

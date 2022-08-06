@@ -7,6 +7,11 @@
 </span>
 <div class="model-display" hidden>
     <form id="programmer-display-form" class="display-form">
+        <div name="name" class="display-row" column-type="text-item">
+            <span class="row-label">Name</span>
+            <span class="row-contents"></span>
+            <input class="row-edit" name="name" hidden />
+        </div>
         <div name="email" class="display-row" column-type="text-item">
             <span class="row-label">Email</span>
             <span class="row-contents"></span>
