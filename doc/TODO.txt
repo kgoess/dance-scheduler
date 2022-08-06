@@ -42,8 +42,11 @@ phase I:
  DONE add leader_url and band_url to bands (performer_url isn't currently used
    anywhere)
  DONE add photo_url to talent
+ - need an event url for display in https://bacds.org/scripts/dancefinder.pl,
+   called out by Alan's change 904dd65c6e832 in
+   git:/var/lib/git/bacds.org-scripts/
  - add a "pricing" textbox to events
- - add "manager" to series
+ - add "manager name" to series
  - fill in TOS, privacy urls from google auth
  - merge to master
 
