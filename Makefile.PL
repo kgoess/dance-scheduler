@@ -60,7 +60,7 @@ app-install:
 	install config.yml   $(APPDIR)
 	install README.md    $(APPDIR)
 	install -d $(APPDIR)/environments --mode 2755
-	install -d $(APPDIR)/view         --mode 2755
+	install -d $(APPDIR)/views        --mode 2755
 	install -d $(APPDIR)/public       --mode 2755
 	install -d $(APPDIR)/private      --mode 2750
 	cp -r environments   $(APPDIR)
