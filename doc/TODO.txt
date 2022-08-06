@@ -48,6 +48,7 @@ phase I:
  - add a "pricing" textbox to events
  - add "manager name" to series
  - fill in TOS, privacy urls from google auth
+ - need CLI tool for password management
  - merge to master
 
 phase II:
