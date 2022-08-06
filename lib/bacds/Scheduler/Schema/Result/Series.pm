@@ -342,18 +342,6 @@ __PACKAGE__->has_many(
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-15 19:47:11
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:j1mgEYYQTUCWEu8LxjpXAA
 
-use Role::Tiny::With;
-with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
-
-sub get_fields_for_event_row {
-    my ($self) = @_;
-    return {
-        id => $self->series_id,
-        name => $self->name,
-    };
-}
-
-1;
 # End of lines loaded from '/var/lib/dance-scheduler/lib/perl5/bacds/Scheduler/Schema/Result/Series.pm'
 
 use Role::Tiny::With;
@@ -367,4 +355,11 @@ sub get_fields_for_event_row {
     };
 }
 
+sub get_fields_for_programmer_row {
+    my ($self) = @_;
+    return {
+        id => $self->series_id,
+        name => $self->name,
+    };
+}
 1;

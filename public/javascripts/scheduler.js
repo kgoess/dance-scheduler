@@ -255,8 +255,9 @@ function displayItem(target, msg) {
  */
 const keyToDisplayInItemRow = {
     event: ['start_date', 'synthetic_name'],
-    venue: ['vkey', 'hall_name'],
     parent_org: 'abbreviation',
+    programmer: 'email',
+    venue: ['vkey', 'hall_name'],
 };
 function getLabelForDisplayInItemListbox (modelName, data) {
 
@@ -291,6 +292,14 @@ function displayItemRow(currentRow, targetObj) {
             displayText = displayText.replace(/\n/g, '<br/>');
             currentRow.children('.row-contents').html(displayText);
             currentRow.children('.row-edit').val(theText);
+            break;
+        case 'checkbox-item':
+            const theCheckbox = targetObj
+                ? targetObj[currentRow.attr('name')]
+                : '';
+            const isChecked = !!theCheckbox;
+            currentRow.children('.row-edit').prop('checked', isChecked);
+            currentRow.children('.row-contents').html(isChecked ? 'Yes': 'No');
             break;
         case 'hidden-item':
             const theValue = targetObj

@@ -1,5 +1,6 @@
 CREATE TABLE programmer_series_map (
     programmer_id INT NOT NULL,
+    ordering INT,
     series_id INT NOT NULL,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,

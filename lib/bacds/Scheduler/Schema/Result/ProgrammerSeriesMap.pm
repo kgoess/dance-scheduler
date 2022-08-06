@@ -41,6 +41,11 @@ __PACKAGE__->table("programmer_series_map");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 ordering
+
+  data_type: 'integer'
+  is_nullable: 1
+
 =head2 series_id
 
   data_type: 'integer'
@@ -65,6 +70,8 @@ __PACKAGE__->table("programmer_series_map");
 __PACKAGE__->add_columns(
   "programmer_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "ordering",
+  { data_type => "integer", is_nullable => 1 },
   "series_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "created_ts",
@@ -131,8 +138,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-05 19:21:08
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2f8msZqkDAPCIurDnMZgww
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-05 20:09:48
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sMLyvTJGDqg0ba6GLXxthg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

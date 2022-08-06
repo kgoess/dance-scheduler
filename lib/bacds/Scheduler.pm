@@ -28,6 +28,7 @@ use Crypt::JWT qw/decode_jwt/;
 use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
+use bacds::Scheduler::Model::Programmer;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
 
@@ -165,6 +166,10 @@ get '/' => sub {
             { label => 'Parent Org',
               modelName => 'parent_org',
               content => template("parent_org.tt", {}, { layout=> undef }),
+            },
+            { label => 'Programmers',
+              modelName => 'programmer',
+              content => template("programmers.tt", {}, { layout=> undef }),
             },
         ],
     };
@@ -953,6 +958,88 @@ put '/parent_org/:parent_org_id' => sub {
     }
     else{
         $results->add_error(3400, "Update failed for new parent_org");
+    }
+
+    return $results->format;
+};
+
+
+=head2 Programmers
+
+The people that are allowed to make changes
+
+=head3 GET /ProgrammerAll
+
+Returns all of the programmers in the db not marked "is_deleted".
+
+
+=cut
+
+my $programmer_model = 'bacds::Scheduler::Model::Programmer';
+
+get '/programmerAll' => sub {
+    my $results = Results->new;
+
+    $results->data($programmer_model->get_multiple_rows);
+
+    return $results->format;
+};
+
+
+=head3 GET /programmer/:programmer_id
+
+=cut
+
+get '/programmer/:programmer_id' => sub {
+    my $programmer_id = params->{programmer_id};
+    my $results = Results->new;
+
+    my $programmer = $programmer_model->get_row($programmer_id);
+    if($programmer){
+        $results->data($programmer)
+    }
+    else{
+        $results->add_error(3200, "Nothing Found for programmer_id $programmer_id");
+    }
+
+    return $results->format;
+};
+
+=head3 POST /programmer
+
+Create a new programmer.
+
+=cut
+
+post '/programmer/' => sub {
+    my $programmer = $programmer_model->post_row(params);
+    my $results = Results->new;
+
+    if($programmer){
+        $results->data($programmer)
+    }
+    else{
+        $results->add_error(4300, "Insert failed for new programmer");
+    }
+
+    return $results->format;
+};
+
+=head3 PUT /programmer/:programmer_id
+
+Update a programmer.
+
+=cut
+
+put '/programmer/:programmer_id' => sub {
+    my $programmer = $programmer_model->put_row(params);
+    my $results = Results->new;
+
+    if($programmer){
+        $results->data($programmer)
+    }
+    else{
+        $results->add_error(4400, "Update failed for new programmer");
     }
 
     return $results->format;

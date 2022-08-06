@@ -1,0 +1,33 @@
+<form>
+    <select class="clickable-list" size="5">
+    </select>
+</form>
+<span class="button-container">
+    <button class="button create-new-button">Create New</button>
+</span>
+<div class="model-display" hidden>
+    <form id="programmer-display-form" class="display-form">
+        <div name="email" class="display-row" column-type="text-item">
+            <span class="row-label">Email</span>
+            <span class="row-contents"></span>
+            <input class="row-edit" name="email" hidden />
+        </div>
+        <div name="is_superuser" class="display-row" column-type="checkbox-item">
+            <span class="row-label">Super User?</span>
+            <span class="row-contents"></span>
+            <input type="checkbox" value="1" class="row-edit" name="is_superuser" hidden />
+        </div>
+        <input type="hidden" name="programmer_id"/>
+        <div name="series_id" class="display-row" column-type="list-item" model-name="series" table-name="series" >
+            <div class="multi-select-wrapper">
+                <span class="row-label">Can Edit Series</span>
+                <select name="series_id">
+                </select>
+                <span class="add-multi-select-button">+</span>
+            </div>
+        </div>
+        <span class="button-container">
+            <button class="button save-button">Save</button>
+        </span>
+    </form>
+</div>
