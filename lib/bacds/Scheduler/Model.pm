@@ -55,32 +55,37 @@ one-to-many relationships, like C<[qw/Series series series_id/],>
 
 =item * get_default_sorting()
 
-This must return a dict that can be sent to C<order_by> in 
+This must return a dict that can be sent to C<order_by> in
 C<< DBIx::Class::ResultSet->seach() >>
 
 =back
 
 =cut
 
-=head2 get_multiple_rows()
+=head2 get_multiple_rows($args)
 
-Return all rows for this table. Does not include any information from
-related tables. Uses get_default_sorting from the decendent class.
+Return all rows for this table (or just the ones filtered by $args). Does not
+include any information from related tables. Uses get_default_sorting from the
+decendent class.
+
+Optional $args can be a hashref  of arguments to DBIx's search() function, e.g.
+
+    { email => 'alice@foo.com' },
 
 =cut
 
 sub get_multiple_rows {
-    #TODO: This should probably only allow a maximum number of results
-    #It should also probably accept args to filter/sort?
-    #Or maybe that should be a different function?
     my ($class, $args) = @_;
     my $model_name = $class->get_model_name;
     my $dbh = get_dbh();
     my %sorting = $class->get_default_sorting;
 
     my $resultset = $dbh->resultset($model_name)->search(
-        undef, 
-        { order_by => \%sorting }
+        $args,
+        {
+            order_by => \%sorting,
+            limit => 1000,
+        }
     );
 
     $resultset or die "empty set"; #TODO: More gracefully
@@ -188,7 +193,7 @@ sub post_row {
     foreach my $column (@fkey_fields) {
         $row->$column(undef) if !$row->$column;
     };
-    
+
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
 
@@ -243,7 +248,7 @@ sub put_row {
     foreach my $column (@fkey_fields) {
         $row->$column(undef) if !$row->$column;
     }
-    
+
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
 
