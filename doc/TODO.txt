@@ -30,18 +30,19 @@ phase I:
  DONE dance cancelled
  NOPE make start/end times raw text, just "times" like "dance is from 6 to 7 with
    food in the middle"
- - work out authentication
- - work out that is_deleted field--it shouldn't be exposed (there should be a
-   'delete' button), and it should do something on the backend
  DONE add description to venue list, not just the three-letter thing
- - sort out abuse of the 'band' column
  DONE event.name on the UI use event.name if present otherwise generate one
- - return a fresh object from the db, not the one that was submitted
- - find other TODOs/FIXMEs in the code
- - set up in apache
  DONE add leader_url and band_url to bands (performer_url isn't currently used
    anywhere)
  DONE add photo_url to talent
+ DONE set up in apache
+ DONE- merge to master
+ - work out authentication
+ - work out that is_deleted field--it shouldn't be exposed (there should be a
+   'delete' button), and it should do something on the backend
+ - sort out abuse of the 'band' column
+ - return a fresh object from the db, not the one that was submitted
+ - find other TODOs/FIXMEs in the code
  - need an event url for display in https://bacds.org/scripts/dancefinder.pl,
    called out by Alan's change 904dd65c6e832 in
    git:/var/lib/git/bacds.org-scripts/
@@ -53,7 +54,6 @@ phase I:
    address, and profile picture with bacds.org. See bacds.org's "privacy policy"
    and "terms of service""
  - need CLI tool for password management
- - merge to master
 
 phase II:
 
