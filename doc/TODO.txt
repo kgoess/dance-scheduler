@@ -48,6 +48,10 @@ phase I:
  - add a "pricing" textbox to events
  - add "manager name" to series
  - fill in TOS, privacy urls from google auth
+   for their page "Confirm you want to sign in to "bacds.org" as Bob
+   bob@foo.com. To create your account, Google will share your name, email
+   address, and profile picture with bacds.org. See bacds.org's "privacy policy"
+   and "terms of service""
  - need CLI tool for password management
  - merge to master
 

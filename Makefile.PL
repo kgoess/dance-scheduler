@@ -19,6 +19,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Class::Accessor::Lite' => 0,
         'Clone' => 0,
+        'Crypt::Bcrypt' => 0,
         'DateTime::Format::MySQL' => 0,
         'DateTime::Format::SQLite' => 0,
         'DBD::mysql' => 0,
@@ -32,6 +33,7 @@ WriteMakefile(
         'HTML::Entities' => 0,
         'HTTP::Date' => 0,
         'JSON::MaybeXS' => 0,
+        'LWP::Protocol::https' => 0,
         'SQL::Translator' => 0,
         'Template' => 0,
         'Test::More' => 0,

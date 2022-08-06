@@ -22,9 +22,10 @@ use 5.16.0;
 use warnings;
 
 use Dancer2;
+use Dancer2::Core::Cookie;
 use Data::Dump qw/dump/;
-use Crypt::JWT qw/decode_jwt/;
 
+use bacds::Scheduler::Auth;
 use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
@@ -50,63 +51,18 @@ session TBD
 =cut
 
 post '/google-signin' => sub {
-    my $jwt = params->{credential};
+    my $jwt = params->{credential}
+        or send_error 'missing parameter "credential"' => 400;
 
-    # these are from https://www.googleapis.com/oauth2/v2/certs
-    # per notes on https://metacpan.org/pod/Crypt::JWT
+    my ($res, $err) = bacds::Scheduler::Auth->check_google_auth($jwt);
 
-    my $kid_keys = {
-      "keys" => [
-        {
-          "e" => "AQAB",
-          "n" => "vzPaUgWDbV5pHZRg3EXSPmOSW4khgA6YLHASVp6uS-6y7sUCP976xu2rbg4aS8Dll5qDYjPIgrzhDwhtW9AjuHt6Ne1gSjsZv0nmLlDDIeCFH7hs8aTqyfazclFuvZmQxC2AoyoEL0UfdEOm0jZ_2fX_TiD6h5j__poWAIv9JtZ3SteYF2hfnlQJg_iCX7QNp3O_Bjl4omYjjS75IHAX_K1GR8RGWSXSRnbBUIYjFFE9Cu9n3pqyRM5jgPe1_v3H1BPePO9S4TS225JlDVdOTenvas7_HqR_fsgk_hNLu19WNniTKp1CuqWSweBHMI1P3-p5hmXPV4Ce4xHmOx9EWw==",
-          "kty" => "RSA",
-          "alg" => "RS256",
-          "use" => "sig",
-          "kid" => "074b928edf65a6f470c71b0a247bd0f7a4c9ccbc"
-        },
-        {
-          "n" => "stD2wMn0tZrAn8FnW9LdQozV9qNatcdbJ6R7V6ag5XNzJdFfdD5vOOGw5n8SJ-vqg69rK322kha5vkLODd6hdtn5R0KMiOVAD8Gf8DmKfSafSBZm7ImacVawagdvBcVGfiLqQEXavRLcDDLsTOAI9sIyH6KU2Rmg9RUdFbgTyZj_9mp4vzHIBG8ED71oqHv41KX4v3Ku4kE7x93a34QOdqkKXn6GZUCbC9urWB4UNX7rg_Bds2pfwutC3QhWS109GnPO7Mvt_XaUOyKavwiMNH4Bv7nD9rGflffh7WYmzosQPZvyY5b9Flhiev180DPfQ7J5vca5MO263AyWBv4roQ==",
-          "e" => "AQAB",
-          "kty" => "RSA",
-          "kid" => "1549e0aef574d1c7bdd136c202b8d290580b165c",
-          "alg" => "RS256",
-          "use" => "sig"
-        }
-      ]
-    };
+    if ($err) {
+        my ($code, $msg) = @$err;
+        send_error $msg => $code;
+    }
 
-    # if decode_jwt fails:
-    #   decode_payload
-    #   undef (default) - if possible decode payload from JSON
-    #   string, if decode_json fails return payload as a raw string
-    #   (octets).
-    #
-    #
-    my $decoded = decode_jwt(
-        token => $jwt,
-        kid_keys => $kid_keys,
-        verify_iss => 'https://accounts.google.com',
-        verify_aud => '1098017941996-inv98s0als8ikk474e2tm6b2necuna1g.apps.googleusercontent.com',
-    );
-    # decoded is now:
-    # {
-    #   aud => "1098017941996-inv98s0als8ikk474e2tm6b2necuna1g.apps.googleusercontent.com",
-    #   azp => "1098017941996-inv98s0als8ikk474e2tm6b2necuna1g.apps.googleusercontent.com",
-    #   email => "kgoess.bacds.board\@gmail.com",
-    #   email_verified => bless(do{\(my $o = 1)}, "JSON::PP::Boolean"),
-    #   exp => 1659321752,
-    #   family_name => "Goess",
-    #   given_name => "Kevin",
-    #   iat => 1659318152,
-    #   iss => "https://accounts.google.com",
-    #   jti => "f219eacca83f763e900b292e4d6740dffbb7b449",
-    #   name => "Kevin Goess",
-    #   nbf => 1659317852,
-    #   picture => "https://lh3.googleusercontent.com/a-/AFdZuco2U0jgMnGCQdkDJXtOH8QLaulYFDSY4tQlkghH=s96-c",
-    #   sub => "114402625298339466385",
-    # }
-    return '<pre>'. dump($decoded). '</pre>';
+    cookie name => "GoogleToken", value => $jwt, expires => "72 hours";
+    redirect '/' => 303;
 };
 
 =head2 login page
@@ -197,7 +153,7 @@ Returns the flat list of all events in the database
       },
       ...
     "errors": []
-    
+
 
 
 =cut
@@ -206,9 +162,9 @@ my $event_model = 'bacds::Scheduler::Model::Event';
 
 get '/eventAll' => sub {
     my $results = Results->new;
-    
+
     $results->data($event_model->get_multiple_rows);
-    
+
     return $results->format;
 };
 
@@ -256,7 +212,7 @@ the nested data structures.
       ...
     },
     "errors": []
-    
+
 =cut
 
 get '/event/:event_id' => sub {
@@ -1058,7 +1014,7 @@ A little internal class to collect any errors and format the results:
         num: 1234
       }
     ],
-    
+
 
 =cut
 

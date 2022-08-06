@@ -38,4 +38,5 @@ inc/
 
 #test db file
 /t/testdbs/
+/t/cache/
 TODO
