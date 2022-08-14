@@ -103,9 +103,6 @@ sub get_multiple_rows {
 
 Return all rows from yesterday into the future. Useful for the UI.
 
-Still not sure if this needs to be a separate function or just parameters to
-get_multiple_rows().
-
 =cut
 
 sub get_upcoming_rows {
@@ -119,20 +116,11 @@ sub get_upcoming_rows {
     # see DBIx::Class::Manual::FAQ "format a DateTime object for searching"
     my $dtf = $dbh->storage->datetime_parser;
 
-    my $model_name = $class->get_model_name;
-    my $resultset = $dbh->resultset($model_name)->search({
+    my $search_args = {
         start_date => { '>=' => $dtf->format_date($yesterday) }
-    });
+    };
 
-    $resultset or die "empty set"; #TODO: More gracefully
-
-    my @rows;
-
-    while (my $row = $resultset->next) {
-        push @rows, $class->_row_to_result($row);
-    }
-
-    return \@rows;
+    return $class->get_multiple_rows($search_args);
 }
 
 =head2 get_row()
