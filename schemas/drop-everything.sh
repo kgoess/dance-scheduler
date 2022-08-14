@@ -7,14 +7,16 @@ tables="
     event_styles_map
     event_talent_map
     event_venues_map
+    programmer_series_map
     band_membership
     events
     series
-    bands
     styles
     talent
+    bands
     venues
     callers
+    programmers
     parent_orgs
 "
 

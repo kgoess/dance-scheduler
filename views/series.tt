@@ -37,6 +37,10 @@
                 type  => "textarea",
             },
             {
+                name => "series_url",
+                label => "Series URL",
+            },
+            {
                 name => "is_deleted",
                 label => "Is Deleted",
                 type => "checkbox",

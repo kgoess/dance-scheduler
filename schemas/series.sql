@@ -5,6 +5,7 @@ CREATE TABLE series (
     short_desc varchar(2048),
     sidebar TEXT(32866),
     display_text TEXT(32866),
+    series_url VARCHAR(256),
     programmer_notes TEXT(32866),
     is_deleted BOOLEAN,
     created_ts DATETIME NOT NULL,

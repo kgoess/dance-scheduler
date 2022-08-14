@@ -69,6 +69,12 @@ __PACKAGE__->table("series");
   data_type: 'text'
   is_nullable: 1
 
+=head2 series_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 256
+
 =head2 programmer_notes
 
   data_type: 'text'
@@ -107,6 +113,8 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 1 },
   "display_text",
   { data_type => "text", is_nullable => 1 },
+  "series_url",
+  { data_type => "varchar", is_nullable => 1, size => 256 },
   "programmer_notes",
   { data_type => "text", is_nullable => 1 },
   "is_deleted",
@@ -171,8 +179,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-05 19:21:08
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Jaz5J9nlkC/Y5dzJjJpy9w
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 13:24:39
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:J2SPwi5BrV40HI32wLpGyw
 # These lines were loaded from '/var/lib/dance-scheduler/lib/perl5/bacds/Scheduler/Schema/Result/Series.pm' found in @INC.
 # They are now part of the custom portion of this file
 # for you to hand-edit.  If you do not either delete

@@ -27,6 +27,7 @@ sub get_model_name { 'Series' }
 sub get_fields_for_output {
     qw/
         created_ts
+        series_url
         display_text
         frequency
         is_deleted
@@ -41,6 +42,7 @@ sub get_fields_for_output {
 sub get_fields_for_input {
     qw/
         display_text
+        series_url
         frequency
         is_deleted
         name

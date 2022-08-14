@@ -41,7 +41,7 @@ subtest 'POST /event' => sub {
         end_date    => "2022-05-01",
         end_time    => "22:00",
         is_canceled => 1,
-        short_desc   => "this is the short desc",
+        short_desc  => "this is the short desc",
         name        => "saturday night test event",
         series_id   => undef,
     };
@@ -50,16 +50,16 @@ subtest 'POST /event' => sub {
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $expected = {
         event_id    => 1,
         start_date  => $new_event->{start_date},
         start_time  => $new_event->{start_time},
         end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
-        is_canceled     => $new_event->{is_canceled},
-        short_desc   => $new_event->{short_desc},
+        is_canceled => $new_event->{is_canceled},
+        short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
-        is_template => undef,
         callers     => [],
         parent_orgs => [],
         series      => [],
@@ -70,7 +70,6 @@ subtest 'POST /event' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
-        synthetic_name => undef,
     };
     eq_or_diff $got, $expected, 'return matches';
 

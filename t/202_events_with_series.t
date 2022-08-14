@@ -41,7 +41,6 @@ subtest 'POST /event' => sub {
         end_time    => "22:00",
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
-        series_id   => undef,
         is_canceled => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -49,6 +48,7 @@ subtest 'POST /event' => sub {
     ok($res->is_success, 'returned success');
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $expected = {
         event_id    => 1,
         start_date  => $new_event->{start_date},
@@ -57,7 +57,6 @@ subtest 'POST /event' => sub {
         end_time    => $new_event->{end_time},
         short_desc  => $new_event->{short_desc},
         name        => $new_event->{name},
-        is_template => undef,
         callers     => [],
         parent_orgs => [],
         series      => [],
@@ -69,7 +68,6 @@ subtest 'POST /event' => sub {
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
         is_canceled => 0,
-        synthetic_name => undef,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -95,15 +93,12 @@ subtest 'POST /series' => sub {
     $decoded = decode_json($res->content);
     $Series_Id = $decoded->{data}{series_id};
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
 
     my $expected = {
         series_id             => $Series_Id,
         name                  => 'Bree Trewsday English',
         frequency             => 'fourth Trewsday',
-        display_text          => undef,
-        short_desc            => undef,
-        sidebar               => undef,
-        programmer_notes      => undef,
         created_ts            => '2022-04-28T02:18:05',
         modified_ts           => '2022-04-28T02:18:05',
         is_deleted            => 0,

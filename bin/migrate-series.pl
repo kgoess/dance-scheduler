@@ -20,26 +20,31 @@ sub create_series {
         {
             name => 'Berkeley Contra',
             frequency => 'first, third and fifth Wednesdays',
+            series_url => 'https://bacds.org/series/contra/berkeley_wed/',
             is_deleted => 0,
         },
         {
             name => 'San Francisco Contra',
             frequency => 'first and third Saturdays',
+            series_url => 'https://bacds.org/series/contra/san_francisco/',
             is_deleted => 0,
         },
         {
             name => 'Palo Alto Contra',
             frequency => 'second, fourth and fifth Saturdays',
+            series_url => 'https://bacds.org/series/contra/palo_alto/',
             is_deleted => 0,
         },
         {
             name => 'Palo Alto English',
             frequency => 'first, third, and fifth Fridays',
+            series_url => 'https://bacds.org/series/english/peninsula/',
             is_deleted => 0,
         },
         {
             name => 'South Bay Contra',
             frequency => 'third Sunday afternoons, 3:00–6:00, lesson at 2:30',
+            series_url => 'https://bacds.org/series/contra/san_jose/',
             is_deleted => 0,
         },
         {
@@ -50,26 +55,31 @@ sub create_series {
         {
             name => 'Peninsula English (Palo Alto)',
             frequency => 'first, third, and fifth Tuesday evenings of each month (with a break from late June through Labor Day).',
+            series_url => 'https://bacds.org/series/english/palo_alto/',
             is_deleted => 0,
         },
         {
             name => 'Berkeley English',
             frequency => 'second and fourth Wednesday',
+            series_url => 'https://bacds.org/series/english/berkeley_wed/',
             is_deleted => 0,
         },
         {
             name => 'Berkeley Fourth Saturday Experienced Dance',
             frequency => 'fourth Saturday',
+            series_url => 'https://bacds.org/series/english/berkeley_sat/',
             is_deleted => 0,
         },
         {
             name => 'San Francisco English',
             frequency => 'second Saturday',
+            series_url => 'https://bacds.org/series/english/san_francisco/',
             is_deleted => 0,
         },
         {
             name => 'San Jose English',
             frequency => 'second Sunday afternoons of the month, September through June',
+            series_url => 'https://bacds.org/series/english/san_jose/',
             is_deleted => 0,
         },
         {
@@ -110,6 +120,7 @@ sub create_series {
         {
             name => 'English Regency',
             frequency => 'second Fridays',
+            series_url => 'https://bacds.org/series/english/palo_alto_reg/',
             is_deleted => 0,
         },
     );
@@ -122,6 +133,7 @@ sub create_series {
         $new->$_( $series->{$_} ) for qw/
             name
             frequency
+            series_url
         /;
         $new->is_deleted(0);
 

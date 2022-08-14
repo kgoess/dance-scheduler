@@ -81,6 +81,12 @@ __PACKAGE__->table("events");
   is_nullable: 1
   size: 2048
 
+=head2 custom_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 256
+
 =head2 is_template
 
   data_type: 'tinyint'
@@ -134,6 +140,8 @@ __PACKAGE__->add_columns(
   { data_type => "time", is_nullable => 1 },
   "short_desc",
   { data_type => "varchar", is_nullable => 1, size => 2048 },
+  "custom_url",
+  { data_type => "varchar", is_nullable => 1, size => 256 },
   "is_template",
   { data_type => "tinyint", is_nullable => 1 },
   "series_id",
@@ -282,8 +290,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-22 20:12:03
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vAvLrrZhdhDnGE0hvJYvrg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 13:24:39
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:y3XLL6xq4XaaJmXIrPLnMQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');
