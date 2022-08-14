@@ -53,6 +53,8 @@ phase I:
    bob@foo.com. To create your account, Google will share your name, email
    address, and profile picture with bacds.org. See bacds.org's "privacy policy"
    and "terms of service""
+ - make the UI clear which fields are required and which are optional
+ - add "help" buttons to the UI?
  - need CLI tool for password management
 
 phase II:
