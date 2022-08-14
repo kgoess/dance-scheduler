@@ -22,6 +22,7 @@ The files in lib/bacds/Scheduler/Schema\* were generated via
     dbicdump -o dump_directory=./lib \
          -o components='["InflateColumn::DateTime"]' \
          -o debug=1 \
+         -o skip_load_external=1 \
          bacds::Scheduler::Schema \
          'dbi:mysql:dbname=schedule' \
          scheduler \
