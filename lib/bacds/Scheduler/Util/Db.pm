@@ -17,7 +17,9 @@ sub get_dbh {
     my $hostname = 'localhost';
     my $port = 3306;
 
-    my %dbi_params = ();
+    my %dbi_params = (
+        mysql_enable_utf8 => 1,
+    );
 
     my $dbi_dsn = $ENV{TEST_DSN} || "DBI:mysql:database=$database;host=$hostname;port=$port";
 

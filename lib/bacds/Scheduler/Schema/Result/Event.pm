@@ -45,13 +45,13 @@ __PACKAGE__->table("events");
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 synthetic_name
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 start_date
 
@@ -85,7 +85,7 @@ __PACKAGE__->table("events");
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 is_template
 
@@ -127,9 +127,9 @@ __PACKAGE__->add_columns(
   "event_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "synthetic_name",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "start_date",
   { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 0 },
   "start_time",
@@ -141,7 +141,7 @@ __PACKAGE__->add_columns(
   "short_desc",
   { data_type => "varchar", is_nullable => 1, size => 2048 },
   "custom_url",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "is_template",
   { data_type => "tinyint", is_nullable => 1 },
   "series_id",
@@ -290,8 +290,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 13:24:39
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:y3XLL6xq4XaaJmXIrPLnMQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eaYsPqtbcSgDHJvpk+ZhMQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

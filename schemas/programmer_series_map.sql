@@ -13,4 +13,4 @@ CREATE TABLE programmer_series_map (
         ON DELETE RESTRICT,
 
     UNIQUE KEY (programmer_id, series_id)
-);
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;

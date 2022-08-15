@@ -57,7 +57,7 @@ __PACKAGE__->table("venues");
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 city
 
@@ -73,17 +73,17 @@ __PACKAGE__->table("venues");
 
 =head2 sidebar
 
-  data_type: 'text'
+  data_type: 'mediumtext'
   is_nullable: 1
 
 =head2 directions
 
-  data_type: 'text'
+  data_type: 'mediumtext'
   is_nullable: 1
 
 =head2 programmer_notes
 
-  data_type: 'text'
+  data_type: 'mediumtext'
   is_nullable: 1
 
 =head2 is_deleted
@@ -114,17 +114,17 @@ __PACKAGE__->add_columns(
   "hall_name",
   { data_type => "varchar", is_nullable => 0, size => 128 },
   "address",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "city",
   { data_type => "varchar", is_nullable => 1, size => 64 },
   "zip",
   { data_type => "char", is_nullable => 1, size => 10 },
   "sidebar",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "directions",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "programmer_notes",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -186,8 +186,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-15 19:47:11
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1rSgJefZv6GfHnVkMuGwEw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:P6NqA8pAwiodhVzR4EkE8A
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

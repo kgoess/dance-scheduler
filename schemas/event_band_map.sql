@@ -15,4 +15,4 @@ CREATE TABLE event_band_map (
     UNIQUE KEY (event_id, band_id),
     UNIQUE KEY (event_id, ordering)
 
-);
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;

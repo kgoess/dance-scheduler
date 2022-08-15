@@ -45,7 +45,7 @@ __PACKAGE__->table("styles");
 
   data_type: 'varchar'
   is_nullable: 0
-  size: 256
+  size: 255
 
 =head2 is_deleted
 
@@ -71,7 +71,7 @@ __PACKAGE__->add_columns(
   "style_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 0, size => 256 },
+  { data_type => "varchar", is_nullable => 0, size => 255 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -133,8 +133,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-06-21 19:08:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cL4yHT69RMKog6RHZJ7BUQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:mp+F3rf7dUpVP+4mDUz9+w
 
 
 

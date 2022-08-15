@@ -14,4 +14,4 @@ CREATE TABLE band_membership (
 
     UNIQUE INDEX band_membership_idx(band_id, talent_id),
     UNIQUE KEY (band_id, ordering)
-);
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;

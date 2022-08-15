@@ -15,4 +15,4 @@ CREATE TABLE event_venues_map (
     UNIQUE KEY (event_id, venue_id),
     UNIQUE KEY (event_id, ordering)
 
-);
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;

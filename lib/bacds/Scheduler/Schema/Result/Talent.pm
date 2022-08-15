@@ -45,19 +45,19 @@ __PACKAGE__->table("talent");
 
   data_type: 'varchar'
   is_nullable: 0
-  size: 256
+  size: 255
 
 =head2 url
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 photo_url
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 is_deleted
 
@@ -83,11 +83,11 @@ __PACKAGE__->add_columns(
   "talent_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 0, size => 256 },
+  { data_type => "varchar", is_nullable => 0, size => 255 },
   "url",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "photo_url",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -164,8 +164,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-07-25 21:11:59
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:s4VsxnkgJG7sLfnObDVA6g
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+Ilgf86p4hCgtQN6+SCw1Q
 
 __PACKAGE__->many_to_many(bands=> 'band_memberships', 'band');
 

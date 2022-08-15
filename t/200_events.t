@@ -1,5 +1,6 @@
 use 5.16.0;
 use warnings;
+use utf8;
 
 use Data::Dump qw/dump/;
 use DateTime::Format::Strptime qw/strptime/;
@@ -57,7 +58,7 @@ subtest 'POST /event' => sub {
         end_time    => "22:00",
         short_desc  => "itsa shortdesc",
         custom_url  => 'https://event.url',
-        name        => "saturday night test event",
+        name        => "saturday night test event £ ウ",
         is_canceled => 0,
         synthetic_name => 'Saturday Night Test',
     };

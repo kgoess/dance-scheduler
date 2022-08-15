@@ -15,4 +15,4 @@ CREATE TABLE event_parent_orgs_map (
     UNIQUE KEY (event_id, parent_org_id),
     UNIQUE KEY (event_id, ordering)
 
-);
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;

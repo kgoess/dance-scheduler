@@ -1,13 +1,13 @@
 CREATE TABLE events (
     event_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(256),
-    synthetic_name varchar(256),
+    name VARCHAR(255),
+    synthetic_name varchar(255),
     start_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_date DATE,
     end_time TIME,
     short_desc VARCHAR(2048),    
-    custom_url VARCHAR(256),
+    custom_url VARCHAR(255),
     is_template BOOLEAN,
     series_id INT,
     is_canceled BOOLEAN,
@@ -25,6 +25,6 @@ CREATE TABLE events (
 
     -- nope, that only works if is_template is either 1 or null
     -- UNIQUE KEY (series_id, is_template)
-);
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
 

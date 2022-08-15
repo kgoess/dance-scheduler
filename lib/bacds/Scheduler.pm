@@ -1021,6 +1021,7 @@ A little internal class to collect any errors and format the results:
 package Results {
     use Dancer2;
     use Data::Dump qw/dump/;
+    use Encode qw/decode_utf8/;
     use Class::Accessor::Lite (
         new => 0,
         rw => [ qw(data errors) ],
@@ -1040,7 +1041,7 @@ package Results {
 
     sub format {
         my ($self) = @_;
-        return encode_json({
+        my $json_str = encode_json({
             data => $self->data,
             errors => [
                 map { {
@@ -1049,6 +1050,11 @@ package Results {
                 } } @{$self->errors}
             ],
         });
+        # encode_json returns utf8 octets. Apparently the dancer2 handlers
+        # expect logical perl characters which *they* can then utf8-encode.
+        # Lacking this call to decode-utf8 the Dancer2 handlers double-encode
+        # the output. Maybe there's a way to tell Dancer2 to not do that?
+        return decode_utf8 $json_str;
     }
 }
 

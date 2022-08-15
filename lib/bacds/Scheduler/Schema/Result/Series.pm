@@ -45,7 +45,7 @@ __PACKAGE__->table("series");
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 frequency
 
@@ -61,23 +61,23 @@ __PACKAGE__->table("series");
 
 =head2 sidebar
 
-  data_type: 'text'
+  data_type: 'mediumtext'
   is_nullable: 1
 
 =head2 display_text
 
-  data_type: 'text'
+  data_type: 'mediumtext'
   is_nullable: 1
 
 =head2 series_url
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 256
+  size: 255
 
 =head2 programmer_notes
 
-  data_type: 'text'
+  data_type: 'mediumtext'
   is_nullable: 1
 
 =head2 is_deleted
@@ -104,19 +104,19 @@ __PACKAGE__->add_columns(
   "series_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "frequency",
   { data_type => "varchar", is_nullable => 1, size => 128 },
   "short_desc",
   { data_type => "varchar", is_nullable => 1, size => 2048 },
   "sidebar",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "display_text",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "series_url",
-  { data_type => "varchar", is_nullable => 1, size => 256 },
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "programmer_notes",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", is_nullable => 1 },
   "created_ts",
@@ -179,8 +179,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 13:24:39
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:J2SPwi5BrV40HI32wLpGyw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Fc1LT98ofH4M5YXMeQI1Sg
 # These lines were loaded from '/var/lib/dance-scheduler/lib/perl5/bacds/Scheduler/Schema/Result/Series.pm' found in @INC.
 # They are now part of the custom portion of this file
 # for you to hand-edit.  If you do not either delete
