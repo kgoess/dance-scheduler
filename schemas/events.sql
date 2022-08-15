@@ -8,6 +8,7 @@ CREATE TABLE events (
     end_time TIME,
     short_desc VARCHAR(2048),    
     custom_url VARCHAR(255),
+    custom_pricing TEXT(32866),
     is_template BOOLEAN,
     series_id INT,
     is_canceled BOOLEAN,

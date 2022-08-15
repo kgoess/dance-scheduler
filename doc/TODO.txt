@@ -43,11 +43,12 @@ phase I:
  - sort out abuse of the 'band' column
  - return a fresh object from the db, not the one that was submitted
  - find other TODOs/FIXMEs in the code
- - need an event url for display in https://bacds.org/scripts/dancefinder.pl,
+ DONE- need an event url for display in https://bacds.org/scripts/dancefinder.pl,
    called out by Alan's change 904dd65c6e832 in
    git:/var/lib/git/bacds.org-scripts/
- - add a "pricing" textbox to events
- - add "manager name" to series
+ DONE- add a "pricing" textbox to events
+ DONE add "manager name" to series
+ - talk about "sidebar", see a47b7c918239
  - fill in TOS, privacy urls from google auth
    for their page "Confirm you want to sign in to "bacds.org" as Bob
    bob@foo.com. To create your account, Google will share your name, email
@@ -56,6 +57,7 @@ phase I:
  - make the UI clear which fields are required and which are optional
  - add "help" buttons to the UI?
  - need CLI tool for password management
+ - need permissions to edit a standalone event without a series
 
 phase II:
 

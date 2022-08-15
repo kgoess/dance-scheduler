@@ -51,15 +51,16 @@ subtest 'POST /event' => sub {
     my ($expected, $created_time, $res, $decoded, $got);
 
     my $new_event = {
-        event_id    => '', # this should be ignored by the model
-        start_date  => "2022-05-01",
-        start_time  => "20:00",
-        end_date    => "2022-05-01",
-        end_time    => "22:00",
-        short_desc  => "itsa shortdesc",
-        custom_url  => 'https://event.url',
-        name        => "saturday night test event £ ウ",
-        is_canceled => 0,
+        event_id       => '', # this should be ignored by the model
+        start_date     => "2022-05-01",
+        start_time     => "20:00",
+        end_date       => "2022-05-01",
+        end_time       => "22:00",
+        short_desc     => "itsa shortdesc",
+        custom_url     => 'https://event.url',
+        custom_pricing => '¥4,000',
+        name           => "saturday night test event £ ウ",
+        is_canceled    => 0,
         synthetic_name => 'Saturday Night Test',
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -68,26 +69,27 @@ subtest 'POST /event' => sub {
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        event_id    => 1,
-        start_date  => $new_event->{start_date},
-        start_time  => $new_event->{start_time},
-        end_date    => $new_event->{end_date},
-        end_time    => $new_event->{end_time},
-        short_desc  => $new_event->{short_desc},
-        custom_url  => $new_event->{custom_url},
-        name        => $new_event->{name},
-        is_canceled => $new_event->{is_canceled},
-        is_template => undef,
-        callers     => [],
-        parent_orgs => [],
-        series      => [],
-        styles      => [],
-        venues      => [],
-        bands       => [],
-        talent      => [],
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:18:05",
-        is_deleted  => 0,
+        event_id       => 1,
+        start_date     => $new_event->{start_date},
+        start_time     => $new_event->{start_time},
+        end_date       => $new_event->{end_date},
+        end_time       => $new_event->{end_time},
+        short_desc     => $new_event->{short_desc},
+        custom_url     => $new_event->{custom_url},
+        custom_pricing => '¥4,000',
+        name           => $new_event->{name},
+        is_canceled    => $new_event->{is_canceled},
+        is_template    => undef,
+        callers        => [],
+        parent_orgs    => [],
+        series         => [],
+        styles         => [],
+        venues         => [],
+        bands          => [],
+        talent         => [],
+        created_ts     => "2022-04-28T02:18:05",
+        modified_ts    => "2022-04-28T02:18:05",
+        is_deleted     => 0,
         synthetic_name => 'Saturday Night Test',
     };
     eq_or_diff $got, $expected, 'return matches';
@@ -109,26 +111,27 @@ subtest "GET /event/#" => sub{
     $got = $decoded->{data};
 
     $expected = {
-        event_id    => $Event->event_id,
-        start_date  => $Event->start_date->ymd('-'),
-        start_time  => $Event->start_time =~ s/:00$//r,
-        end_date    => $Event->end_date->ymd('-'),
-        end_time    => $Event->end_time =~ s/:00$//r,
-        short_desc  => $Event->short_desc,
-        custom_url  => $Event->custom_url,
-        name        => $Event->name,
-        is_canceled => $Event->is_canceled,
-        is_template => $Event->is_template,
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:18:05",
-        callers     => [],
-        parent_orgs => [],
-        series      => [],
-        styles      => [],
-        venues      => [],
-        bands       => [],
-        talent      => [],
-        is_deleted  => 0,
+        event_id       => $Event->event_id,
+        start_date     => $Event->start_date->ymd('-'),
+        start_time     => $Event->start_time =~ s/:00$//r,
+        end_date       => $Event->end_date->ymd('-'),
+        end_time       => $Event->end_time =~ s/:00$//r,
+        short_desc     => $Event->short_desc,
+        custom_url     => $Event->custom_url,
+        custom_pricing => $Event->custom_pricing,
+        name           => $Event->name,
+        is_canceled    => $Event->is_canceled,
+        is_template    => $Event->is_template,
+        created_ts     => "2022-04-28T02:18:05",
+        modified_ts    => "2022-04-28T02:18:05",
+        callers        => [],
+        parent_orgs    => [],
+        series         => [],
+        styles         => [],
+        venues         => [],
+        bands          => [],
+        talent         => [],
+        is_deleted     => 0,
         synthetic_name => 'Saturday Night Test',
     };
 
@@ -161,6 +164,7 @@ subtest "PUT /event/#" => sub {
 
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $expected = {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:19:45",
@@ -173,7 +177,6 @@ subtest "PUT /event/#" => sub {
         name        => $edit_event->{name},
         is_canceled => $edit_event->{is_canceled},
         event_id    => $Event_Id,
-        is_template => undef,
         callers     => [],
         parent_orgs => [],
         series      => [],
@@ -189,6 +192,7 @@ subtest "PUT /event/#" => sub {
     $res  = $test->request( GET "/event/$Event_Id" );
     $decoded = decode_json($res->content); 
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     eq_or_diff $got, $expected, 'GET changed after PUT';
 
 
@@ -220,6 +224,7 @@ subtest 'POST /event #2' => sub{
 
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $Second_Event_Id = $got->{event_id};
     $expected = {
         event_id    => $Second_Event_Id,
@@ -229,9 +234,7 @@ subtest 'POST /event #2' => sub{
         end_time    => $new_event->{end_time},
         is_canceled => $new_event->{is_canceled},
         short_desc  => $new_event->{short_desc},
-        custom_url  => undef,
         name        => $new_event->{name},
-        is_template => undef,
         created_ts  => $now_ts,
         modified_ts => $now_ts,
         callers     => [],
@@ -242,7 +245,6 @@ subtest 'POST /event #2' => sub{
         bands       => [],
         talent      => [],
         is_deleted  => 0,
-        synthetic_name => undef,
     };
     eq_or_diff $got, $expected, 'return from POST matches';
 
@@ -251,6 +253,7 @@ subtest 'POST /event #2' => sub{
     $res = $test->request(GET '/event/'.$Second_Event_Id);
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     eq_or_diff $got, $expected, 'return from GET matches';
 };
 
@@ -266,35 +269,37 @@ subtest 'GET /eventAll' => sub {
     $got = $decoded->{data};
     $expected = [
       {
-        event_id    => $Event->event_id,
-        start_date  => $Event->start_date->ymd('-'),
-        start_time  => $Event->start_time =~ s/:00$//r,
-        end_date    => $Event->end_date->ymd('-'),
-        end_time    => $Event->end_time =~ s/:00$//r,
-        short_desc  => $Event->short_desc,
-        custom_url  => $Event->custom_url,
-        name        => $Event->name,
-        is_canceled => $Event->is_canceled,
-        is_template => $Event->is_template,
-        created_ts  => "2022-04-28T02:18:05",
-        modified_ts => "2022-04-28T02:19:45",
-        is_deleted  => 0,
+        event_id       => $Event->event_id,
+        start_date     => $Event->start_date->ymd('-'),
+        start_time     => $Event->start_time =~ s/:00$//r,
+        end_date       => $Event->end_date->ymd('-'),
+        end_time       => $Event->end_time =~ s/:00$//r,
+        short_desc     => $Event->short_desc,
+        custom_url     => $Event->custom_url,
+        custom_pricing => $Event->custom_pricing,
+        name           => $Event->name,
+        is_canceled    => $Event->is_canceled,
+        is_template    => $Event->is_template,
+        created_ts     => "2022-04-28T02:18:05",
+        modified_ts    => "2022-04-28T02:19:45",
+        is_deleted     => 0,
         synthetic_name => "Saturday Night Test",
       },
       {
-        event_id    => $Second_Event_Id,
-        start_date  => $Second_Event->start_date->ymd('-'),
-        start_time  => $Second_Event->start_time =~ s/:00$//r,
-        end_date    => $Second_Event->end_date->ymd('-'),
-        end_time    => $Second_Event->end_time =~ s/:00$//r,
-        is_canceled => $Second_Event->is_canceled,
-        name        => $Second_Event->name,
-        short_desc  => $Second_Event->short_desc,
-        custom_url  => undef,
-        is_template => $Second_Event->is_template,
-        modified_ts => "2022-04-28T02:18:05",
-        created_ts  => "2022-04-28T02:18:05",
-        is_deleted  => 0,
+        event_id       => $Second_Event_Id,
+        start_date     => $Second_Event->start_date->ymd('-'),
+        start_time     => $Second_Event->start_time =~ s/:00$//r,
+        end_date       => $Second_Event->end_date->ymd('-'),
+        end_time       => $Second_Event->end_time =~ s/:00$//r,
+        is_canceled    => $Second_Event->is_canceled,
+        name           => $Second_Event->name,
+        short_desc     => $Second_Event->short_desc,
+        custom_url     => undef,
+        custom_pricing => undef,
+        is_template    => $Second_Event->is_template,
+        modified_ts    => "2022-04-28T02:18:05",
+        created_ts     => "2022-04-28T02:18:05",
+        is_deleted     => 0,
         synthetic_name => undef,
       },
     ];

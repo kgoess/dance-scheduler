@@ -17,6 +17,7 @@ sub get_fields_for_output {
         end_time
         short_desc
         custom_url
+        custom_pricing
         is_template
         created_ts
         modified_ts
@@ -34,6 +35,7 @@ sub get_fields_for_input {
         end_time
         short_desc
         custom_url
+        custom_pricing
         is_template
         is_canceled
         is_deleted

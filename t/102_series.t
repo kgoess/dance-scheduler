@@ -56,6 +56,7 @@ subtest 'POST /series' => sub{
         short_desc   => 'this is short desc',
         sidebar      => 'this is sidebar',
         series_url   => 'https://bree.me',
+        manager      => 'Mary Manager',
         programmer_notes => 'this is programmer notes',
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -71,6 +72,7 @@ subtest 'POST /series' => sub{
         short_desc            => 'this is short desc',
         sidebar               => 'this is sidebar',
         series_url            => 'https://bree.me',
+        manager               => 'Mary Manager',
         programmer_notes      => 'this is programmer notes',
         created_ts            => "2022-04-28T02:18:05",
         modified_ts           => "2022-04-28T02:18:05",
@@ -100,6 +102,7 @@ subtest 'GET /series/#' => sub {
         series_url            => 'https://bree.me',
         short_desc            => 'this is short desc',
         sidebar               => 'this is sidebar',
+        manager               => 'Mary Manager',
         programmer_notes      => 'this is programmer notes',
         created_ts            => "2022-04-28T02:18:05",
         modified_ts           => "2022-04-28T02:18:05",
@@ -144,11 +147,14 @@ subtest 'PUT /series/1' => sub {
     };
 
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
+
     eq_or_diff $got, $expected, 'matches';
 
     $res  = $test->request( GET '/series/1' );
     $decoded = decode_json($res->content); 
     $got = $decoded->{data};
+    $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     eq_or_diff $got, $expected, 'GET changed after PUT';
 
     # update our global series object
@@ -173,6 +179,7 @@ subtest 'GET /seriesAll' => sub {
             short_desc            => 'this is short desc',
             sidebar               => 'this is sidebar',
             series_url            => 'https://changed-brie.me',
+            manager               => undef,
             programmer_notes      => 'this is programmer notes',
             created_ts            => "2022-04-28T02:18:05",
             modified_ts           => "2022-04-28T02:19:45",

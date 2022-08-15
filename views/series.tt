@@ -41,6 +41,10 @@
                 label => "Series URL",
             },
             {
+                name => "manager",
+                label => "Manager Name(s)",
+            },
+            {
                 name => "is_deleted",
                 label => "Is Deleted",
                 type => "checkbox",

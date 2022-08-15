@@ -31,6 +31,7 @@ sub get_fields_for_output {
         display_text
         frequency
         is_deleted
+        manager
         modified_ts
         name
         programmer_notes
@@ -45,6 +46,7 @@ sub get_fields_for_input {
         series_url
         frequency
         is_deleted
+        manager
         name
         programmer_notes
         short_desc

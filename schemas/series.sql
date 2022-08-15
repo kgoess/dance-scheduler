@@ -6,6 +6,7 @@ CREATE TABLE series (
     sidebar TEXT(32866),
     display_text TEXT(32866),
     series_url VARCHAR(255),
+    manager VARCHAR(255),
     programmer_notes TEXT(32866),
     is_deleted BOOLEAN,
     created_ts DATETIME NOT NULL,
