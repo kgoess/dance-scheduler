@@ -42,6 +42,7 @@ sub get_fields_for_input {
 sub get_fkey_fields { }
 sub get_many_to_manys { 
     [qw/Series series series_id/],
+    [qw/Event events event_id/],
 }
 sub get_one_to_manys { }
 sub get_default_sorting { {-asc=>'email'} }

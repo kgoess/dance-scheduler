@@ -276,6 +276,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 programmer_events_maps
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::ProgrammerEventsMap>
+
+=cut
+
+__PACKAGE__->has_many(
+  "programmer_events_maps",
+  "bacds::Scheduler::Schema::Result::ProgrammerEventsMap",
+  { "foreign.event_id" => "self.event_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 series
 
 Type: belongs_to
@@ -297,8 +312,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 19:52:58
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:k8piMTD9A5OBgoPCpWW32Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-16 19:44:58
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uD/ovtix7f42x/bTJBrEgQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');
@@ -310,4 +325,11 @@ __PACKAGE__->many_to_many(venues => 'event_venues_maps', 'venue');
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 
+sub get_fields_for_programmer_row {
+    my ($self) = @_;
+    return {
+        id => $self->event_id,
+        name => $self->synthetic_name,
+    };
+}
 1;

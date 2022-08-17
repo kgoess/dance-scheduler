@@ -49,6 +49,9 @@ phase I:
  DONE- add a "pricing" textbox to events
  DONE add "manager name" to series
  - talk about "sidebar", see a47b7c918239
+    -- add "directions" field to venues
+    -- create "pricing" table that maps to events
+    -- create a sidebar options table that links to events, to allow including and sorting options as desired
  - fill in TOS, privacy urls from google auth
    for their page "Confirm you want to sign in to "bacds.org" as Bob
    bob@foo.com. To create your account, Google will share your name, email

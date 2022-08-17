@@ -46,12 +46,16 @@ C<undef> if POST/PUT is sent anything falsey for them.
 =item * get_many_to_manys()
 
 This must return a nested list of lists of other tables with
-many-to-many relationships like C<[qw/Style styles style_id/],>
+many-to-many relationships like C<[qw/Style styles style_id/],> With the first
+item being the model name (/Models/Style.pm), the second being the tablename in
+the database, and the third being the primary key.
 
 =item * get_one_to_manys()
 
 This must return a nested list of lists of other tables with
-one-to-many relationships, like C<[qw/Series series series_id/],>
+one-to-many relationships like C<[qw/Style styles style_id/],> With the first
+item being the model name (/Models/Style.pm), the second being the tablename in
+the database, and the third being the primary key.
 
 =item * get_default_sorting()
 

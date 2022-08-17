@@ -140,6 +140,21 @@ __PACKAGE__->add_unique_constraint("programmer_email_idx", ["email"]);
 
 =head1 RELATIONS
 
+=head2 programmer_events_maps
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::ProgrammerEventsMap>
+
+=cut
+
+__PACKAGE__->has_many(
+  "programmer_events_maps",
+  "bacds::Scheduler::Schema::Result::ProgrammerEventsMap",
+  { "foreign.programmer_id" => "self.programmer_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 programmer_series_maps
 
 Type: has_many
@@ -156,13 +171,14 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KbNDWkaRCG4EWAo+pNkTJw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-16 19:44:58
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Vdw19g7swLR0z4ss1ZHmpw
 
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 
 __PACKAGE__->many_to_many(series => 'programmer_series_maps', 'series');
+__PACKAGE__->many_to_many(events => 'programmer_events_maps', 'event');
 
 1;

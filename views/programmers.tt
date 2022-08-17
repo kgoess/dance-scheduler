@@ -31,6 +31,14 @@
                 <span class="add-multi-select-button">+</span>
             </div>
         </div>
+        <div name="event_id" class="display-row" column-type="list-item" model-name="event" table-name="events" >
+            <div class="multi-select-wrapper">
+                <span class="row-label">Can Edit Event</span>
+                <select name="event_id">
+                </select>
+                <span class="add-multi-select-button">+</span>
+            </div>
+        </div>
         <span class="button-container">
             <button class="button save-button">Save</button>
         </span>
