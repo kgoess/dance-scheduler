@@ -68,3 +68,4 @@ phase II:
  - make /directions/content.html a dynamic page
  - the listbox showing existing things would be completely retooled, with
    filtering and who knows
+ - CALDAV output
