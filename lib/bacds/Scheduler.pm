@@ -25,7 +25,8 @@ use Dancer2;
 use Dancer2::Core::Cookie;
 use Data::Dump qw/dump/;
 
-use bacds::Scheduler::Auth;
+use bacds::Scheduler::FederatedAuth;
+use bacds::Scheduler::Plugin::Auth;
 use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
@@ -54,14 +55,15 @@ post '/google-signin' => sub {
     my $jwt = params->{credential}
         or send_error 'missing parameter "credential"' => 400;
 
-    my ($res, $err) = bacds::Scheduler::Auth->check_google_auth($jwt);
+    my ($res, $err) = bacds::Scheduler::FederatedAuth->check_google_auth($jwt);
 
     if ($err) {
         my ($code, $msg) = @$err;
         send_error $msg => $code;
     }
 
-    cookie name => "GoogleToken", value => $jwt, expires => "72 hours";
+    cookie "GoogleToken" => $jwt, expires => "72 hours";
+    cookie "LoginMethod" => 'google';
     redirect '/' => 303;
 };
 
@@ -258,7 +260,7 @@ Update an existing event
 
 =cut
 
-put '/event/:event_id' => sub {
+put '/event/:event_id' => can_edit_event sub {
     my $event = $event_model->put_row(params);
     my $results = Results->new;
 

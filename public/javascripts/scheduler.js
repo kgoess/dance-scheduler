@@ -476,5 +476,14 @@ function saveAction(target, onSuccess) {
             onSuccess();
         }
      })
-    .fail( () => { alert('something bad happened, update failed, see the server logs') }); // FIXME later
+    .fail( (err) => {
+        switch (err.status){
+            case 401:
+                alert("You don't have authorization to do that!");
+                break;
+            default:
+                alert('something bad happened, update failed, see the server logs');
+                console.log(err);
+        }
+    }); // FIXME later
 }

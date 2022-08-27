@@ -1,4 +1,4 @@
-package bacds::Scheduler::Auth;
+package bacds::Scheduler::FederatedAuth;
 
 use 5.16.0;
 use warnings;
