@@ -6,8 +6,16 @@ use warnings;
 use File::Basename qw/basename/;
 use FindBin qw/$Bin/;
 
+use bacds::Scheduler::Util::Db qw/get_dbh/;
+use bacds::Scheduler::FederatedAuth;
+
 use Exporter 'import';
-our @EXPORT_OK = qw/setup_test_db/;
+our @EXPORT_OK = qw/
+    setup_test_db
+    GET
+    PUT
+    POST
+/;
 
 
 sub setup_test_db{
@@ -25,6 +33,28 @@ sub setup_test_db{
     bacds::Scheduler::Schema->connection($ENV{TEST_DSN},'','');
     bacds::Scheduler::Schema->load_namespaces;
     bacds::Scheduler::Schema->deploy;
+
+    my $dbh = get_dbh();
+    my $new = $dbh->resultset('Programmer')->new({
+        name => 'Peter Programmer',
+        is_superuser => 1,
+        email => 'peterprogrammer@test.com',
+        is_deleted => 0,
+    });
+
+    $new->insert;
 }
+
+sub auth_cookie {
+    state $session_cookie = bacds::Scheduler::FederatedAuth
+        ->create_session_cookie('peterprogrammer@test.com');
+
+    return Cookie => "LoginMethod=session;LoginSession=$session_cookie"
+}
+
+sub POST { HTTP::Request::Common::POST(@_, auth_cookie()) }
+sub PUT  { HTTP::Request::Common::PUT (@_, auth_cookie()) }
+sub GET  { HTTP::Request::Common::GET (@_, auth_cookie()) }
+# do other methods if needed: OPTIONS, DELETE, PATCH
 
 1;

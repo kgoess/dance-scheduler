@@ -4,9 +4,15 @@ use 5.16.0;
 use warnings;
 
 use Crypt::JWT qw/decode_jwt/;
+use Crypt::CBC;
+use Data::UUID;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use LWP::UserAgent;
+use MIME::Base64 qw/encode_base64 decode_base64/;
+use String::Random;
+
+use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 =head2 check_google_auth
 
@@ -147,6 +153,92 @@ sub refresh_google_oauth_keys {
         print $fh $json;
     }
     return $json;
+}
+
+sub cipher {
+    state $cipher = Crypt::CBC->new(
+        -pass => _get_session_encryption_key(),
+        -cipher => 'Crypt::Blowfish',
+        -pbkdf => 'pbkdf2',
+    );
+    return $cipher;
+}
+
+sub create_session_cookie {
+    my ($class, $email) = @_;
+
+    state $rand =
+    my $cookie = join $;,
+        'v1',
+        $email,
+        'this-is-bacds',
+        String::Random->new->randpattern('.'x128),
+    ;
+
+    return encode_base64 cipher()->encrypt($cookie);
+}
+
+sub check_session_cookie {
+    my ($class, $session_cookie) = @_;
+
+    my $programmer;
+
+    eval {
+        my $session_str = cipher()->decrypt(decode_base64 $session_cookie);
+        my ($version, $email, $canary, $nonce) = split /$;/, $session_str;
+        $version eq 'v1' or die "version looks funny: $session_str";
+        # not sure this is necessary, but seems helpful
+        $canary eq 'this-is-bacds' or die "canary looks funny: $session_str";
+        length $nonce == 128 or die "nonce wrong length: $session_str";
+
+        my $dbh = get_dbh();
+        my $rs = $dbh->resultset('Programmer')->search({
+            email => $email
+        });
+        $programmer = $rs->first or die "no programmer found for '$email'";
+    };
+    if ($@) {
+        warn "check_login_str: $@";
+        return undef;
+    }
+    return $programmer;
+}
+
+# I'm copying this from bacds::Scheduler::Util::Db->_get_password
+# but they should both be cleaned-up/combined, whatever,
+# see the perldoc Dancer2::Config notes in _get_password
+my $_session_encryption_key;
+sub _get_session_encryption_key {
+    return $_session_encryption_key if $_session_encryption_key;
+
+    my $system_key_file = '/var/www/bacds.org/dance-scheduler/private/session-encryption-key';
+    my $user_key_file = $ENV{HOME} ? "$ENV{HOME}/.session-encryption-key" : undef;
+
+    if (-r $system_key_file) {
+        open my $fh, "<", $system_key_file
+            or die "can't read $system_key_file: $!";
+        $_session_encryption_key = <$fh>;
+        chomp $_session_encryption_key;
+    } elsif (!$ENV{HOME}) {
+        open my $fh, ">", $system_key_file
+            or die "can't create to $system_key_file: $!";
+        $_session_encryption_key = Data::UUID->new->create_b64;
+        print $fh $_session_encryption_key;
+        close $fh;
+    } elsif ($user_key_file and -e $user_key_file) {
+        open my $fh, "<", $user_key_file
+            or die "can't read $user_key_file: $!";
+        $_session_encryption_key = <$fh>;
+        chomp $_session_encryption_key;
+    } else {
+        open my $fh, ">", $user_key_file
+            or die "cant create $user_key_file: $!";
+        $_session_encryption_key = Data::UUID->new->create_b64;
+        print $fh $_session_encryption_key;
+        close $fh;
+    }
+
+    return $_session_encryption_key;
 }
 
 1;

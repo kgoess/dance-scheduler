@@ -5,7 +5,6 @@ use utf8;
 use Data::Dump qw/dump/;
 use DateTime::Format::Strptime qw/strptime/;
 use DateTime;
-use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
@@ -14,14 +13,15 @@ use Test::More tests => 7;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
+use bacds::Scheduler::Util::TestDb qw/setup_test_db GET POST PUT/;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-use bacds::Scheduler::Util::TestDb qw/setup_test_db/;
-setup_test_db;
-
 my $app = bacds::Scheduler->to_app;
 my $test = Plack::Test->create($app);
+
+setup_test_db;
+
 my $dbh = get_dbh();
 
 my ($Event, $Second_Event);
@@ -160,7 +160,7 @@ subtest "PUT /event/#" => sub {
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
     $res = $test->request( PUT '/event/1' , content => $edit_event);
-    ok( $res->is_success, 'returned success' );
+    ok( $res->is_success, 'returned success' ) or die $res->content;
 
     $decoded = decode_json($res->content);
     $got = $decoded->{data};

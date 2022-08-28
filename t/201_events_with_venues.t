@@ -4,7 +4,6 @@ use warnings;
 use Data::Dump qw/dump/;
 use DateTime::Format::Strptime qw/strptime/;
 use DateTime;
-use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
@@ -16,7 +15,7 @@ use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-use bacds::Scheduler::Util::TestDb qw/setup_test_db/;
+use bacds::Scheduler::Util::TestDb qw/setup_test_db GET POST PUT/;
 setup_test_db;
 
 my $app = bacds::Scheduler->to_app;
@@ -201,7 +200,7 @@ subtest "PUT /event/# with venues" => sub {
         is_deleted  => 0,
     };
     $res = $test->request(POST '/venue/', $other_venue );
-    ok($res->is_success, 'created venue');
+    ok($res->is_success, 'created venue') or die $res->content;
 
     $decoded = decode_json($res->content);
     my $other_venue_id = $decoded->{data}{venue_id};
@@ -220,7 +219,7 @@ subtest "PUT /event/# with venues" => sub {
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
     $res = $test->request( PUT "/event/$Venued_Event_Id" , content => $edit_event);
-    ok( $res->is_success, 'returned success' );
+    ok( $res->is_success, 'returned success' ) or die $res->content;
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
