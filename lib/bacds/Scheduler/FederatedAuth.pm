@@ -9,7 +9,7 @@ use Data::UUID;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use LWP::UserAgent;
-use MIME::Base64 qw/encode_base64 decode_base64/;
+use MIME::Base64 qw/encode_base64url decode_base64url/;
 use String::Random;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
@@ -167,7 +167,6 @@ sub cipher {
 sub create_session_cookie {
     my ($class, $email) = @_;
 
-    state $rand =
     my $cookie = join $;,
         'v1',
         $email,
@@ -175,21 +174,21 @@ sub create_session_cookie {
         String::Random->new->randpattern('.'x128),
     ;
 
-    return encode_base64 cipher()->encrypt($cookie);
+    return encode_base64url cipher()->encrypt($cookie);
 }
 
 sub check_session_cookie {
     my ($class, $session_cookie) = @_;
 
-    my $programmer;
+my $programmer;
 
-    eval {
-        my $session_str = cipher()->decrypt(decode_base64 $session_cookie);
-        my ($version, $email, $canary, $nonce) = split /$;/, $session_str;
-        $version eq 'v1' or die "version looks funny: $session_str";
-        # not sure this is necessary, but seems helpful
-        $canary eq 'this-is-bacds' or die "canary looks funny: $session_str";
-        length $nonce == 128 or die "nonce wrong length: $session_str";
+eval {
+    my $session_str = cipher()->decrypt(decode_base64url $session_cookie);
+    my ($version, $email, $canary, $nonce) = split /$;/, $session_str;
+    ($version//'') eq 'v1' or die "version looks funny: $session_str";
+    # not sure this is necessary, but seems helpful
+    $canary eq 'this-is-bacds' or die "canary looks funny: $session_str";
+    length $nonce == 128 or die "nonce wrong length: $session_str";
 
         my $dbh = get_dbh();
         my $rs = $dbh->resultset('Programmer')->search({

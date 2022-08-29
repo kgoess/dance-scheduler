@@ -25,7 +25,8 @@ plugin_keywords can_edit_event => sub {
                 if ($err) {
                     #Failed to sign in
                     my ($code, $msg) = @$err;
-                    return $self->send_error($msg, $code); 
+                    warn qq{check_google_auth: "$msg" for token '$google_token"};
+                    return $self->send_error('check google auth failure, see server logs', $code);
                 }
                 my $email = $res->{email};
             }
