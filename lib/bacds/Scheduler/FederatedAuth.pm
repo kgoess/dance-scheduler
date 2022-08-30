@@ -1,3 +1,48 @@
+=head1 NAME
+
+bacds::Scheduler::FederatedAuth - handles various authentication realms
+
+=head1 SYNOPSIS
+
+We have these endpoints configured:
+
+    post '/whatever-signin' => sub {
+        my $jwt = params->{access_token}
+            or send_error 'missing parameter "access_token"' => 400;
+
+        my ($res, $err) = bacds::Scheduler::FederatedAuth
+            ->check_whatever_auth($access_token);
+
+        if ($err) {
+            my ($code, $msg) = @$err;
+            send_error $msg => $code;
+        }
+
+        cookie "WhateverToken" => $jwt, expires => "72 hours";
+        cookie "LoginMethod" => 'whatever';
+        redirect '/' => 303;
+    };
+
+And individual endpoints have their authorization protected like this, where
+the "can_edit_event" checks those cookies.
+
+    put '/event/:event_id' => can_edit_event sub {
+         my $event = $event_model->put_row(params);
+
+
+
+=head1 DESCRIPTION
+
+We have a signin.html page with a Google button, a Facebook button, and a
+regular email/password/submit form. The latter is only for people who have
+access to the database table on our server, so that we don't have to implement
+an entire forgot-my-password flow and everything else a password form would
+entail (like a Captcha even).
+
+The implementation of all those authentications is here.
+
+=cut
+
 package bacds::Scheduler::FederatedAuth;
 
 use 5.16.0;
@@ -6,6 +51,9 @@ use warnings;
 use Crypt::JWT qw/decode_jwt/;
 use Crypt::CBC;
 use Data::UUID;
+use Data::Dump qw/dump/;
+use Facebook::OpenGraph;
+use Furl;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use LWP::UserAgent;
@@ -78,7 +126,6 @@ sub check_google_auth {
         return undef, [401, 'Login failed'];
     }
 
-    my $programmer_model = '';
     my $rows = bacds::Scheduler::Model::Programmer->get_multiple_rows({
          email => $decoded->{email}
     });
@@ -155,6 +202,90 @@ sub refresh_google_oauth_keys {
     return $json;
 }
 
+=head2 check_facebook_auth
+
+The response from Facebook's /me will look like this:
+
+    {
+      email => "knet\@goess.org",
+      id => 10160221707369379,
+      name => "Kevin Goess",
+      picture => {
+        data => {
+          height => 50,
+          is_silhouette => bless(do{\(my $o = 0)}, "JSON::PP::Boolean"),
+          url => "https://platform-lookaside.fbsbx.com/p...",
+          width => 50,
+        },
+      },
+    }
+
+
+=cut
+
+sub check_facebook_auth {
+    my ($class, $access_token) = @_;
+
+    my $res;
+
+    eval {
+        my $ua = Furl::HTTP->new(
+            timeout => 10
+        );
+
+        my $secret = _get_facebook_secret();
+
+        my $fb = Facebook::OpenGraph->new({
+            app_id => '430760472446636',
+            secret => $secret,
+            version => 'v14.0',
+            ua => $ua,
+            access_token => $access_token,
+            #namespace =>
+            #redirect_uri
+        });
+
+        $res = $fb->get('/me?locale=en_US&fields=name,email,picture');
+    };
+    if ($@) {
+        return undef, [400, $@];
+    }
+
+    if (!ref $res) {
+        return undef, [401, 'Login failed'];
+    }
+
+    my $rows = bacds::Scheduler::Model::Programmer->get_multiple_rows({
+         email => $res->{email}
+    });
+
+    if (!@$rows) {
+        return undef, [401, "We don't recognize $res->{email} in our system"];
+    }
+
+    return $rows->[0];
+}
+
+sub _get_facebook_secret {
+    if ($ENV{HOME} && -e "$ENV{HOME}/.facebook-secret") {
+        open my $fh, '<', "$ENV{HOME}/.facebook-secret"
+            or die "can't read $ENV{HOME}/.facebook-secret: $!";
+        my $secret = <$fh>;
+        chomp $secret;
+        return $secret;
+    }
+
+    my $system_path = '/var/www/bacds.org/dance-scheduler/private/facebook-secret';
+    if (-e $system_path) {
+        open my $fh, '<', $system_path
+            or die "can'e read $system_path: $!";
+        my $secret = <$fh>;
+        chomp $secret;
+        return $secret;
+    }
+    die "please put the Facebook API secret into either ~/.facebook-secret or $system_path"
+}
+
 sub cipher {
     state $cipher = Crypt::CBC->new(
         -pass => _get_session_encryption_key(),
@@ -163,6 +294,13 @@ sub cipher {
     );
     return $cipher;
 }
+
+=head2 create_session_cookie
+
+If they login with the email/password/submit form, we'll create this session
+cookie and check it on subsequent protected requests.
+
+=cut
 
 sub create_session_cookie {
     my ($class, $email) = @_;
@@ -177,18 +315,25 @@ sub create_session_cookie {
     return encode_base64url cipher()->encrypt($cookie);
 }
 
+=head2 check_session_cookie
+
+This checks the cookie we created if they logged in with our
+email/password/submit form (as opposed to the Facebook and Google buttons).
+
+=cut
+
 sub check_session_cookie {
     my ($class, $session_cookie) = @_;
 
-my $programmer;
+    my $programmer;
 
-eval {
-    my $session_str = cipher()->decrypt(decode_base64url $session_cookie);
-    my ($version, $email, $canary, $nonce) = split /$;/, $session_str;
-    ($version//'') eq 'v1' or die "version looks funny: $session_str";
-    # not sure this is necessary, but seems helpful
-    $canary eq 'this-is-bacds' or die "canary looks funny: $session_str";
-    length $nonce == 128 or die "nonce wrong length: $session_str";
+    eval {
+        my $session_str = cipher()->decrypt(decode_base64url $session_cookie);
+        my ($version, $email, $canary, $nonce) = split /$;/, $session_str;
+        ($version//'') eq 'v1' or die "version looks funny: $session_str";
+        # not sure this is necessary, but seems helpful
+        $canary eq 'this-is-bacds' or die "canary looks funny: $session_str";
+        length $nonce == 128 or die "nonce wrong length: $session_str";
 
         my $dbh = get_dbh();
         my $rs = $dbh->resultset('Programmer')->search({
@@ -197,8 +342,7 @@ eval {
         $programmer = $rs->first or die "no programmer found for '$email'";
     };
     if ($@) {
-        warn "check_login_str: $@";
-        return undef;
+        return undef, $@;
     }
     return $programmer;
 }
@@ -219,8 +363,9 @@ sub _get_session_encryption_key {
         $_session_encryption_key = <$fh>;
         chomp $_session_encryption_key;
     } elsif (!$ENV{HOME}) {
+        # this just hits an SELinux error, I'll do it by hand
         open my $fh, ">", $system_key_file
-            or die "can't create to $system_key_file: $!";
+            or die "can't create $system_key_file: $!";
         $_session_encryption_key = Data::UUID->new->create_b64;
         print $fh $_session_encryption_key;
         close $fh;

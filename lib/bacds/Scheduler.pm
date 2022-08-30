@@ -36,7 +36,9 @@ use bacds::Scheduler::Model::Venue;
 
 our $VERSION = '0.1';
 
-=head2 login credential checking redirector
+=head2 /google-signin
+
+login credential checking redirector
 
 A request to https://www.bacds.org/dance-scheduler/signin.html
 will show a login-with-google button and others.
@@ -64,6 +66,41 @@ post '/google-signin' => sub {
 
     cookie "GoogleToken" => $jwt, expires => "72 hours";
     cookie "LoginMethod" => 'google';
+    redirect '/' => 303;
+};
+
+=head2 /facebook-signin
+
+login credential checking redirector
+
+A request to https://www.bacds.org/dance-scheduler/signin.html
+will show a login-with-facebook button and others.
+
+Click on that facebook button and after logging in to facebok it'll redirect you here.
+
+This page will verify your credential information and set up a
+session TBD
+
+=cut
+
+post '/facebook-signin' => sub {
+    my $access_token = params->{access_token}
+        or send_error 'missing parameter "access_token"' => 400;
+
+    my ($email, $err) = bacds::Scheduler::FederatedAuth->check_facebook_auth($access_token);
+
+    if ($err) {
+        my ($code, $msg) = @$err;
+        send_error $msg => $code;
+    }
+
+    # Checking the facebook cookie requires making an HTTP request to facebook
+    # every time, so instead of doing that, we'll use our own session cookie.
+    # We should just do this with Google too, and then we can probably just use
+    # the Plack auth session.
+    my $session_cookie = bacds::Scheduler::FederatedAuth->create_session_cookie($email);
+    cookie "LoginSession" => $session_cookie, expires => "72 hours";
+    cookie "LoginMethod" => 'session';
     redirect '/' => 303;
 };
 

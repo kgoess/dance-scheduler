@@ -30,9 +30,9 @@ plugin_keywords can_edit_event => sub {
                 }
                 my $email = $res->{email};
             }
-            when ('facebook') {
-                ...
-            }
+            #when ('facebook') {
+            #    ...
+            #}
             when ('session') {
                 my $session_cookie = $self->cookie("LoginSession")
                     or return $self->send_error('Missing LoginSession cookie', 400);
