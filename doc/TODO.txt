@@ -43,10 +43,10 @@ phase I:
  - sort out abuse of the 'band' column
  - return a fresh object from the db, not the one that was submitted
  - find other TODOs/FIXMEs in the code
- DONE- need an event url for display in https://bacds.org/scripts/dancefinder.pl,
+ DONE need an event url for display in https://bacds.org/scripts/dancefinder.pl,
    called out by Alan's change 904dd65c6e832 in
    git:/var/lib/git/bacds.org-scripts/
- DONE- add a "pricing" textbox to events
+ DONE add a "pricing" textbox to events
  DONE add "manager name" to series
  - talk about "sidebar", see a47b7c918239
     -- add "directions" field to venues
@@ -61,6 +61,10 @@ phase I:
  - add "help" buttons to the UI?
  - need CLI tool for password management
  - need permissions to edit a standalone event without a series
+ - fill in the 401 unauthorized error page 401.html
+ - care that they're logged in
+ DONE hook up the bacds login form
+ DONE CLI utility to manage username/pw
 
 phase II:
 
