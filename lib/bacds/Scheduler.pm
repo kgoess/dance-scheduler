@@ -48,8 +48,8 @@ an account to continue to bacds.org" page.
 
 Continuing with that will redirect you here.
 
-This page will verify your credential information and set up a
-session TBD
+This endpoint will verify your credential information and set up a
+session.
 
 =cut
 
@@ -78,8 +78,8 @@ will show a login-with-facebook button and others.
 
 Click on that facebook button and after logging in to facebok it'll redirect you here.
 
-This page will verify your credential information and set up a
-session TBD
+This endpoint will verify your credential information and set up a
+session.
 
 =cut
 
@@ -103,6 +103,37 @@ post '/facebook-signin' => sub {
     cookie "LoginMethod" => 'session';
     redirect '/' => 303;
 };
+
+=head2 bacds-signin
+
+login credential checking redirector
+
+A request to signin.html will show a login-with-bacds button
+and others. Submitting the bacds login form ends up here.
+
+=cut
+
+post '/bacds-signin' => sub {
+    my $programmer_email = params->{programmer_email}
+        or send_error 'missing parameter "programmer_email"' => 400;
+    my $password = params->{password}
+        or send_error 'missing parameter "password"' => 400;
+
+    my ($email, $err) = bacds::Scheduler::FederatedAuth->check_bacds_auth($programmer_email, $password);
+
+    if ($err) {
+        my ($code, $msg) = @$err;
+        warn "login failure for $programmer_email: $msg\n";
+        send_error $msg => $code;
+    }
+
+    my $session_cookie = bacds::Scheduler::FederatedAuth->create_session_cookie($email);
+
+    cookie "LoginSession" => $session_cookie, expires => "72 hours";
+    cookie "LoginMethod" => 'session';
+    redirect '/' => 303;
+};
+
 
 =head2 login page
 

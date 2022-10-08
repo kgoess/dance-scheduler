@@ -26,7 +26,7 @@ sub setup_test_db{
 
     my $test_db = "$Bin/testdbs/testdb.$test_script.sqlite";
 
-    unlink $test_db;
+    unlink $test_db or die "can't unlink $test_db $!";
 
     $ENV{TEST_DSN} = "dbi:SQLite:dbname=$test_db";
     # load an on-disk test database and deploy the required tables
@@ -36,9 +36,9 @@ sub setup_test_db{
 
     my $dbh = get_dbh();
     my $new = $dbh->resultset('Programmer')->new({
-        name => 'Peter Programmer',
+        name => 'Peter Admin',
         is_superuser => 1,
-        email => 'peterprogrammer@test.com',
+        email => 'petertheadmin@test.com',
         is_deleted => 0,
     });
 
@@ -47,7 +47,7 @@ sub setup_test_db{
 
 sub auth_cookie {
     state $session_cookie = bacds::Scheduler::FederatedAuth
-        ->create_session_cookie('peterprogrammer@test.com');
+        ->create_session_cookie('petertheadmin@test.com');
 
     return Cookie => "LoginMethod=session;LoginSession=$session_cookie"
 }

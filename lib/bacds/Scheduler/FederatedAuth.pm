@@ -50,8 +50,10 @@ use warnings;
 
 use Crypt::JWT qw/decode_jwt/;
 use Crypt::CBC;
-use Data::UUID;
 use Data::Dump qw/dump/;
+use Data::Entropy::Algorithms qw(rand_bits); # recommended by Digest::Bcrypt
+use Data::UUID;
+use Digest;
 use Facebook::OpenGraph;
 use Furl;
 use HTTP::Request::Common;
@@ -284,6 +286,76 @@ sub _get_facebook_secret {
         return $secret;
     }
     die "please put the Facebook API secret into either ~/.facebook-secret or $system_path"
+}
+
+=head2 check_bacds_auth
+
+Compare the incoming email+password to the database and return ($email, $err).
+
+=cut
+
+sub check_bacds_auth {
+    shift if $_[0] eq __PACKAGE__;
+    my ($email_param, $password_param) = @_;
+
+    my $dbh = get_dbh();
+    my $rs = $dbh->resultset('Programmer')->search({
+        email => $email_param
+    });
+
+    my $programmer = $rs->first or return undef, [401, "No programmer found for '$email_param'"];
+    $programmer->is_deleted and return undef, [403, "The account for '$email_param' is deleted"];
+    $programmer->password_hash or return undef, [403,
+         'Please use google or facebook to login, or ask webmaster@ about dance-scheduler-user-password.pl'
+    ];
+
+    # FIXME we're being an oracle. should return something more vague?
+    password_matches($password_param, $programmer->password_hash)
+         or return undef, [401, 'Incorrect password'] ;
+
+    return $programmer->email;
+}
+
+=head2 password_matches
+
+Returns boolean checking that the incoming pw parameter
+jibes with the entry in the database of "$alg=$salt=$hash"
+
+=cut
+
+sub password_matches {
+    shift if $_[0] eq __PACKAGE__;
+    my ($pw_param, $existing_pw_data) = @_;
+
+    my ($alg, $data) = split /=/, $existing_pw_data, 2;
+    if ($alg eq 'bcrypt') {
+        my ($salt_b64, $existing_b64) = split /=/, $data, 2;
+        my $salt = decode_base64url($salt_b64);
+
+        my $bcrypt = Digest->new('Bcrypt', cost => 12, salt => $salt);
+        $bcrypt->add($pw_param);
+        return $bcrypt->b64digest eq $existing_b64;
+    }
+}
+
+=head2 make_password_entry
+
+We'll store the passwords as:
+
+    'bcrypt=$salt=$hash
+
+See https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html and perldoc Digest::Bcrypt
+
+=cut
+sub make_password_entry {
+    shift if $_[0] eq __PACKAGE__;
+    my ($password) = @_;
+
+    my $salt = rand_bits(16*8);
+    my $bcrypt = Digest->new('Bcrypt', cost => 12, salt => $salt);
+    $bcrypt->add($password);
+    my $salt_b64 = encode_base64url($salt);
+    return join '=', 'bcrypt', $salt_b64, $bcrypt->b64digest;
 }
 
 sub cipher {
