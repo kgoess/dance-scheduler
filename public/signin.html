@@ -1,98 +1,109 @@
 <html>
     <head>
+        <style>
+            .main-box{
+                border: 1px solid grey;
+                padding: 3px;
+                width: fit-content;
+                margin: auto;
+            }
+            .one-button{
+                width: fit-content;
+                margin: 1em auto;
+            }
+            .login-div{
+                width: fit-content;
+                margin: auto;
+            }
+            .login-div button{
+                margin: auto;
+            }
+
+        </style>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <!-- Load the facebook JS SDK asynchronously -->
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+        <script>
+            function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
+                console.log('statusChangeCallback');
+                console.log(response);                   // The current login status of the person.
+                if (response.status === 'connected') {   // Logged into your webpage and Facebook.
+                    loginToScheduler(response); 
+                } else {                                 // Not logged into your webpage or we are unable to tell.
+                    document.getElementById('status').innerHTML = 'Your are not logged in to Facebook';
+                }
+            }
+
+
+            function checkLoginState() {               // Called when a person is finished with the Login Button.
+                FB.getLoginStatus(function(response) {   // See the onlogin handler
+                    statusChangeCallback(response);
+                });
+            }
+
+
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : '430760472446636',
+                    cookie     : true,               // Enable cookies to allow the server to access the session.
+                    xfbml      : true,               // Parse social plugins on this webpage.
+                    version    : 'v14.0'             // Use this Graph API version for this call.
+                });
+            };
+
+            /* response is:
+            {
+                authResponse: {
+                    accessToken: "EAAG...pMZD"
+                    data_access_expiration_time: 1669602192
+                    expiresIn: 5808
+                    graphDomain: "facebook"
+                    signedRequest: "SomJVc...xOTJ9"
+                    userID: "10160221707369379"
+                }
+            }
+            */
+            function loginToScheduler(response) {
+                console.log("authResponse is ", response);
+                const accessToken = response.authResponse.accessToken;
+                document.getElementById('facebook-access-token').setAttribute('value', accessToken);
+                console.log(accessToken);
+                document.getElementById('facebook-login-form').submit();
+                // document.getElementById('status').innerHTML = 'Logging you into BACDS Dance Scheduler via Facebook...';
+                // FB.api('/me', function(response) {
+                //   response is {name: 'Kevin Goess', id: '10160221707369379'}
+                // });
+            }
+        </script>
     </head>
     <body>
-
-        <div>
-            <!-- google login button -->
-            <div id="g_id_onload"
-                 data-client_id="1098017941996-inv98s0als8ikk474e2tm6b2necuna1g.apps.googleusercontent.com"
-                 data-ux_mode="redirect"
-                 data-login_uri="https://www.bacds.org/dance-scheduler/google-signin">
+        <div class="main-box">
+            <div class="google one-button"><!-- google login button -->
+                <div id="g_id_onload"
+                     data-client_id="1098017941996-inv98s0als8ikk474e2tm6b2necuna1g.apps.googleusercontent.com"
+                     data-ux_mode="redirect"
+                     data-login_uri="https://www.bacds.org/dance-scheduler/google-signin">
+                </div>
+                <div class="g_id_signin" data-type="standard"></div>
             </div>
-            <div class="g_id_signin" data-type="standard"></div>
+            <div class="facebook one-button"><!-- facebook login button --->
+                <!-- The JS SDK Login Button -->
+                <fb:login-button scope="public_profile,email" onlogin="checkLoginState();" data-size="large"
+                    data-button-type="continue_with" data-layout="rounded" data-auto-logout-link="false"
+                    data-use-continue-as="true">
+                </fb:login-button>
+                <form id="facebook-login-form" method="POST" action="https://www.bacds.org/dance-scheduler/facebook-signin">
+                    <input id="facebook-access-token" name="access_token" value="" type="hidden">
+                </form>
+                <div id="status">
+
+            </div>
         </div>
-        <div>
-            <!-- facebook login button --->
-    <script>
-
-  function statusChangeCallback(response) {  // Called with the results from FB.getLoginStatus().
-    console.log('statusChangeCallback');
-    console.log(response);                   // The current login status of the person.
-    if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-      loginToScheduler(response);  
-    } else {                                 // Not logged into your webpage or we are unable to tell.
-      document.getElementById('status').innerHTML = 'Your are not logged in to Facebook';
-    }
-  }
-
-
-  function checkLoginState() {               // Called when a person is finished with the Login Button.
-    FB.getLoginStatus(function(response) {   // See the onlogin handler
-      statusChangeCallback(response);
-    });
-  }
-
-
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '430760472446636',
-      cookie     : true,               // Enable cookies to allow the server to access the session.
-      xfbml      : true,               // Parse social plugins on this webpage.
-      version    : 'v14.0'             // Use this Graph API version for this call.
-    });
-
-
-  };
- 
-  /* response is:
-    {
-      authResponse: {
-        accessToken: "EAAG...pMZD"
-        data_access_expiration_time: 1669602192
-        expiresIn: 5808
-        graphDomain: "facebook"
-        signedRequest: "SomJVc...xOTJ9"
-        userID: "10160221707369379"
-      }
-    }
-  */
-  function loginToScheduler(response) {
-        console.log("authResponse is ", response);
-      const accessToken = response.authResponse.accessToken;
-      document.getElementById('facebook-access-token').setAttribute('value', accessToken);
-      console.log(accessToken);
-      document.getElementById('facebook-login-form').submit();
-      // document.getElementById('status').innerHTML = 'Logging you into BACDS Dance Scheduler via Facebook...';
-      // FB.api('/me', function(response) {
-      //   response is {name: 'Kevin Goess', id: '10160221707369379'}
-      // });
-  }
-
-</script>
-
-<!-- The JS SDK Login Button -->
-
-<fb:login-button scope="public_profile,email" onlogin="checkLoginState();"
-data-size="large"
-data-button-type="continue_with" data-layout="rounded" data-auto-logout-link="false" data-use-continue-as="true"
->
-</fb:login-button>
-
-<form id="facebook-login-form" method="POST" action="https://www.bacds.org/dance-scheduler/facebook-signin">
-    <input id="facebook-access-token" name="access_token" value="" type="hidden">
-</form>
-<div id="status">
-</div>
-
-<!-- Load the JS SDK asynchronously -->
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-
+        <div class="bacds one-button">
+            <button onclick="document.location='bacds-signin.html'">Login via BACDS</button>
+        </div>
         <div>
             FIXME need a logout button (facebook policy)
-        </div>
-
         </div>
     </body>
 </html>
