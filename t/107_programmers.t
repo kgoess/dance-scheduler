@@ -72,32 +72,32 @@ my $Series3 = $dbh->resultset('Series')->new({
 $Series3->insert;
 
 
-subtest 'Invalid GET /programmer/1' => sub{
+# note that setup_test_db adds a programmer to seed the table
+subtest 'Invalid GET /programmer/2' => sub {
     plan tests=>2;
 
     my ($res, $decoded, $got, $expected);
-    $res = $test->request( GET '/programmer/1' );
+    $res = $test->request( GET '/programmer/2' );
     ok($res->is_success, 'returned success');
 
     $decoded = decode_json($res->content);
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing Found for programmer_id 1',
+            msg => 'Nothing Found for programmer_id 2',
             num => 3200,
         }]
     };
     eq_or_diff $decoded, $expected, 'error msg matches';
 };
 
-subtest 'POST /programmer' => sub{
+subtest 'POST /programmer' => sub {
     plan tests=>2;
 
     my ($expected, $res, $decoded, $got);
     my $new_programmer = {
         name          => 'alice programmer',
         email         => 'alice@test.com',
-        password_hash => 'thisisthepasswordhash',
         is_superuser  => 1,
         programmer_id => '', # the webapp sends name=test+programmer&programmer_id=
     };
@@ -109,7 +109,7 @@ subtest 'POST /programmer' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        programmer_id    => 1,
+        programmer_id    => 2,
         name         => $new_programmer->{name},
         email        => $new_programmer->{email},
         is_superuser => $new_programmer->{is_superuser},
@@ -117,6 +117,7 @@ subtest 'POST /programmer' => sub{
         modified_ts  => $Created_Time,
         events       => [],
         series       => [],
+        events       => [],
         is_deleted   => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
@@ -126,7 +127,7 @@ subtest 'POST /programmer' => sub{
     $Programmer_Id = $Programmer->programmer_id;
 };
 
-subtest 'POST /programmer with series' => sub{
+subtest 'POST /programmer with series' => sub {
     plan tests=>2;
 
     my ($expected, $res, $decoded, $got);
@@ -146,7 +147,7 @@ subtest 'POST /programmer with series' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        programmer_id => 2,
+        programmer_id => 3,
         name          => $new_programmer->{name},
         email         => $new_programmer->{email},
         is_superuser  => $new_programmer->{is_superuser},
@@ -163,6 +164,7 @@ subtest 'POST /programmer with series' => sub{
                 name => $Series2->name,
             },
         ],
+        events       => [],
         is_deleted   => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
@@ -218,7 +220,7 @@ subtest 'POST /programmer with events' => sub{
     $Programmer_With_Event_Id = $Programmer_With_Event->programmer_id;
 };
 
-subtest 'GET /programmer/1' => sub{
+subtest 'GET /programmer/2' => sub {
     plan tests=>2;
 
     my ($res, $decoded, $got, $expected);
@@ -238,11 +240,12 @@ subtest 'GET /programmer/1' => sub{
         is_deleted     => 0,
         events         => [],
         series         => [],
+        events         => [],
     };
     eq_or_diff $got, $expected, 'return matches';
 };
 
-subtest 'GET /programmer/2 (with series)' => sub{
+subtest 'GET /programmer/2 (with series)' => sub {
     plan tests=>2;
 
     my ($res, $decoded, $got, $expected);
@@ -271,6 +274,7 @@ subtest 'GET /programmer/2 (with series)' => sub{
                 name => $Series2->name,
             },
         ],
+        events => [],
     };
     eq_or_diff $got, $expected, 'return matches';
 };
@@ -374,6 +378,7 @@ subtest 'PUT /programmer/# 2 (with series)' => sub {
                 name => $Series3->name,
             },
         ],
+        events      => [],
         created_ts  => $Created_Time,
         modified_ts => $Modified_Time_With_Series,
         is_deleted  => 0,
@@ -434,7 +439,7 @@ subtest 'PUT /programmer/# 3 (with events)' => sub {
     $Programmer = $dbh->resultset('Programmer')->find($Programmer_Id);
 };
 
-subtest 'GET /programmerAll' => sub{
+subtest 'GET /programmerAll' => sub {
     plan tests => 2;
 
     my ($res, $decoded, $got, $expected);
@@ -443,6 +448,7 @@ subtest 'GET /programmerAll' => sub{
 
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
+    $got = [ grep { $_->{email} ne 'petertheadmin@test.com' } @$got ];
     $expected = [
       {
         programmer_id => $Programmer_With_Series_Id,
