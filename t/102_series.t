@@ -17,7 +17,7 @@ use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-use bacds::Scheduler::Util::TestDb qw/setup_test_db/;
+use bacds::Scheduler::Util::Test qw/setup_test_db/;
 setup_test_db;
 
 my $app = bacds::Scheduler->to_app;

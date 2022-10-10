@@ -14,7 +14,7 @@ use Test::Warn;
 use bacds::Scheduler;
 use bacds::Scheduler::Auth;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
-use bacds::Scheduler::Util::TestDb qw/setup_test_db/;
+use bacds::Scheduler::Util::Test qw/setup_test_db/;
 setup_test_db;
 
 $ENV{TEST_CACHE_PATH} = "$Bin/cache"; # s/b t/cache/

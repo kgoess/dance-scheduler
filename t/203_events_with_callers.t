@@ -13,13 +13,11 @@ use Test::More tests => 5;
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
-use bacds::Scheduler::Util::TestDb qw/setup_test_db GET POST PUT/;
+use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
 use bacds::Scheduler::Util::Time qw/get_now/;
 
 setup_test_db;
-
-my $app = bacds::Scheduler->to_app;
-my $test = Plack::Test->create($app);
+my $test = get_tester(auth => 1);
 my $dbh = get_dbh();
 
 my ($Event, $Callered_Event);
@@ -29,9 +27,9 @@ my ($Caller_Id);
 
 # this could just use DBIx::Class to insert it directly
 subtest 'POST /event' => sub {
-    plan tests=>2;
+    plan tests => 3;
 
-    my ($expected, $res, $decoded, $got);
+    my ($expected, $decoded, $got);
 
     my $new_event = {
         start_date  => "2022-05-01",
@@ -44,9 +42,9 @@ subtest 'POST /event' => sub {
         is_canceled => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
-    $res = $test->request(POST '/event/', $new_event );
-    ok($res->is_success, 'returned success');
-    $decoded = decode_json($res->content);
+    $test->post_ok('/event/', $new_event );
+    ok($test->success, 'returned success');
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
     $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $expected = {
@@ -81,16 +79,16 @@ subtest 'POST /event' => sub {
 
 
 subtest 'POST /caller' => sub {
-    my ($res, $decoded, $got);
+    my ($decoded, $got);
 
     my $new_caller = {
         name       => 'Rose Gamgee',
         frequency  => 'fourth Trewsday',
         
     };
-    $res = $test->request(POST '/caller/', $new_caller );
-    ok($res->is_success, 'created caller');
-    $decoded = decode_json($res->content);
+    $test->post_ok('/caller/', $new_caller );
+    ok($test->success, 'created caller');
+    $decoded = decode_json($test->content);
     $Caller_Id = $decoded->{data}{caller_id};
     $got = $decoded->{data};
 
@@ -108,9 +106,9 @@ subtest 'POST /caller' => sub {
 };
 
 subtest 'POST /event/# with caller' => sub {
-    plan tests => 2;
+    plan tests => 3;
 
-    my ($res, $decoded, $got);
+    my ($decoded, $got);
 
     my $new_event = {
         start_date  => "2022-05-03",
@@ -126,9 +124,9 @@ subtest 'POST /event/# with caller' => sub {
     my $now_ts = DateTime
         ->from_epoch(epoch => $ENV{TEST_NOW})
         ->iso8601;
-    $res = $test->request(POST '/event/', $new_event );
-    ok($res->is_success, 'returned success');
-    $decoded = decode_json($res->content);
+    $test->post_ok('/event/', $new_event );
+    ok($test->success, 'returned success');
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
 
     $Callered_Event_Id = $got->{event_id},
@@ -148,13 +146,13 @@ subtest 'POST /event/# with caller' => sub {
 };
 
 subtest "GET /event/# with caller" => sub {
-    plan tests=>2;
+    plan tests => 3;
 
-    my ($expected, $res, $decoded, $got);
+    my ($expected, $decoded, $got);
 
-    $res  = $test->request( GET "/event/$Callered_Event_Id" );
-    ok( $res->is_success, 'returned success' );
-    $decoded = decode_json($res->content);
+    $test->get_ok("/event/$Callered_Event_Id" );
+    ok( $test->success, 'returned success' );
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
     $expected = {
         callers => [
@@ -169,18 +167,18 @@ subtest "GET /event/# with caller" => sub {
 };
 
 subtest "PUT /event/# with caller" => sub {
-    plan tests => 4;
+    plan tests => 7;
 
-    my ($expected, $modified_time, $res, $decoded, $got);
+    my ($expected, $modified_time, $decoded, $got);
 
     my $other_caller = {
         name        => 'Daffodil Brandybuck',
         frequency   => 'monthly',
     };
-    $res = $test->request(POST '/caller/', $other_caller );
-    ok($res->is_success, 'created caller');
+    $test->post_ok('/caller/', $other_caller );
+    ok($test->success, 'created caller');
 
-    $decoded = decode_json($res->content);
+    $decoded = decode_json($test->content);
     my $other_caller_id = $decoded->{data}{caller_id};
 
     my $edit_event = {
@@ -197,9 +195,9 @@ subtest "PUT /event/# with caller" => sub {
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
-    $res = $test->request( PUT "/event/$Callered_Event_Id" , content => $edit_event);
-    ok( $res->is_success, 'returned success' );
-    $decoded = decode_json($res->content);
+    $test->put_ok("/event/$Callered_Event_Id" , { content => $edit_event });
+    ok( $test->success, 'returned success' );
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
     $expected = {
         callers => [
@@ -211,8 +209,8 @@ subtest "PUT /event/# with caller" => sub {
     };
     eq_or_diff $got->{callers}, $expected->{callers}, 'return matches';
 
-    $res  = $test->request( GET "/event/$Callered_Event_Id" );
-    $decoded = decode_json($res->content);
+    $test->get_ok("/event/$Callered_Event_Id" );
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
 
     eq_or_diff $got->{callers}, $expected->{callers}, 'GET changed after PUT';

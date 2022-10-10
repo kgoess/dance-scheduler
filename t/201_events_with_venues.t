@@ -15,11 +15,10 @@ use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-use bacds::Scheduler::Util::TestDb qw/setup_test_db GET POST PUT/;
+use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
 setup_test_db;
+my $test = get_tester(auth => 1);
 
-my $app = bacds::Scheduler->to_app;
-my $test = Plack::Test->create($app);
 my $dbh = get_dbh();
 
 my ($Event, $Venued_Event);
@@ -30,9 +29,9 @@ my ($Venue_Id, $Venue_Vkey);
 # We've already tested POST /event in 200_events.t, so
 # this could just use DBIx::Class to insert it directly
 subtest 'POST /event' => sub {
-    plan tests=>2;
+    plan tests => 3;
 
-    my ($expected, $created_time, $res, $decoded, $got);
+    my ($expected, $created_time, $decoded, $got);
 
     my $new_event = {
         start_date  => "2022-05-01",
@@ -45,9 +44,9 @@ subtest 'POST /event' => sub {
         series_id   => undef,
     };
     $ENV{TEST_NOW} = 1651112285;
-    $res = $test->request(POST '/event/', $new_event );
-    ok($res->is_success, 'returned success');
-    $decoded = decode_json($res->content);
+    $test->post_ok('/event/', $new_event );
+    ok($test->success, 'returned success');
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
     $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $expected = {
@@ -81,9 +80,9 @@ subtest 'POST /event' => sub {
 # ******* Now adding venues *******
 
 subtest 'POST /event/# with venues' => sub{
-    plan tests => 5;
+    plan tests => 7;
 
-    my ($new_venue, $res, $decoded, $got, $created_time);
+    my ($new_venue, $decoded, $got, $created_time);
 
     $new_venue = {
         vkey        => 'VXX',
@@ -96,9 +95,9 @@ subtest 'POST /event/# with venues' => sub{
         programmer_notes => 'blah blah',
         is_deleted  => 0,
     };
-    $res = $test->request(POST '/venue/', $new_venue );
-    ok($res->is_success, 'created venue');
-    $decoded = decode_json($res->content);
+    $test->post_ok('/venue/', $new_venue );
+    ok($test->success, 'created venue');
+    $decoded = decode_json($test->content);
     $Venue_Id = $decoded->{data}{venue_id};
     $Venue_Vkey = $decoded->{data}{vkey};
     $got = {};
@@ -144,9 +143,9 @@ subtest 'POST /event/# with venues' => sub{
     my $now_ts = DateTime
         ->from_epoch(epoch => $ENV{TEST_NOW})
         ->iso8601;
-    $res = $test->request(POST '/event/', $new_event );
-    ok($res->is_success, 'returned success');
-    $decoded = decode_json($res->content);
+    $test->post_ok('/event/', $new_event );
+    ok($test->success, 'returned success');
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
 
     $Venued_Event_Id = $got->{event_id},
@@ -165,13 +164,13 @@ subtest 'POST /event/# with venues' => sub{
 };
 
 subtest "GET /event/# with venues" => sub {
-    plan tests => 3;
+    plan tests => 4;
 
-    my ($expected, $res, $decoded, $got);
+    my ($expected, $decoded, $got);
 
-    $res  = $test->request( GET "/event/$Venued_Event_Id" );
-    ok( $res->is_success, 'returned success' );
-    $decoded = decode_json($res->content);
+    $test->get_ok("/event/$Venued_Event_Id" );
+    ok( $test->success, 'returned success' );
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
     $expected = {
         venues      => [{
@@ -186,9 +185,9 @@ subtest "GET /event/# with venues" => sub {
 
 
 subtest "PUT /event/# with venues" => sub {
-    plan tests => 5;
+    plan tests => 8;
 
-    my ($expected, $created_time, $modified_time, $res, $decoded, $got);
+    my ($expected, $created_time, $modified_time, $decoded, $got);
 
     my $other_venue = {
         vkey        => 'VZZ',
@@ -199,10 +198,10 @@ subtest "PUT /event/# with venues" => sub {
         comment     => 'this is the comment',
         is_deleted  => 0,
     };
-    $res = $test->request(POST '/venue/', $other_venue );
-    ok($res->is_success, 'created venue') or die $res->content;
+    $test->post_ok('/venue/', $other_venue );
+    ok($test->success, 'created venue') or die $test->content;
 
-    $decoded = decode_json($res->content);
+    $decoded = decode_json($test->content);
     my $other_venue_id = $decoded->{data}{venue_id};
 
     my $edit_event = {
@@ -218,9 +217,9 @@ subtest "PUT /event/# with venues" => sub {
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
-    $res = $test->request( PUT "/event/$Venued_Event_Id" , content => $edit_event);
-    ok( $res->is_success, 'returned success' ) or die $res->content;
-    $decoded = decode_json($res->content);
+    $test->put_ok("/event/$Venued_Event_Id" , {content => $edit_event});
+    ok( $test->success, 'returned success' ) or die $test->content;
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
     $expected = {
         venues      => [
@@ -237,8 +236,8 @@ subtest "PUT /event/# with venues" => sub {
     is $got->{event_id}, $Venued_Event_Id, "that's the right event";
     eq_or_diff $got->{venues}, $expected->{venues}, 'return matches';
 
-    $res  = $test->request( GET "/event/$Venued_Event_Id" );
-    $decoded = decode_json($res->content);
+    $test->get_ok("/event/$Venued_Event_Id" );
+    $decoded = decode_json($test->content);
     $got = $decoded->{data};
 
     eq_or_diff $got->{venues}, $expected->{venues}, 'GET changed after PUT';

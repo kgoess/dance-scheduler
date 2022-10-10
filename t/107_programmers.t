@@ -16,7 +16,7 @@ use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-use bacds::Scheduler::Util::TestDb qw/setup_test_db/;
+use bacds::Scheduler::Util::Test qw/get_tester setup_test_db/;
 setup_test_db;
 
 my $app = bacds::Scheduler->to_app;
@@ -103,7 +103,7 @@ subtest 'POST /programmer' => sub {
     };
     $ENV{TEST_NOW} = 1651112285;
     $Created_Time = get_now()->iso8601;
-    $res = $test->request(POST '/programmer/', $new_programmer );
+    $res = $atest->request(POST '/programmer/', $new_programmer );
     ok($res->is_success, 'returned success');
 
     $decoded = decode_json($res->content);
@@ -129,6 +129,8 @@ subtest 'POST /programmer' => sub {
 
 subtest 'POST /programmer with series' => sub {
     plan tests=>2;
+
+    my $atest = get_tester(auth => 1);
 
     my ($expected, $res, $decoded, $got);
     my $new_programmer = {

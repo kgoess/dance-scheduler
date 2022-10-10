@@ -16,6 +16,10 @@ WriteMakefile(
       ? ('LICENSE'=> 'perl')
       : ()),
     PL_FILES            => {},
+    BUILD_REQUIRES => {
+        'Test::WWW::Mechanize::PSGI' => 0,
+        'LWP::ConsoleLogger::Easy' => 0,
+    },
     PREREQ_PM => {
         'Class::Accessor::Lite' => 0,
         'Clone' => 0,

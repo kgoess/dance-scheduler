@@ -13,14 +13,12 @@ use Test::More tests => 7;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
-use bacds::Scheduler::Util::TestDb qw/setup_test_db GET POST PUT/;
+use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-my $app = bacds::Scheduler->to_app;
-my $test = Plack::Test->create($app);
-
 setup_test_db;
+my $test = get_tester(auth => 1);
 
 my $dbh = get_dbh();
 
@@ -30,11 +28,10 @@ my ($Event_Id, $Second_Event_Id);
 subtest 'Invalid GET /event/1' => sub{
     plan tests=>2;
 
-    my ($res, $decoded, $expected);
+    my ($decoded, $expected);
 
-    $res = $test->request( GET '/event/1' );
-    ok($res->is_success, 'returned success');
-    $decoded = decode_json($res->content);
+    $test->get_ok('/event/1', '/event/1 returned success');
+    $decoded = decode_json($test->content);
     $expected = {
         data => '',
         errors => [{
@@ -48,7 +45,7 @@ subtest 'Invalid GET /event/1' => sub{
 subtest 'POST /event' => sub {
     plan tests=>2;
 
-    my ($expected, $created_time, $res, $decoded, $got);
+    my ($expected, $created_time, $decoded, $got);
 
     my $new_event = {
         event_id       => '', # this should be ignored by the model
@@ -64,9 +61,8 @@ subtest 'POST /event' => sub {
         synthetic_name => 'Saturday Night Test',
     };
     $ENV{TEST_NOW} = 1651112285;
-    $res = $test->request(POST '/event/', $new_event );
-    ok($res->is_success, 'returned success');
-    $decoded = decode_json($res->content);
+    $test->post_ok('/event/', $new_event, 'post to /event/ returned success' );
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     $expected = {
         event_id       => 1,
@@ -103,11 +99,10 @@ subtest 'POST /event' => sub {
 subtest "GET /event/#" => sub{
     plan tests=>2;
 
-    my ($res, $decoded, $got, $expected);
+    my ($decoded, $got, $expected);
 
-    $res  = $test->request( GET "/event/$Event_Id" );
-    ok( $res->is_success, 'returned success' );
-    $decoded = decode_json($res->content); 
+    $test->get_ok("/event/$Event_Id", "GET /event/$Event_Id ok");
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
 
     $expected = {
@@ -140,9 +135,9 @@ subtest "GET /event/#" => sub{
 
 
 subtest "PUT /event/#" => sub {
-    plan tests => 3;
+    plan tests => 4;
 
-    my ($expected, $modified_time, $created_time, $res, $decoded, $got);
+    my ($expected, $modified_time, $created_time, $decoded, $got);
 
     $created_time = get_now();
 
@@ -159,10 +154,10 @@ subtest "PUT /event/#" => sub {
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
-    $res = $test->request( PUT '/event/1' , content => $edit_event);
-    ok( $res->is_success, 'returned success' ) or die $res->content;
+    $test->put_ok('/event/1', { content => $edit_event })
+        or die $test->res->content;
 
-    $decoded = decode_json($res->content);
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $expected = {
@@ -189,8 +184,8 @@ subtest "PUT /event/#" => sub {
     };
     eq_or_diff $got, $expected, 'return matches';
 
-    $res  = $test->request( GET "/event/$Event_Id" );
-    $decoded = decode_json($res->content); 
+    $test->get_ok("/event/$Event_Id" );
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     eq_or_diff $got, $expected, 'GET changed after PUT';
@@ -202,9 +197,9 @@ subtest "PUT /event/#" => sub {
 
 
 subtest 'POST /event #2' => sub{
-    plan tests=>3;
+    plan tests => 4;
 
-    my ($expected, $res, $decoded, $got);
+    my ($expected, $decoded, $got);
 
     my $new_event = {
         start_date  => "2022-05-03",
@@ -219,10 +214,9 @@ subtest 'POST /event #2' => sub{
     my $now_ts = DateTime
         ->from_epoch(epoch => $ENV{TEST_NOW})
         ->iso8601;
-    $res = $test->request(POST '/event/', $new_event );
-    ok($res->is_success, 'returned success');
+    $test->post_ok('/event/', $new_event, 'POST /event returned ok' );
 
-    $decoded = decode_json($res->content);
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     $Second_Event_Id = $got->{event_id};
@@ -250,8 +244,8 @@ subtest 'POST /event #2' => sub{
 
     $Second_Event = $dbh->resultset('Event')->find($Second_Event_Id);
 
-    $res = $test->request(GET '/event/'.$Second_Event_Id);
-    $decoded = decode_json($res->content);
+    $test->get_ok('/event/'.$Second_Event_Id);
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     $got = { map { $_ => $got->{$_} } grep { defined $got->{$_} } keys %$got };
     eq_or_diff $got, $expected, 'return from GET matches';
@@ -261,11 +255,10 @@ subtest 'POST /event #2' => sub{
 subtest 'GET /eventAll' => sub {
     plan tests => 2;
 
-    my ($res, $expected, $decoded, $got);
+    my ($expected, $decoded, $got);
 
-    $res  = $test->request( GET '/eventAll' );
-    ok( $res->is_success, 'Returned success' );
-    $decoded = decode_json($res->content);
+    $test->get_ok('/eventAll', 'GET /eventAll returned ok');
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     $expected = [
       {
@@ -309,7 +302,7 @@ subtest 'GET /eventAll' => sub {
 
 
 subtest 'GET /eventsUpcoming' => sub {
-    plan tests => 5;
+    plan tests => 9;
 
     # could these tests all have independent data?
 
@@ -323,25 +316,25 @@ subtest 'GET /eventsUpcoming' => sub {
     );
     $ENV{TEST_NOW} = $now->epoch;
 
-    $res  = $test->request( GET '/eventsUpcoming' );
-    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
-    $decoded = decode_json($res->content);
+    $test->get_ok('/eventsUpcoming', 'GET /eventsUpcoming ok')
+        or die "GET /eventsUpcoming failed: ".$test->res->content;
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     is @$got, 2, "both events are in the future from $now";
 
     $now = $now->add(days => 1);
     $ENV{TEST_NOW} = $now->epoch;
-    $res  = $test->request( GET '/eventsUpcoming' );
-    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
-    $decoded = decode_json($res->content);
+    $test->get_ok('/eventsUpcoming', 'get /eventsUpcoming ok')
+        or die "GET /eventsUpcoming failed: ".$test->res->content;
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     is @$got, 2, "both events are still 'upcoming' from $now";
 
     $now = $now->add(days => 1);
     $ENV{TEST_NOW} = $now->epoch;
-    $res  = $test->request( GET '/eventsUpcoming' );
-    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
-    $decoded = decode_json($res->content);
+    $test->get_ok('/eventsUpcoming', 'get /eventsUpcoming ok')
+        or die "GET /eventsUpcoming failed: ".$test->res->content;
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     is @$got, 1, "only one event is future from $now";
     is $got->[0]{event_id}, $Second_Event_Id, "and it's the 'second event'";
@@ -349,10 +342,9 @@ subtest 'GET /eventsUpcoming' => sub {
 
     $now = $now->add(days => 2);
     $ENV{TEST_NOW} = $now->epoch;
-    $res  = $test->request( GET '/eventsUpcoming' );
-    $res->is_success or die "GET /eventsUpcoming failed: ".$res->content;
-    $decoded = decode_json($res->content);
+    $test->get_ok('/eventsUpcoming', 'get /eventsUpcoming ok')
+        or die "GET /eventsUpcoming failed: ".$test->res->content;
+    $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     is @$got, 0, "no events are future from $now";
-
 };

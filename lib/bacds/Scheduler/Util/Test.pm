@@ -1,11 +1,22 @@
-package bacds::Scheduler::Util::TestDb;
+=head1 NAME
+
+bacds::Scheduler::Util::Test - unit test utilities
+
+=head1 EXPORTABLE FUNCTIONS
+
+=cut
+
+package bacds::Scheduler::Util::Test;
 
 use 5.16.0;
 use warnings;
 
 use File::Basename qw/basename/;
 use FindBin qw/$Bin/;
+use Test::WWW::Mechanize::PSGI;
+use LWP::ConsoleLogger::Easy qw/debug_ua/;
 
+use bacds::Scheduler;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession/;
 use bacds::Scheduler::FederatedAuth;
@@ -13,11 +24,13 @@ use bacds::Scheduler::FederatedAuth;
 use Exporter 'import';
 our @EXPORT_OK = qw/
     setup_test_db
-    GET
-    PUT
-    POST
+    get_tester
 /;
 
+
+=head2 setup_test_db
+
+=cut
 
 sub setup_test_db{
 
@@ -48,6 +61,44 @@ sub setup_test_db{
     $new->insert;
 }
 
+=head2 get_tester
+
+Returns a Test::WWW::Mechanize::PSGI object (which inherits from
+Test::WWW:Mechanize, WWW::Mechanize, and LWP::UserAgent) with max_redirect set
+to 0.
+
+Possible args:
+
+ - auth => 1 set up the LoginMethod and LoginSession cookie headers
+ - max_redirect => $c (default 0)
+ - debug => [1-8] see LWP::ConsoleLogger::Easy
+    (can also use $ENV{DEBUG_UA})
+
+=cut
+
+sub get_tester {
+    my (%args) = @_;
+
+    my $app = bacds::Scheduler->to_app;
+
+    my $max_redirect = $args{max_redirect} || 0;
+
+    my $test = Test::WWW::Mechanize::PSGI->new(
+        app => $app,
+        max_redirect => $max_redirect,
+    );
+
+    if ($args{auth}) {
+        $test->add_header(auth_cookie());
+    }
+    my $debug = $args{debug} || $ENV{DEBUG_UA};
+    if (defined $debug) {
+        debug_ua($test, $debug);
+    }
+
+    return $test;
+}
+
 sub auth_cookie {
     state $session_cookie = bacds::Scheduler::FederatedAuth
         ->create_session_cookie('petertheadmin@test.com');
@@ -55,9 +106,5 @@ sub auth_cookie {
     return Cookie => LoginMethod()."=session;".LoginSession()."=$session_cookie"
 }
 
-sub POST { HTTP::Request::Common::POST(@_, auth_cookie()) }
-sub PUT  { HTTP::Request::Common::PUT (@_, auth_cookie()) }
-sub GET  { HTTP::Request::Common::GET (@_, auth_cookie()) }
-# do other methods if needed: OPTIONS, DELETE, PATCH
 
 1;
