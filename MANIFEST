@@ -20,7 +20,7 @@ environments/production.yml
 fails.txt
 lib/bacds/.Scheduler.pm.swo
 lib/bacds/Scheduler.pm
-lib/bacds/Scheduler/Auth.pm
+lib/bacds/Scheduler/FederatedAuth.pm
 lib/bacds/Scheduler/Model.pm
 lib/bacds/Scheduler/Model/Band.pm
 lib/bacds/Scheduler/Model/Caller.pm

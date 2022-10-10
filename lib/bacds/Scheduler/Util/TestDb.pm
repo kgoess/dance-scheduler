@@ -7,6 +7,7 @@ use File::Basename qw/basename/;
 use FindBin qw/$Bin/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
+use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession/;
 use bacds::Scheduler::FederatedAuth;
 
 use Exporter 'import';
@@ -26,7 +27,9 @@ sub setup_test_db{
 
     my $test_db = "$Bin/testdbs/testdb.$test_script.sqlite";
 
-    unlink $test_db or die "can't unlink $test_db $!";
+    if (-e $test_db) {
+        unlink $test_db or die "can't unlink $test_db $!";
+    }
 
     $ENV{TEST_DSN} = "dbi:SQLite:dbname=$test_db";
     # load an on-disk test database and deploy the required tables
@@ -49,7 +52,7 @@ sub auth_cookie {
     state $session_cookie = bacds::Scheduler::FederatedAuth
         ->create_session_cookie('petertheadmin@test.com');
 
-    return Cookie => "LoginMethod=session;LoginSession=$session_cookie"
+    return Cookie => LoginMethod()."=session;".LoginSession()."=$session_cookie"
 }
 
 sub POST { HTTP::Request::Common::POST(@_, auth_cookie()) }

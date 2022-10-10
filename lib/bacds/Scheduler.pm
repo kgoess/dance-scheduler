@@ -17,12 +17,13 @@ These are the url endpoints for the app.
 =cut
 
 package bacds::Scheduler;
-#All error nums in this file are 1###
+
 use 5.16.0;
 use warnings;
 
 use Dancer2;
 use Dancer2::Core::Cookie;
+use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Data::Dump qw/dump/;
 
 use bacds::Scheduler::FederatedAuth;
@@ -33,8 +34,56 @@ use bacds::Scheduler::Model::ParentOrg;
 use bacds::Scheduler::Model::Programmer;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
+use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
 
 our $VERSION = '0.1';
+
+=head2 before hook
+
+The "before" hook is set up to catch every dancer2 request, check for the
+LoginMethod cookie and associated login cookie, and if they check out then put
+the "signed_in_as" email in the var() stash.
+
+We might not need this for static assets like images or css. Could screen
+on the Accept header, Content Negotiation.
+
+=cut
+
+hook before => sub {
+    my $login_cookie = cookie LoginMethod
+        or return;
+
+    my $login_method = $login_cookie->value;
+
+    given ($login_method) {
+        when ('google') {
+            my $google_token = cookie GoogleToken
+                or return;
+            my ($res, $err) = bacds::Scheduler::FederatedAuth
+                ->check_google_auth($google_token);
+            if ($err) {
+                my ($code, $msg) = @$err;
+                warn qq{hook before check_google_auth: "$msg" for token '$google_token"};
+                return;
+            }
+            var signed_in_as => $res->{email};
+        }
+        #when ('facebook') {
+        #    my $session_cookie = cookie LoginSession
+        #        or return;
+        #    ...
+        #}
+        when ('session') {
+            my $session_cookie = cookie LoginSession
+                or return;
+
+            my ($programmer) = bacds::Scheduler::FederatedAuth
+                ->check_session_cookie($session_cookie)
+                or return;
+            var signed_in_as => $programmer->email;
+        }
+    }
+};
 
 =head2 /google-signin
 
@@ -64,8 +113,8 @@ post '/google-signin' => sub {
         send_error $msg => $code;
     }
 
-    cookie "GoogleToken" => $jwt, expires => "72 hours";
-    cookie "LoginMethod" => 'google';
+    cookie GoogleToken, $jwt,     expires => "72 hours";
+    cookie LoginMethod, 'google', expires => "72 hours";
     redirect '/' => 303;
 };
 
@@ -99,12 +148,12 @@ post '/facebook-signin' => sub {
     # We should just do this with Google too, and then we can probably just use
     # the Plack auth session.
     my $session_cookie = bacds::Scheduler::FederatedAuth->create_session_cookie($email);
-    cookie "LoginSession" => $session_cookie, expires => "72 hours";
-    cookie "LoginMethod" => 'session';
+    cookie LoginSession, $session_cookie, expires => "72 hours";
+    cookie LoginMethod, 'session';
     redirect '/' => 303;
 };
 
-=head2 bacds-signin
+=head2 /bacds-signin
 
 login credential checking redirector
 
@@ -129,9 +178,19 @@ post '/bacds-signin' => sub {
 
     my $session_cookie = bacds::Scheduler::FederatedAuth->create_session_cookie($email);
 
-    cookie "LoginSession" => $session_cookie, expires => "72 hours";
-    cookie "LoginMethod" => 'session';
+    cookie LoginSession, $session_cookie, expires => "72 hours";
+    cookie LoginMethod, 'session'       , expires => "72 hours";
     redirect '/' => 303;
+};
+
+=head2 /signout
+
+=cut
+
+get '/signout' => sub {
+    cookie LoginSession, '', expires => "-1 hours";
+    cookie LoginMethod,  '', expires => "-1 hours";
+    redirect '/signin.html', 302;
 };
 
 
@@ -157,9 +216,10 @@ The display page. This is the only endpoint that serves html.
 
 =cut
 
-get '/' => sub {
+get '/' => requires_login sub {
     template 'index' => {
         title => 'Dance Schedule',
+        signed_in_as => vars->{signed_in_as},
         accordions => [
             { label => 'Events',
               modelName => 'event',
@@ -307,7 +367,7 @@ Create a new event.
 
 =cut
 
-post '/event/' => sub {
+post '/event/' => can_edit_event sub {
     my $event = $event_model->post_row(params);
     my $results = Results->new;
 
@@ -1098,7 +1158,7 @@ package Results {
     );
 
     sub new {
-        return bless {data=>'',errors=>[]};
+        return bless { data => '', errors => [] };
     }
 
     sub add_error {
@@ -1127,6 +1187,5 @@ package Results {
         return decode_utf8 $json_str;
     }
 }
-
 
 true;
