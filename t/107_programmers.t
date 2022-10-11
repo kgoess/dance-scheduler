@@ -94,6 +94,8 @@ subtest 'Invalid GET /programmer/2' => sub {
 subtest 'POST /programmer' => sub {
     plan tests=>2;
 
+    my $atest = get_tester(auth => 1);
+
     my ($expected, $res, $decoded, $got);
     my $new_programmer = {
         name          => 'alice programmer',
@@ -196,7 +198,7 @@ subtest 'POST /programmer with events' => sub{
     $decoded = decode_json($res->content);
     $got = $decoded->{data};
     $expected = {
-        programmer_id => 3,
+        programmer_id => 4,
         name          => $new_programmer->{name},
         email         => $new_programmer->{email},
         is_superuser  => $new_programmer->{is_superuser},
