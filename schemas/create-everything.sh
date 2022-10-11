@@ -18,6 +18,7 @@ schema_files="
     band_membership.sql
     programmers.sql
     programmer_series_map.sql
+    programmer_events_map.sql
 "
 
 for schema_file in $schema_files ; do

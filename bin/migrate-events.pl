@@ -15,16 +15,19 @@ my %Series_Lookup = (
     'SF-CONTRA' => 'San Francisco Contra',
     'FUM-CONTRA' => 'Palo Alto Contra', # ?
     'FUM-CONTRA/SPECIAL' => 'Palo Alto Contra',
+    'FUM-ENGLISH/SPECIAL' => 'Palo Alto English',
     'HVC-CONTRA' => 'Hayward Contra',
     'FSJ-CONTRA' => 'South Bay Contra',
     'ASE-ENGLISH' => 'Peninsula English',
     'CCB-ENGLISH' => 'Berkeley English',
-    'STM-ENGLISH' => 'Palo Alto English',
+    'STM-ENGLISH' => 'Palo Alto English', # SME and STM are dups?
     # ???
     #'CCB-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
     'SJP-ENGLISH' => 'San Francisco English',
     'FSJ-ENGLISH' => 'San Jose English',
     'HPP-WOODSHED' => 'Atherton Woodshed',
+    'STM-WOODSHED' => "St. Mark Palo Alto Woodshed",
+    'SME-WOODSHED' => "St. Mark Palo Alto Woodshed",
     'ONLINE-ONLINE' => 'Odd Sundays Online',
     'ONLINE-ONLINE ENGLISH DANCE' => 'Odd Sundays Online',
     'ONLINE-ENGLISH' => 'Odd Sundays Online',
@@ -32,10 +35,12 @@ my %Series_Lookup = (
     'ONLINE-ONLINE Concert &amp; Dance' => 'Online Concert',
     'ONLINE-ONLINE Concert & Dance' => 'Online Concert',
     'SSU-ENGLISH/CAMP' => 'Hey Days English Week',
+    'BR-ENGLISH CAMP FALL FROLICK' => 'Fall Frolick',
     'MON-FAMILY/CAMP' => 'Family Week',
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
     'JPC-CONTRA/SPECIAL' => 'Balance the Bay',
     'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
+    'SME-ENGLISH' => 'Palo Alto English', # SME and STM are dups?
     'SME-ENGLISH/REGENCY' => 'English Regency',
     'STM-ENGLISH/REGENCY' => 'English Regency',
     'ACC-ENGLISH' => 'Arlington Community Church English',
@@ -125,6 +130,8 @@ sub attach_styles {
         push @old_styles, 'ONLINE' # fudging e.g. ONLINE Concert &amp; Dance
     } elsif ($old_style eq 'ENGLISH/CAMP') {
         push @old_styles, 'ENGLISH', 'CAMP';
+    } elsif ($old_style eq 'ENGLISH CAMP FALL FROLICK') {
+        push @old_styles, 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'FAMILY/CAMP') {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CONTRA/CAMP') {
@@ -133,6 +140,8 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'REGENCY';
     } elsif ($old_style eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
         push @old_styles, 'CONTRA', 'CAMP';
+    } elsif ($old_style eq 'ENGLISH/SPECIAL') {
+        push @old_styles, 'ENGLISH';
     } elsif ($old_style eq 'CONTRA/SPECIAL') {
         push @old_styles, 'CONTRA';
     } else {

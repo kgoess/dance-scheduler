@@ -8,6 +8,7 @@ tables="
     event_talent_map
     event_venues_map
     programmer_series_map
+    programmer_events_map
     band_membership
     events
     series
