@@ -15,7 +15,7 @@
     </span>
     <span id="header-info">
         You are signed in as <% signed_in_as %><br>
-        <a href="/signout">Log out</a>
+        <a href="signout">Log out</a>
     </span>
 </div>
         <div class="accordion">
