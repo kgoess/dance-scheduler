@@ -15,6 +15,10 @@ WriteMakefile(
     ($eumm_version >= 6.3001
       ? ('LICENSE'=> 'perl')
       : ()),
+    EXE_FILES => [
+        'bin/dance-scheduler-user-password.pl',
+        'bin/dance-scheduler-add-programmer.pl',
+    ],
     PL_FILES            => {},
     BUILD_REQUIRES => {
         'Test::WWW::Mechanize::PSGI' => 0,
