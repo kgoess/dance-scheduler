@@ -5,16 +5,18 @@ use 5.16.0;
 use warnings;
 
 use Data::Dump qw/dump/;
+use Encode qw/decode_utf8/;
 use FindBin qw/$Bin/;
 use HTTP::Request::Common;
+use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 31;
+use Test::More tests => 40;
 use Test::Warn;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Auth;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
-use bacds::Scheduler::Util::Test qw/setup_test_db/;
+use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
 setup_test_db;
 
 $ENV{TEST_CACHE_PATH} = "$Bin/cache"; # s/b t/cache/
@@ -24,6 +26,8 @@ test_google_login();
 test_session_key_and_cookie();
 test_password_matches();
 test_bacds_login();
+test_requires_login();
+test_can_edit();
 
 
 sub test_fetch_google_oauth_keys {
@@ -169,5 +173,65 @@ sub test_bacds_login {
     is $res->code, 401, 'successful login';
     like $res->content, qr{Unauthorized!}, 'bad request';
 
+}
+
+sub test_requires_login {
+    # the / endpoint just requires you to be there with a valid login,
+    # otherwise it redirects you to /signin.html
+
+    my $test_noauth = get_tester();
+    my $test_authed = get_tester(auth => 1);
+
+    #
+    # test GET /
+    #
+    $test_authed->get_ok('/', 'authenticated GET / succeeds');
+    $test_noauth->get('/');
+    ok ! $test_noauth->success, 'noauth GET / fails';
+    is $test_noauth->res->code, 303, 'noauth GET / gets a 303';
+    is $test_noauth->res->header('location'), '/signin.html', 'noauth GET / right loc';
+}
+
+sub test_can_edit {
+    # POST and PUT to /event/ require can_edit_event
+    my $test_noauth = get_tester();
+    my $test_authed = get_tester(auth => 1);
+
+    my $new_event = {
+        start_date     => "2022-05-01",
+        start_time     => "20:00",
+        end_date       => "2022-05-01",
+        end_time       => "22:00",
+        short_desc     => "itsa shortdesc",
+        custom_url     => 'https://event.url',
+        custom_pricing => '¥4,000',
+        name           => "saturday night test event £ ウ",
+        is_canceled    => 0,
+        synthetic_name => 'Saturday Night Test',
+    };
+    my ($content, $res_data);
+    #
+    # logged-in user
+    #
+
+    $test_authed->post_ok('/event/', $new_event, 'authenticated POST / succeeds');
+    $content = $test_authed->res->content;
+    $res_data = decode_json $content;
+    ok $res_data->{data}{event_id}, "POST created event # $res_data->{data}{event_id}";
+    is $res_data->{data}{name}, decode_utf8("saturday night test event £ ウ"),
+        '...with good json';
+    is_deeply $res_data->{errors}, [], '...and with no errors';
+
+    #
+    # not-logged-in
+    #
+    # FIXME Plugin::Auth->login_redirect_json should return some JSON blob that
+    # the js client understands
+    $test_noauth->post('/event/', $new_event);
+    is $test_noauth->res->code, '401', 'no-auth POST / fails with 401';
+    $content = $test_noauth->res->content;
+    
+    diag "TODO test with some *other* user that doesn't have permission to ".
+         "edit this *particular* event";
 }
 

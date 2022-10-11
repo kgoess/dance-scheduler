@@ -71,6 +71,7 @@ Possible args:
 
  - auth => 1 set up the LoginMethod and LoginSession cookie headers
  - max_redirect => $c (default 0)
+ - user_email (defaults to petertheadmin@test.com)
  - debug => [1-8] see LWP::ConsoleLogger::Easy
     (can also use $ENV{DEBUG_UA})
 
@@ -89,7 +90,7 @@ sub get_tester {
     );
 
     if ($args{auth}) {
-        $test->add_header(auth_cookie());
+        $test->add_header(auth_cookie($args{user_email}));
     }
     my $debug = $args{debug} || $ENV{DEBUG_UA};
     if (defined $debug) {
@@ -100,8 +101,11 @@ sub get_tester {
 }
 
 sub auth_cookie {
+    my ($email) = @_;
+    $email ||= 'petertheadmin@test.com';
+
     state $session_cookie = bacds::Scheduler::FederatedAuth
-        ->create_session_cookie('petertheadmin@test.com');
+        ->create_session_cookie($email);
 
     return Cookie => LoginMethod()."=session;".LoginSession()."=$session_cookie"
 }

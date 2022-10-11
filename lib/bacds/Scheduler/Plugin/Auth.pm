@@ -71,7 +71,8 @@ plugin_keywords can_edit_event => sub {
 
         my $email = $self->app->request->var('signed_in_as')
             or return $plugin->login_redirect_json($self);
-        #do something
+
+        #TODO check that this user can edit this particular event
 
         #on failure
         #return pass;
