@@ -257,15 +257,23 @@ sub check_facebook_auth {
         return undef, [401, 'Login failed'];
     }
 
-    my $rows = bacds::Scheduler::Model::Programmer->get_multiple_rows({
+    my $dbh = get_dbh();
+    # This had been using:
+    #     my $rows = bacds::Scheduler::Model::Programmer->get_multiple_rows({
+    # but that is more verbose, we don't want multiple rows, and we want
+    # a Programmer object we can call methods on, not a generic hash
+    # (for which a mis-typed key can silently fail to give you data).
+    # I think we should change google to just use ->search as well.
+    my $rs = $dbh->resultset('Programmer')->search({
          email => $res->{email}
     });
 
-    if (!@$rows) {
-        return undef, [401, "We don't recognize $res->{email} in our system"];
-    }
+    my $programmer = $rs->first
+        or return undef, [401, "No programmer found for '$res->{email}'"];
+    $programmer->is_deleted
+         and return undef, [403, "The account for '$res->{email}' is deleted"];
 
-    return $rows->[0];
+    return $programmer->email;
 }
 
 sub _get_facebook_secret {
@@ -303,8 +311,10 @@ sub check_bacds_auth {
         email => $email_param
     });
 
-    my $programmer = $rs->first or return undef, [401, "No programmer found for '$email_param'"];
-    $programmer->is_deleted and return undef, [403, "The account for '$email_param' is deleted"];
+    my $programmer = $rs->first
+        or return undef, [401, "No programmer found for '$email_param'"];
+    $programmer->is_deleted
+         and return undef, [403, "The account for '$email_param' is deleted"];
     $programmer->password_hash or return undef, [403,
          'Please use google or facebook to login, or ask webmaster@ about dance-scheduler-user-password.pl'
     ];

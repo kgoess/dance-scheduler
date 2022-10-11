@@ -44,6 +44,8 @@ The "before" hook is set up to catch every dancer2 request, check for the
 LoginMethod cookie and associated login cookie, and if they check out then put
 the "signed_in_as" email in the var() stash.
 
+See bacds::Scheduler::FederatedAuth for what sets these cookies.
+
 We might not need this for static assets like images or css. Could screen
 on the Accept header, Content Negotiation.
 
@@ -68,18 +70,19 @@ hook before => sub {
             }
             var signed_in_as => $res->{email};
         }
-        #when ('facebook') {
-        #    my $session_cookie = cookie LoginSession
-        #        or return;
-        #    ...
-        #}
         when ('session') {
+            # this handles both facebook and bacds signins
             my $session_cookie = cookie LoginSession
                 or return;
 
-            my ($programmer) = bacds::Scheduler::FederatedAuth
-                ->check_session_cookie($session_cookie)
-                or return;
+            my ($programmer, $err) = bacds::Scheduler::FederatedAuth
+                ->check_session_cookie($session_cookie);
+
+            if ($err) {
+                warn qq{hook before session: "$err" for $session_cookie};
+                return;
+            };
+
             var signed_in_as => $programmer->email;
         }
     }
@@ -125,7 +128,8 @@ login credential checking redirector
 A request to https://www.bacds.org/dance-scheduler/signin.html
 will show a login-with-facebook button and others.
 
-Click on that facebook button and after logging in to facebok it'll redirect you here.
+Click on that facebook button and after logging in to facebok it'll redirect
+you here.
 
 This endpoint will verify your credential information and set up a
 session.
@@ -136,7 +140,8 @@ post '/facebook-signin' => sub {
     my $access_token = params->{access_token}
         or send_error 'missing parameter "access_token"' => 400;
 
-    my ($email, $err) = bacds::Scheduler::FederatedAuth->check_facebook_auth($access_token);
+    my ($email, $err) = bacds::Scheduler::FederatedAuth
+        ->check_facebook_auth($access_token);
 
     if ($err) {
         my ($code, $msg) = @$err;

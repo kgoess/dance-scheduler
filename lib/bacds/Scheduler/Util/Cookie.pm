@@ -28,9 +28,12 @@ sub GoogleToken()  { cookie_name('GoogleToken')  };
 
 sub cookie_name {
     my ($s) = @_;
-    if ($ENV{USER} eq 'apache') {
+    if ($ENV{MOD_PERL} || !$ENV{USER}) {
+        # running in production
         return $s;
     } else {
+        # we're running from a dev's git checkout under plackup
+        # so make the cookie name separate
         my $user = $ENV{USER} =~ s/[^a-zA-Z0-9]//r;
         return "$user-$s";
     }
