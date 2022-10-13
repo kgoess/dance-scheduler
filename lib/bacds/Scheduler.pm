@@ -35,6 +35,8 @@ use bacds::Scheduler::Model::Programmer;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
+use bacds::Scheduler::Util::Results;
+my $Results_Class = "bacds::Scheduler::Util::Results";
 
 our $VERSION = '0.1';
 
@@ -296,7 +298,7 @@ Returns the flat list of all events in the database
 my $event_model = 'bacds::Scheduler::Model::Event';
 
 get '/eventAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($event_model->get_multiple_rows);
 
@@ -310,7 +312,7 @@ Like /eventAll, but just events from yesterday on.
 =cut
 
 get '/eventsUpcoming' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($event_model->get_upcoming_rows);
 
@@ -352,7 +354,7 @@ the nested data structures.
 
 get '/event/:event_id' => sub {
     my $event_id = params->{event_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $event = $event_model->get_row($event_id);
     if($event){
@@ -374,7 +376,7 @@ Create a new event.
 
 post '/event/' => can_edit_event sub {
     my $event = $event_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($event){
         $results->data($event)
@@ -395,7 +397,7 @@ Update an existing event
 
 put '/event/:event_id' => can_edit_event sub {
     my $event = $event_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($event){
         $results->data($event)
@@ -431,7 +433,7 @@ Returns all of the styles in the db not marked "is_deleted".
 my $style_model = 'bacds::Scheduler::Model::Style';
 
 get '/styleAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($style_model->get_multiple_rows);
 
@@ -453,7 +455,7 @@ get '/styleAll' => sub {
 
 get '/style/:style_id' => sub {
     my $style_id = params->{style_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $style = $style_model->get_row($style_id);
     if($style){
@@ -469,7 +471,7 @@ get '/style/:style_id' => sub {
 
 post '/style/' => sub {
     my $style = $style_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($style){
         $results->data($style)
@@ -484,7 +486,7 @@ post '/style/' => sub {
 
 put '/style/:style_id' => sub {
     my $style = $style_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($style){
         $results->data($style)
@@ -509,7 +511,7 @@ my $venue_model = 'bacds::Scheduler::Model::Venue';
 
 get '/venue/:venue_id' => sub {
     my $venue_id = params->{venue_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $venue = $venue_model->get_row($venue_id);
     if($venue){
@@ -530,7 +532,7 @@ Create a new venue
 
 post '/venue/' => sub {
     my $venue = $venue_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if ($venue) {
         $results->data($venue)
@@ -549,7 +551,7 @@ Update an existing venue.
 
 put '/venue/:venue_id' => sub {
     my $venue = $venue_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($venue){
         $results->data($venue)
@@ -583,7 +585,7 @@ Return all the non-deleted venues
 =cut
 
 get '/venueAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($venue_model->get_multiple_rows);
 
@@ -605,7 +607,7 @@ use bacds::Scheduler::Model::Series;
 
 get '/series/:series_id' => sub {
     my $series_id = params->{series_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $series = $series_model->get_row($series_id);
     if($series){
@@ -624,7 +626,7 @@ get '/series/:series_id' => sub {
 
 get '/series/:series_id/template-event' => sub {
     my $series_id = params->{series_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $event = $series_model->get_template_event($series_id);
 
@@ -651,7 +653,7 @@ Create a new series
 
 post '/series/' => sub {
     my $series = $series_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if ($series) {
         $results->data($series)
@@ -670,7 +672,7 @@ Update an existing series.
 
 put '/series/:series_id' => sub {
     my $series = $series_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($series){
         $results->data($series)
@@ -689,7 +691,7 @@ Return all the non-deleted seriess
 =cut
 
 get '/seriesAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($series_model->get_multiple_rows);
 
@@ -712,7 +714,7 @@ Get all the info for one band.
 
 get '/band/:band_id' => sub {
     my $band_id = params->{band_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $band = $band_model->get_row($band_id);
     if($band){
@@ -733,7 +735,7 @@ Create a new band.
 
 post '/band/' => sub {
     my $band = $band_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if ($band) {
         $results->data($band)
@@ -752,7 +754,7 @@ Update an existing band.
 
 put '/band/:band_id' => sub {
     my $band = $band_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($band){
         $results->data($band)
@@ -771,7 +773,7 @@ Return all the non-deleted bands
 =cut
 
 get '/bandAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($band_model->get_multiple_rows);
 
@@ -794,7 +796,7 @@ Get all the info for one talent.
 
 get '/talent/:talent_id' => sub {
     my $talent_id = params->{talent_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $talent = $talent_model->get_row($talent_id);
     if($talent){
@@ -815,7 +817,7 @@ Create a new talent.
 
 post '/talent/' => sub {
     my $talent = $talent_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if ($talent) {
         $results->data($talent)
@@ -834,7 +836,7 @@ Update an existing talent.
 
 put '/talent/:talent_id' => sub {
     my $talent = $talent_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($talent){
         $results->data($talent)
@@ -853,7 +855,7 @@ Return all the non-deleted talents
 =cut
 
 get '/talentAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($talent_model->get_multiple_rows);
 
@@ -883,7 +885,7 @@ Returns all of the callers in the db not marked "is_deleted".
 my $caller_model = 'bacds::Scheduler::Model::Caller';
 
 get '/callerAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($caller_model->get_multiple_rows);
 
@@ -905,7 +907,7 @@ get '/callerAll' => sub {
 
 get '/caller/:caller_id' => sub {
     my $caller_id = params->{caller_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $caller = $caller_model->get_row($caller_id);
     if($caller){
@@ -926,7 +928,7 @@ Create a new caller.
 
 post '/caller/' => sub {
     my $caller = $caller_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($caller){
         $results->data($caller)
@@ -946,7 +948,7 @@ Update a caller.
 
 put '/caller/:caller_id' => sub {
     my $caller = $caller_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($caller){
         $results->data($caller)
@@ -987,7 +989,7 @@ Returns all of the parent orgs in the db not marked "is_deleted".
 my $parent_org_model = 'bacds::Scheduler::Model::ParentOrg';
 
 get '/parent_orgAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($parent_org_model->get_multiple_rows);
 
@@ -1001,7 +1003,7 @@ get '/parent_orgAll' => sub {
 
 get '/parent_org/:parent_org_id' => sub {
     my $parent_org_id = params->{parent_org_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $parent_org = $parent_org_model->get_row($parent_org_id);
     if($parent_org){
@@ -1022,7 +1024,7 @@ Create a new parent_org.
 
 post '/parent_org/' => sub {
     my $parent_org = $parent_org_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($parent_org){
         $results->data($parent_org)
@@ -1042,7 +1044,7 @@ Update a parent_org.
 
 put '/parent_org/:parent_org_id' => sub {
     my $parent_org = $parent_org_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($parent_org){
         $results->data($parent_org)
@@ -1069,7 +1071,7 @@ Returns all of the programmers in the db not marked "is_deleted".
 my $programmer_model = 'bacds::Scheduler::Model::Programmer';
 
 get '/programmerAll' => sub {
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     $results->data($programmer_model->get_multiple_rows);
 
@@ -1083,7 +1085,7 @@ get '/programmerAll' => sub {
 
 get '/programmer/:programmer_id' => sub {
     my $programmer_id = params->{programmer_id};
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     my $programmer = $programmer_model->get_row($programmer_id);
     if($programmer){
@@ -1104,7 +1106,7 @@ Create a new programmer.
 
 post '/programmer/' => sub {
     my $programmer = $programmer_model->post_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($programmer){
         $results->data($programmer)
@@ -1124,7 +1126,7 @@ Update a programmer.
 
 put '/programmer/:programmer_id' => sub {
     my $programmer = $programmer_model->put_row(params);
-    my $results = Results->new;
+    my $results = $Results_Class->new;
 
     if($programmer){
         $results->data($programmer)
@@ -1135,62 +1137,5 @@ put '/programmer/:programmer_id' => sub {
 
     return $results->format;
 };
-
-=head1 Results
-
-A little internal class to collect any errors and format the results:
-
-    "data": [
-        ...
-    ],
-    "errors": [
-      {
-        msg: "big fail",
-        num: 1234
-      }
-    ],
-
-
-=cut
-
-package Results {
-    use Dancer2;
-    use Data::Dump qw/dump/;
-    use Encode qw/decode_utf8/;
-    use Class::Accessor::Lite (
-        new => 0,
-        rw => [ qw(data errors) ],
-    );
-
-    sub new {
-        return bless { data => '', errors => [] };
-    }
-
-    sub add_error {
-        my ($self, $num, $msg) = @_;
-        push @{$self->errors}, {
-            msg => $msg,
-            num => $num,
-        };
-    }
-
-    sub format {
-        my ($self) = @_;
-        my $json_str = encode_json({
-            data => $self->data,
-            errors => [
-                map { {
-                    msg => $_->{msg},
-                    num => $_->{num},
-                } } @{$self->errors}
-            ],
-        });
-        # encode_json returns utf8 octets. Apparently the dancer2 handlers
-        # expect logical perl characters which *they* can then utf8-encode.
-        # Lacking this call to decode-utf8 the Dancer2 handlers double-encode
-        # the output. Maybe there's a way to tell Dancer2 to not do that?
-        return decode_utf8 $json_str;
-    }
-}
 
 true;
