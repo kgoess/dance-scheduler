@@ -7,10 +7,12 @@ bacds::Scheduler::Util::Results - Package to collect any errors and format the r
     my $results = bacds::Scheduler::Util::Results->new;
 
     $results->data($array_pointer);
+    # or
+    $results->add_error(4300, "Insert failed for new programmer");
     
     return $results->format;
 
-    outputs JSON like:
+    # outputs JSON like:
     "data": [
         ...
     ],

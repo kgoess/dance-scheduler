@@ -10,7 +10,7 @@ use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 40;
+use Test::More tests => 44;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -181,7 +181,6 @@ sub test_requires_login {
 
     my $test_noauth = get_tester();
     my $test_authed = get_tester(auth => 1);
-
     #
     # test GET /
     #
@@ -189,7 +188,22 @@ sub test_requires_login {
     $test_noauth->get('/');
     ok ! $test_noauth->success, 'noauth GET / fails';
     is $test_noauth->res->code, 303, 'noauth GET / gets a 303';
-    is $test_noauth->res->header('location'), '/signin.html', 'noauth GET / right loc';
+    is $test_noauth->res->header('location'), 'http://localhost/signin.html', 'noauth GET / right loc';
+
+    #
+    # test GET JSON /
+    #
+    $test_noauth->add_header(accept=>'application/json');
+    $test_noauth->get('/');
+    ok ! $test_noauth->success, 'noauth GET JSON / fails';
+    is $test_noauth->res->headers->content_type, 'application/json', 'noauth GET JSON returns application/json';
+    is $test_noauth->res->code, 401, 'noauth GET JSON / gets a 401';
+    my $json = decode_json($test_noauth->res->content);
+    is_deeply $json, 
+        {
+          data   => { url => "http://localhost/signin.html" },
+          errors => [{ msg => "You are not logged in", num => 40101 }],
+        };
 }
 
 sub test_can_edit {

@@ -10,6 +10,7 @@ use HTTP::Negotiate qw/choose/;
 
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
+use bacds::Scheduler::Util::Results;
 
 =head2 requires_login
 
@@ -34,6 +35,7 @@ plugin_keywords requires_login => sub {
                 ['json', 1.000,    'application/json'],
             ];
             my $media_type = choose($variants, $self->app->request->headers);
+            print STDERR "**********" . $media_type . "\n";
             if ($media_type eq 'html') {
                 return $plugin->login_redirect_html($self);
             } else {
@@ -48,16 +50,31 @@ plugin_keywords requires_login => sub {
 sub login_redirect_html {
     my ($plugin, $app) = @_;
 
-    $app->redirect('/signin.html' => 303);
+    $app->redirect($plugin->get_login_page_url($app) => 303);
 }
 
 sub login_redirect_json {
-    my ($plugin, $app) = @_;
+    my ($plugin, $app, @args) = @_;
+    my $results = bacds::Scheduler::Util::Results->new;
+
+    $results->add_error(40101, "You are not logged in");
+    $results->data(
+        {
+            url => $plugin->get_login_page_url($app),
+        }
+    );
 
     # this 401 will trigger this in the js app:
     #     alert("You don't have authorization to do that!");
     $app->response->status(401);
+    $app->response->headers->content_type('application/json');
+    $app->response->content($results->format);
     # FIXME how to send back the /signin.html location?
+}
+
+sub get_login_page_url {
+    my ($plugin, $app) = @_;
+    return $app->request->uri_base . "/signin.html";
 }
 
 =head2 can_edit_event
