@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title><% title %></title>
   <link rel="stylesheet" href="<% request.uri_base %>/css/style.css">
+  <link rel="icon" type="image/x-icon" href="<% request.uri_base %>/images/favicon.ico">
+
 
 <!-- Grab jQuery from a CDN, fall back to local if necessary -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"
