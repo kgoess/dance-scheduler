@@ -212,6 +212,13 @@
         eventTemplateDialog.dialog( 'open' );
     });
 
+    loginRedirectModal = $( '#login-redirect-modal' ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 400,
+        modal: true,
+    });
+
 });
 
 
@@ -477,13 +484,23 @@ function saveAction(target, onSuccess) {
         }
      })
     .fail( (err) => {
-        switch (err.status){
-            case 401:
-                alert("You don't have authorization to do that!");
-                break;
-            default:
-                alert('something bad happened, update failed, see the server logs');
-                console.log(err);
-        }
-    }); // FIXME later
+        handleError(err);
+    });
+}
+
+/* handleError
+ * generic response error handler
+ * TODO this should be added to all the requests
+ */
+function handleError(err) {
+    switch (err.status){
+        case 401:
+            const signinUrl = err.responseJSON.data.url;
+            $( '#login-redirect-modal-link' ).attr('href', signinUrl);
+            loginRedirectModal.dialog( 'open' );
+            break;
+        default:
+            alert('something bad happened, update failed, see the server logs');
+            console.log(err);
+    }
 }

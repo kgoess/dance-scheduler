@@ -32,3 +32,6 @@
         </div>
       </div>
     </div>
+    <div id="login-redirect-modal">
+        You are not/no longer signed in. <a id="login-redirect-modal-link">Click here</a> to redirect to the signin page.
+    </div>
