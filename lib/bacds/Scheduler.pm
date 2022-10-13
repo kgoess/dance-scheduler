@@ -223,7 +223,7 @@ The display page. This is the only endpoint that serves html.
 
 get '/' => requires_login sub {
     template 'index' => {
-        title => 'Dance Schedule',
+        title => 'Dance Scheduler',
         signed_in_as => vars->{signed_in_as},
         accordions => [
             { label => 'Events',
