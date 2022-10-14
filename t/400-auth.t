@@ -1,5 +1,5 @@
 
-# testing bacds::Scheduler::Auth in isolation
+# testing bacds::Scheduler::FederatedAuth in isolation
 
 use 5.16.0;
 use warnings;
@@ -14,7 +14,7 @@ use Test::More tests => 44;
 use Test::Warn;
 
 use bacds::Scheduler;
-use bacds::Scheduler::Auth;
+use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
 setup_test_db;
@@ -32,7 +32,7 @@ test_can_edit();
 
 sub test_fetch_google_oauth_keys {
 
-    my $data = bacds::Scheduler::Auth::fetch_google_oauth_keys();
+    my $data = bacds::Scheduler::FederatedAuth::fetch_google_oauth_keys();
 
     is ref $data, 'HASH', 'looks like a hashref';
 
