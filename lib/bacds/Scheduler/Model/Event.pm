@@ -58,7 +58,7 @@ sub get_default_sorting { {-asc => [qw/start_date start_time/]} }
 sub filter_input {
     my ($class, $field, $value) = @_;
 
-    if ($field eq 'start_time' or $field eq 'end_time') {
+    if ($field =~ /^( start_time|end_time )$/x and defined $value) {
         if (($value =~ tr/:/:/) == 1) { # change 7:30 to 7:30:00
             $value .= ':00';
         }

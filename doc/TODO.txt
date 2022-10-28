@@ -65,6 +65,9 @@ phase I:
  - care that they're logged in
  DONE hook up the bacds login form
  DONE CLI utility to manage username/pw
+ - find docs on google/facebook to change them from redirects to something else
+ - then change our js to pop up a modal and follow that new flow
+ - add handler for the 403 "you don't have permission" and let them continue
 
 phase II:
 

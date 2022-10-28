@@ -11,6 +11,7 @@ package bacds::Scheduler::Util::Test;
 use 5.16.0;
 use warnings;
 
+use Data::Dump qw/dump/;
 use File::Basename qw/basename/;
 use FindBin qw/$Bin/;
 use Test::WWW::Mechanize::PSGI;
@@ -104,7 +105,7 @@ sub auth_cookie {
     my ($email) = @_;
     $email ||= 'petertheadmin@test.com';
 
-    state $session_cookie = bacds::Scheduler::FederatedAuth
+    my $session_cookie = bacds::Scheduler::FederatedAuth
         ->create_session_cookie($email);
 
     return Cookie => LoginMethod()."=session;".LoginSession()."=$session_cookie"

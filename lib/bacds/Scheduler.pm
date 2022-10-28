@@ -374,7 +374,7 @@ Create a new event.
 
 =cut
 
-post '/event/' => can_edit_event sub {
+post '/event/' => requires_login sub {
     my $event = $event_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -469,7 +469,7 @@ get '/style/:style_id' => sub {
 };
 
 
-post '/style/' => sub {
+post '/style/' => requires_login sub {
     my $style = $style_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -530,7 +530,7 @@ Create a new venue
 
 =cut
 
-post '/venue/' => sub {
+post '/venue/' => requires_login sub {
     my $venue = $venue_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -651,7 +651,7 @@ Create a new series
 
 =cut
 
-post '/series/' => sub {
+post '/series/' => requires_login sub {
     my $series = $series_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -733,7 +733,7 @@ Create a new band.
 
 =cut
 
-post '/band/' => sub {
+post '/band/' => requires_login sub {
     my $band = $band_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -815,7 +815,7 @@ Create a new talent.
 
 =cut
 
-post '/talent/' => sub {
+post '/talent/' => requires_login sub {
     my $talent = $talent_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -926,7 +926,7 @@ Create a new caller.
 
 =cut
 
-post '/caller/' => sub {
+post '/caller/' => requires_login sub {
     my $caller = $caller_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -1022,7 +1022,7 @@ Create a new parent_org.
 
 =cut
 
-post '/parent_org/' => sub {
+post '/parent_org/' => requires_login sub {
     my $parent_org = $parent_org_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -1104,7 +1104,7 @@ Create a new programmer.
 
 =cut
 
-post '/programmer/' => sub {
+post '/programmer/' => requires_login sub {
     my $programmer = $programmer_model->post_row(params);
     my $results = $Results_Class->new;
 

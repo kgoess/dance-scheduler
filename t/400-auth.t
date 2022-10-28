@@ -10,7 +10,7 @@ use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 44;
+use Test::More tests => 54;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -199,7 +199,7 @@ sub test_requires_login {
     is $test_noauth->res->headers->content_type, 'application/json', 'noauth GET JSON returns application/json';
     is $test_noauth->res->code, 401, 'noauth GET JSON / gets a 401';
     my $json = decode_json($test_noauth->res->content);
-    is_deeply $json, 
+    is_deeply $json,
         {
           data   => { url => "http://localhost/signin.html" },
           errors => [{ msg => "You are not logged in", num => 40101 }],
@@ -209,9 +209,67 @@ sub test_requires_login {
 sub test_can_edit {
     # POST and PUT to /event/ require can_edit_event
     my $test_noauth = get_tester();
-    my $test_authed = get_tester(auth => 1);
+    my $test_authed = get_tester(
+        auth => 1,
+    );
+    my $test_series_programmer = get_tester(
+        auth => 1,
+        user_email => 'caneditseries@example.com',
+    );
+    my $test_event_programmer = get_tester(
+        auth => 1,
+        user_email => 'caneditevent@example.com',
+    );
+    my $test_programmer = get_tester(
+        auth => 1,
+        user_email => 'cannotedit@example.com',
+    );
+    my $test_other_event_programmer = get_tester(
+        auth => 1,
+        user_email => 'caneditjustnotthisone@example.com',
+    );
+    my $dbh = get_dbh();
+
+    my $series_programmer = $dbh->resultset('Programmer')->new({
+        name => 'Series Programmer',
+        is_superuser => 0,
+        email => 'caneditseries@example.com',
+        is_deleted => 0,
+    });
+    $series_programmer->insert;
+    my $series = $dbh->resultset('Series')->new({
+        name => 'a series',
+        is_deleted => 0,
+    });
+    $series->insert;
+    $series_programmer->add_to_series($series, {ordering => 1});
+
+    my $event_programmer = $dbh->resultset('Programmer')->new({
+        name => 'Event Programmer',
+        is_superuser => 0,
+        email => 'caneditevent@example.com',
+        is_deleted => 0,
+    });
+    $event_programmer->insert;
+
+    my $programmer = $dbh->resultset('Programmer')->new({
+        name => 'Unevented Programmer',
+        is_superuser => 0,
+        email => 'cannotedit@example.com',
+        is_deleted => 0,
+    });
+    $programmer->insert;
+
+    my $other_event_programmer = $dbh->resultset('Programmer')->new({
+        name => 'Otherevent Programmer',
+        is_superuser => 0,
+        email => 'caneditjustnotthisone@example.com',
+        is_deleted => 0,
+    });
+    $other_event_programmer->insert;
 
     my $new_event = {
+        series_id      => $series->series_id,
         start_date     => "2022-05-01",
         start_time     => "20:00",
         end_date       => "2022-05-01",
@@ -224,28 +282,113 @@ sub test_can_edit {
         synthetic_name => 'Saturday Night Test',
     };
     my ($content, $res_data);
-    #
-    # logged-in user
-    #
 
-    $test_authed->post_ok('/event/', $new_event, 'authenticated POST / succeeds');
+    #
+    # any logged-in user can create an event
+    #
+    $test_authed->post_ok('/event/', $new_event, 'authed can create event');
     $content = $test_authed->res->content;
     $res_data = decode_json $content;
-    ok $res_data->{data}{event_id}, "POST created event # $res_data->{data}{event_id}";
+    ok $res_data->{data}{event_id},
+        "POST created event # $res_data->{data}{event_id}";
+    my $new_event_id = $res_data->{data}{event_id};
     is $res_data->{data}{name}, decode_utf8("saturday night test event £ ウ"),
         '...with good json';
-    is_deeply $res_data->{errors}, [], '...and with no errors';
+    is_deeply $res_data->{errors}, [],
+        '...and with no errors';
+
+    # link the $event_programmer to that event
+    $event_programmer->add_to_events({event_id => $new_event_id});
+
+    my $event_edit = {
+        start_date     => "2022-05-01",
+        start_time     => "20:00",
+        end_date       => "2022-05-01",
+        end_time       => "22:00",
+        short_desc     => "¥tsa change",
+        custom_url     => 'https://event.url',
+        custom_pricing => '¥4,000',
+        name           => "saturday night test event £ ウ",
+        is_canceled    => 0,
+        synthetic_name => 'Saturday Night Test',
+    };
 
     #
-    # not-logged-in
+    # the series programmer can edit the event
     #
-    # FIXME Plugin::Auth->login_redirect_json should return some JSON blob that
-    # the js client understands
+    $test_series_programmer->put_ok("/event/$new_event_id", {content => $event_edit},
+         'series programmer can edit the event');
+    $content = $test_series_programmer->res->content;
+    $res_data = decode_json $content;
+    is $res_data->{data}{short_desc}, decode_utf8("¥tsa change"),
+        'the desc was changed to a UTF8 char';
+
+    #
+    # the event programmer can edit the event
+    #
+    $test_event_programmer->put_ok("/event/$new_event_id", {content => $event_edit},
+         'the event programmer can edit the event');
+
+    #
+    # some unaffiliated programmer can NOT edit the event
+    #
+    $test_programmer->put("/event/$new_event_id", content => $event_edit);
+    is $test_programmer->res->code, '403',
+        'unaffiliated programmer gets a 403';
+
+    #
+    # not-logged-in user gets a redirect
+    #
+    diag "FIXME Plugin::Auth->login_redirect_json should return some JSON blob that
+          the js client understands";
     $test_noauth->post('/event/', $new_event);
-    is $test_noauth->res->code, '401', 'no-auth POST / fails with 401';
+    is $test_noauth->res->code, '303',
+        "not-logged-in user can't do jack";
     $content = $test_noauth->res->content;
-    
-    diag "TODO test with some *other* user that doesn't have permission to ".
-         "edit this *particular* event";
+
+    #
+    # some other user has permissions but not to this particular event
+    #
+    my $other_event = {
+        series_id      => $series->series_id,
+        start_date     => "2022-05-01",
+        start_time     => "20:00",
+        end_date       => "2022-05-01",
+        end_time       => "22:00",
+        short_desc     => "some other event",
+        custom_url     => 'https://other.url',
+        custom_pricing => '99',
+        name           => "some other event",
+        is_canceled    => 0,
+        synthetic_name => 'some other event',
+    };
+    $test_other_event_programmer->post_ok('/event/', $other_event,
+        'created other event');
+    $content = $test_other_event_programmer->res->content;
+    $res_data = decode_json $content;
+    ok $res_data->{data}{event_id},
+         "POST created other event # $res_data->{data}{event_id}";
+    is_deeply $res_data->{errors}, [],
+        '...and with no errors';
+    my $other_event_id = $res_data->{data}{event_id};
+
+    # link the $other_event_programmer to that event
+    $other_event_programmer->add_to_events({event_id => $other_event_id});
+
+    # which they can edit
+    my $other_event_edit = {
+        %$other_event,
+        name => "changed name for other event",
+    };
+    $test_other_event_programmer->put_ok("/event/$other_event_id", {content => $other_event_edit},
+        "sure, the other event programmer can edit *their* event");
+
+    # but the other_event_programmer can't edit the *first* event
+    my $res = $test_other_event_programmer->put("/event/$new_event_id", content => $event_edit);
+    is $res->code, 403, 'other event programmer gets a 403';
+    $res_data = decode_json $res->content;
+    is $res_data->{errors}[0]{msg}, "You do not have permission to modify this event",
+        "and got expected error message";
+
 }
 

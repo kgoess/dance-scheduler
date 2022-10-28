@@ -322,6 +322,7 @@ __PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
 __PACKAGE__->many_to_many(talent => 'event_talent_maps', 'talent');
 __PACKAGE__->many_to_many(venues => 'event_venues_maps', 'venue');
 
+
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 

@@ -11,6 +11,8 @@ use HTTP::Negotiate qw/choose/;
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
 use bacds::Scheduler::Util::Results;
+use bacds::Scheduler::Model::Event;
+use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 =head2 requires_login
 
@@ -35,7 +37,6 @@ plugin_keywords requires_login => sub {
                 ['json', 1.000,    'application/json'],
             ];
             my $media_type = choose($variants, $self->app->request->headers);
-            print STDERR "**********" . $media_type . "\n";
             if ($media_type eq 'html') {
                 return $plugin->login_redirect_html($self);
             } else {
@@ -77,6 +78,7 @@ sub get_login_page_url {
     return $app->request->uri_base . "/signin.html";
 }
 
+
 =head2 can_edit_event
 
 =cut
@@ -85,17 +87,40 @@ plugin_keywords can_edit_event => sub {
     my ($plugin, $route_sub, @args) = @_;
     return sub {
         my ($self) = @_;
-
         my $email = $self->app->request->var('signed_in_as')
             or return $plugin->login_redirect_json($self);
 
-        #TODO check that this user can edit this particular event
+        my $dbh = get_dbh();
 
-        #on failure
-        #return pass;
+        my @rs = $dbh->resultset('Programmer')->search({
+            email => $email,
+        });
+        my $programmer = $rs[0];
 
-        #on success
-        $route_sub->(@args);
+        my $event_id = $self->app->request->param('event_id');
+        my $event_rs = $dbh->resultset('Event')->find($event_id);
+        my $series_id = $event_rs->series_id;
+        my @series_rs = $programmer->series(
+             #{ 'series.series_id' => $series_id }
+        );
+        my @event_rs = $programmer->events(
+             {  'event.event_id' => $event_id }
+        );
+        if (@series_rs or @event_rs) {
+            $route_sub->(@args); # this is success
+        } else {
+            my $results = bacds::Scheduler::Util::Results->new;
+
+            $results->add_error(40301, "You do not have permission to modify this event");
+            $results->data(
+                {
+                    #url => $plugin->get_login_page_url($self),
+                }
+            );
+            $self->response->status(403);
+            $self->response->headers->content_type('application/json');
+            $self->response->content($results->format);
+        }
     };
 };
 
