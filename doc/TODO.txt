@@ -67,6 +67,7 @@ phase I:
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
  - add handler for the 403 "you don't have permission" and let them continue
+ - is_superuser is saying "yes" even when it's not
 
 phase II:
 
