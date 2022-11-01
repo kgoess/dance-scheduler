@@ -17,11 +17,11 @@ use bacds::Scheduler::Schema;
 use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-use bacds::Scheduler::Util::Test qw/setup_test_db/;
+use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
 setup_test_db;
 
 my $app = bacds::Scheduler->to_app;
-my $test = Plack::Test->create($app);
+my $test = get_tester(auth => 1);
 my $dbh = get_dbh();
 
 my ($Series, $Series_Id);

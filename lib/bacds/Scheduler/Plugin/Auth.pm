@@ -92,10 +92,13 @@ plugin_keywords can_edit_event => sub {
 
         my $dbh = get_dbh();
 
-        my @rs = $dbh->resultset('Programmer')->search({
+        my $programmer = $dbh->resultset('Programmer')->search({
             email => $email,
-        });
-        my $programmer = $rs[0];
+        })->first();
+
+        if ($programmer->is_superuser) {
+            return $route_sub->(@args);
+        }
 
         my $event_id = $self->app->request->param('event_id');
         my $event_rs = $dbh->resultset('Event')->find($event_id);

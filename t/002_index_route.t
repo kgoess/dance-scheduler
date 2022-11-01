@@ -16,7 +16,7 @@ my $test        = get_tester(auth => 1);
 $test_noauth->get('/');
 is $test_noauth->res->code, '303',
     'unauthenticated request to / returns 303';
-$test_noauth->header_is(location => '/signin.html',
+$test_noauth->header_is(location => 'http://localhost/signin.html',
     'unauthenticated request to / returns redirect to signin.html');
 
 $test->get_ok('/', 'authenticated request ok')
