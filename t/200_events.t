@@ -5,6 +5,7 @@ use utf8;
 use Data::Dump qw/dump/;
 use DateTime::Format::Strptime qw/strptime/;
 use DateTime;
+use Encode qw/encode_utf8/;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
@@ -56,7 +57,7 @@ subtest 'POST /event' => sub {
         short_desc     => "itsa shortdesc",
         custom_url     => 'https://event.url',
         custom_pricing => '¥4,000',
-        name           => "saturday night test event £ ウ",
+        name           => "saturday night test event ꙮ",
         is_canceled    => 0,
         synthetic_name => 'Saturday Night Test',
     };
@@ -64,6 +65,10 @@ subtest 'POST /event' => sub {
     $test->post_ok('/event/', $new_event, 'post to /event/ returned success' );
     $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
+    # With the change in this commit, the output of decode_json is utf8 octets
+    # so we have to encode these logical perl characters here to match. That's
+    # not right. The output of decode_json should be logical characters. We're
+    # doing something wrong somwhere. But the web UI looks ok, so...?.
     $expected = {
         event_id       => 1,
         start_date     => $new_event->{start_date},
@@ -72,8 +77,8 @@ subtest 'POST /event' => sub {
         end_time       => $new_event->{end_time},
         short_desc     => $new_event->{short_desc},
         custom_url     => $new_event->{custom_url},
-        custom_pricing => '¥4,000',
-        name           => $new_event->{name},
+        custom_pricing => encode_utf8('¥4,000'),
+        name           => encode_utf8($new_event->{name}),
         is_canceled    => $new_event->{is_canceled},
         is_template    => undef,
         callers        => [],

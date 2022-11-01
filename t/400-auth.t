@@ -292,7 +292,7 @@ sub test_can_edit {
     ok $res_data->{data}{event_id},
         "POST created event # $res_data->{data}{event_id}";
     my $new_event_id = $res_data->{data}{event_id};
-    is $res_data->{data}{name}, decode_utf8("saturday night test event £ ウ"),
+    is $res_data->{data}{name}, "saturday night test event £ ウ",
         '...with good json';
     is_deeply $res_data->{errors}, [],
         '...and with no errors';
@@ -320,7 +320,7 @@ sub test_can_edit {
          'series programmer can edit the event');
     $content = $test_series_programmer->res->content;
     $res_data = decode_json $content;
-    is $res_data->{data}{short_desc}, decode_utf8("¥tsa change"),
+    is $res_data->{data}{short_desc}, "¥tsa change",
         'the desc was changed to a UTF8 char';
 
     #

@@ -191,18 +191,15 @@ sub post_row {
 
     $row->insert(); #TODO: check for failure
 
+    # fetch the row from the db to return so that they're getting the actual
+    # results
     my @pkey = $row->primary_columns;
     my $pkey = $pkey[0]; #We're not using composite pkeys
     my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
-    # TODO: load a fresh one to be returned
-    #     my $millennium_cds_rs = $schema->resultset('CD')->search(
-    #    { event_id => $event->event_id },
-    #    { prefetch => 'style' }
-    #  );
 
-    my $other_tables = $class->_update_relationships($row, \%incoming_data, $dbh);
+    my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh);
 
-    return $class->_row_to_result($row, $other_tables);
+    return $class->_row_to_result($retrieved_row, $other_tables);
 }
 
 =head2 put_row()
@@ -246,9 +243,13 @@ sub put_row {
 
     $row->update(); #TODO: check for failure
 
-    my $other_tables = $class->_update_relationships($row, \%incoming_data, $dbh);
+    # fetch the row from the db to return so that they're getting the actual
+    # results
+    my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
 
-    return $class->_row_to_result($row, $other_tables);
+    my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh);
+
+    return $class->_row_to_result($retrieved_row, $other_tables);
 };
 
 =head2 filter_input($field, $value)
