@@ -32,6 +32,11 @@
         </div>
       </div>
     </div>
-    <div id="login-redirect-modal">
-        You are not/no longer signed in. <a id="login-redirect-modal-link">Click here</a> to redirect to the signin page.
+    <div class="the-modal-zone">
+        <div id="login-redirect-modal">
+            You are not/no longer signed in. <a id="login-redirect-modal-link" target="_blank">Click here</a> to open the signin page.
+        </div>
+        <div id="insufficient-permissions-modal">
+            You do not have permissions to do that. Talk to the owner of the event/series or somebody on bacds-web-committee@.
+        </div>
     </div>

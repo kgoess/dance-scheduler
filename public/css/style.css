@@ -248,6 +248,11 @@ font-size: 10px;
     height: 100%;
 }
 
+/* so they'll be invisible if the javascript breaks */
+.the-modal-zone {
+    display: none;
+}
+
 /* 
  * accordion nav menu!
  * https://www.freecodecamp.org/news/build-an-accordion-menu-using-html-css-and-javascript/#:~:text=In%20UI%20design%2C%20an%20accordion,label%20will%20expand%20its%20content.

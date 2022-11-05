@@ -218,6 +218,12 @@
         width: 400,
         modal: true,
     });
+    insufficientPermissionsModal = $( '#insufficient-permissions-modal' ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 400,
+        modal: true,
+    });
 
 });
 
@@ -498,6 +504,9 @@ function handleError(err) {
             const signinUrl = err.responseJSON.data.url;
             $( '#login-redirect-modal-link' ).attr('href', signinUrl);
             loginRedirectModal.dialog( 'open' );
+            break;
+        case 403:
+            insufficientPermissionsModal.dialog( 'open' );
             break;
         default:
             alert('something bad happened, update failed, see the server logs');
