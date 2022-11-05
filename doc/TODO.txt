@@ -58,10 +58,10 @@ phase I:
    and "terms of service""
  - make the UI clear which fields are required and which are optional
  - add "help" buttons to the UI?
- - need CLI tool for password management
+ DONE need CLI tool for password management
  - need permissions to edit a standalone event without a series
  - fill in the 401 unauthorized error page 401.html
- - care that they're logged in
+ DONE care that they're logged in
  DONE hook up the bacds login form
  DONE CLI utility to manage username/pw
  - find docs on google/facebook to change them from redirects to something else
