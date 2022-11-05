@@ -102,7 +102,7 @@ subtest 'GET /parent_org/#' => sub{
 
 
 subtest 'PUT /parent_org/#' => sub {
-    plan tests => 3;
+    plan tests => 5;
 
     my ($res, $decoded, $got, $expected);
     my $edit_parent_org = {
@@ -133,6 +133,14 @@ subtest 'PUT /parent_org/#' => sub {
 
     # update our global parent_org object
     $ParentOrg = $dbh->resultset('ParentOrg')->find($ParentOrg_Id);
+
+
+    # demonstrate behavior on PUT with a non-existent pkey
+    $test->put_ok('/parent_org/45789', { content => $edit_parent_org })
+        or die $test->res->content;
+    $decoded = decode_json($test->res->content);
+    is $decoded->{errors}[0]{msg}, "Update failed for PUT /parent_org: parent_org_id '45789' not found",
+        'failed PUT has expected error msg' or diag explain $decoded;
 };
 
 

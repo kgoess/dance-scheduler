@@ -92,10 +92,7 @@ sub get_multiple_rows {
         }
     );
 
-    $resultset or die "empty set"; #TODO: More gracefully
-
     my @rows;
-
     while (my $row = $resultset->next) {
         push @rows, $class->_row_to_result($row);
     }
@@ -127,11 +124,13 @@ sub get_upcoming_rows {
     return $class->get_multiple_rows($search_args);
 }
 
-=head2 get_row()
+=head2 get_row($row_id)
 
 Return all information for a single row by primary key. Uses
 get_many_to_manys() and get_one_to_manys() from the child class to
 include data from related tables.
+
+Returns false if nothing found for $row_id
 
 =cut
 
@@ -149,7 +148,7 @@ sub get_row {
         }
 
     my $row = $dbh->resultset($model_name)->find($row_id)
-        or return false; #TODO: actual error message
+        or return false;
 
     my $other_tables = {};
     foreach my $other_table_name (@other_table_names){
@@ -165,6 +164,9 @@ sub get_row {
 Insert a new row. Uses get_fields_for_input from the child class to
 decide which fields can be set, and get_fkey_fields to know which must
 be converted to C<undef>.
+
+Technically all these updates should be wrapped in a transaction and rolled
+back if anything fails. I'll add that to our TODO.txt list for Phase II.
 
 =cut
 
@@ -189,7 +191,9 @@ sub post_row {
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
 
-    $row->insert(); #TODO: check for failure
+    # technically all this should be wrapped in a transaction and rolled back
+    # if any part fails
+    $row->insert();
 
     # fetch the row from the db to return so that they're getting the actual
     # results
@@ -205,7 +209,10 @@ sub post_row {
 =head2 put_row()
 
 Updates an existing row. Uses get_model_name(),
-get_fields_for_input(), and get_fkey_fields from decendent class.
+get_fields_for_input(), and get_fkey_fields from descendent class.
+
+The multiple table updates in here should really be wrapped
+in a transaction. I'll note that in our TODO.txt.
 
 =cut
 
@@ -219,13 +226,8 @@ sub put_row {
     my @pkeys = $resultset->result_source->primary_columns;
     my $pkey = $pkeys[0]; #We're not using composite pkeys
 
-    $resultset = $resultset->search(
-        { $pkey=> { '=' => $incoming_data{$pkey} } } # SQL::Abstract::Classic
-    );
-
-    $resultset or return 0; #TODO: More robust error handling
-
-    my $row = $resultset->next; #it's searching on primary key, there will only be 0 or 1 result
+    my $row = $resultset->find($incoming_data{$pkey})
+        or return;
 
     my @fields_for_input = $class->get_fields_for_input;
     foreach my $column (@fields_for_input) {
@@ -240,8 +242,9 @@ sub put_row {
 
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
-
-    $row->update(); #TODO: check for failure
+    
+    # This should all be wrapped in a transaction.
+    $row->update();
 
     # fetch the row from the db to return so that they're getting the actual
     # results

@@ -114,7 +114,7 @@ subtest 'GET /series/#' => sub {
 
 
 subtest 'PUT /series/1' => sub {
-    plan tests => 3;
+    plan tests => 5;
     my ($expected, $res, $decoded, $got);
 
     $ENV{TEST_NOW} += 100;
@@ -160,6 +160,13 @@ subtest 'PUT /series/1' => sub {
     # update our global series object
     $Series = $dbh->resultset('Series')->find($decoded->{data}{series_id});
 
+
+    # demonstrate behavior on PUT with a non-existent pkey
+    $test->put_ok('/series/45789', { content => $edit_series })
+        or die $test->res->content;
+    $decoded = decode_json($test->res->content);
+    is $decoded->{errors}[0]{msg}, "Update failed for PUT /series: series_id '45789' not found",
+        'failed PUT has expected error msg' or diag explain $decoded;
 };
 
 subtest 'GET /seriesAll' => sub {

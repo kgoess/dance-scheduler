@@ -107,7 +107,7 @@ subtest 'GET /band/#' => sub{
 
 
 subtest 'PUT /band/#' => sub {
-    plan tests => 3;
+    plan tests => 5;
 
     my ($res, $decoded, $got, $expected);
     my $edit_band = {
@@ -141,6 +141,14 @@ subtest 'PUT /band/#' => sub {
 
     # update our global band object
     $Band = $dbh->resultset('Band')->find($Band_Id);
+
+
+    # demonstrate behavior on PUT with a non-existent pkey
+    $test->put_ok('/band/45789', { content => $edit_band })
+        or die $test->res->content;
+    $decoded = decode_json($test->res->content);
+    is $decoded->{errors}[0]{msg}, "Update failed for PUT /band: band_id '45789' not found",
+        'failed PUT has expected error msg' or diag explain $decoded;
 };
 
 

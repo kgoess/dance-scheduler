@@ -134,9 +134,11 @@ plugin_keywords can_edit_event => sub {
             return $route_sub->(@args);
         }
 
-        my $event_id = $self->app->request->param('event_id');
-        my $event_rs = $dbh->resultset('Event')->find($event_id);
-        my $series_id = $event_rs->series_id;
+        my $event_id = $self->app->request->param('event_id')
+            or die "missing event_id in call to can_edit_event\n";
+        my $event = $dbh->resultset('Event')->find($event_id)
+            or die "no event found for event_id '$event_id' in can_edit_event\n";
+        my $series_id = $event->series_id;
         my @series_rs = $programmer->series(
              { 'series.series_id' => $series_id }
         );
@@ -274,7 +276,6 @@ sub login_redirect_json {
     $app->response->status(401);
     $app->response->headers->content_type('application/json');
     $app->response->content($results->format);
-    # FIXME how to send back the /signin.html location?
 }
 
 sub get_login_page_url {

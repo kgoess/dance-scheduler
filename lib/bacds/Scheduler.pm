@@ -357,10 +357,9 @@ get '/event/:event_id' => sub {
     my $results = $Results_Class->new;
 
     my $event = $event_model->get_row($event_id);
-    if($event){
+    if ($event) {
         $results->data($event)
-    }
-    else{
+    } else {
         $results->add_error(1100, "Nothing Found for event_id $event_id");
     }
 
@@ -378,10 +377,9 @@ post '/event/' => can_create_event sub {
     my $event = $event_model->post_row(params);
     my $results = $Results_Class->new;
 
-    if($event){
+    if ($event) {
         $results->data($event)
-    }
-    else{
+    } else {
         $results->add_error(1200, "Insert failed for new event");
     }
 
@@ -399,11 +397,11 @@ put '/event/:event_id' => can_edit_event sub {
     my $event = $event_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($event){
+    if ($event) {
         $results->data($event)
-    }
-    else{
-        $results->add_error(1300, "Update failed for new event");
+    } else {
+        my $event_id = params->{event_id};
+        $results->add_error(1300, "Update failed for PUT /event: event_id '$event_id' not found");
     }
 
     return $results->format;
@@ -458,10 +456,9 @@ get '/style/:style_id' => sub {
     my $results = $Results_Class->new;
 
     my $style = $style_model->get_row($style_id);
-    if($style){
+    if ($style) {
         $results->data($style)
-    }
-    else{
+    } else {
         $results->add_error(1400, "Nothing Found for style_id $style_id");
     }
 
@@ -473,10 +470,9 @@ post '/style/' => requires_superuser sub {
     my $style = $style_model->post_row(params);
     my $results = $Results_Class->new;
 
-    if($style){
+    if ($style) {
         $results->data($style)
-    }
-    else{
+    } else {
         $results->add_error(1500, "Insert failed for new style");
     }
 
@@ -488,11 +484,11 @@ put '/style/:style_id' => requires_superuser sub {
     my $style = $style_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($style){
+    if ($style) {
         $results->data($style)
-    }
-    else{
-        $results->add_error(1600, "Update failed for new style");
+    } else {
+        my $style_id = params->{style_id};
+        $results->add_error(1600, "Update failed for PUT /style: style_id '$style_id' not found");
     }
 
     return $results->format;
@@ -514,10 +510,9 @@ get '/venue/:venue_id' => sub {
     my $results = $Results_Class->new;
 
     my $venue = $venue_model->get_row($venue_id);
-    if($venue){
+    if ($venue) {
         $results->data($venue)
-    }
-    else{
+    } else {
         $results->add_error(1700, "Nothing Found for venue_id $venue_id");
     }
 
@@ -553,11 +548,11 @@ put '/venue/:venue_id' => requires_superuser sub {
     my $venue = $venue_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($venue){
+    if ($venue) {
         $results->data($venue)
-    }
-    else{
-        $results->add_error(1900, "Update failed for venue");
+    } else {
+        my $venue_id = params->{venue_id};
+        $results->add_error(1900, "Update failed for PUT /venue: venue_id '$venue_id' not found");
     }
 
     return $results->format;
@@ -610,10 +605,9 @@ get '/series/:series_id' => sub {
     my $results = $Results_Class->new;
 
     my $series = $series_model->get_row($series_id);
-    if($series){
+    if ($series) {
         $results->data($series)
-    }
-    else{
+    } else {
         $results->add_error(2000, "Nothing Found for series_id $series_id");
     }
 
@@ -674,11 +668,11 @@ put '/series/:series_id' => requires_superuser sub {
     my $series = $series_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($series){
+    if ($series) {
         $results->data($series)
-    }
-    else{
-        $results->add_error(2200, "Update failed for series");
+    } else {
+        my $series_id = params->{series_id};
+        $results->add_error(2200, "Update failed for PUT /series: series_id '$series_id' not found");
     }
 
     return $results->format;
@@ -717,10 +711,9 @@ get '/band/:band_id' => sub {
     my $results = $Results_Class->new;
 
     my $band = $band_model->get_row($band_id);
-    if($band){
+    if ($band) {
         $results->data($band)
-    }
-    else{
+    } else {
         $results->add_error(2300, "Nothing Found for band_id $band_id");
     }
 
@@ -756,11 +749,11 @@ put '/band/:band_id' => requires_login sub {
     my $band = $band_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($band){
+    if ($band) {
         $results->data($band)
-    }
-    else{
-        $results->add_error(2500, "Update failed for band");
+    } else {
+        my $band_id = params->{band_id};
+        $results->add_error(2500, "Update failed for PUT /band: band_id '$band_id' not found");
     }
 
     return $results->format;
@@ -799,10 +792,9 @@ get '/talent/:talent_id' => sub {
     my $results = $Results_Class->new;
 
     my $talent = $talent_model->get_row($talent_id);
-    if($talent){
+    if ($talent) {
         $results->data($talent)
-    }
-    else{
+    } else {
         $results->add_error(2600, "Nothing Found for talent_id $talent_id");
     }
 
@@ -838,11 +830,11 @@ put '/talent/:talent_id' => requires_login sub {
     my $talent = $talent_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($talent){
+    if ($talent) {
         $results->data($talent)
-    }
-    else{
-        $results->add_error(2800, "Update failed for talent");
+    } else {
+        my $talent_id = params->{talent_id};
+        $results->add_error(2800, "Update failed for PUT /talent: talent_id '$talent_id' not found");
     }
 
     return $results->format;
@@ -910,10 +902,9 @@ get '/caller/:caller_id' => sub {
     my $results = $Results_Class->new;
 
     my $caller = $caller_model->get_row($caller_id);
-    if($caller){
+    if ($caller) {
         $results->data($caller)
-    }
-    else{
+    } else {
         $results->add_error(2900, "Nothing Found for caller_id $caller_id");
     }
 
@@ -930,10 +921,9 @@ post '/caller/' => requires_login sub {
     my $caller = $caller_model->post_row(params);
     my $results = $Results_Class->new;
 
-    if($caller){
+    if ($caller) {
         $results->data($caller)
-    }
-    else{
+    } else {
         $results->add_error(3000, "Insert failed for new caller");
     }
 
@@ -950,11 +940,11 @@ put '/caller/:caller_id' => requires_login sub {
     my $caller = $caller_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($caller){
+    if ($caller) {
         $results->data($caller)
-    }
-    else{
-        $results->add_error(3100, "Update failed for new caller");
+    } else {
+        my $caller_id = params->{caller_id};
+        $results->add_error(3100, "Update failed for PUT /caller: caller_id '$caller_id' not found");
     }
 
     return $results->format;
@@ -1006,10 +996,9 @@ get '/parent_org/:parent_org_id' => sub {
     my $results = $Results_Class->new;
 
     my $parent_org = $parent_org_model->get_row($parent_org_id);
-    if($parent_org){
+    if ($parent_org) {
         $results->data($parent_org)
-    }
-    else{
+    } else {
         $results->add_error(3200, "Nothing Found for parent_org_id $parent_org_id");
     }
 
@@ -1026,10 +1015,9 @@ post '/parent_org/' => requires_superuser sub {
     my $parent_org = $parent_org_model->post_row(params);
     my $results = $Results_Class->new;
 
-    if($parent_org){
+    if ($parent_org) {
         $results->data($parent_org)
-    }
-    else{
+    } else {
         $results->add_error(3300, "Insert failed for new parent_org");
     }
 
@@ -1046,11 +1034,11 @@ put '/parent_org/:parent_org_id' => requires_superuser sub {
     my $parent_org = $parent_org_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($parent_org){
+    if ($parent_org) {
         $results->data($parent_org)
-    }
-    else{
-        $results->add_error(3400, "Update failed for new parent_org");
+    } else {
+        my $parent_org_id = params->{parent_org_id};
+        $results->add_error(3400, "Update failed for PUT /parent_org: parent_org_id '$parent_org_id' not found");
     }
 
     return $results->format;
@@ -1088,10 +1076,9 @@ get '/programmer/:programmer_id' => sub {
     my $results = $Results_Class->new;
 
     my $programmer = $programmer_model->get_row($programmer_id);
-    if($programmer){
+    if ($programmer) {
         $results->data($programmer)
-    }
-    else{
+    } else {
         $results->add_error(3200, "Nothing Found for programmer_id $programmer_id");
     }
 
@@ -1108,10 +1095,9 @@ post '/programmer/' => requires_superuser sub {
     my $programmer = $programmer_model->post_row(params);
     my $results = $Results_Class->new;
 
-    if($programmer){
+    if ($programmer) {
         $results->data($programmer)
-    }
-    else{
+    } else {
         $results->add_error(4300, "Insert failed for new programmer");
     }
 
@@ -1128,11 +1114,11 @@ put '/programmer/:programmer_id' => requires_superuser sub {
     my $programmer = $programmer_model->put_row(params);
     my $results = $Results_Class->new;
 
-    if($programmer){
+    if ($programmer) {
         $results->data($programmer)
-    }
-    else{
-        $results->add_error(4400, "Update failed for new programmer");
+    } else {
+        my $programmer_id = params->{programmer_id};
+        $results->add_error(4400, "Update failed for PUT /programmer: programmer_id '$programmer_id' not found");
     }
 
     return $results->format;

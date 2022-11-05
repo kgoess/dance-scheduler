@@ -140,7 +140,7 @@ subtest "GET /event/#" => sub{
 
 
 subtest "PUT /event/#" => sub {
-    plan tests => 4;
+    plan tests => 6;
 
     my ($expected, $modified_time, $created_time, $decoded, $got);
 
@@ -198,6 +198,14 @@ subtest "PUT /event/#" => sub {
 
     # update our global event object
     $Event = $dbh->resultset('Event')->find($decoded->{data}{event_id});
+
+    # demonstrate behavior on PUT with a non-existent pkey
+    $test->put_ok('/event/45789', { content => $edit_event })
+        or die $test->res->content;
+    $decoded = decode_json($test->res->content);
+    is $decoded->{errors}[0]{msg}, "Update failed for PUT /event: event_id '45789' not found",
+        'failed PUT has expected error msg' or diag explain $decoded;
+    
 };
 
 

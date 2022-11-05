@@ -79,13 +79,14 @@ subtest 'POST /venue' => sub{
         is_deleted           => $new_venue->{is_deleted},
         created_ts           => "2022-04-28T02:18:05",
         modified_ts          => "2022-04-28T02:18:05",
-        is_deleted           => 0, # FIXME is that right? test 1
+        is_deleted           => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
     # now save it for the subsequent tests
     $Venue = $dbh->resultset('Venue')->find($decoded->{data}{venue_id});
     $Venue_Id = $Venue->venue_id;
+
 };
 
 
@@ -117,7 +118,7 @@ subtest 'GET /venue/#' => sub {
 
 
 subtest 'PUT /venue/1' => sub {
-    plan tests => 4;
+    plan tests => 6;
     my ($expected, $res, $decoded, $got);
 
     $ENV{TEST_NOW} += 100;
@@ -167,6 +168,14 @@ subtest 'PUT /venue/1' => sub {
     ok( $res->is_success, 'returned success' );
 
     $Venue = $dbh->resultset('Venue')->find($decoded->{data}{venue_id});
+
+
+    # demonstrate behavior on PUT with a non-existent pkey
+    $test->put_ok('/venue/45789', { content => $edit_venue })
+        or die $test->res->content;
+    $decoded = decode_json($test->res->content);
+    is $decoded->{errors}[0]{msg}, "Update failed for PUT /venue: venue_id '45789' not found",
+        'failed PUT has expected error msg' or diag explain $decoded;
 
 };
 

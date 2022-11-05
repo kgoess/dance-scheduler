@@ -316,10 +316,10 @@ sub check_bacds_auth {
     $programmer->is_deleted
          and return undef, [403, "The account for '$email_param' is deleted"];
     $programmer->password_hash or return undef, [403,
-         'Please use google or facebook to login, or ask webmaster@ about dance-scheduler-user-password.pl'
+         'Please use google or facebook to login, or ask bacds-web-committee@ about dance-scheduler-user-password.pl'
     ];
 
-    # FIXME we're being an oracle. should return something more vague?
+    # We're being an oracle. Should return something more vague? Meh.
     password_matches($password_param, $programmer->password_hash)
          or return undef, [401, 'Incorrect password'] ;
 

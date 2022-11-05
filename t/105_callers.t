@@ -104,7 +104,7 @@ subtest 'GET /caller/#' => sub{
 
 
 subtest 'PUT /caller/#' => sub {
-    plan tests => 3;
+    plan tests => 5;
 
     my ($res, $decoded, $got, $expected);
     my $edit_caller = {
@@ -137,6 +137,14 @@ subtest 'PUT /caller/#' => sub {
 
     # update our global caller object
     $Caller = $dbh->resultset('Caller')->find($Caller_Id);
+
+
+    # demonstrate behavior on PUT with a non-existent pkey
+    $test->put_ok('/caller/45789', { content => $edit_caller })
+        or die $test->res->content;
+    $decoded = decode_json($test->res->content);
+    is $decoded->{errors}[0]{msg}, "Update failed for PUT /caller: caller_id '45789' not found",
+        'failed PUT has expected error msg' or diag explain $decoded;
 };
 
 

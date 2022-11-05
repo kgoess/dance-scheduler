@@ -19,6 +19,7 @@ sub get_dbh {
 
     my %dbi_params = (
         mysql_enable_utf8 => 1,
+        AutoCommit => 1, # recommended by DBIx::Class::Schema
     );
 
     my $dbi_dsn = $ENV{TEST_DSN} || "DBI:mysql:database=$database;host=$hostname;port=$port";
@@ -27,8 +28,7 @@ sub get_dbh {
     my $password = _get_password();
     my $user = 'scheduler';
 
-    my $dbh = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params)
-        or die "can't connect"; #TODO: More gracefully
+    my $dbh = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params);
 
     return $dbh;
 }

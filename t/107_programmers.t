@@ -317,7 +317,7 @@ subtest 'GET /programmer/3 (with events)' => sub{
 
 
 subtest 'PUT /programmer/#' => sub {
-    plan tests => 3;
+    plan tests => 5;
 
     my ($res, $decoded, $got, $expected);
     my $edit_programmer = {
@@ -351,6 +351,14 @@ subtest 'PUT /programmer/#' => sub {
 
     # update our global programmer object
     $Programmer = $dbh->resultset('Programmer')->find($Programmer_Id);
+
+
+    # demonstrate behavior on PUT with a non-existent pkey
+    $test->put_ok('/programmer/45789', { content => $edit_programmer })
+        or die $test->res->content;
+    $decoded = decode_json($test->res->content);
+    is $decoded->{errors}[0]{msg}, "Update failed for PUT /programmer: programmer_id '45789' not found",
+        'failed PUT has expected error msg' or diag explain $decoded;
 };
 
 subtest 'PUT /programmer/# 2 (with series)' => sub {

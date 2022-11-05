@@ -483,6 +483,10 @@ function saveAction(target, onSuccess) {
         data: dataString
     })
     .done( (msg) => {
+        if (msg.errors.length > 0) {
+            msg.errors.map((err) => alert(err.msg));
+            return;
+        }
         loadListForModel(modelName);
         displayItem(modelName, msg);
         if (onSuccess) {

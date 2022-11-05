@@ -17,7 +17,6 @@ package bacds::Scheduler::Model::Series;
 use 5.16.0;
 use warnings;
 
-#used by get_template_event
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Model::Event;
 
@@ -63,6 +62,8 @@ sub get_default_sorting { {-asc=>'name'} }
 Looks for an event with is_template set to true and the provided
 series_id
 
+Returns false if nothing found.
+
 =cut
 
 sub get_template_event {
@@ -73,7 +74,7 @@ sub get_template_event {
         series_id => $series_id,
         is_template => 1,
     });
-    my $row = $rs->single or return; #TODO: Actual error message
+    my $row = $rs->single or return;
     my $event_id = $row->event_id;
 
     my $event_model = 'bacds::Scheduler::Model::Event';
