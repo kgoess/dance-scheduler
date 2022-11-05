@@ -20,29 +20,13 @@ Checks for "signed_in_as" in the request stash and redirects if not present.
 
 =cut
 
-
 plugin_keywords requires_login => sub {
     my ($plugin, $route_sub, @args) = @_;
     return sub {
         my ($self) = @_;
 
-        my $login = $self->app->request->var('signed_in_as');
-
-        if (!$login) {
-
-            # see also Dancer2::Plugin::HTTP::ContentNegotiation?
-            # and $self->app->request->header('Accept');
-            state $variants = [
-                ['html', 1.000, 'text/html'       ],
-                ['json', 1.000,    'application/json'],
-            ];
-            my $media_type = choose($variants, $self->app->request->headers);
-            if ($media_type eq 'html') {
-                return $plugin->login_redirect_html($self);
-            } else {
-                return $plugin->login_redirect_json($self);
-            }
-        }
+        $self->app->request->var('signed_in_as') 
+            or return $plugin->login_redirect($self);
 
         $route_sub->(@args);
     };
@@ -53,7 +37,7 @@ plugin_keywords requires_superuser => sub {
     return sub {
         my ($self) = @_;
         my $email = $self->app->request->var('signed_in_as')
-            or return $plugin->login_redirect_json($self);
+            or return $plugin->login_redirect($self);
 
         my $dbh = get_dbh();
         my $programmer = $dbh->resultset('Programmer')->search({
@@ -78,6 +62,22 @@ plugin_keywords requires_superuser => sub {
         
     };
 };
+
+sub login_redirect{
+    my ($plugin, $self) = @_;
+    # see also Dancer2::Plugin::HTTP::ContentNegotiation?
+    # and $self->app->request->header('Accept');
+    state $variants = [
+        ['html', 1.000, 'text/html'       ],
+        ['json', 1.000,    'application/json'],
+    ];
+    my $media_type = choose($variants, $self->app->request->headers);
+    if ($media_type eq 'html') {
+        return $plugin->login_redirect_html($self);
+    } else {
+        return $plugin->login_redirect_json($self);
+    }
+}
 
 sub login_redirect_html {
     my ($plugin, $app) = @_;
@@ -119,7 +119,7 @@ plugin_keywords can_edit_event => sub {
     return sub {
         my ($self) = @_;
         my $email = $self->app->request->var('signed_in_as')
-            or return $plugin->login_redirect_json($self);
+            or return $plugin->login_redirect($self);
 
         my $dbh = get_dbh();
 
@@ -135,7 +135,7 @@ plugin_keywords can_edit_event => sub {
         my $event_rs = $dbh->resultset('Event')->find($event_id);
         my $series_id = $event_rs->series_id;
         my @series_rs = $programmer->series(
-             #{ 'series.series_id' => $series_id }
+             { 'series.series_id' => $series_id }
         );
         my @event_rs = $programmer->events(
              {  'event.event_id' => $event_id }
@@ -146,6 +146,50 @@ plugin_keywords can_edit_event => sub {
             my $results = bacds::Scheduler::Util::Results->new;
 
             $results->add_error(40301, "You do not have permission to modify this event");
+            $results->data(
+                {
+                    #url => $plugin->get_login_page_url($self),
+                }
+            );
+            $self->response->status(403);
+            $self->response->headers->content_type('application/json');
+            $self->response->content($results->format);
+        }
+    };
+};
+
+
+=head2 can_create_event
+
+=cut
+
+plugin_keywords can_create_event => sub {
+    my ($plugin, $route_sub, @args) = @_;
+    return sub {
+        my ($self) = @_;
+        my $email = $self->app->request->var('signed_in_as')
+            or return $plugin->login_redirect($self);
+
+        my $dbh = get_dbh();
+
+        my $programmer = $dbh->resultset('Programmer')->search({
+            email => $email,
+        })->first();
+
+        if ($programmer->is_superuser) {
+            return $route_sub->(@args);
+        }
+
+        my $series_id = $self->app->request->param('series_id');
+        my @series_rs = $programmer->series(
+             { 'series.series_id' => $series_id }
+        );
+        if (@series_rs ) {
+            $route_sub->(@args); # this is success
+        } else {
+            my $results = bacds::Scheduler::Util::Results->new;
+
+            $results->add_error(40303, "You do not have permission to create this event");
             $results->data(
                 {
                     #url => $plugin->get_login_page_url($self),

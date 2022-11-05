@@ -374,7 +374,7 @@ Create a new event.
 
 =cut
 
-post '/event/' => requires_login sub {
+post '/event/' => can_create_event sub {
     my $event = $event_model->post_row(params);
     my $results = $Results_Class->new;
 
