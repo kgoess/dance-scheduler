@@ -10,7 +10,7 @@ use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 57;
+use Test::More tests => 60;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -281,7 +281,7 @@ sub test_can_edit {
         is_canceled    => 0,
         synthetic_name => 'Saturday Night Test',
     };
-    my ($content, $res_data);
+    my ($content, $res, $res_data);
 
     #
     # any logged-in user can create an event
@@ -355,6 +355,7 @@ sub test_can_edit {
     $content = decode_json($test_noauth->res->content);
     is $content->{errors}[0]{msg}, "You are not logged in",
         'JSON not logged in getting appropriate error' or diag explain $content;
+
     #
     # some other user has permissions but not to this particular event
     #
@@ -371,9 +372,19 @@ sub test_can_edit {
         is_canceled    => 0,
         synthetic_name => 'some other event',
     };
-    $test_other_event_programmer->post_ok('/event/', $other_event,
+    # verify that this programmer doesn't have permissions to create
+    # an event under this series
+    $res = $test_other_event_programmer->post('/event/', $other_event);
+    is $res->code, '403', 'no permission to create event in series 1';
+    like $res->content, qr{You do not have permission to create this event} or diag $res->content;
+
+    # so use the series programmer to create this other event
+    $test_series_programmer->post_ok('/event/', $other_event,
         'created other event');
-    $content = $test_other_event_programmer->res->content;
+    $res = $test_series_programmer->res;
+    is $res->code, '200', 'create other_event got 200 ok'
+        or BAIL_OUT($res->content);;
+    $content = $res->content;
     $res_data = decode_json $content;
     ok $res_data->{data}{event_id},
          "POST created other event # $res_data->{data}{event_id}";
@@ -393,7 +404,7 @@ sub test_can_edit {
         "sure, the other event programmer can edit *their* event");
 
     # but the other_event_programmer can't edit the *first* event
-    my $res = $test_other_event_programmer->put("/event/$new_event_id", content => $event_edit);
+    $res = $test_other_event_programmer->put("/event/$new_event_id", content => $event_edit);
     is $res->code, 403, 'other event programmer gets a 403';
     $res_data = decode_json $res->content;
     is $res_data->{errors}[0]{msg}, "You do not have permission to modify this event",
