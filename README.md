@@ -45,6 +45,8 @@ Install
     perl Makefile.PL
     make
     make test
+    # or make test HARNESS_OPTIONS=j3 (there are only 2 cores on the fried VPS,
+    # so "3" is the best speedup you'll get)
 
     # install the libraries to /var/lib/dance-scheduler
     make install
