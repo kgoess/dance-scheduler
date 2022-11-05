@@ -1,5 +1,6 @@
 apache/dance-scheduler.conf
 bin/app.psgi
+bin/dance-scheduler-add-programmer.pl
 bin/dance-scheduler-user-password.pl
 bin/insert-an-event.pl
 bin/migrate-bands.pl
@@ -18,7 +19,6 @@ doc/system-setup.txt
 doc/TODO.txt
 environments/development.yml
 environments/production.yml
-lib/bacds/.Scheduler.pm.swo
 lib/bacds/Scheduler.pm
 lib/bacds/Scheduler/FederatedAuth.pm
 lib/bacds/Scheduler/Model.pm
@@ -50,11 +50,12 @@ lib/bacds/Scheduler/Schema/Result/ProgrammerSeriesMap.pm
 lib/bacds/Scheduler/Schema/Result/Series.pm
 lib/bacds/Scheduler/Schema/Result/Style.pm
 lib/bacds/Scheduler/Schema/Result/Talent.pm
-lib/bacds/Scheduler/Util/Cookie.pm
-lib/bacds/Scheduler/Util/Test.pm
 lib/bacds/Scheduler/Schema/Result/Venue.pm
 lib/bacds/Scheduler/Schema/Role/AutoTimestamps.pm
+lib/bacds/Scheduler/Util/Cookie.pm
 lib/bacds/Scheduler/Util/Db.pm
+lib/bacds/Scheduler/Util/Results.pm
+lib/bacds/Scheduler/Util/Test.pm
 lib/bacds/Scheduler/Util/Time.pm
 LICENSE
 Makefile.PL
@@ -72,6 +73,7 @@ public/dispatch.fcgi
 public/favicon.ico
 public/images/calendar.png
 public/images/facebook-logo.svg
+public/images/favicon.ico
 public/javascripts/events.js
 public/javascripts/jquery-ui.js
 public/javascripts/jquery.js
@@ -117,6 +119,7 @@ t/204_events_with_styles.t
 t/206_events_with_parent_orgs.t
 t/400-auth.t
 t/cache/google-oauth-keys.json
+views/400.tt
 views/401.tt
 views/500.tt
 views/accordion2.tt
