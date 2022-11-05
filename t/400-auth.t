@@ -10,7 +10,7 @@ use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 54;
+use Test::More tests => 57;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -64,7 +64,7 @@ sub test_google_login {
     my $jwt = "eyJhbGciOiJIUzI1NiJ9.dGVzdA.ujBihtLSr66CEWqN74SpLUkv28lra_CeHnxLmLNp4Jo";
     $res = $test->request(POST '/google-signin', {credential => $jwt});
     is $res->code, 400, 'got 400';
-    like $res->content, qr{<h1>Error 400 - Bad Request</h1>}, 'bad request';
+    like $res->content, qr{<h1>Error 400 - Bad Request :\(</h1>}, 'bad request';
 
     like $res->content, qr{JWS: kid_keys lookup failed}, 'invalid jwt';
 }
@@ -339,13 +339,22 @@ sub test_can_edit {
     #
     # not-logged-in user gets a redirect
     #
-    diag "FIXME Plugin::Auth->login_redirect_json should return some JSON blob that
-          the js client understands";
     $test_noauth->post('/event/', $new_event);
     is $test_noauth->res->code, '303',
         "not-logged-in user can't do jack";
     $content = $test_noauth->res->content;
+    like $content, qr{This item has moved <a href="http://localhost/signin.html">here</a>},
+        'html redirect getting appropriate message'; 
 
+    #
+    # JSON not-logged-in user gets a 401 error
+    #
+    $test_noauth->post('/event/', $new_event, accept => 'application/json');
+    is $test_noauth->res->code, '401',
+        "not-logged-in json can't do jack either";
+    $content = decode_json($test_noauth->res->content);
+    is $content->{errors}[0]{msg}, "You are not logged in",
+        'JSON not logged in getting appropriate error' or diag explain $content;
     #
     # some other user has permissions but not to this particular event
     #

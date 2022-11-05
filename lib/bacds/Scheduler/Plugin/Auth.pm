@@ -48,6 +48,37 @@ plugin_keywords requires_login => sub {
     };
 };
 
+plugin_keywords requires_superuser => sub {
+    my ($plugin, $route_sub, @args) = @_;
+    return sub {
+        my ($self) = @_;
+        my $email = $self->app->request->var('signed_in_as')
+            or return $plugin->login_redirect_json($self);
+
+        my $dbh = get_dbh();
+        my $programmer = $dbh->resultset('Programmer')->search({
+            email => $email,
+        })->first();
+
+        if ($programmer->is_superuser) {
+            return $route_sub->(@args);
+        } else {
+            my $results = bacds::Scheduler::Util::Results->new;
+
+            $results->add_error(40302, "You do not have permission to do that");
+            $results->data(
+                {
+                    #url => $plugin->get_login_page_url($self),
+                }
+            );
+            $self->response->status(403);
+            $self->response->headers->content_type('application/json');
+            $self->response->content($results->format);
+        }
+        
+    };
+};
+
 sub login_redirect_html {
     my ($plugin, $app) = @_;
 

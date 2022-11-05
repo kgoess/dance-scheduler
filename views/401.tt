@@ -1,1 +1,2 @@
-401 Unauthorized!
+<h1>Error 400 Unauthorized!</h1>
+<% content | html_entity %>

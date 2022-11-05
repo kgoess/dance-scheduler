@@ -469,7 +469,7 @@ get '/style/:style_id' => sub {
 };
 
 
-post '/style/' => requires_login sub {
+post '/style/' => requires_superuser sub {
     my $style = $style_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -484,7 +484,7 @@ post '/style/' => requires_login sub {
 };
 
 
-put '/style/:style_id' => sub {
+put '/style/:style_id' => requires_superuser sub {
     my $style = $style_model->put_row(params);
     my $results = $Results_Class->new;
 
@@ -530,7 +530,7 @@ Create a new venue
 
 =cut
 
-post '/venue/' => requires_login sub {
+post '/venue/' => requires_superuser sub {
     my $venue = $venue_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -549,7 +549,7 @@ Update an existing venue.
 
 =cut
 
-put '/venue/:venue_id' => sub {
+put '/venue/:venue_id' => requires_superuser sub {
     my $venue = $venue_model->put_row(params);
     my $results = $Results_Class->new;
 
@@ -651,7 +651,7 @@ Create a new series
 
 =cut
 
-post '/series/' => requires_login sub {
+post '/series/' => requires_superuser sub {
     my $series = $series_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -670,7 +670,7 @@ Update an existing series.
 
 =cut
 
-put '/series/:series_id' => sub {
+put '/series/:series_id' => requires_superuser sub {
     my $series = $series_model->put_row(params);
     my $results = $Results_Class->new;
 
@@ -752,7 +752,7 @@ Update an existing band.
 
 =cut
 
-put '/band/:band_id' => sub {
+put '/band/:band_id' => requires_login sub {
     my $band = $band_model->put_row(params);
     my $results = $Results_Class->new;
 
@@ -834,7 +834,7 @@ Update an existing talent.
 
 =cut
 
-put '/talent/:talent_id' => sub {
+put '/talent/:talent_id' => requires_login sub {
     my $talent = $talent_model->put_row(params);
     my $results = $Results_Class->new;
 
@@ -946,7 +946,7 @@ Update a caller.
 
 =cut
 
-put '/caller/:caller_id' => sub {
+put '/caller/:caller_id' => requires_login sub {
     my $caller = $caller_model->put_row(params);
     my $results = $Results_Class->new;
 
@@ -1022,7 +1022,7 @@ Create a new parent_org.
 
 =cut
 
-post '/parent_org/' => requires_login sub {
+post '/parent_org/' => requires_superuser sub {
     my $parent_org = $parent_org_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -1042,7 +1042,7 @@ Update a parent_org.
 
 =cut
 
-put '/parent_org/:parent_org_id' => sub {
+put '/parent_org/:parent_org_id' => requires_superuser sub {
     my $parent_org = $parent_org_model->put_row(params);
     my $results = $Results_Class->new;
 
@@ -1104,7 +1104,7 @@ Create a new programmer.
 
 =cut
 
-post '/programmer/' => requires_login sub {
+post '/programmer/' => requires_superuser sub {
     my $programmer = $programmer_model->post_row(params);
     my $results = $Results_Class->new;
 
@@ -1124,7 +1124,7 @@ Update a programmer.
 
 =cut
 
-put '/programmer/:programmer_id' => sub {
+put '/programmer/:programmer_id' => requires_superuser sub {
     my $programmer = $programmer_model->put_row(params);
     my $results = $Results_Class->new;
 
