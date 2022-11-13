@@ -40,7 +40,7 @@ WriteMakefile(
         'DBIx::Class' => 0,
         'DBIx::Class::Schema::Loader' => 0,
         'Dancer2' => 0.400000,
-        'Dancer2::Plugin::HTTP::ContentNegotiation' => '',
+        'Dancer2::Plugin::HTTP::ContentNegotiation' => 0,
         'Data::Dump' => 0,
         'Data::Entropy::Algorithms' => 0,
         'DateTime' => 0,
