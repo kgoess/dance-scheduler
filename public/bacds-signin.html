@@ -1,18 +1,25 @@
 <html>
     <head>
         <style>
-            .container{
+            .container {
                 border: 1px solid grey;
                 padding: 3px;
                 margin: auto;
                 width: fit-content;
             }
-            .container div{
+            .container div {
                 margin: 5px auto;
                 width: fit-content;
             }
-            form{
+            form {
                 margin: auto;
+            }
+            .message {
+                max-width: 400px;
+                margin: auto;
+                padding: 20px;
+                font-style: italic;
+                background-color: ivory;
             }
         </style>
     </head>
@@ -24,6 +31,11 @@
                 <div class"password"><label>Password: <input name="password" type="password"></label></div>
                 <div><button>Login</button></div>
             </form>
+        </div>
+        <div class="message">
+            To use this form you're expected to have access to command-line
+            scripts on the server: dance-scheduler-add-programmer.pl and
+            dance-scheduler-user-password.pl in /var/lib/dance-scheduler/bin/.
         </div>
     </body>
 </html>
