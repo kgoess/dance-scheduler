@@ -105,6 +105,8 @@ Continuing with that will redirect you here.
 This endpoint will verify your credential information and set up a
 session.
 
+See also bacds::Scheduler::FederatedAuth->check_google_auth.
+
 =cut
 
 post '/google-signin' => sub {
@@ -135,6 +137,8 @@ you here.
 
 This endpoint will verify your credential information and set up a
 session.
+
+See also bacds::Scheduler::FederatedAuth->check_facebook_auth
 
 =cut
 

@@ -66,6 +66,8 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 =head2 check_google_auth
 
+See the /google-signin route in bacds::Scheduler.
+
 See notes on https://metacpan.org/pod/Crypt::JWT
 
 Returns ($programmer, $err), with only one of those populated.
@@ -205,6 +207,8 @@ sub refresh_google_oauth_keys {
 }
 
 =head2 check_facebook_auth
+
+See the /facebook-signin route in bacds::Scheduler.
 
 The response from Facebook's /me will look like this:
 
