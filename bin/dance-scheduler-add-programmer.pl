@@ -6,7 +6,17 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage qw/pod2usage/;
 
-use bacds::Scheduler::Util::Db qw/get_dbh/;
+eval {
+     require bacds::Scheduler::Util::Db;
+};
+if ($@) {
+   die "\nERROR: Loading the code failed, try running this first:\n\n".
+    "       eval \$(perl -Mlocal::lib=/var/lib/dance-scheduler)\n\n".
+    "Error was:\n$@\\nn";
+}
+
+bacds::Scheduler::Util::Db->import( qw/get_dbh/ );
+
 
 my ($name, $email, $is_superuser, $help);
 GetOptions(
@@ -30,7 +40,7 @@ my $new = $dbh->resultset('Programmer')->new({
 
 $new->insert;
 
-say "New user $email/$name is in the database";
+say "New user $email/$name has been added to the database";
 
 exit;
 

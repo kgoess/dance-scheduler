@@ -6,8 +6,17 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage qw/pod2usage/;
 
-use bacds::Scheduler::FederatedAuth;
-use bacds::Scheduler::Util::Db qw/get_dbh/;
+eval {
+    require bacds::Scheduler::Util::Db;
+    require bacds::Scheduler::FederatedAuth;
+};
+if ($@) {
+   die "\nERROR: Loading the code failed, try running this first:\n\n".
+    "       eval \$(perl -Mlocal::lib=/var/lib/dance-scheduler)\n\n".
+    "Error was:\n$@\\nn";
+}
+bacds::Scheduler::Util::Db->import( qw/get_dbh/ );
+
 
 my ($email, $unset, $help);
 GetOptions(
