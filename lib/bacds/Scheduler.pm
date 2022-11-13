@@ -1053,12 +1053,11 @@ The people that are allowed to make changes
 
 Returns all of the programmers in the db not marked "is_deleted".
 
-
 =cut
 
 my $programmer_model = 'bacds::Scheduler::Model::Programmer';
 
-get '/programmerAll' => sub {
+get '/programmerAll' => requires_login sub {
     my $results = $Results_Class->new;
 
     $results->data($programmer_model->get_multiple_rows);
@@ -1071,7 +1070,7 @@ get '/programmerAll' => sub {
 
 =cut
 
-get '/programmer/:programmer_id' => sub {
+get '/programmer/:programmer_id' => requires_login sub {
     my $programmer_id = params->{programmer_id};
     my $results = $Results_Class->new;
 
