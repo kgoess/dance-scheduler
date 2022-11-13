@@ -1,0 +1,7 @@
+BACDS Dance Scheduler
+
+Data Deletion
+
+To delete your personal information from the Dance Scheduler Application,
+contact web-committee@ via email and ask them to change the value for the
+programmers.email field in the schedule database to an opaque value.
