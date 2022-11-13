@@ -35,6 +35,7 @@ my %Series_Lookup = (
     'ONLINE-ONLINE Concert &amp; Dance' => 'Online Concert',
     'ONLINE-ONLINE Concert & Dance' => 'Online Concert',
     'SSU-ENGLISH/CAMP' => 'Hey Days English Week',
+    'SSU-ENGLISH CAMP HEY DAYS' => 'Hey Days English Week',
     'BR-ENGLISH CAMP FALL FROLICK' => 'Fall Frolick',
     'MON-FAMILY/CAMP' => 'Family Week',
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
@@ -132,6 +133,8 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'ENGLISH CAMP FALL FROLICK') {
         push @old_styles, 'ENGLISH', 'CAMP';
+    } elsif ($old_style eq 'ENGLISH CAMP HEY DAYS') {
+        push @old_styles, 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'FAMILY/CAMP') {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CONTRA/CAMP') {
@@ -142,6 +145,8 @@ sub attach_styles {
         push @old_styles, 'CONTRA', 'CAMP';
     } elsif ($old_style eq 'ENGLISH/SPECIAL') {
         push @old_styles, 'ENGLISH';
+    } elsif ($old_style eq 'CONTRA/SPECIAL') {
+        push @old_styles, 'CONTRA';
     } elsif ($old_style eq 'CONTRA/SPECIAL') {
         push @old_styles, 'CONTRA';
     } else {
