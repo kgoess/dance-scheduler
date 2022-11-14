@@ -32,6 +32,11 @@
         </div>
       </div>
     </div>
+    <!-- These divs in "the-modal-zone" are hidden divs used by jquery's dialog()
+         in scheduler.js, e.g.
+
+             insufficientPermissionsModal = $( '#insufficient-permissions-modal' ).dialog({
+     -->
     <div class="the-modal-zone">
         <div id="login-redirect-modal">
             You are not/no longer signed in. <a id="login-redirect-modal-link" target="_blank">Click here</a> to open the signin page.
