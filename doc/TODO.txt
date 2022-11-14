@@ -39,7 +39,7 @@ phase I:
  DONE- merge to master
  DONE work out authentication
  - sort out abuse of the 'band' column
- - find other TODOs/FIXMEs in the code
+ DONE find other TODOs/FIXMEs in the code
  DONE need an event url for display in https://bacds.org/scripts/dancefinder.pl,
    called out by Alan's change 904dd65c6e832 in
    git:/var/lib/git/bacds.org-scripts/
@@ -49,13 +49,13 @@ phase I:
     -- add "directions" field to venues
     -- create "pricing" table that maps to events
     -- create a sidebar options table that links to events, to allow including and sorting options as desired
- - fill in TOS, privacy urls from google auth
+ DONE fill in TOS, privacy urls from google auth
    for their page "Confirm you want to sign in to "bacds.org" as Bob
    bob@foo.com. To create your account, Google will share your name, email
    address, and profile picture with bacds.org. See bacds.org's "privacy policy"
    and "terms of service""
  DONE need CLI tool for password management
- - fill in the 401 unauthorized error page 401.html
+ DONE fill in the 401 unauthorized error page 401.html
  DONE care that they're logged in
  DONE hook up the bacds login form
  DONE CLI utility to manage username/pw
@@ -72,11 +72,14 @@ phase I:
 
 phase II:
 
+ - need a way to see old events
  - handle server errors better than an alert box
  - make /directions/content.html a dynamic page
  - the listbox showing existing things would be completely retooled, with
    filtering and who knows
  - CALDAV output
- - need a way to see old events
  - add transactions in functions like bacds::Scheduler::Model->post_row and
    ->put_row that update multiple tables
+ - add spinner for login buttons, see recommendation here:
+    https://developers.facebook.com/docs/facebook-login/web/login-button/
+ - add spinner for other document loading stuff in the main page?
