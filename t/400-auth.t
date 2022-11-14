@@ -10,7 +10,7 @@ use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 60;
+use Test::More tests => 62;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -141,7 +141,9 @@ sub test_bacds_login {
         programmer_email => 'nobody@evil.ru',
         password => 'paSSw0rd',
     };
-    $res = $test->request(POST '/bacds-signin', $bad_params);
+    warning_is {
+        $res = $test->request(POST '/bacds-signin', $bad_params);
+    } qq{login failure for nobody\@evil.ru: No programmer found for 'nobody\@evil.ru'\n};
     is $res->code, 401, 'got 401';
     like $res->content, qr{Unauthorized!}, 'bad request';
 
@@ -169,9 +171,11 @@ sub test_bacds_login {
         programmer_email => 'bacds@loginner.com',
         password => 'not my password',
     };
-    $res = $test->request(POST '/bacds-signin', $wrong_pw_params);
-    is $res->code, 401, 'successful login';
-    like $res->content, qr{Unauthorized!}, 'bad request';
+    warning_is {
+        $res = $test->request(POST '/bacds-signin', $wrong_pw_params);
+    } qq{login failure for bacds\@loginner.com: Incorrect password\n};
+    is $res->code, 401, 'wrong pw gets a 401';
+    like $res->content, qr{Unauthorized!}, 'bad request gets "Unauthorized"';
 
 }
 
