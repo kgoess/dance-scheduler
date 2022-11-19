@@ -11,6 +11,7 @@
             {
                 name => "name",
                 label => "Name",
+                required => 1,
             },
             {
                 name => "frequency",
@@ -20,6 +21,7 @@
                 name => "short_desc",
                 label => "Short Description",
                 type  => "textarea",
+                required => 1,
             },
             {
                 name => "sidebar",
@@ -30,6 +32,7 @@
                 name => "display_text",
                 label => "Display Text",
                 type  => "textarea",
+                required => 1,
             },
             {
                 name => "programmer_notes",
@@ -53,15 +56,15 @@
         %>
         <% FOREACH column IN series_column_types %>
             <div name="<% column.name %>" class="display-row" column-type="text-item">
-                <label for="<% column.name %>" class="row-label"><% column.label %></label>
+                <label for="<% column.name %>" class="row-label"><% column.label %><% IF column.required %><span class="required-marker">*</span><% END %></label>
                 <span class="row-contents"></span>
                 <% IF column.type == "textarea" %>
-                    <textarea class="row-edit" name="<% column.name %>" rows="8" cols="70" hidden >
+                    <textarea class="row-edit" name="<% column.name %>" rows="8" cols="70" hidden <% IF column.required %>required<% END %> >
                     </textarea>
                 <% ELSIF column.type == "checkbox" %>
                     <input type="checkbox" class="row-edit" name="<% column.name %>" value="1" hidden />
                 <% ELSE %>
-                    <input class="row-edit" name="<% column.name %>" size="40" hidden />
+                    <input class="row-edit" name="<% column.name %>" size="40" hidden <% IF column.required %>required<% END %>  />
                 <% END %>
             </div>
         <% END %>

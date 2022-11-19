@@ -8,14 +8,18 @@
 <div class="model-display" hidden>
     <form id="programmer-display-form" class="display-form">
         <div name="name" class="display-row" column-type="text-item">
-            <span class="row-label">Name</span>
+            <label for="name">
+                <span class="row-label">Name<span class="required-marker">*</span></span>
+            </label>
             <span class="row-contents"></span>
-            <input class="row-edit" name="name" hidden />
+            <input class="row-edit" name="name" hidden required />
         </div>
         <div name="email" class="display-row" column-type="text-item">
-            <span class="row-label">Email</span>
+            <label for="email">
+                <span class="row-label">Email<span class="required-marker">*</span></span>
+            </label>
             <span class="row-contents"></span>
-            <input class="row-edit" name="email" hidden />
+            <input class="row-edit" name="email" hidden required />
         </div>
         <div name="is_superuser" class="display-row" column-type="checkbox-item">
             <span class="row-label">Super User?</span>

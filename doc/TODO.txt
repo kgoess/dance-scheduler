@@ -83,3 +83,4 @@ phase II:
  - add spinner for login buttons, see recommendation here:
     https://developers.facebook.com/docs/facebook-login/web/login-button/
  - add spinner for other document loading stuff in the main page?
+ - refactor all that repetition in the templates
