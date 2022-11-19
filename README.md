@@ -83,7 +83,7 @@ Code Layout
 
 ```
 # these drive the dancer2 app
-./environments
+./environments/
 ./environments/development.yml
 ./environments/production.yml
 ./config.yml
@@ -91,7 +91,7 @@ Code Layout
 
 # these are TemplateToolkit templates that produce the html, dancer2 called the
 # directory "view" as part of the MVC pattern
-./views
+./views/
 ./views/accordion2.tt
 ./views/bands.tt
 ./views/callers.tt
@@ -100,7 +100,7 @@ Code Layout
 
 # lib contains the perl modules, they get installed to
 # /var/lib/dance-scheduler/lib/perl5
-./lib
+./lib/
 
 # this is the main module and has all the url routes defined. It's the
 # "Controller" in MVC
@@ -130,14 +130,14 @@ Code Layout
 
 # various notes in doc and README.md
 ./README.md
-./doc
+./doc/
 ./doc/HOW-TO-DBIx.md
 ./doc/dance-scheduler-erd.png
 ./doc/system-setup.txt
 ./doc/TODO.txt
 
 
-./schemas
+./schemas/
 ./schemas/drop-everything.sh
 ./schemas/create-everything.sh
 ./schemas/migrate-everything.sh
@@ -151,8 +151,10 @@ Code Layout
 ./apache/dance-scheduler.conf
 
 # some utility scripts that get installed to /var/lib/dance-scheduler/bin/
+# (which will be in your path if you've run this:)
+#     eval $(perl -Mlocal::lib=/var/lib/dance-scheduler)
 # and the migration helpers (that don't get installed)
-./bin
+./bin/
 ./bin/dance-scheduler-user-password.pl
 ./bin/dance-scheduler-add-programmer.pl
 ./bin/migrate-bands.pl
@@ -161,10 +163,10 @@ Code Layout
 # ...etc
 
 # css, javascript and static un-templated HTML
-./public
-./public/css
-./public/images
-./public/javascripts
+./public/
+./public/css/
+./public/images/
+./public/javascripts/
 ./public/signin.html
 ./public/bacds-signin.html
 
@@ -172,3 +174,66 @@ Code Layout
 ./t
 
 ```
+
+Login
+----
+
+So that we don't have to manage passwords for users, and worry about weak
+passwords and all that, we added a login-with button for Facebook and Google.
+If a user has command-line access at the server they can run the user-password
+utility and login with a password.
+
+
+Google Signin Button
+----
+
+See the /google-signin route in bacds::Scheduler and
+bacds::Scheduler::FederatedAuth->check_google_auth
+
+https://developers.google.com/identity/gsi/web/guides/overview
+
+For the settings in public/signin.html, see:
+https://developers.google.com/identity/gsi/web/reference/html-reference
+
+
+For the admin console:
+
+https://cloud.google.com, sign in with kevin's board email, click "console" pick the
+"BACDS Dance Scheduler" project.
+
+
+
+Facebook Signin Button
+----
+
+See the /facebook-signin route in bacds::Scheduler and
+bacds::Scheduler::FederatedAuth->check_facebook_auth
+
+See Facebook::OpenGraph https://metacpan.org/pod/Facebook::OpenGraph.
+
+https://developers.facebook.com/docs/facebook-login/web/login-button/
+
+https://developers.facebook.com/docs/javascript/quickstart
+
+https://developers.facebook.com/docs/reference/javascript/FB.getLoginStatus/
+
+https://developers.facebook.com/docs/facebook-login/guides
+
+https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow/
+
+https://developers.facebook.com/apps/430760472446636/fb-login/quickstart/
+
+
+For the admin console:
+
+https://developers.facebook.com/, kevin and kennith are set as administrators.
+
+
+Some Other Urls I Had Open That Might Be Helpful
+----
+
+https://medium.com/@ashokyogi5/a-beginners-guide-to-google-oauth-and-google-apis-450f36389184
+
+https://developers.google.com/identity/openid-connect/openid-connect
+
+https://blog.logrocket.com/how-to-authenticate-access-google-apis-using-oauth-2-0/
