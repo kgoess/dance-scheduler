@@ -12,6 +12,7 @@
             <input type="hidden" class="row-edit" name="is_template">
         </div>
         <div name="series_id" class="display-row" column-type="list-item" model-name="series" table-name="series" >
+            <div class="help-button" id="template-help">?</div>
             <div class="multi-select-wrapper">
                 <span class="row-label">Series</span>
                 <select name="series_id" class="series-for-event">

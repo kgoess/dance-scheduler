@@ -44,4 +44,12 @@
         <div id="insufficient-permissions-modal">
             You do not have permissions to do that. Talk to the owner of the event/series or somebody on bacds-web-committee@.
         </div>
+        <div id="template-help-modal">
+            <p>Selecting a Series for a new Event fills in some fields for that
+               Event from the "template" fields for the selected Series.</p>
+            <p>Check out the "Manage Template" button underneath the Series
+               section and it will make more sense.</p>
+            <p>If there's anything filled in for the Event then changing the
+               Series won't apply the "template" to the Event.</p>
+        </div>
     </div>

@@ -149,6 +149,13 @@
 
     templateEventPopup.attr('modelName', 'event');
 
+    templateHelpDialog = $( '#template-help-modal' ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 400,
+        modal: true,
+    });
+
     eventTemplateDialog = $( '#series-template' ).dialog({
         autoOpen: false,
         height: 400,
@@ -203,6 +210,13 @@
 
     $( '.datepicker' ).datepicker({
           dateFormat: "yy-mm-dd"
+    });
+
+    $( '#template-help' ).click(function() {
+        templateHelpDialog.dialog( 'open' );
+    });
+    $( '#manage-template-help' ).click(function() {
+        templateHelpDialog.dialog( 'open' );
     });
 
     /* this is the button on the series accordion the starts the popup with the

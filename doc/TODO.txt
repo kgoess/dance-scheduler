@@ -62,8 +62,8 @@ phase I:
  FIXED?- is_superuser is saying "yes" even when it's not
  DONE add handler for the 403 "you don't have permission" and let them continue
  NO, SUPERUSER IS FINE need permissions to edit a standalone event without a series
- - make the UI clear which fields are required and which are optional
- - add "help" buttons to the UI?
+ DONE make the UI clear which fields are required and which are optional
+ DONE add "help" buttons to the UI?
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
  - work out that is_deleted field--it shouldn't be exposed (there should be a

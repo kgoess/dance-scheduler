@@ -223,9 +223,10 @@ font-size: 10px;
 .button-container {
     display: flex;
     justify-content: center;
+    margin: 5px;
 }
 .button {
-    margin: 5px;
+    margin: 0 5px;
 }
 .row-contents {
     max-width: 40em;
@@ -272,6 +273,19 @@ form:invalid button {
 .required-marker {
     color: yellow;
     margin-left: .5em;
+}
+
+
+.help-button {
+    border: 1px solid grey;
+    border-radius: 1.2em;
+    width: 1.2em;
+    height: 1.2em;
+    cursor: help;
+    background-color: green;
+    color: yellow;
+    text-align: center;
+    float: right;
 }
 
 /* 

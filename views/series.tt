@@ -74,6 +74,7 @@
         <span class="button-container">
             <button class="button save-button">Save</button>
             <button class="button select-template-button">Manage Template</button>
+            <div class="help-button" id="manage-template-help">?</div>
         </span>
     </form>
 </div>
