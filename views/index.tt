@@ -45,6 +45,7 @@
             You do not have permissions to do that. Talk to the owner of the event/series or somebody on bacds-web-committee@.
         </div>
         <div id="template-help-modal">
+            <p>The yellow star means the field is required</p>
             <p>Selecting a Series for a new Event fills in some fields for that
                Event from the "template" fields for the selected Series.</p>
             <p>Check out the "Manage Template" button underneath the Series
