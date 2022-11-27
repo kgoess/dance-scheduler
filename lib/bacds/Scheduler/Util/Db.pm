@@ -1,3 +1,13 @@
+=head1 NAME
+
+bacds::Scheduler::Util::Db - database utilities
+
+=head1 SYNOPSIS
+
+    use bacds::Scheduler::Util::Db qw/get_dbh/;
+
+=cut
+
 package bacds::Scheduler::Util::Db;
 
 use 5.16.0;
@@ -12,7 +22,23 @@ our @EXPORT_OK = qw/get_dbh/;
 use bacds::Scheduler::Schema;
 
 
+=head2 get_dbh(debug => 1)
+
+Knows to use $ENV{TEST_DSN} from the unit tests if set.
+
+If using the production mysql dsn will read the mysql password from the first
+readable one of:
+
+    /var/www/bacds.org/dance-scheduler/private/mysql-password'
+    ~/.mysql-password
+
+Can also set $ENV{DBIX_DEBUG} instead of passing debug => 1.
+
+=cut
+
 sub get_dbh {
+    my (%args) = @_;
+
     my $database = 'schedule';
     my $hostname = 'localhost';
     my $port = 3306;
@@ -29,6 +55,10 @@ sub get_dbh {
     my $user = 'scheduler';
 
     my $dbh = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params);
+
+    if ($ENV{DBIX_DEBUG} || $args{debug}) {
+      $dbh->storage->debug(1);
+    }
 
     return $dbh;
 }
