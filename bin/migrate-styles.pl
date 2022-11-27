@@ -35,6 +35,9 @@ my @styles =(
     {
         name=>'CONCERT',
     },
+    {
+        name=>'SPECIAL',
+    },
 );
 
 foreach my $style (@styles) {

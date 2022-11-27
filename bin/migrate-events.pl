@@ -144,11 +144,9 @@ sub attach_styles {
     } elsif ($old_style eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
         push @old_styles, 'CONTRA', 'CAMP';
     } elsif ($old_style eq 'ENGLISH/SPECIAL') {
-        push @old_styles, 'ENGLISH';
+        push @old_styles, 'ENGLISH', 'SPECIAL';
     } elsif ($old_style eq 'CONTRA/SPECIAL') {
-        push @old_styles, 'CONTRA';
-    } elsif ($old_style eq 'CONTRA/SPECIAL') {
-        push @old_styles, 'CONTRA';
+        push @old_styles, 'CONTRA', 'SPECIAL';
     } else {
         push @old_styles, $old_style;
     }
@@ -164,11 +162,11 @@ sub attach_styles {
             say "skipping style for ".$new->name;
             return;
         }
-        my @rs = $dbh->resultset('Style')->search({
+        my $style = $dbh->resultset('Style')->search({
             name => $style,
-        });
-        @rs or die "can't find $style in styles table";
-        $new->add_to_styles($rs[0], {
+        })->single
+            or die "can't find $style in styles table";
+        $new->add_to_styles($style, {
             ordering => $i++,
         });
     }
