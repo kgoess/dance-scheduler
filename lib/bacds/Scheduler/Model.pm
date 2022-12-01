@@ -76,6 +76,9 @@ Optional $args can be a hashref  of arguments to DBIx's search() function, e.g.
 
     { email => 'alice@foo.com' },
 
+Defaults to not showing deleted rows; setting is_deleted = 'dont care' means
+show all rows regardless of deleted status
+
 =cut
 
 sub get_multiple_rows {
@@ -83,6 +86,13 @@ sub get_multiple_rows {
     my $model_name = $class->get_model_name;
     my $dbh = get_dbh();
     my %sorting = $class->get_default_sorting;
+
+        
+
+    $args->{is_deleted} //= false; #Default to not showing deleted rows
+    if ($args->{is_deleted} eq 'dont care'){ #The special string 'dont care' means show all rows regardless of deleted status
+        delete $args->{is_deleted};
+    }
 
     my $resultset = $dbh->resultset($model_name)->search(
         $args,

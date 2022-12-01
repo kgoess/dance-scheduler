@@ -9,7 +9,7 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -157,4 +157,24 @@ subtest 'GET /styleAll' => sub{
       },
     ];
     eq_or_diff $got, $expected, 'matches';
+    
+};
+
+subtest 'GET /styleAll with deleted' => sub{
+    plan tests => 3;
+    my ($res, $decoded, $got, $expected);
+    my $edit_style = {
+        is_deleted        => 1,
+        name => $Style->name,
+    };
+    $res = $test->request( PUT "/style/$Style_Id" , content => $edit_style);
+    ok( $res->is_success, 'PUT returned success' );
+
+    $res  = $test->request( GET '/styleAll' );
+    ok( $res->is_success, 'GET Returned success' );
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    $expected = [
+    ];
+    eq_or_diff $got, $expected, 'deleted style did not show';
 };
