@@ -241,6 +241,7 @@ sub put_row {
 
     my @fields_for_input = $class->get_fields_for_input;
     foreach my $column (@fields_for_input) {
+        next unless exists $incoming_data{$column};
         my $filtered_input = $class->filter_input($column, $incoming_data{$column});
         $row->$column($filtered_input);
     };

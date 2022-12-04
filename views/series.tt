@@ -49,11 +49,6 @@
                 name => "manager",
                 label => "Manager Name(s)",
             },
-            {
-                name => "is_deleted",
-                label => "Is Deleted",
-                type => "checkbox",
-            },
            ]
         %>
         <% FOREACH column IN series_column_types %>
@@ -75,6 +70,7 @@
             <button class="button save-button">Save</button>
             <button class="button select-template-button">Manage Template</button>
             <div class="help-button" id="manage-template-help">?</div>
+            <button class="button delete-button">Delete</button>
         </span>
     </form>
 </div>

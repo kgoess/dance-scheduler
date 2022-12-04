@@ -43,6 +43,10 @@
         parentContainer.find('.select-template-button').prop('disabled', false);
     });
 
+    $( '.delete-button' ).click( function() {
+        confirmDelete(this)
+    });
+
 
     $( '.create-new-button' ).click(function() {
 
@@ -105,7 +109,7 @@
         })
         .done( (msg) => {
             displayItem('event', msg);
-            const eventContainer = getContainerForModelName('event');
+            const eventContainer = getParentContainerForModelName('event');
 
             // keep them from editing an existing event_id, because this is
             // only for *new* events
@@ -129,7 +133,7 @@
      * event for the series in a modal.  We copy the container for "event" and
      * re-use it in the popup.
     */
-    const eventContainer = getContainerForModelName('event');
+    const eventContainer = getParentContainerForModelName('event');
     const templateEventPopup = $('#series-template');
 
     templateEventPopup.attr('title', 'Defaults for new event in this series');
@@ -182,7 +186,7 @@
             templateEventPopup.find('form').get(0).reset();
         },
         open: function() {
-            const seriesContainer = getContainerForModelName('series');
+            const seriesContainer = getParentContainerForModelName('series');
             const seriesId = seriesContainer.find('[name="series_id"]').val();
 
             // the series shouldn't be editable in this popup, so...
@@ -239,6 +243,24 @@
         modal: true,
     });
 
+    deleteConfirmationModal = $( '#delete-confirmation-modal' ).dialog({
+        autoOpen: false,
+        height: 200,
+        width: 400,
+        modal: true,
+        buttons: {
+            Yes: function() {
+                deleteAction();
+                deleteConfirmationModal.dialog("close");
+            },
+            No: function() {
+                deleteConfirmationModal.dialog("close");
+            },
+        },
+        close: function() {
+        },
+    });
+
 });
 
 
@@ -259,7 +281,7 @@ function displayItem(target, msg) {
     } else {
         let parentContainer, modelName;
         if (typeof target === "string") {
-            parentContainer = getContainerForModelName(target);
+            parentContainer = getParentContainerForModelName(target);
             modelName = target;
         } else {
             parentContainer = $(target);
@@ -397,7 +419,7 @@ function fillInItemRowList(currentRow, msg, selections, labelGetter) {
  */
 function displayListForModel(modelName, msg) {
 
-    const insertTarget = getContainerForModelName(modelName).find('.clickable-list');
+    const insertTarget = getParentContainerForModelName(modelName).find('.clickable-list');
 
     if (msg['data']) {
 
@@ -422,7 +444,7 @@ function loadListForModel(modelName) {
     };
     const url = urlForModel[modelName] || `${modelName}All`;
 
-    getContainerForModelName(modelName).find('.clickable-list' ).empty();
+    getParentContainerForModelName(modelName).find('.clickable-list' ).empty();
     $( `#${modelName}-display` ).first().hide();
 
     $.ajax({
@@ -447,7 +469,7 @@ function getParentAndModelName(element) {
     const modelName = parentContainer.attr('modelName');
     return [parentContainer, modelName];
 }
-function getContainerForModelName(modelName) {
+function getParentContainerForModelName(modelName) {
     return $( `.accordion-container[modelName="${modelName}"]` );
 }
 
@@ -506,6 +528,60 @@ function saveAction(target, onSuccess) {
         if (onSuccess) {
             onSuccess();
         }
+     })
+    .fail( (err) => {
+        handleError(err);
+    });
+}
+
+function confirmDelete (target) {
+    const [parentContainer, modelName] = getParentAndModelName(target);
+    const modal = $( '#delete-confirmation-modal' );
+    const fieldName = `${modelName}_id`;
+
+    const idElement = $('#delete-confirmation-modal-id-el');
+    idElement.attr('name', fieldName);
+    idElement.val(parentContainer.find(`[name="${fieldName}"]`).val());
+
+    modal.find('[name="model-name"]').val(modelName);
+
+    const rowNameCandidate = parentContainer.find('.row-edit[name="name"]').val();
+
+
+    const theForm = parentContainer.find('.display-form')[0];
+    const fd =  new FormData(theForm);
+    const formAsObject= Object.fromEntries(fd.entries());
+
+    var rowName= getLabelForDisplayInItemListbox(modelName, formAsObject);
+    modal.find('#delete-confirmation-what').text(rowName);
+
+    deleteConfirmationModal.dialog( 'open' );
+}
+
+function deleteAction() {
+    const modal = $( '#delete-confirmation-modal' );
+    const modelName = modal.find( '[name="model-name"]' ).val();
+    const fieldName = `${modelName}_id`;
+    const idElement = $('#delete-confirmation-modal-id-el');
+    const rowId = idElement.val();
+
+    const url = `${appUriBase}/${modelName}/${rowId}`;
+
+    $.ajax({
+        url,
+        dataType: 'json',
+        method: 'put',
+        data: 'is_deleted=1',
+    })
+    .done( (msg) => {
+        if (msg.errors.length > 0) {
+            msg.errors.map((err) => alert(err.msg));
+            return;
+        }
+        loadListForModel(modelName);
+        // it's now deleted, so hide this item
+        const parentContainer = getParentContainerForModelName(modelName);
+        parentContainer.find('.model-display').hide();
      })
     .fail( (err) => {
         handleError(err);

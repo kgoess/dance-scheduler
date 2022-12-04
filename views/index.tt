@@ -53,4 +53,11 @@
             <p>If there's anything filled in for the Event then changing the
                Series won't apply the "template" to the Event.</p>
         </div>
+        <div id="delete-confirmation-modal">
+            <form>
+            Are you sure you want to delete <span id="delete-confirmation-what"></span>?
+            <input type="hidden" name="model-name">
+            <input type="hidden" id="delete-confirmation-modal-id-el">
+            </form>
+        </div>
     </div>

@@ -165,7 +165,6 @@ subtest 'GET /styleAll with deleted' => sub{
     my ($res, $decoded, $got, $expected);
     my $edit_style = {
         is_deleted        => 1,
-        name => $Style->name,
     };
     $res = $test->request( PUT "/style/$Style_Id" , content => $edit_style);
     ok( $res->is_success, 'PUT returned success' );

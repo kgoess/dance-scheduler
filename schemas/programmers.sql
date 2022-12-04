@@ -4,7 +4,7 @@ CREATE TABLE programmers (
     email VARCHAR(255) NOT NULL,
     password_hash VARCHAR(128),
     is_superuser BOOLEAN,
-    is_deleted BOOLEAN,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 

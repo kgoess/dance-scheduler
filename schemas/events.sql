@@ -12,7 +12,7 @@ CREATE TABLE events (
     is_template BOOLEAN,
     series_id INT,
     is_canceled BOOLEAN,
-    is_deleted BOOLEAN,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 

@@ -8,7 +8,7 @@ CREATE TABLE series (
     series_url VARCHAR(255),
     manager VARCHAR(255),
     programmer_notes TEXT(32866),
-    is_deleted BOOLEAN,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 

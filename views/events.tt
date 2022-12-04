@@ -135,6 +135,7 @@
         <input type="hidden" name="synthetic_name"/>
         <span class="button-container">
             <button class="button save-button">Save</button>
+            <button class="button delete-button">Delete</button>
         </span>
     </form>
 </div>
