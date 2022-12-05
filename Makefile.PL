@@ -41,6 +41,7 @@ WriteMakefile(
         'DBIx::Class::Schema::Loader' => 0,
         'Dancer2' => 0.400000,
         'Dancer2::Plugin::HTTP::ContentNegotiation' => 0,
+        'Dancer2::Plugin::ParamTypes' => 0,
         'Data::Dump' => 0,
         'Data::Entropy::Algorithms' => 0,
         'DateTime' => 0,

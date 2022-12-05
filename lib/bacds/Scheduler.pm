@@ -24,21 +24,40 @@ use warnings;
 use Dancer2;
 use Dancer2::Core::Cookie;
 use Dancer2::Plugin::HTTP::ContentNegotiation;
+use Dancer2::Plugin::ParamTypes;
 use Data::Dump qw/dump/;
+use List::Util; # "any" is exported by Dancer2 qw/any/;
+use HTML::Entities qw/decode_entities/;
+use Scalar::Util qw/looks_like_number/;
 
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Plugin::Auth;
 use bacds::Scheduler::Model::Caller;
+use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
 use bacds::Scheduler::Model::Programmer;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
+use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Results;
 my $Results_Class = "bacds::Scheduler::Util::Results";
 
 our $VERSION = '0.1';
+
+register_type_check 'SchedulerId' => sub {
+    return 1 unless $_[0]; # the form can send ""
+    return unless looks_like_number( $_[0] );
+    return unless $_[0] >= 0;
+    return unless $_[0] <= 2147483647; # mysql INT
+    return 1;
+};
+register_type_check 'Timestamp' => sub {
+    return unless looks_like_number( $_[0] );
+    return unless $_[0] >= 0;
+    return 1;
+};
 
 =head2 before hook
 
@@ -1126,5 +1145,309 @@ put '/programmer/:programmer_id' => requires_superuser sub {
 
     return $results->format;
 };
+
+=head3 GET /dancefinder
+
+Replacing the old dancefinder cgi, display the form
+
+=cut
+
+get '/dancefinder' => sub {
+
+    my $data = bacds::Scheduler::Model::DanceFinder
+        ->related_entities_for_upcoming_events();
+
+    my (@callers, @venues, @bands, @musos, @styles);
+
+    # set up the callers
+    foreach my $caller_id (keys $data->{callers}) {
+        my $caller = $data->{callers}{$caller_id};
+        push @callers, [$caller_id, $caller->name];
+    }
+    @callers = sort { $a->[1] cmp $b->[1] } @callers;
+
+    # set up the venues
+    foreach my $venue_id (keys $data->{venues}) {
+        my $venue = $data->{venues}{$venue_id};
+        my $venue_str = $venue->city . ' -- ' .$venue->hall_name;
+        push @venues, [$venue_id, $venue_str];
+    }
+    @venues = sort { $a->[1] cmp $b->[1] } @venues;
+
+    # set up the bands
+    foreach my $band_id (keys $data->{bands}) {
+        my $band = $data->{bands}{$band_id};
+        push @bands, [$band_id, $band->name];
+    }
+    @bands = sort { $a->[1] cmp $b->[1] } @bands;
+
+    # set up the musos
+    foreach my $muso_id (keys $data->{musos}) {
+        my $muso = $data->{musos}{$muso_id};
+        push @musos, [$muso_id, $muso->name];
+    }
+    @musos = sort { $a->[1] cmp $b->[1] } @musos;
+
+    # set up the styles
+    foreach my $style_id (keys $data->{styles}) {
+        my $style = $data->{styles}{$style_id};
+        push @styles, [$style_id, $style->name];
+    }
+    @styles = sort { $a->[1] cmp $b->[1] } @styles;
+
+    template 'dancefinder/index.html' => {
+        bacds_uri_base => 'https://www.bacds.org/',
+        title => 'Find A Dance Near You!',
+        callers => \@callers,
+        venues  => \@venues,
+        bands   => \@bands,
+        musos   => \@musos,
+        styles  => \@styles,
+        virtual_include => {
+            meta_tags => _virtual_include('/shared/meta-tags.html'),
+            navbar    => _virtual_include('/shared/navbar.html'),
+            menu      => _virtual_include('/shared/menu.html'),
+            copyright => _virtual_include('/shared/copyright.html'),
+        },
+
+    },
+    # get the wrapper from views/layouts/<whatever>
+    { layout => 'dancefinder' },
+
+};
+
+=head3 GET /dancefinder-results
+
+Replacing the old dancefinder cgi, display the results
+
+=cut
+
+get '/dancefinder-results' => with_types [
+    'optional' => ['query', 'caller', 'SchedulerId'],
+    'optional' => ['query', 'venue',  'SchedulerId'],
+    'optional' => ['query', 'band',   'SchedulerId'],
+    'optional' => ['query', 'muso',   'SchedulerId'],
+    'optional' => ['query', 'style',  'SchedulerId'],
+] => sub {
+
+    my %params = (
+        caller => [grep $_, query_parameters->get_all('caller')],
+        venue  => [grep $_, query_parameters->get_all('venue')],
+        band   => [grep $_, query_parameters->get_all('band')],
+        muso   => [grep $_, query_parameters->get_all('muso')],
+        style  => [grep $_, query_parameters->get_all('style')],
+    );
+
+    my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
+        %params
+    );
+
+    # using ->all here because the order_by generates this warning:
+    #     DBIx::Class::ResultSet::_construct_results(): Unable to properly collapse
+    #     has_many results in iterator mode due to order criteria - performed an
+    #     eager cursor slurp underneath. Consider using ->all() instead at
+    my @events = $rs->all;
+
+
+    # individually look up the query parameters so we can fill them out on the
+    # results page
+    my $dbh = get_dbh(debug => 0);
+
+    my @fetchers = (
+        [qw/caller Caller caller_id/],
+        [qw/style Style style_id/],
+        [qw/venue Venue venue_id/],
+        [qw/band Band band_id/],
+        [qw/muso Talent talent_id /],
+    );
+    my %results;
+    foreach my $fetcher (@fetchers) {
+        my ($key, $model_name, $primary_key_name) = @$fetcher;
+
+        my @rs;
+        if (@{$params{$key}}) {
+            @rs = $dbh->resultset($model_name)->search({
+                is_deleted => 0,
+                $primary_key_name => $params{$key},
+            })->all;
+        }
+        $results{$key} = \@rs;
+    }
+
+    template 'dancefinder/results.html' => {
+        bacds_uri_base => 'https://www.bacds.org',
+        title => 'Results from dancefinder query',
+        caller_arg => $results{caller},
+        venue_arg  => $results{venue},
+        bands_and_musos_arg  => [ @{$results{band}}, @{$results{muso}} ],
+        style_arg  => $results{style},
+
+        events => \@events,
+        virtual_include => {
+            meta_tags => _virtual_include('/shared/meta-tags.html'),
+            navbar    => _virtual_include('/shared/navbar.html'),
+            menu      => _virtual_include('/shared/menu.html'),
+            copyright => _virtual_include('/shared/copyright.html'),
+        },
+
+    },
+    # no wrapper
+    { layout => undef },
+
+};
+
+# a quick substitution for these "include virtual" directives in the original
+# dancefinder html files:
+# <!--#include virtual="/shared/meta-tags.html" -->
+sub _virtual_include {
+    my ($path) = @_;
+    my $docroot = "/var/www/bacds.org/public_html";
+    my $fullpath = "$docroot/$path";
+    open my $fh, "<", $fullpath or do {
+        warn "can't read $fullpath $!";
+        return '';
+    };
+    return join '', <$fh>;
+}
+
+
+=head2 GET livecalendar-results
+
+This is used by the interactive calendar at https://bacds.org/livecalendar.html
+which runs https://fullcalendar.io/ and sends AJAX requests to this endpoint,
+expecting json in return.
+
+We're using https://github.com/ynjia/fullcalendar-1.6.4/tree/master/demos from 2013
+
+=cut
+
+get '/livecalendar-results' => with_types [
+    ['query', 'start', 'Timestamp'],
+    ['query', 'end', 'Timestamp'],
+] => sub {
+    my $start = query_parameters->{start};
+    my $end   = query_parameters->{end};
+    my $start_date = DateTime->from_epoch(epoch => $start)->ymd;
+    my $end_date   = DateTime->from_epoch(epoch => $end  )->ymd;
+
+    my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
+        start_date => $start_date,
+        end_date   => $end_date,
+    );
+
+    my $ret = [];
+
+    foreach my $event ($rs->all) {
+        my $titlestring = join '',
+            (join '/', map $_->name, $event->styles->all),
+            ' ',
+            ($event->name//''), # mostly empty except for specials, camps
+            ' at ',
+            (join ', and ', map $_->hall_name.' in '.$_->city, $event->venues->all),
+            '.';
+        if ($event->callers != 0) {
+            $titlestring .= ' Led by ';
+            $titlestring .= join ' and ', map $_->name, $event->callers->all;
+            $titlestring .= '.';
+        }
+        if ($event->bands != 0) {
+            $titlestring .= ' Music by ';
+            $titlestring .= join ', ', map $_->name, $event->bands->all;
+            $titlestring .= '.';
+        }
+
+        $titlestring .= ' - '.$event->short_desc
+            if $event->short_desc;
+
+        # fullcalendar doesn't support html in the text so remove the tags
+        $titlestring =~ s/<[^>]*>//g;
+        $titlestring = decode_entities($titlestring);
+
+        my $colors;
+        if (my @styles = $event->styles->all) {
+            $colors = _colors_for_livecalendar(map $_->name, @styles);
+        } else {
+            $colors = _colors_for_livecalendar('DEFAULT');
+        }
+
+        push $ret, {
+            id => $event->event_id, # in dancefinder.pl this is just $i++
+            url => $event->custom_url,# FIXME, series url?
+            start => $event->start_date ? $event->start_date->ymd : '',
+            end => $event->end_date ? $event->end_date->ymd : '',
+            title => $titlestring,
+            allDay => true,
+            backgroundColor => $colors->{bgcolor},
+            borderColor => $colors->{bordercolor},
+            textColor => $colors->{textcolor},
+        },
+    }
+    # what about this in dancefinder.pl?
+    # print "$jsonobject [ ";
+    send_as JSON => $ret,
+        { content_type => 'application/json; charset=UTF-8' };
+};
+
+state $livecalendar_colors = {
+    SPECIAL => { # and CAMP and WORKSHOP, see below
+        bgcolor => 'plum',
+        bordercolor => 'dimgrey',
+        textcolor => 'black',
+    },
+    ENGLISH => {
+        bgcolor => 'darkturquoise',
+        bordercolor => 'darkblue',
+        textcolor => 'black',
+    },
+    CONTRA => {
+        bgcolor => 'coral',
+        bordercolor => 'bisque',
+        textcolor => 'black',
+    },
+    WOODSHED => {
+      bgcolor => 'burlywood',
+      bordercolor => 'sienna',
+      textcolor => 'black',
+    },
+    DEFAULT => {
+        bgcolor => 'yellow',
+        bordercolor => 'antiquewhite',
+        textcolor => 'black',
+    },
+};
+$livecalendar_colors->{CAMP}     = $livecalendar_colors->{SPECIAL};
+$livecalendar_colors->{WORKSHOP} = $livecalendar_colors->{SPECIAL};
+# REGENCY = ENGLISH
+$livecalendar_colors->{REGENCY} = $livecalendar_colors->{ENGLISH};
+
+sub _colors_for_livecalendar {
+    my (@style_names) = @_;
+
+    @style_names or return $livecalendar_colors->{DEFAULT};
+
+    if (@style_names == 1) {
+        return $livecalendar_colors->{$style_names[0]} ||
+                $livecalendar_colors->{DEFAULT};
+    }
+
+    # SPECIAL/CAMP/WORKSHOP
+    if (List::Util::any {/^(?: SPECIAL | CAMP | WORKSHOP )$/x} @style_names) {
+        return $livecalendar_colors->{SPECIAL};
+    }
+
+    # pick the most interesting one
+    my @interesting_styles = grep { $_ !~ /^(?: ENGLISH | CONTRA )$/x } @style_names;
+    if (@interesting_styles) {
+        my $style = shift @interesting_styles;
+        return $livecalendar_colors->{$style}
+            if $livecalendar_colors->{$style};
+    }
+
+    # otherwise just pick the first one
+    my $style = shift @style_names;
+    return $livecalendar_colors->{$style} || $livecalendar_colors->{DEFAULT};
+}
+
+
 
 true;

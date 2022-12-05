@@ -1,0 +1,121 @@
+<%# the wrapper for this file is views/layouts/dancefinder.tt %>
+<a name="top"></a><h1>Find a dance near you!</h1>
+<p>
+This convenient form will help you prepare a customized dance calendar.
+Want to see all of the dances at a particular venue or featuring a
+particular caller, musician, or band?  This form will help you out.
+Want to see all the BACDS dances we know about? Don't make any selections,
+just press the "Get Your Schedule!" button.
+</p>
+<form action="<% request.base %>dancefinder-results" method="GET">
+  <table>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <p>
+Which callers:
+        </p>
+      </td>
+      <td>
+	<p>
+<select name="caller" multiple>
+    <option value="">ALL LEADERS</option>
+    <%- FOREACH caller IN callers %>
+        <option value="<% caller.0 | html %>"><% caller.1 | html %></option>
+    <%- END %>
+</select>
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <p>
+Which venues:
+        </p>
+      </td>
+      <td>
+	<p>
+<select name="venue" multiple>
+    <option value="">ALL LOCATIONS</option>
+    <%- FOREACH venue_rec IN venues %>
+        <option value="<% venue_rec.0 | html %>"><% venue_rec.1 | html %></option>
+    <%- END %>
+</select>
+        </p>
+      </td>
+      <td>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <p>
+Which bands:
+        </p>
+      </td>
+      <td>
+	<p>
+<select name="band" multiple>
+    <option value="">ALL BANDS</option>
+    <%- FOREACH band IN bands %>
+        <option value="<% band.0 | html %>"><% band.1 | html %></option>
+    <%- END %>
+</select>
+        </p>
+      </td>
+      <td>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <p>
+Which musicians:
+        </p>
+      </td>
+      <td>
+	<p>
+<select name="muso" multiple>
+    <option value="">ALL MUSICIANS</option>
+    <%- FOREACH muso IN musos %>
+        <option value="<% muso.0 | html %>"><% muso.1 | html %></option>
+    <%- END %>
+</select>
+        </p>
+      </td>
+      <td>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <p>
+Which styles:
+        </p>
+      </td>
+      <td>
+	<p>
+<select name="style" multiple>
+    <option value="">ALL STYLES</option>
+    <%- FOREACH style IN styles %>
+        <option value="<% style.0 | html %>"><% style.1 | html %></option>
+    <%- END %>
+</select>
+        </p>
+      </td>
+      <td>
+      </td>
+    </tr>
+  </table>
+  <p>
+<input type="hidden" name="outputtype" value="buildpage" />
+<input type="submit" value="Get Your Schedule!" />
+  </p>
+</form>
+

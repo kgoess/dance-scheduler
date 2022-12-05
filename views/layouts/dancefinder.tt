@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<% INCLUDE dancefinder/title.html.tt %>
+<% virtual_include.meta_tags %>
+<link rel="stylesheet" title="base" type="text/css" href="<% bacds_uri_base %>/css/base.css" />
+<link rel="icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+<table width="100%" summary="Table used to specify overall layout of page.  Page is broken into header logo, header, menu bar, content, mailing list addition, and footer">
+<tr>
+<td colspan="3">
+<table><tr>
+<td class="mastheadlogo" >
+<a href="<% bacds_uri_base %>/"><img src="<% bacds_uri_base %>/graphics/bacdsweblogosmall.gif" 
+alt="BACDS Logo" height="108" width="81" class="logo"/></a>
+<td class="masthead" valign="top">
+<table width="100%"><tr><td>
+<h1 class="header">The Bay Area Country Dance Society Website</h1>
+<h3 class="header">This page is:
+<% virtual_include.navbar %>
+<% INCLUDE dancefinder/location.html %>
+</h3>
+</td>
+<td width="250" align="right">
+<a href="<% bacds_uri_base %>/donate/" title="Make a tax-deductible donation to BACDS"><img src="<% bacds_uri_base %>/graphics/Donate-button.png" border="0"></a>
+</td>
+</tr></table>
+</td>
+</tr>
+</table>
+<table>
+<tr>
+<td>
+<a href="<% bacds_uri_base %>/events/SOTG/index.html" 
+title="Purchase the CD &quot;Swinging On The Gate&quot;">
+<img  src="<% bacds_uri_base %>/graphics/SOTG_thumb.jpg" class="logo" /></a>
+<a href="<% bacds_uri_base %>/events/WaltzCD/index.html" 
+title="Purchase the CD &quot;Waltzes Before Breakfast&quot;">
+<img  src="<% bacds_uri_base %>/graphics/WBB_thumb.jpg" class="logo" /></a>
+<a href="<% bacds_uri_base %>/events/WBB2/index.html" 
+title="Purchase the CD &quot;More Waltzes Before Breakfast&quot;">
+<img  src="<% bacds_uri_base %>/graphics/WBB2-thumb.jpg" class="logo" /></a>
+<a href="<% bacds_uri_base %>/events/WBB3/index.html" 
+title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;">
+<img  src="<% bacds_uri_base %>/graphics/WBB3-thumb.jpg" class="logo" /></a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td class="menu" valign="top">
+<% virtual_include.menu %>
+</td>
+<td class="main" valign="top">
+<br />
+
+<%# loads views/dancefinder/index.html.tt %>
+<% content %>
+
+</td>
+</tr>
+<tr>
+<td class="footer" colspan="2">
+<p>
+<% virtual_include.copyright %>
+<br />
+Last Updated:
+</p>
+<p>
+<a href="http://validator.w3.org/check/referer">
+<img src="https://www.w3c.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" />
+</a>
+</p>
+</td>
+</tr>
+</table>
+<p id="noshow">
+If you must send us some spam, please send it
+<a href="mailto:bsbacds@bacds.org">here</a>.
+</p>
+<script src="https://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-773984-1";
+urchinTracker();
+</script>
+</body>
+</html>
