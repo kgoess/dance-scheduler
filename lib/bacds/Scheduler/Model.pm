@@ -87,8 +87,6 @@ sub get_multiple_rows {
     my $dbh = get_dbh();
     my %sorting = $class->get_default_sorting;
 
-        
-
     $args->{is_deleted} //= false; #Default to not showing deleted rows
     if ($args->{is_deleted} eq 'dont care'){ #The special string 'dont care' means show all rows regardless of deleted status
         delete $args->{is_deleted};
