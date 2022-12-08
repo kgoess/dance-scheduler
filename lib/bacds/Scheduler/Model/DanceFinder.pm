@@ -115,10 +115,19 @@ sub do_search {
         {event_band_maps => {band => { band_memberships => 'talent'}}},
     );
 
+    my @joins = (
+        @$caller_arg ? 'event_callers_maps' : (),
+        @$venue_arg ? 'event_venues_maps' : (),
+        @$style_arg ? 'event_styles_maps' : (),
+        @$muso_arg ? 'event_talent_maps' : (),
+        @$band_arg ? 'event_band_maps' : (),
+    );
 
     my $start_date = $start_date_arg || get_now()->ymd;
 
-    my $rs = $dbh->resultset('Event')->search(
+    # wrt join and prefetch see:
+    # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
+    my $subquery = $dbh->resultset('Event')->search(
         {
             @$caller_arg ? ('event_callers_maps.caller_id' => $caller_arg) : (),
             @$venue_arg ? ('event_venues_maps.venue_id' => $venue_arg) : (),
@@ -128,15 +137,21 @@ sub do_search {
             start_date => { '>=' => $start_date },
         },
         {
+            join => \@joins,
+            select => 'event_id',
+        },
+    );
+    my $query = $dbh->resultset('Event')->search(
+        {
+            'me.event_id' => { -in => $subquery->as_query },
+        },
+        {
             order_by => 'start_date',
-        # wrt join and prefetch see:
-        # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
-            join => \@prefetches,
             prefetch => \@prefetches,
         },
     );
 
-    return $rs;
+    return $query;
 }
 
 
