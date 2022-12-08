@@ -92,6 +92,7 @@ sub do_search {
     my ($class, %args) = @_;
 
     my $start_date_arg = delete $args{start_date};
+    my $end_date_arg   = delete $args{end_date};
     my $caller_arg     = delete $args{caller}     || [];
     my $venue_arg      = delete $args{venue}      || [];
     my $band_arg       = delete $args{band}       || [];
@@ -134,7 +135,9 @@ sub do_search {
             @$style_arg ? ('event_styles_maps.style_id' => $style_arg) : (),
             @$muso_arg ? ('event_talent_maps.talent_id' => $muso_arg) : (),
             @$band_arg ? ('event_band_maps.band_id' => $band_arg) : (),
-            start_date => { '>=' => $start_date },
+            start_date => $end_date_arg 
+                ? { '-between' => [$start_date, $end_date_arg] }
+                : { '>=' => $start_date },
         },
         {
             join => \@joins,

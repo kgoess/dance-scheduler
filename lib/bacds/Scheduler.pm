@@ -45,10 +45,14 @@ my $Results_Class = "bacds::Scheduler::Util::Results";
 our $VERSION = '0.1';
 
 register_type_check 'SchedulerId' => sub {
-    return 1 unless $_[0];
     return unless looks_like_number( $_[0] );
     return unless $_[0] >= 0;
     return unless $_[0] <= 2147483647; # mysql INT
+    return 1;
+};
+register_type_check 'Timestamp' => sub {
+    return unless looks_like_number( $_[0] );
+    return unless $_[0] >= 0;
     return 1;
 };
 
@@ -1282,6 +1286,22 @@ get '/dancefinder-results' => with_types [
     # no wrapper
     { layout => undef },
 
+};
+
+get '/livecalendar-results' => with_types [
+    ['query', 'start', 'Timestamp'],
+    ['query', 'end', 'Timestamp'],
+] => sub {
+    my $start = query_parameters->{start};
+    my $start_date = DateTime->from_epoch( epoch => $start )->ymd;
+    my $end = query_parameters->{end};
+    my $end_date = DateTime->from_epoch( epoch => $end )->ymd;
+
+    my $rs = bacds::Scheduler::Model::DanceFinder->do_search(
+        start_date => $start_date,
+        end_date => $end_date,
+    );
+    dump $rs->all();
 };
 
 
