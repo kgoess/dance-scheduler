@@ -30,36 +30,7 @@ dancefinder needs to display the input form.
 sub get_events {
     my ($class, %args) = @_;
 
-    my $dbh = get_dbh();
-
-    my @search_args;
-    # These prefetches means all the data is fetched with one big
-    # JOIN, you can verify that by adding debug=>1 in the
-    # get_dbh call above
-    my @prefetches = (
-        {event_callers_maps => 'caller'},
-        {event_venues_maps => 'venue'},
-        {event_band_maps => 'band'},
-        {event_talent_maps => 'talent'},
-        {event_styles_maps => 'style'},
-        {event_band_maps => {band => { band_memberships => 'talent'}}},
-    );
-
-
-    my $now = get_now();
-
-    my $rs = $dbh->resultset('Event')->search(
-        {
-            start_date => { '>=' => $now->ymd },
-            @search_args,
-        },
-        {
-        # wrt join and prefetch see:
-        # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
-        #    join => \@related_tables,
-            prefetch => \@prefetches,
-        },
-    );
+    my $rs = $class->do_search(%args);
 
     my (%stylehash, %venuehash, %bandhash, %musohash, %callerhash);
     while (my $event = $rs->next) {
@@ -106,5 +77,67 @@ sub get_events {
         styles => \%stylehash,
     };
 }
+
+sub find_events {
+    my ($class, %args) = @_;
+
+    # TODO add series to prefetch for the result display
+    my $rs = $class->do_search(%args);
+
+    return $rs;
+}
+
+
+sub do_search {
+    my ($class, %args) = @_;
+
+    my $start_date_arg = delete $args{start_date};
+    my $caller_arg     = delete $args{caller}     || [];
+    my $venue_arg      = delete $args{venue}      || [];
+    my $band_arg       = delete $args{band}       || [];
+    my $muso_arg       = delete $args{muso}       || [];
+    my $style_arg      = delete $args{style}      || [];
+    die "unrecognized args in call to get_events: ".join(', ', sort keys %args)
+        if %args;
+
+    my $dbh = get_dbh(debug => 1);
+
+    # These prefetches means all the data is fetched with one big
+    # JOIN, you can verify that by adding debug=>1 in the
+    # get_dbh call above
+    my @prefetches = (
+        'series',
+        {event_band_maps => 'band'},
+        {event_callers_maps => 'caller'},
+        {event_styles_maps => 'style'},
+        {event_talent_maps => 'talent'},
+        {event_venues_maps => 'venue'},
+        {event_band_maps => {band => { band_memberships => 'talent'}}},
+    );
+
+
+    my $start_date = $start_date_arg || get_now()->ymd;
+
+    my $rs = $dbh->resultset('Event')->search(
+        {
+            @$caller_arg ? ('event_callers_maps.caller_id' => $caller_arg) : (),
+            @$venue_arg ? ('event_venues_maps.venue_id' => $venue_arg) : (),
+            @$style_arg ? ('event_styles_maps.style_id' => $style_arg) : (),
+            @$muso_arg ? ('event_talent_maps.talent_id' => $muso_arg) : (),
+            @$band_arg ? ('event_band_maps.band_id' => $band_arg) : (),
+            start_date => { '>=' => $start_date },
+        },
+        {
+            order_by => 'start_date',
+        # wrt join and prefetch see:
+        # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
+            join => \@prefetches,
+            prefetch => \@prefetches,
+        },
+    );
+
+    return $rs;
+}
+
 
 1;

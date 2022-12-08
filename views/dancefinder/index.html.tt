@@ -1,3 +1,4 @@
+<%# the wrapper for this file is views/layouts/dancefinder.tt %>
 <a name="top"></a><h1>Find a dance near you!</h1>
 <p>
 This convenient form will help you prepare a customized dance calendar.
@@ -6,22 +7,19 @@ particular caller, musician, or band?  This form will help you out.
 Want to see all the BACDS dances we know about? Don't make any selections,
 just press the "Get Your Schedule!" button.
 </p>
-<!--
-<form action="/bacds-cgi-bin/dancefinder.cgi" method="post">
--->
-<form action="/scripts/dancefinder.pl" method="post">
+<form action="<% request.base %>dancefinder-results" method="GET">
   <table>
     <tr>
       <td>
       </td>
       <td>
         <p>
-Choose a caller:
+Which callers:
         </p>
       </td>
       <td>
 	<p>
-<select name="caller">
+<select name="caller" multiple>
     <option value="">ALL LEADERS</option>
     <%- FOREACH caller IN callers %>
         <option value="<% caller.0 | html %>"><% caller.1 | html %></option>
@@ -35,12 +33,12 @@ Choose a caller:
       </td>
       <td>
         <p>
-Choose a venue:
+Which venues:
         </p>
       </td>
       <td>
 	<p>
-<select name="venue">
+<select name="venue" multiple>
     <option value="">ALL LOCATIONS</option>
     <%- FOREACH venue_rec IN venues %>
         <option value="<% venue_rec.0 | html %>"><% venue_rec.1 | html %></option>
@@ -56,17 +54,34 @@ Choose a venue:
       </td>
       <td>
         <p>
-Choose a band or musician:
+Which bands:
         </p>
       </td>
       <td>
 	<p>
-<select name="muso">
-    <option value="">ALL BANDS AND MUSICIANS</option>
+<select name="band" multiple>
+    <option value="">ALL BANDS</option>
     <%- FOREACH band IN bands %>
         <option value="<% band.0 | html %>"><% band.1 | html %></option>
     <%- END %>
-    <option value=""></option>
+</select>
+        </p>
+      </td>
+      <td>
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <p>
+Which musicians:
+        </p>
+      </td>
+      <td>
+	<p>
+<select name="muso" multiple>
+    <option value="">ALL MUSICIANS</option>
     <%- FOREACH muso IN musos %>
         <option value="<% muso.0 | html %>"><% muso.1 | html %></option>
     <%- END %>
@@ -81,12 +96,12 @@ Choose a band or musician:
       </td>
       <td>
         <p>
-Choose a style:
+Which styles:
         </p>
       </td>
       <td>
 	<p>
-<select name="style">
+<select name="style" multiple>
     <option value="">ALL STYLES</option>
     <%- FOREACH style IN styles %>
         <option value="<% style.0 | html %>"><% style.1 | html %></option>

@@ -1,8 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
 <html>
 <head>
-<!--#include file="title.html" -->
-<!--#include virtual="/shared/meta-tags.html" -->
+<% INCLUDE dancefinder/title.html.tt %>
+<% virtual_include.meta_tags %>
 <link rel="stylesheet" title="base" type="text/css" href="<% bacds_uri_base %>/css/base.css" />
 <link rel="icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
@@ -19,8 +19,8 @@ alt="BACDS Logo" height="108" width="81" class="logo"/></a>
 <table width="100%"><tr><td>
 <h1 class="header">The Bay Area Country Dance Society Website</h1>
 <h3 class="header">This page is:
-<!--#include virtual="/shared/navbar.html" -->
-<!--#include file="location.html" -->
+<% virtual_include.navbar %>
+<% INCLUDE dancefinder/location.html %>
 </h3>
 </td>
 <td width="250" align="right">
@@ -52,7 +52,7 @@ title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;">
 </tr>
 <tr>
 <td class="menu" valign="top">
-<!--#include virtual="/shared/menu.html" -->
+<% virtual_include.menu %>
 </td>
 <td class="main" valign="top">
 <br />
@@ -65,11 +65,9 @@ title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;">
 <tr>
 <td class="footer" colspan="2">
 <p>
-<!--#include virtual="/shared/copyright.html" -->
+<% virtual_include.copyright %>
 <br />
 Last Updated:
-<!--#config timefmt="%c" -->
-<!--#echo var="LAST_MODIFIED" -->
 </p>
 <p>
 <a href="http://validator.w3.org/check/referer">

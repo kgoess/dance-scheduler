@@ -24,7 +24,9 @@ use warnings;
 use Dancer2;
 use Dancer2::Core::Cookie;
 use Dancer2::Plugin::HTTP::ContentNegotiation;
+use Dancer2::Plugin::ParamTypes;
 use Data::Dump qw/dump/;
+use Scalar::Util qw/looks_like_number/;
 
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Plugin::Auth;
@@ -36,10 +38,19 @@ use bacds::Scheduler::Model::Programmer;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
+use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Results;
 my $Results_Class = "bacds::Scheduler::Util::Results";
 
 our $VERSION = '0.1';
+
+register_type_check 'SchedulerId' => sub {
+    return 1 unless $_[0];
+    return unless looks_like_number( $_[0] );
+    return unless $_[0] >= 0;
+    return unless $_[0] <= 2147483647; # mysql INT
+    return 1;
+};
 
 =head2 before hook
 
@@ -1130,7 +1141,7 @@ put '/programmer/:programmer_id' => requires_superuser sub {
 
 =head3 GET /dancefinder
 
-Replacing the old dancefinder cgi.
+Replacing the old dancefinder cgi, display the form
 
 =cut
 
@@ -1178,15 +1189,114 @@ get '/dancefinder' => sub {
 
     template 'dancefinder/index.html' => {
         bacds_uri_base => 'https://www.bacds.org/',
+        title => 'Find A Dance Near You!',
         callers => \@callers,
-        venues => \@venues,
-        bands => \@bands,
-        musos => \@musos,
-        styles => \@styles,
+        venues  => \@venues,
+        bands   => \@bands,
+        musos   => \@musos,
+        styles  => \@styles,
+        virtual_include => {
+            meta_tags => virtual_include('/shared/meta-tags.html'),
+            navbar    => virtual_include('/shared/navbar.html'),
+            menu      => virtual_include('/shared/menu.html'),
+            copyright => virtual_include('/shared/copyright.html'),
+        },
+
     },
     # get the wrapper from views/layouts/<whatever>
     { layout => 'dancefinder' },
 
 };
+
+=head3 GET /dancefinder-results
+
+Replacing the old dancefinder cgi, display the results
+
+=cut
+
+get '/dancefinder-results' => with_types [
+    'optional' => ['query', 'caller', 'SchedulerId'],
+    'optional' => ['query', 'venue',  'SchedulerId'],
+    'optional' => ['query', 'band',   'SchedulerId'],
+    'optional' => ['query', 'muso',   'SchedulerId'],
+    'optional' => ['query', 'style',  'SchedulerId'],
+] => sub {
+
+    my @caller_params = query_parameters->get_all('caller');
+    my @venue_params  = query_parameters->get_all('venue');
+    my @band_params   = query_parameters->get_all('band');
+    my @muso_params   = query_parameters->get_all('muso');
+    my @style_params  = query_parameters->get_all('style');
+
+    my $rs = bacds::Scheduler::Model::DanceFinder->find_events(
+        caller => \@caller_params,
+        venue  => \@venue_params,
+        band   => \@band_params,
+        muso   => \@muso_params,
+        style  => \@style_params,
+    );
+
+    my $dbh = get_dbh();
+    my @callers;
+    if (@caller_params) {
+        @callers = $dbh->resultset('Caller')->search({ caller_id => \@caller_params })->all;
+    }
+    my @styles;
+    if (@style_params) {
+        @styles = $dbh->resultset('Style')->search({ style_id => \@style_params })->all;
+    }
+    my @venues;
+    if (@venue_params) {
+        @venues = $dbh->resultset('Venue')->search({ venue_id => \@venue_params })->all;
+    }
+    my @bands;
+    if (@band_params) {
+        @bands = $dbh->resultset('Band')->search({ band_id => \@band_params })->all;
+    }
+    my @musos;
+    if (@muso_params) {
+        @musos = $dbh->resultset('Talent')->search({ talent_id => \@muso_params })->all;
+    }
+    my @events;
+    while (my $event = $rs->next) {
+        push @events, $event;
+    }
+
+    template 'dancefinder/results.html' => {
+        bacds_uri_base => 'https://www.bacds.org/',
+        title => 'Results from dancefinder query',
+        caller_arg => \@callers,
+        venue_arg  => \@venues,
+        bands_and_musos_arg  => [@bands, @musos],
+        style_arg  => \@styles,
+
+        events => \@events,
+        virtual_include => {
+            meta_tags => virtual_include('/shared/meta-tags.html'),
+            navbar    => virtual_include('/shared/navbar.html'),
+            menu      => virtual_include('/shared/menu.html'),
+            copyright => virtual_include('/shared/copyright.html'),
+        },
+
+    },
+    # no wrapper
+    { layout => undef },
+
+};
+
+
+# a quick substitution for this in the original dancefinder html files:
+# <!--#include virtual="/shared/meta-tags.html" -->
+sub virtual_include {
+    my ($path) = @_;
+    my $docroot = "/var/www/bacds.org/public_html";
+    my $fullpath = "$docroot/$path";
+    open my $fh, "<", $fullpath or do {
+        warn "can't read $fullpath $!";
+        return '';
+    };
+    return join '', <$fh>;
+}
+
 
 true;

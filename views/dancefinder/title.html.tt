@@ -1,0 +1,5 @@
+<!--begin title element -->
+<title>
+BACDS -- <% title %>
+</title>
+<!--end title element -->

@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<% INCLUDE dancefinder/title.html.tt %>
+<% virtual_include.meta_tags %>
+<link rel="stylesheet" title="base" type="text/css" href="<% bacds_uri_base %>/css/base.css" />
+<link rel="icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
+<style>
+.search_args {
+    margin: 20px;
+    font-size: 1.5em;
+}
+.search_arg {
+    font-weight: bold;
+}
+</style>
+
+</head>
+<body id="scriptoutput">
+<table>
+<tr>
+<td class="main">
+<div class="search_args">
+<% IF style_arg %>
+    <% FOREACH style IN style_arg %>
+        <span class="search_arg"><% style.name.lower().ucfirst() %></span><% IF !loop.last() %> or <% END %>
+    <% END %>
+<% END %>
+Dances
+<% IF venue_arg %>
+    <% FOREACH venue IN venue_arg %>
+        <% IF loop.first() %>At <% END %><span class="search_arg"><% venue.hall_name %> in <% venue.city %></span><% IF !loop.last() %> or <% END %>
+    <% END %>
+<% END %>
+<% IF caller_arg %>
+    <% FOREACH caller IN caller_arg %>
+        <% IF loop.first() %>Led by <% END %><span class="search_arg"><% caller.name %></span><% IF !loop.last() %> or <% END %>
+    <% END %>
+<% END %>
+
+<% IF bands_and_musos_arg %>
+    Featuring
+    <% FOREACH bands_and_musos IN bands_and_musos_arg %>
+        <% IF loop.last() %> and <% END %><span class="search_arg"><% bands_and_musos.name %></span><% IF !loop.last() %>, <% END %>
+    <% END %>
+    <span class="search_arg" >
+<% END %>
+</div>
+<!--
+        $loc_hall = $loc_city = ' ';
+        print ucfirst(lc($style)) . " " if $style;
+        print "Dances";
+        if ($venue) {
+            ($loc_hall, $loc_city) = get_hall_name_city($venue);
+            print " At " . $loc_hall . " in " . $loc_city;
+        }
+        if ($caller) {
+            print " Led By " . $caller;
+        }
+        if ($muso) {
+            print " Featuring " . $muso;
+        }
+        if ($numdays) {
+            print " During The Next " . $numdays;
+            ($numdays == 1) ? print " Day" : print " Days";
+        }
+        print "\n</h1>\n";
+    }
+}
+-->
+
+<% FOREACH event IN events %>
+    <% event.start_date.strftime("%A, %e %B, %Y") %>: <strong>
+    <%- FOREACH style IN event.styles %>
+        <%- style.name %><% IF !loop.last() %>/<% END %>
+    <%- END %></strong>
+    at
+    <%- FOREACH venue IN event.venues %>
+        <%# event.custom_url ? %>
+        <a href="<% event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
+    <% END %>
+    <% IF event.callers %>
+        <%# FIXME this doesn't work if the search was for caller, wtf? '%>
+        <% FOREACH caller IN event.callers %>
+            <% caller.name %><% IF !loop.last() %>, <% END %>
+        <% END %>
+        <% IF event.bands || event.talent %>with<% END %>
+    <% ELSE %>
+        <% IF event.bands || event.talent %>
+            Music by
+        <% END %>
+    <% END %>
+    <% FOREACH band IN event.bands %>
+        <% band.name %><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
+    <% END %>
+    <% IF event.talent %>
+        <% FOREACH talent IN event.talent %>
+            <% talent.name %><% IF !loop.last() %>, <% END %>
+        <% END %>
+    <% END %>
+    <% IF event.name %>
+        <%# if it's a special event, print out the title.'%>
+        <em><% event.name %></em>
+    <% END %>
+    <% event.short_desc %>
+            
+    <p>------------------------</p>
+<% END %>
+<% content %>
+
+</body>
+</html>
