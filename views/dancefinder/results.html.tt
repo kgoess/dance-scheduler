@@ -22,29 +22,24 @@
 <tr>
 <td class="main">
 <div class="search_args">
-<% IF style_arg %>
-    <% FOREACH style IN style_arg %>
-        <span class="search_arg"><% style.name.lower().ucfirst() %></span><% IF !loop.last() %> or <% END %>
-    <% END %>
+<% FOREACH style IN style_arg %>
+    <span class="search_arg"><% style.name.lower().ucfirst() %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 Dances
-<% IF venue_arg %>
-    <% FOREACH venue IN venue_arg %>
-        <% IF loop.first() %>At <% END %><span class="search_arg"><% venue.hall_name %> in <% venue.city %></span><% IF !loop.last() %> or <% END %>
-    <% END %>
+<% FOREACH venue IN venue_arg %>
+    <% IF loop.first() %>At <% END %><span class="search_arg"><% venue.hall_name %> in <% venue.city %></span><% IF !loop.last() %> or <% END %>
 <% END %>
-<% IF caller_arg %>
-    <% FOREACH caller IN caller_arg %>
-        <% IF loop.first() %>Led by <% END %><span class="search_arg"><% caller.name %></span><% IF !loop.last() %> or <% END %>
-    <% END %>
+<% FOREACH caller IN caller_arg %>
+    <% IF loop.first() %>Led by <% END %><span class="search_arg"><% caller.name %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 
-<% IF bands_and_musos_arg %>
+<% IF bands_and_musos_arg.size() %>
     Featuring
     <% FOREACH bands_and_musos IN bands_and_musos_arg %>
-        <% IF loop.last() %> and <% END %><span class="search_arg"><% bands_and_musos.name %></span><% IF !loop.last() %>, <% END %>
+        <% IF loop.last() && !loop.first() %> and <% END %>
+        <span class="search_arg"><% bands_and_musos.name %></span>
+        <%- IF !loop.last() %>, <% END %>
     <% END %>
-    <span class="search_arg" >
 <% END %>
 </div>
 <!--
@@ -71,6 +66,7 @@ Dances
 -->
 
 <% FOREACH event IN events %>
+    <p class="listing">
     <% event.start_date.strftime("%A, %e %B, %Y") %>: <strong>
     <%- FOREACH style IN event.styles %>
         <%- style.name %><% IF !loop.last() %>/<% END %>
@@ -105,7 +101,7 @@ Dances
     <% END %>
     <% event.short_desc %>
             
-    <p>------------------------</p>
+    </p>
 <% END %>
 <% content %>
 

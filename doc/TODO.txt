@@ -38,17 +38,13 @@ phase I:
  DONE set up in apache
  DONE- merge to master
  DONE work out authentication
- - sort out abuse of the 'band' column
+ DO MANUALLY AT SWITCHOVER- sort out abuse of the 'band' column
  DONE find other TODOs/FIXMEs in the code
  DONE need an event url for display in https://bacds.org/scripts/dancefinder.pl,
    called out by Alan's change 904dd65c6e832 in
    git:/var/lib/git/bacds.org-scripts/
  DONE add a "pricing" textbox to events
  DONE add "manager name" to series
- - talk about "sidebar", see a47b7c918239
-    -- add "directions" field to venues
-    -- create "pricing" table that maps to events
-    -- create a sidebar options table that links to events, to allow including and sorting options as desired
  DONE fill in TOS, privacy urls from google auth
    for their page "Confirm you want to sign in to "bacds.org" as Bob
    bob@foo.com. To create your account, Google will share your name, email
@@ -64,6 +60,7 @@ phase I:
  NO, SUPERUSER IS FINE need permissions to edit a standalone event without a series
  DONE make the UI clear which fields are required and which are optional
  DONE add "help" buttons to the UI?
+ DONE add "directions" field to venues
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
  - work out that is_deleted field--it shouldn't be exposed (there should be a
@@ -74,6 +71,10 @@ FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING D
        Route exception: DBIx::Class::Storage::DBI::_dbh_execute(): DBI Exception:
        DBD::mysql::st execute failed: Duplicate entry 'Bruce Herbold' for key
        'caller_id_idx' [for Statement "INSERT INTO callers
+ - talk about "sidebar", see a47b7c918239
+    -- create a sidebar options table that links to events, to allow including and sorting options as desired
+ - better styling for dancefinder results page? at least a "back to search"
+   link? and for the search page?
 
 new bug: shouldn't the BOOL colmns like is_canceled, is_superuser and
 is_template be NOT NULL? But that raises problems with the checkbox in the web
@@ -101,4 +102,5 @@ phase II:
  - add spinner for login buttons, see recommendation here:
     https://developers.facebook.com/docs/facebook-login/web/login-button/
  - add spinner for other document loading stuff in the main page?
+ - create "pricing" table that maps to events
  - refactor all that repetition in the templates

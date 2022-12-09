@@ -45,6 +45,7 @@ my $Results_Class = "bacds::Scheduler::Util::Results";
 our $VERSION = '0.1';
 
 register_type_check 'SchedulerId' => sub {
+    return 1 unless $_[0]; # the form can send ""
     return unless looks_like_number( $_[0] );
     return unless $_[0] >= 0;
     return unless $_[0] <= 2147483647; # mysql INT
@@ -1151,7 +1152,8 @@ Replacing the old dancefinder cgi, display the form
 
 get '/dancefinder' => sub {
 
-    my $data = bacds::Scheduler::Model::DanceFinder->get_events();
+    my $data = bacds::Scheduler::Model::DanceFinder
+        ->related_entities_for_upcoming_events();
 
     my (@callers, @venues, @bands, @musos, @styles);
 
@@ -1200,10 +1202,10 @@ get '/dancefinder' => sub {
         musos   => \@musos,
         styles  => \@styles,
         virtual_include => {
-            meta_tags => virtual_include('/shared/meta-tags.html'),
-            navbar    => virtual_include('/shared/navbar.html'),
-            menu      => virtual_include('/shared/menu.html'),
-            copyright => virtual_include('/shared/copyright.html'),
+            meta_tags => _virtual_include('/shared/meta-tags.html'),
+            navbar    => _virtual_include('/shared/navbar.html'),
+            menu      => _virtual_include('/shared/menu.html'),
+            copyright => _virtual_include('/shared/copyright.html'),
         },
 
     },
@@ -1226,13 +1228,13 @@ get '/dancefinder-results' => with_types [
     'optional' => ['query', 'style',  'SchedulerId'],
 ] => sub {
 
-    my @caller_params = query_parameters->get_all('caller');
-    my @venue_params  = query_parameters->get_all('venue');
-    my @band_params   = query_parameters->get_all('band');
-    my @muso_params   = query_parameters->get_all('muso');
-    my @style_params  = query_parameters->get_all('style');
+    my @caller_params = grep $_, query_parameters->get_all('caller');
+    my @venue_params  = grep $_, query_parameters->get_all('venue');
+    my @band_params   = grep $_, query_parameters->get_all('band');
+    my @muso_params   = grep $_, query_parameters->get_all('muso');
+    my @style_params  = grep $_, query_parameters->get_all('style');
 
-    my $rs = bacds::Scheduler::Model::DanceFinder->find_events(
+    my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
         caller => \@caller_params,
         venue  => \@venue_params,
         band   => \@band_params,
@@ -1240,7 +1242,15 @@ get '/dancefinder-results' => with_types [
         style  => \@style_params,
     );
 
+    # using ->all here because the order_by generates this warning:
+    #     DBIx::Class::ResultSet::_construct_results(): Unable to properly collapse
+    #     has_many results in iterator mode due to order criteria - performed an
+    #     eager cursor slurp underneath. Consider using ->all() instead at
+    my @events = $rs->all;
+
+
     my $dbh = get_dbh();
+
     my @callers;
     if (@caller_params) {
         @callers = $dbh->resultset('Caller')->search({ caller_id => \@caller_params })->all;
@@ -1261,13 +1271,9 @@ get '/dancefinder-results' => with_types [
     if (@muso_params) {
         @musos = $dbh->resultset('Talent')->search({ talent_id => \@muso_params })->all;
     }
-    my @events;
-    while (my $event = $rs->next) {
-        push @events, $event;
-    }
 
     template 'dancefinder/results.html' => {
-        bacds_uri_base => 'https://www.bacds.org/',
+        bacds_uri_base => 'https://www.bacds.org',
         title => 'Results from dancefinder query',
         caller_arg => \@callers,
         venue_arg  => \@venues,
@@ -1276,10 +1282,10 @@ get '/dancefinder-results' => with_types [
 
         events => \@events,
         virtual_include => {
-            meta_tags => virtual_include('/shared/meta-tags.html'),
-            navbar    => virtual_include('/shared/navbar.html'),
-            menu      => virtual_include('/shared/menu.html'),
-            copyright => virtual_include('/shared/copyright.html'),
+            meta_tags => _virtual_include('/shared/meta-tags.html'),
+            navbar    => _virtual_include('/shared/navbar.html'),
+            menu      => _virtual_include('/shared/menu.html'),
+            copyright => _virtual_include('/shared/copyright.html'),
         },
 
     },
@@ -1287,6 +1293,29 @@ get '/dancefinder-results' => with_types [
     { layout => undef },
 
 };
+
+# a quick substitution for these "include virtual" directives in the original
+# dancefinder html files:
+# <!--#include virtual="/shared/meta-tags.html" -->
+sub _virtual_include {
+    my ($path) = @_;
+    my $docroot = "/var/www/bacds.org/public_html";
+    my $fullpath = "$docroot/$path";
+    open my $fh, "<", $fullpath or do {
+        warn "can't read $fullpath $!";
+        return '';
+    };
+    return join '', <$fh>;
+}
+
+
+=head2 GET livecalendar-results
+
+This is used by the interactive calendar at https://bacds.org/livecalendar.html
+which runs https://fullcalendar.io/ and sends AJAX requests to this endpoint,
+expecting json in return.
+
+=cut
 
 get '/livecalendar-results' => with_types [
     ['query', 'start', 'Timestamp'],
@@ -1297,26 +1326,13 @@ get '/livecalendar-results' => with_types [
     my $end = query_parameters->{end};
     my $end_date = DateTime->from_epoch( epoch => $end )->ymd;
 
-    my $rs = bacds::Scheduler::Model::DanceFinder->do_search(
+    my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
         start_date => $start_date,
         end_date => $end_date,
     );
     dump $rs->all();
 };
 
-
-# a quick substitution for this in the original dancefinder html files:
-# <!--#include virtual="/shared/meta-tags.html" -->
-sub virtual_include {
-    my ($path) = @_;
-    my $docroot = "/var/www/bacds.org/public_html";
-    my $fullpath = "$docroot/$path";
-    open my $fh, "<", $fullpath or do {
-        warn "can't read $fullpath $!";
-        return '';
-    };
-    return join '', <$fh>;
-}
 
 
 true;
