@@ -26,6 +26,7 @@ use Dancer2::Core::Cookie;
 use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Dancer2::Plugin::ParamTypes;
 use Data::Dump qw/dump/;
+use List::Util; # "any" is exported by Dancer2 qw/any/;
 use Scalar::Util qw/looks_like_number/;
 
 use bacds::Scheduler::FederatedAuth;
@@ -1322,15 +1323,59 @@ get '/livecalendar-results' => with_types [
     ['query', 'end', 'Timestamp'],
 ] => sub {
     my $start = query_parameters->{start};
-    my $start_date = DateTime->from_epoch( epoch => $start )->ymd;
-    my $end = query_parameters->{end};
-    my $end_date = DateTime->from_epoch( epoch => $end )->ymd;
+    my $end   = query_parameters->{end};
+    my $start_date = DateTime->from_epoch(epoch => $start)->ymd;
+    my $end_date   = DateTime->from_epoch(epoch => $end  )->ymd;
 
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
         start_date => $start_date,
-        end_date => $end_date,
+        end_date   => $end_date,
     );
-    dump $rs->all();
+
+    my $ret = [];
+
+    foreach my $event ($rs->all) {
+        my $titlestring =
+            (join '/', map $_->name, $event->styles->all) .
+            ' at '.
+            (join ', and ', map $_->hall_name.' in '.$_->city, $event->venues->all).
+            '.';
+        if ($event->callers != 0) {
+            $titlestring .= ' Led by ';
+            $titlestring .= join ' and ', map $_->name, $event->callers->all;
+            $titlestring .= '.';
+        }
+        if ($event->bands != 0) {
+            $titlestring .= ' Music by ';
+            $titlestring .= join ', ', map $_->name, $event->bands->all;
+            $titlestring .= '.';
+        }
+        if ((List::Util::any
+                { $_ =~ /^(?: SPECIAL | WORKSHOP | CAMP )$/x }
+                 $event->styles->all
+            ) && $event->short_desc
+        ) {
+            $titlestring .= ' - '.$event->short_desc;
+        }
+        # entity-escape $titlestring?
+        my ($bordercolor, $bgcolor, $textcolor) = ('white', 'white', 'white');
+
+        push $ret, {
+            id => $event->event_id, # in dancefinder.pl this is just $i++
+            url => $event->custom_url,# FIXME, series url?
+            start => $event->start_date ? $event->start_date->ymd : '',
+            end => $event->end_date ? $event->end_date->ymd : '',
+            title => $titlestring,
+            allDay => true,
+            backgroundColor => $bgcolor,
+            borderColor => $bordercolor,
+            textColor => $textcolor,
+        },
+    }
+    # what about this in dancefinder.pl?
+    # print "$jsonobject [ ";
+    send_as JSON => $ret,
+        { content_type => 'application/json; charset=UTF-8' };
 };
 
 

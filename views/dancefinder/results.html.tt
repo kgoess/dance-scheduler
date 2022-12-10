@@ -30,7 +30,7 @@ Dances
     <% IF loop.first() %>At <% END %><span class="search_arg"><% venue.hall_name %> in <% venue.city %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 <% FOREACH caller IN caller_arg %>
-    <% IF loop.first() %>Led by <% END %><span class="search_arg"><% caller.name %></span><% IF !loop.last() %> or <% END %>
+    <% IF loop.first() %>Led By <% END %><span class="search_arg"><% caller.name %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 
 <% IF bands_and_musos_arg.size() %>

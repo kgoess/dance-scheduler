@@ -3,7 +3,9 @@ use 5.16.0;
 use warnings;
 
 use Data::Dump qw/dump/;
-use Test::More tests => 22;
+use JSON::MaybeXS qw/decode_json/;
+use Test::Differences qw/eq_or_diff/;
+use Test::More tests => 26;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -25,6 +27,7 @@ my $fixture = setup_fixture();
 test_model_related_entities();
 test_dancefinder_endpoint();
 test_search_events($fixture);
+test_livecalendar_endpoint($fixture);
 
 sub setup_fixture {
 
@@ -44,13 +47,13 @@ sub setup_fixture {
     $event2->insert;
 
     # this one is before today so won't show up
-    my $OldEvent = $dbh->resultset('Event')->new({
+    my $oldevent = $dbh->resultset('Event')->new({
         name => 'old event',
         synthetic_name => 'old event synthname',
         start_date => get_now->subtract(days => 14)->ymd('-'),
         start_time => '20:00',
     });
-    $OldEvent->insert;
+    $oldevent->insert;
 
 
     my $band1 = $dbh->resultset('Band')->new({
@@ -104,9 +107,85 @@ sub setup_fixture {
         name => 'muso 4',
     });
     $muso4->insert;
-    $muso4->add_to_events($OldEvent, {
+    $muso4->add_to_events($oldevent, {
          ordering => $i++,
          created_ts => '2022-04-01T13:33',
+    });
+
+    # we'll add some styles and stuff to the oldevent so we can test the JSON
+    # rendering in livecalendar-results
+    my $style1 = $dbh->resultset('Style')->new({
+        name => 'ENGLISH',
+    });
+    $style1->insert;
+    $style1->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
+    });
+    my $style2 = $dbh->resultset('Style')->new({
+        name => 'CONTRA',
+    });
+    $style2->insert;
+    $style2->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
+    });
+
+    my $caller1 = $dbh->resultset('Caller')->new({
+        name => 'Alice Ackerby',
+    });
+    $caller1->insert;
+    $caller1->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
+    });
+    my $caller2 = $dbh->resultset('Caller')->new({
+        name => 'Bob Bronson',
+    });
+    $caller2->insert;
+    $caller2->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
+    });
+
+    my $band3 = $dbh->resultset('Band')->new({
+        name => 'Raging Rovers',
+    });
+    $band3->insert;
+    $band3->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
+    });
+    my $band4 = $dbh->resultset('Band')->new({
+        name => 'Blasting Berzerkers',
+    });
+    $band4->insert;
+    $band4->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
+    });
+
+    my $venue1 = $dbh->resultset('Venue')->new({
+        vkey => 'hop',
+        hall_name => "Mr. Hooper's Store",
+        address => '123 Sesame St.',
+        city => 'Sunny Day',
+    });
+    $venue1->insert;
+    $venue1->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
+    });
+    my $venue2 = $dbh->resultset('Venue')->new({
+        vkey => 'bcv',
+        hall_name => "Batman's Cave",
+        address => '1 Wayne Manor',
+        city => 'Gotham City',
+    });
+    $venue2->insert;
+    $venue2->add_to_events($oldevent, {
+        ordering => $i++,
+        created_ts => '2022-04-01T13:33',
     });
 
     return {
@@ -232,3 +311,64 @@ sub test_dancefinder_endpoint {
     }x, "musos found in form";
 }
 
+sub test_livecalendar_endpoint {
+    my ($fixture) = @_;
+
+    my $start = 1651112285; # 2022-04-27
+    my $end = 1651112285 + 60*60*24*30;
+
+    $Test->get_ok("/livecalendar-results?start=$start&end=$end", "GET /livecalendar-results ok");
+
+    my ($data, $expected);
+
+    $data = decode_json $Test->content;
+
+    $expected = [
+      {
+        allDay => 1,
+        backgroundColor => "white",
+        borderColor => "white",
+        end => "",
+        id => 1,
+        start => "2022-04-28",
+        textColor => "white",
+        title => " at . Music by test band 1, test band 2.",
+        url => undef,
+      },
+      {
+        allDay => 1,
+        backgroundColor => "white",
+        borderColor => "white",
+        end => "",
+        id => 2,
+        start => "2022-04-28",
+        textColor => "white",
+        title => " at .",
+        url => undef,
+      },
+    ];
+    eq_or_diff $data, $expected, "livecalendar two default events ok";
+
+    $start = get_now->subtract(days => 14)->epoch;
+    $end = get_now->subtract(days => 1)->epoch;
+    $Test->get_ok("/livecalendar-results?start=$start&end=$end", "GET /livecalendar-results ok");
+
+    $data = decode_json $Test->content;
+
+    $expected = [
+      {
+        allDay => 1,
+        backgroundColor => "white",
+        borderColor => "white",
+        end => "",
+        id => 3,
+        start => "2022-04-14",
+        textColor => "white",
+        title => "ENGLISH/CONTRA at Mr. Hooper's Store in Sunny Day, and Batman's Cave in Gotham City. Led by Alice Ackerby and Bob Bronson. Music by Raging Rovers, Blasting Berzerkers.",
+        url => undef,
+      },
+    ];
+    eq_or_diff $data, $expected, "livecalendar two default events ok";
+
+    #dump $data;
+}
