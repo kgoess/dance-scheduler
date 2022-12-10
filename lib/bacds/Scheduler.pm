@@ -1358,7 +1358,12 @@ get '/livecalendar-results' => with_types [
             $titlestring .= ' - '.$event->short_desc;
         }
         # entity-escape $titlestring?
-        my ($bordercolor, $bgcolor, $textcolor) = ('white', 'white', 'white');
+        my $colors;
+        if (my $style = $event->styles->first) {
+            $colors = _colors_for_livecalendar($style->name);
+        } else {
+            $colors = _colors_for_livecalendar('DEFAULT');
+        }
 
         push $ret, {
             id => $event->event_id, # in dancefinder.pl this is just $i++
@@ -1367,9 +1372,9 @@ get '/livecalendar-results' => with_types [
             end => $event->end_date ? $event->end_date->ymd : '',
             title => $titlestring,
             allDay => true,
-            backgroundColor => $bgcolor,
-            borderColor => $bordercolor,
-            textColor => $textcolor,
+            backgroundColor => $colors->{bgcolor},
+            borderColor => $colors->{bordercolor},
+            textColor => $colors->{textcolor},
         },
     }
     # what about this in dancefinder.pl?
@@ -1377,6 +1382,42 @@ get '/livecalendar-results' => with_types [
     send_as JSON => $ret,
         { content_type => 'application/json; charset=UTF-8' };
 };
+
+state $livecalendar_colors = {
+    SPECIAL => { # and CAMP and WORKSHOP, see below
+        bgcolor => 'plum',
+        bordercolor => 'dimgrey',
+        textcolor => 'black',
+    },
+    ENGLISH => {
+        bgcolor => 'darkturquoise',
+        bordercolor => 'darkblue',
+        textcolor => 'black',
+    },
+    CONTRA => {
+        bgcolor => 'coral',
+        bordercolor => 'bisque',
+        textcolor => 'black',
+    },
+    WOODSHED => {
+      bgcolor => 'burlywood',
+      bordercolor => 'sienna',
+      textcolor => 'black',
+    },
+    DEFAULT => {
+        bgcolor => 'yellow',
+        bordercolor => 'antiquewhite',
+        textcolor => 'black',
+    },
+};
+$livecalendar_colors->{CAMP}     = $livecalendar_colors->{SPECIAL};
+$livecalendar_colors->{WORKSHOP} = $livecalendar_colors->{SPECIAL};
+
+sub _colors_for_livecalendar {
+    my ($style) = @_;
+
+    return $livecalendar_colors->{$style} || $livecalendar_colors->{DEFAULT};
+}
 
 
 
