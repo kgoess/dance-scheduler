@@ -185,6 +185,7 @@ subtest "PUT /event/#" => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
+        custom_pricing => encode_utf8('¥4,000'),
         synthetic_name => 'Saturday Night Test',
     };
     eq_or_diff $got, $expected, 'return matches';
