@@ -37,20 +37,24 @@ sub related_entities_for_upcoming_events {
         # grab the callers
         my $callers = $event->callers;
         while (my $caller = $callers->next) {
+            next if $caller->is_deleted;
             $callerhash{$caller->caller_id} = $caller;
         }
         # grab the venues
         my $venues = $event->venues;
         while (my $venue = $venues->next) {
+            next if $venue->is_deleted;
             $venuehash{$venue->venue_id} = $venue;
         }
         if (my $bands = $event->bands) {
             # grab the bands
             while (my $band = $bands->next) {
+                next if $band->is_deleted;
                 $bandhash{$band->band_id} = $band;
                 # and the band members
                 if (my $talentii = $band->talents) {
                     while (my $talent = $talentii->next) {
+                        next if $talent->is_deleted;
                         $musohash{$talent->talent_id} = $talent;
                     }
                 }
@@ -59,12 +63,14 @@ sub related_entities_for_upcoming_events {
         # and any unattached musos
         if (my $talentii = $event->talent) {
             while (my $talent = $talentii->next) {
+                next if $talent->is_deleted;
                 $musohash{$talent->talent_id} = $talent
             }
         }
         # grab the styles
         my $styles = $event->styles;
         while (my $style = $styles->next) {
+            next if $style->is_deleted;
             $stylehash{$style->style_id} = $style;
         }
     }
@@ -78,12 +84,14 @@ sub related_entities_for_upcoming_events {
     };
 }
 
-# this is a simpler version of do_search, it takes no args and it doesn't do
-# the subselect make sure all the related tables are loaded whether they match
-# the args or not, so this is more suited for the front-page display
+# _all_upcoming_events is a simpler version of do_search, it takes no args and
+# it doesn't do the subselect make sure all the related tables are loaded
+# whether they match the args or not, so this is more suited for the front-page
+# display.
+# It also includes is_deleted objects, those are filtered in the caller.
 sub _all_upcoming_events {
 
-    my $dbh = get_dbh(); #debug => 1);
+    my $dbh = get_dbh(debug => 0);
 
     # These prefetches means all the data is fetched with one big
     # JOIN, you can verify that by adding debug=>1 in the
@@ -103,6 +111,7 @@ sub _all_upcoming_events {
     my $rs = $dbh->resultset('Event')->search(
         {
             start_date => { '>=' => $start_date },
+            '-not_bool' => 'me.is_deleted',
         },
         {
             prefetch => \@prefetches,
@@ -136,10 +145,10 @@ sub search_events {
     my $band_arg       = delete $args{band}       || [];
     my $muso_arg       = delete $args{muso}       || [];
     my $style_arg      = delete $args{style}      || [];
-    die "unrecognized args in call to get_events: ".join(', ', sort keys %args)
+    die "unrecognized args in call to search_events ".join(', ', sort keys %args)
         if %args;
 
-    my $dbh = get_dbh(); #debug => 1);
+    my $dbh = get_dbh(debug => 0);
 
     # These prefetches means all the data is fetched with one big
     # JOIN, you can verify that by adding debug=>1 in the
@@ -172,9 +181,10 @@ sub search_events {
             @$style_arg  ? ('event_styles_maps.style_id'   => $style_arg)  : (),
             @$muso_arg   ? ('event_talent_maps.talent_id'  => $muso_arg)   : (),
             @$band_arg   ? ('event_band_maps.band_id'      => $band_arg)   : (),
-            start_date => $end_date_arg 
+            start_date => $end_date_arg
                 ? { '-between' => [$start_date, $end_date_arg] }
                 : { '>=' => $start_date },
+            '-not_bool' => 'is_deleted',
         },
         {
             join => \@joins,
@@ -193,6 +203,5 @@ sub search_events {
 
     return $query;
 }
-
 
 1;

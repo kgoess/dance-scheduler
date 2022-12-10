@@ -5,7 +5,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 26;
+use Test::More tests => 34;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -25,7 +25,8 @@ my $i = 0;
 
 my $fixture = setup_fixture();
 test_model_related_entities();
-test_dancefinder_endpoint();
+test_dancefinder_form_endpoint();
+test_dancefinder_results_endpoint($fixture);
 test_search_events($fixture);
 test_livecalendar_endpoint($fixture);
 
@@ -55,6 +56,15 @@ sub setup_fixture {
     });
     $oldevent->insert;
 
+    # is_deleted shouldn't show up
+    my $deleted_event = $dbh->resultset('Event')->new({
+        name => 'deleted event',
+        synthetic_name => 'deleted event synthname',
+        is_deleted => 1,
+        start_date => get_now->ymd('-'),
+        start_time => '20:00',
+    });
+    $deleted_event->insert;
 
     my $band1 = $dbh->resultset('Band')->new({
         name => 'test band 1',
@@ -111,6 +121,18 @@ sub setup_fixture {
          ordering => $i++,
          created_ts => '2022-04-01T13:33',
     });
+
+    # deletedmuso is in a band but is_deleted, so shouldn't show up
+    my $deleted_muso = $dbh->resultset('Talent')->new({
+        name => 'deleted muso',
+        is_deleted => 1,
+    });
+    $deleted_muso->insert;
+    $deleted_muso->add_to_bands($band1, {
+         ordering => $i++,
+         created_ts => '2022-07-31T13:33',
+    });
+
 
     # we'll add some styles and stuff to the oldevent so we can test the JSON
     # rendering in livecalendar-results
@@ -172,10 +194,11 @@ sub setup_fixture {
         city => 'Sunny Day',
     });
     $venue1->insert;
-    $venue1->add_to_events($oldevent, {
+    $venue1->add_to_events($_, {
         ordering => $i++,
         created_ts => '2022-04-01T13:33',
-    });
+    }) for ($oldevent, $event1, $event2);
+
     my $venue2 = $dbh->resultset('Venue')->new({
         vkey => 'bcv',
         hall_name => "Batman's Cave",
@@ -191,9 +214,15 @@ sub setup_fixture {
     return {
         band1 => $band1->band_id,
         band2 => $band2->band_id,
+        caller1 => $caller1->caller_id,
+        caller2 => $caller2->caller_id,
         muso1 => $muso1->talent_id,
         muso2 => $muso2->talent_id,
         muso3 => $muso3->talent_id,
+        style1 => $style1->style_id,
+        style2 => $style2->style_id,
+        venue1 => $venue1->venue_id,
+        venue2 => $venue2->venue_id,
         # add more if needed
     }
 }
@@ -283,14 +312,7 @@ sub test_search_events {
 
 }
 
-sub test_dancefinder_results_endpoint {
-    $Test->get_ok("/dancefinder-results", "GET /event/dancefinder ok");
-
-    say $Test->content;
-
-}
-
-sub test_dancefinder_endpoint {
+sub test_dancefinder_form_endpoint {
     $Test->get_ok("/dancefinder", "GET /event/dancefinder ok");
 
     like $Test->content, qr{
@@ -310,6 +332,99 @@ sub test_dancefinder_endpoint {
              </select>
     }x, "musos found in form";
 }
+
+sub test_dancefinder_results_endpoint {
+    my ($fixture) = @_;
+
+    #
+    # request with no params
+    #
+    $Test->get_ok("/dancefinder-results", "GET /event/dancefinder ok");
+
+    my ($body, $q);
+
+    ($body) = $Test->content =~ m{(<body.+?>.+</body>)}ms;
+
+    like $body, qr{<div class="search_args">\s+Dances\s+</div>},
+        'vanilla results header with no params';
+
+    like $body, qr{
+        Thursday,.28.April,.2022:.<strong></strong>.at \s+
+        <a.href="">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+            Music.by \s+
+            test.band.1,.test.band.2:.muso.3 \s+
+        <em>test.event.1</em>
+    }x, "event1's title looks right";
+
+    like $body, qr{
+        Thursday,.28.April,.2022:.<strong></strong>.at. \s+
+        <a.href="">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+        <em>test.event.2</em> \s+
+    }x, "event2's title looks right";
+
+
+    #
+    # with more params
+    #
+    $q = join '&',
+        "caller=$fixture->{caller1}",
+        "venue=$fixture->{venue1}",
+        "style=$fixture->{style1}",
+        "band=$fixture->{band1}",
+    ;
+
+    $Test->get_ok("/dancefinder-results?$q", "GET /event/dancefinder ok");
+
+    ($body) = $Test->content =~ m{(<body.+?>.+</body>)}ms;
+
+    like $body, qr{
+        <div.class="search_args"> \s+
+            <span.class="search_arg">English</span> \s+
+            Dances \s+
+            At.<span.class="search_arg">Mr..Hooper's.Store.in.Sunny.Day</span> \s+
+            Led.By.<span.class="search_arg">Alice.Ackerby</span> \s+
+            Featuring \s+
+            <span.class="search_arg">test.band.1</span> \s+
+        </div>
+    }x, 'query with bunch of args looks ok';
+
+    #
+    # whole buncha params
+    #
+    $q = join '&',
+        "caller=$fixture->{caller1}",
+        "caller=$fixture->{caller2}",
+        "venue=$fixture->{venue1}",
+        "venue=$fixture->{venue2}",
+        "style=$fixture->{style1}",
+        "style=$fixture->{style2}",
+        "band=$fixture->{band1}",
+        "band=$fixture->{band2}",
+    ;
+
+    $Test->get_ok("/dancefinder-results?$q", "GET /event/dancefinder ok");
+
+    ($body) = $Test->content =~ m{(<body.+?>.+</body>)}ms;
+
+    like $body, qr{
+        <div.class="search_args"> \s+
+            <span.class="search_arg">English</span>.or. \s+
+            <span.class="search_arg">Contra</span> \s+
+            Dances \s+
+            At.<span.class="search_arg">Mr..Hooper's.Store.in.Sunny.Day</span>.or. \s+
+            <span.class="search_arg">Batman's.Cave.in.Gotham.City</span> \s+
+
+            Led.By.<span.class="search_arg">Alice.Ackerby</span>.or \s+
+            <span.class="search_arg">Bob.Bronson</span> \s+
+
+            Featuring \s+
+            <span.class="search_arg">test.band.1</span>, \s+
+            and \s+
+            <span.class="search_arg">test.band.2</span> \s+
+        </div>
+    }x, 'query with bunch of args looks ok';
+}
+
 
 sub test_livecalendar_endpoint {
     my ($fixture) = @_;
@@ -332,7 +447,7 @@ sub test_livecalendar_endpoint {
         id => 1,
         start => "2022-04-28",
         textColor => "black",
-        title => " at . Music by test band 1, test band 2.",
+        title => " at Mr. Hooper\'s Store in Sunny Day. Music by test band 1, test band 2.",
         url => undef,
       },
       {
@@ -343,7 +458,7 @@ sub test_livecalendar_endpoint {
         id => 2,
         start => "2022-04-28",
         textColor => "black",
-        title => " at .",
+        title => " at Mr. Hooper\'s Store in Sunny Day.",
         url => undef,
       },
     ];

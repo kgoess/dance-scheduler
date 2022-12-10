@@ -1229,18 +1229,16 @@ get '/dancefinder-results' => with_types [
     'optional' => ['query', 'style',  'SchedulerId'],
 ] => sub {
 
-    my @caller_params = grep $_, query_parameters->get_all('caller');
-    my @venue_params  = grep $_, query_parameters->get_all('venue');
-    my @band_params   = grep $_, query_parameters->get_all('band');
-    my @muso_params   = grep $_, query_parameters->get_all('muso');
-    my @style_params  = grep $_, query_parameters->get_all('style');
+    my %params = (
+        caller => [grep $_, query_parameters->get_all('caller')],
+        venue  => [grep $_, query_parameters->get_all('venue')],
+        band   => [grep $_, query_parameters->get_all('band')],
+        muso   => [grep $_, query_parameters->get_all('muso')],
+        style  => [grep $_, query_parameters->get_all('style')],
+    );
 
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
-        caller => \@caller_params,
-        venue  => \@venue_params,
-        band   => \@band_params,
-        muso   => \@muso_params,
-        style  => \@style_params,
+        %params
     );
 
     # using ->all here because the order_by generates this warning:
@@ -1250,36 +1248,38 @@ get '/dancefinder-results' => with_types [
     my @events = $rs->all;
 
 
-    my $dbh = get_dbh();
+    # individually look up the query parameters so we can fill them out on the
+    # results page
+    my $dbh = get_dbh(debug => 0);
 
-    my @callers;
-    if (@caller_params) {
-        @callers = $dbh->resultset('Caller')->search({ caller_id => \@caller_params })->all;
-    }
-    my @styles;
-    if (@style_params) {
-        @styles = $dbh->resultset('Style')->search({ style_id => \@style_params })->all;
-    }
-    my @venues;
-    if (@venue_params) {
-        @venues = $dbh->resultset('Venue')->search({ venue_id => \@venue_params })->all;
-    }
-    my @bands;
-    if (@band_params) {
-        @bands = $dbh->resultset('Band')->search({ band_id => \@band_params })->all;
-    }
-    my @musos;
-    if (@muso_params) {
-        @musos = $dbh->resultset('Talent')->search({ talent_id => \@muso_params })->all;
+    my @fetchers = (
+        [qw/caller Caller caller_id/],
+        [qw/style Style style_id/],
+        [qw/venue Venue venue_id/],
+        [qw/band Band band_id/],
+        [qw/muso Talent talent_id /],
+    );
+    my %results;
+    foreach my $fetcher (@fetchers) {
+        my ($key, $model_name, $primary_key_name) = @$fetcher;
+
+        my @rs;
+        if (@{$params{$key}}) {
+            @rs = $dbh->resultset($model_name)->search({
+                is_deleted => 0,
+                $primary_key_name => $params{$key},
+            })->all;
+        }
+        $results{$key} = \@rs;
     }
 
     template 'dancefinder/results.html' => {
         bacds_uri_base => 'https://www.bacds.org',
         title => 'Results from dancefinder query',
-        caller_arg => \@callers,
-        venue_arg  => \@venues,
-        bands_and_musos_arg  => [@bands, @musos],
-        style_arg  => \@styles,
+        caller_arg => $results{caller},
+        venue_arg  => $results{venue},
+        bands_and_musos_arg  => [ @{$results{band}}, @{$results{muso}} ],
+        style_arg  => $results{style},
 
         events => \@events,
         virtual_include => {

@@ -42,6 +42,7 @@ Dances
     <% END %>
 <% END %>
 </div>
+<%#
 <!--
         $loc_hall = $loc_city = ' ';
         print ucfirst(lc($style)) . " " if $style;
@@ -64,6 +65,7 @@ Dances
     }
 }
 -->
+%>
 
 <% FOREACH event IN events %>
     <p class="listing">
@@ -71,36 +73,36 @@ Dances
     <%- FOREACH style IN event.styles %>
         <%- style.name %><% IF !loop.last() %>/<% END %>
     <%- END %></strong>
-    at
+    <%- IF event.venues %> at <% END %>
     <%- FOREACH venue IN event.venues %>
         <%# event.custom_url ? %>
         <a href="<% event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
-    <% END %>
-    <% IF event.callers %>
+    <%- END %>
+    <%- IF event.callers %>
         <%# FIXME this doesn't work if the search was for caller, wtf? '%>
-        <% FOREACH caller IN event.callers %>
+        <%- FOREACH caller IN event.callers %>
             <% caller.name %><% IF !loop.last() %>, <% END %>
-        <% END %>
-        <% IF event.bands || event.talent %>with<% END %>
-    <% ELSE %>
-        <% IF event.bands || event.talent %>
+        <%- END %>
+        <%- IF event.bands || event.talent %>with<% END %>
+    <%- ELSE %>
+        <%- IF event.bands || event.talent %>
             Music by
         <% END %>
-    <% END %>
-    <% FOREACH band IN event.bands %>
-        <% band.name %><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
-    <% END %>
-    <% IF event.talent %>
-        <% FOREACH talent IN event.talent %>
-            <% talent.name %><% IF !loop.last() %>, <% END %>
-        <% END %>
-    <% END %>
-    <% IF event.name %>
+    <%- END %>
+    <%- FOREACH band IN event.bands %>
+        <%- band.name %><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
+    <%- END %>
+    <%- IF event.talent %>
+        <%- FOREACH talent IN event.talent %>
+            <%- talent.name %><% IF !loop.last() %>, <% END %>
+        <%- END %>
+    <%- END %>
+    <%- IF event.name %>
         <%# if it's a special event, print out the title.'%>
         <em><% event.name %></em>
-    <% END %>
+    <%- END %>
     <% event.short_desc %>
-            
+
     </p>
 <% END %>
 <% content %>
