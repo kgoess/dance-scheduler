@@ -501,6 +501,8 @@ function saveAction(target, onSuccess) {
     // Run any helper functions that have been attached to the form
     activeForm[0].saveHelper.forEach(func => func(activeForm));
 
+    // serialize() makes it into a query string like foo=1&bar=2,
+    // and the ajax() turns that into json
     const dataString = activeForm.serialize();
 
     let http_method;
