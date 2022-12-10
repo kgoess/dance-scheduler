@@ -17,9 +17,10 @@ sub add_talent {
     my ($dbh) = @_;
 
     my @talent = (
+        'Alicia Cover',
         'Anne Goess',
         'Ashley [Broder] Hoyer',
-        'Audrey Knuth',
+        'Audrey Jaber',
         'Beth Christian',
         'Betsy St. Aubin',
         'Bill Jensen',
@@ -29,9 +30,12 @@ sub add_talent {
         'Charlie Hancock',
         'Chip Prince',
         'Christa Burch',
+        'Clark Smith',
         'Conall Barber',
         'Craig Johnson ',
+        'Dan Warrick',
         'Daniel Steinberg',
+        'Dave Wright',
         'David Mostardi',
         'David Newitt',
         'David Strong',
@@ -41,7 +45,9 @@ sub add_talent {
         'Ellen Hoffman',
         'Erik Hoffman',
         'Gary Thomas',
+        'Harry Leidstrand',
         'Heather MacKay',
+        'James Langdell',
         'Janette Duncan',
         'Jeff Spero',
         'Jeffrey Spero',
@@ -64,8 +70,12 @@ sub add_talent {
         'Ryan McKasson',
         'Shira Kammen',
         'Stefan Curl',
+        'Sue Jones',
+        'Susan Jensen',
         'Susan Worland',
+        'Thomas Dewey',
         'Will Wheeler',
+        'William Allen',
      );
      foreach my $talent (@talent) {
 

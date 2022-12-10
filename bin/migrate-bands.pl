@@ -47,6 +47,19 @@ sub create_bands {
             'Elijah Chen',
             'Eleanor Chen',
         ],
+        'The New Vintage Revelers' => [
+            'Paul Kotapish',
+            'Dan Warrick',
+            'Harry Leidstrand',
+        ],
+        'Divertimento' => [
+            'James Langdell',
+        ],
+        'Persons In Black' => [
+            'Clark Smith',
+            'Dave Wright',
+            'Sue Jones',
+        ],
     );
 
     foreach my $band_name (sort keys %bands) {
