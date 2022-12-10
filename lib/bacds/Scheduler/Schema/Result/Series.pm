@@ -89,7 +89,8 @@ __PACKAGE__->table("series");
 =head2 is_deleted
 
   data_type: 'tinyint'
-  is_nullable: 1
+  default_value: 0
+  is_nullable: 0
 
 =head2 created_ts
 
@@ -126,7 +127,7 @@ __PACKAGE__->add_columns(
   "programmer_notes",
   { data_type => "mediumtext", is_nullable => 1 },
   "is_deleted",
-  { data_type => "tinyint", is_nullable => 1 },
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
   {
     data_type => "datetime",
@@ -187,8 +188,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 19:53:19
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:biffTlKlnBSsNlFqw1Ibvw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:25
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6rtGhFlqWhHUUU2JDXTaeA
 # These lines were loaded from '/var/lib/dance-scheduler/lib/perl5/bacds/Scheduler/Schema/Result/Series.pm' found in @INC.
 # They are now part of the custom portion of this file
 # for you to hand-edit.  If you do not either delete

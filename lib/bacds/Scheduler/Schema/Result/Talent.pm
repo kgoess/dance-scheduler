@@ -62,7 +62,8 @@ __PACKAGE__->table("talent");
 =head2 is_deleted
 
   data_type: 'tinyint'
-  is_nullable: 1
+  default_value: 0
+  is_nullable: 0
 
 =head2 created_ts
 
@@ -89,7 +90,7 @@ __PACKAGE__->add_columns(
   "photo_url",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "is_deleted",
-  { data_type => "tinyint", is_nullable => 1 },
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
   {
     data_type => "datetime",
@@ -164,8 +165,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+Ilgf86p4hCgtQN6+SCw1Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:25
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gzdJZdjCaC2vceDTPgWMCg
 
 __PACKAGE__->many_to_many(bands=> 'band_memberships', 'band');
 

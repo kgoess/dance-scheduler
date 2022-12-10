@@ -56,7 +56,8 @@ __PACKAGE__->table("parent_orgs");
 =head2 is_deleted
 
   data_type: 'tinyint'
-  is_nullable: 1
+  default_value: 0
+  is_nullable: 0
 
 =head2 created_ts
 
@@ -81,7 +82,7 @@ __PACKAGE__->add_columns(
   "abbreviation",
   { data_type => "varchar", is_nullable => 0, size => 255 },
   "is_deleted",
-  { data_type => "tinyint", is_nullable => 1 },
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
   {
     data_type => "datetime",
@@ -141,8 +142,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GgR9+0PoYfm8i8e6MVi96w
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:25
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GtPoMAeR66n/xoMqrZtUDA
 
 
 use Role::Tiny::With;

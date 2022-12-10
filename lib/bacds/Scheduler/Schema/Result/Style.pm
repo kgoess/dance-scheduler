@@ -50,7 +50,8 @@ __PACKAGE__->table("styles");
 =head2 is_deleted
 
   data_type: 'tinyint'
-  is_nullable: 1
+  default_value: 0
+  is_nullable: 0
 
 =head2 created_ts
 
@@ -73,7 +74,7 @@ __PACKAGE__->add_columns(
   "name",
   { data_type => "varchar", is_nullable => 0, size => 255 },
   "is_deleted",
-  { data_type => "tinyint", is_nullable => 1 },
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
   {
     data_type => "datetime",
@@ -133,8 +134,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-08-14 18:34:32
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:mp+F3rf7dUpVP+4mDUz9+w
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:25
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:X7czGfHgzpg1oBo9IsSF7g
 
 
 
