@@ -62,8 +62,7 @@ __PACKAGE__->table("programmers");
 =head2 is_superuser
 
   data_type: 'tinyint'
-  default_value: 0
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 is_deleted
 
@@ -96,7 +95,7 @@ __PACKAGE__->add_columns(
   "password_hash",
   { data_type => "varchar", is_nullable => 1, size => 128 },
   "is_superuser",
-  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
+  { data_type => "tinyint", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
@@ -173,8 +172,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:38:58
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eCXhL6fTiMcpoKrFd1AhEA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 13:39:28
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9b5JOvnvrHmx3uOJHs+bOg
 
 
 use Role::Tiny::With;
