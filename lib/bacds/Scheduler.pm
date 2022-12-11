@@ -1340,6 +1340,8 @@ get '/livecalendar-results' => with_types [
     foreach my $event ($rs->all) {
         my $titlestring =
             (join '/', map $_->name, $event->styles->all) .
+            ' '.
+            ($event->name//''), # mostly empty except for specials, camps
             ' at '.
             (join ', and ', map $_->hall_name.' in '.$_->city, $event->venues->all).
             '.';
@@ -1362,8 +1364,8 @@ get '/livecalendar-results' => with_types [
         $titlestring = decode_entities($titlestring);
 
         my $colors;
-        if (my $style = $event->styles->first) {
-            $colors = _colors_for_livecalendar($style->name);
+        if (my @styles = $event->styles->all) {
+            $colors = _colors_for_livecalendar(@styles);
         } else {
             $colors = _colors_for_livecalendar('DEFAULT');
         }
@@ -1415,10 +1417,36 @@ state $livecalendar_colors = {
 };
 $livecalendar_colors->{CAMP}     = $livecalendar_colors->{SPECIAL};
 $livecalendar_colors->{WORKSHOP} = $livecalendar_colors->{SPECIAL};
+# REGENCY = ENGLISH
+$livecalendar_colors->{REGENCY} = $livecalendar_colors->{ENGLISH};
 
 sub _colors_for_livecalendar {
-    my ($style) = @_;
+    my (@styles) = @_;
 
+    @styles or return $livecalendar_colors->{DEFAULT};
+
+    my @style_names = map $_->name, @styles;
+
+    if (@style_names == 1) {
+        return $livecalendar_colors->{$style_names[0]} ||
+                $livecalendar_colors->{DEFAULT};
+    }
+
+    # SPECIAL/CAMP/WORKSHOP
+    if (List::Util::any {/^(?: SPECIAL | CAMP | WORKSHOP )$/x} @style_names) {
+        return $livecalendar_colors->{SPECIAL};
+    }
+
+    # pick the most interesting one
+    my @interesting_styles = grep { $_ !~ /^(?: ENGLISH | CONTRA )$/x } @style_names;
+    if (@interesting_styles) {
+        my $style = shift @interesting_styles;
+        return $livecalendar_colors->{$style}
+            if $livecalendar_colors->{$style};
+    }
+
+    # otherwise just pick the first one
+    my $style = shift @style_names;
     return $livecalendar_colors->{$style} || $livecalendar_colors->{DEFAULT};
 }
 
