@@ -27,6 +27,7 @@ use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Dancer2::Plugin::ParamTypes;
 use Data::Dump qw/dump/;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
+use HTML::Entities qw/decode_entities/;
 use Scalar::Util qw/looks_like_number/;
 
 use bacds::Scheduler::FederatedAuth;
@@ -1316,6 +1317,8 @@ This is used by the interactive calendar at https://bacds.org/livecalendar.html
 which runs https://fullcalendar.io/ and sends AJAX requests to this endpoint,
 expecting json in return.
 
+We're using https://github.com/ynjia/fullcalendar-1.6.4/tree/master/demos from 2013
+
 =cut
 
 get '/livecalendar-results' => with_types [
@@ -1350,14 +1353,14 @@ get '/livecalendar-results' => with_types [
             $titlestring .= join ', ', map $_->name, $event->bands->all;
             $titlestring .= '.';
         }
-        if ((List::Util::any
-                { $_ =~ /^(?: SPECIAL | WORKSHOP | CAMP )$/x }
-                 $event->styles->all
-            ) && $event->short_desc
-        ) {
-            $titlestring .= ' - '.$event->short_desc;
-        }
-        # entity-escape $titlestring?
+
+        $titlestring .= ' - '.$event->short_desc
+            if $event->short_desc;
+
+        # fullcalendar doesn't support html in the text so remove the tags
+        $titlestring =~ s/<[^>]*>//g;
+        $titlestring = decode_entities($titlestring);
+
         my $colors;
         if (my $style = $event->styles->first) {
             $colors = _colors_for_livecalendar($style->name);

@@ -35,6 +35,7 @@ sub setup_fixture {
     my $event1 = $dbh->resultset('Event')->new({
         name => 'test event 1',
         synthetic_name => 'test event 1 synthname',
+        short_desc => 'big <b> dance party &#9786',
         start_date => get_now->ymd('-'),
         start_time => '20:00',
     });
@@ -60,6 +61,7 @@ sub setup_fixture {
     my $deleted_event = $dbh->resultset('Event')->new({
         name => 'deleted event',
         synthetic_name => 'deleted event synthname',
+        short_desc => 'old <b> dance party &#9785;',
         is_deleted => 1,
         start_date => get_now->ymd('-'),
         start_time => '20:00',
@@ -447,7 +449,7 @@ sub test_livecalendar_endpoint {
         id => 1,
         start => "2022-04-28",
         textColor => "black",
-        title => " at Mr. Hooper\'s Store in Sunny Day. Music by test band 1, test band 2.",
+        title => " at Mr. Hooper\'s Store in Sunny Day. Music by test band 1, test band 2. - big  dance party \x{263a}",
         url => undef,
       },
       {
@@ -462,7 +464,7 @@ sub test_livecalendar_endpoint {
         url => undef,
       },
     ];
-    eq_or_diff $data, $expected, "livecalendar two default events ok";
+    eq_or_diff $data, $expected, "livecalendar two default events json";
 
     $start = get_now->subtract(days => 14)->epoch;
     $end = get_now->subtract(days => 1)->epoch;
@@ -479,11 +481,15 @@ sub test_livecalendar_endpoint {
         id => 3,
         start => "2022-04-14",
         textColor => "black",
-        title => "ENGLISH/CONTRA at Mr. Hooper's Store in Sunny Day, and Batman's Cave in Gotham City. Led by Alice Ackerby and Bob Bronson. Music by Raging Rovers, Blasting Berzerkers.",
+        title =>
+            "ENGLISH/CONTRA ".
+            "at Mr. Hooper's Store in Sunny Day, and Batman's Cave in Gotham City. ".
+            "Led by Alice Ackerby and Bob Bronson. ".
+            "Music by Raging Rovers, Blasting Berzerkers.",
         url => undef,
       },
     ];
-    eq_or_diff $data, $expected, "livecalendar two default events ok";
+    eq_or_diff $data, $expected, "livecalendar old event json";
 
     #dump $data;
 }
