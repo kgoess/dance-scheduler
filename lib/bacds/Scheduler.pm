@@ -1370,9 +1370,16 @@ get '/livecalendar-results' => with_types [
             $colors = _colors_for_livecalendar('DEFAULT');
         }
 
+        my $url = '';
+        if ($url = $event->custom_url) {
+            ; # done
+        } elsif (my $series = $event->series) {
+            $url = $series->series_url;
+        }
+
         push $ret, {
             id => $event->event_id, # in dancefinder.pl this is just $i++
-            url => $event->custom_url,# FIXME, series url?
+            url => $url,
             start => $event->start_date ? $event->start_date->ymd : '',
             end => $event->end_date ? $event->end_date->ymd : '',
             title => $titlestring,

@@ -75,8 +75,7 @@ Dances
     <%- END %></strong>
     <%- IF event.venues %> at <% END %>
     <%- FOREACH venue IN event.venues %>
-        <%# event.custom_url ? %>
-        <a href="<% event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
+        <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
     <%- END %>
     <%- IF event.callers %>
         <%# FIXME this doesn't work if the search was for caller, wtf? '%>

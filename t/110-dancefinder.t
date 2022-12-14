@@ -2,6 +2,8 @@
 use 5.16.0;
 use warnings;
 
+# this tests dancefinder and livecalendar, both the backend and the url endpoints
+
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
@@ -35,6 +37,7 @@ sub setup_fixture {
     my $event1 = $dbh->resultset('Event')->new({
         name => 'test event 1',
         synthetic_name => 'test event 1 synthname',
+        custom_url => 'http://custom-url/test-event-1',
         short_desc => 'big <b> dance party &#9786',
         start_date => get_now->ymd('-'),
         start_time => '20:00',
@@ -216,6 +219,14 @@ sub setup_fixture {
         created_ts => '2022-04-01T13:33',
     });
 
+    my $series1 = $dbh->resultset('Series')->new({
+        name => "The Dance-A-Week Series",
+        series_url => "https://series-url/dance-a-week",
+    });
+    $series1->insert;
+    $event2->series_id($series1->series_id);
+    $event2->update;
+
     return {
         band1 => $band1->band_id,
         band2 => $band2->band_id,
@@ -355,7 +366,7 @@ sub test_dancefinder_results_endpoint {
 
     like $body, qr{
         Thursday,.28.April,.2022:.<strong></strong>.at \s+
-        <a.href="">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+        <a.href="http://custom-url/test-event-1">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
             Music.by \s+
             test.band.1,.test.band.2:.muso.3 \s+
         <em>test.event.1</em>
@@ -363,7 +374,7 @@ sub test_dancefinder_results_endpoint {
 
     like $body, qr{
         Thursday,.28.April,.2022:.<strong>CONTRA</strong>.at. \s+
-        <a.href="">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+        <a.href="https://series-url/dance-a-week">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
         </p>
     }x, "event2's title looks right, no event.name, no band, caller or talent";
 
@@ -453,7 +464,7 @@ sub test_livecalendar_endpoint {
         start => "2022-04-28",
         textColor => "black",
         title => " test event 1 at Mr. Hooper\'s Store in Sunny Day. Music by test band 1, test band 2. - big  dance party \x{263a}",
-        url => undef,
+        url => 'http://custom-url/test-event-1',
       },
       {
         allDay => 1,
@@ -464,7 +475,7 @@ sub test_livecalendar_endpoint {
         start => "2022-04-28",
         textColor => "black",
         title => "CONTRA  at Mr. Hooper\'s Store in Sunny Day.",
-        url => undef,
+        url => 'https://series-url/dance-a-week',
       },
     ];
     eq_or_diff $data, $expected, "livecalendar two default events json";
