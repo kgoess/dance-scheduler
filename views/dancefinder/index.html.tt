@@ -7,7 +7,7 @@ particular caller, musician, or band?  This form will help you out.
 Want to see all the BACDS dances we know about? Don't make any selections,
 just press the "Get Your Schedule!" button.
 </p>
-<form action="<% request.base %>dancefinder-results" method="GET">
+<form action="<% request.uri_base %>/dancefinder-results" method="GET">
   <table>
     <tr>
       <td>
