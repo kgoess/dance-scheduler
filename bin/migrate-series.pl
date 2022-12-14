@@ -52,7 +52,7 @@ EOL
         {
             name => 'Palo Alto English',
             frequency => 'first, third, and fifth Fridays',
-            series_url => 'https://bacds.org/series/english/peninsula/',
+            series_url => 'https://bacds.org/series/english/palo_alto/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./english/peninsula/content.html:
 <!--#include virtual="/series/shared/location_ast.html" -->
@@ -86,7 +86,7 @@ EOL
         {
             name => 'Peninsula English (Palo Alto)',
             frequency => 'first, third, and fifth Tuesday evenings of each month (with a break from late June through Labor Day).',
-            series_url => 'https://bacds.org/series/english/palo_alto/',
+            series_url => 'https://bacds.org/series/english/peninsula/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./english/palo_alto/content.html:
 <!--#include virtual="/series/shared/location_mt.html" -->
