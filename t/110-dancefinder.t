@@ -2,12 +2,13 @@
 use 5.16.0;
 use warnings;
 
-# this tests dancefinder and livecalendar, both the backend and the url endpoints
+# this tests dancefinder and livecalendar and series-lister, both the backend
+# and the url endpoints
 
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 34;
+use Test::More tests => 36;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -31,6 +32,8 @@ test_dancefinder_form_endpoint();
 test_dancefinder_results_endpoint($fixture);
 test_search_events($fixture);
 test_livecalendar_endpoint($fixture);
+test_series_lister($fixture);
+test_series_lister_endpoint($fixture);
 
 sub setup_fixture {
 
@@ -329,7 +332,7 @@ sub test_search_events {
 }
 
 sub test_dancefinder_form_endpoint {
-    $Test->get_ok("/dancefinder", "GET /event/dancefinder ok");
+    $Test->get_ok("/dancefinder", "GET /dancefinder ok");
 
     like $Test->content, qr{
         (?-x:<select name="band" multiple>)\s+
@@ -355,7 +358,7 @@ sub test_dancefinder_results_endpoint {
     #
     # request with no params
     #
-    $Test->get_ok("/dancefinder-results", "GET /event/dancefinder ok");
+    $Test->get_ok("/dancefinder-results", "GET /dancefinder-results ok");
 
     my ($body, $q);
 
@@ -389,7 +392,7 @@ sub test_dancefinder_results_endpoint {
         "band=$fixture->{band1}",
     ;
 
-    $Test->get_ok("/dancefinder-results?$q", "GET /event/dancefinder ok");
+    $Test->get_ok("/dancefinder-results?$q", "GET /dancefinder-results?$q ok");
 
     ($body) = $Test->content =~ m{(<body.+?>.+</body>)}ms;
 
@@ -418,7 +421,7 @@ sub test_dancefinder_results_endpoint {
         "band=$fixture->{band2}",
     ;
 
-    $Test->get_ok("/dancefinder-results?$q", "GET /event/dancefinder ok");
+    $Test->get_ok("/dancefinder-results?$q", "GET /dancefinder-results?$q ok");
 
     ($body) = $Test->content =~ m{(<body.+?>.+</body>)}ms;
 
@@ -507,4 +510,16 @@ sub test_livecalendar_endpoint {
     eq_or_diff $data, $expected, "livecalendar old event json";
 
     #dump $data;
+}
+
+sub test_series_lister {
+    my ($fixture) = @_;
+
+    # will there be any logic not in the endpoint?
+}
+
+sub test_series_lister_endpoint {
+    $Test->get_ok("/series-lister", "GET /series-lister ok");
+
+    is $Test->content, 'this is your stub series-lister', 'series-lister content ok';
 }

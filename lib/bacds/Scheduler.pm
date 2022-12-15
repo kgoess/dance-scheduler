@@ -1456,5 +1456,39 @@ sub _colors_for_livecalendar {
 }
 
 
+=head2 GET /series-lister
+
+While we're beta-testing, the httpd.conf has this set:
+
+    SetEnvIf Cookie "DBIX_TEST=1" is_preview_test
+
+and the index.html pages will have this SSI:
+
+    <!--#if expr='v("is_preview_test") = "1"' -->
+    <!--#include virtual="/dance-scheduler/series-lister"-->
+    <!--#else -->
+    <!--#include file="content.html" -->
+    <!--#endif -->
+
+/series-lister will show either one of:
+
+    a) the list of upcoming dances for the series
+    b) the details of the one particular dance the user clicked on
+
+In the first case, we're the google events single-event version of the page, so
+we also add the json-ld
+
+This is a replacement for the old serieslists.pl
+
+=cut
+
+get '/series-lister' => sub {
+#get '/series-lister' => with_types [
+#    ['query', 'start', 'Timestamp'],
+#    ['query', 'end', 'Timestamp'],
+#] => sub {
+
+    send_as html => 'this is your stub series-lister',
+};
 
 true;
