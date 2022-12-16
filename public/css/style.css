@@ -344,3 +344,56 @@ form:invalid button {
   content: '-';
   font-size: 30px;
 }
+
+
+/* toggle switch css from https://dev.to/codebubb/create-a-simple-on-off-slide-toggle-with-css-db8 */
+
+.custom-bool {
+    display: inline-flex;
+    width: 15em;
+    height: 1.5em;
+}
+.custom-bool input {
+    display: none;
+}
+.custom-bool input + label {
+  height: 100%;
+  width: 100%;
+}
+.custom-bool input + label > .status-switch {
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: grey;
+  color: white;
+  transition: all 0.5s ease;
+  padding: 3px 3px 1px;
+  border-radius: 3px;
+}
+.custom-bool input + label > .status-switch:before, .custom-bool input + label > .status-switch:after {
+  border-radius: 2px;
+  height: calc(100% - 6px);
+  width: calc(50% - 3px);
+  display: flex;
+  align-items: center;
+  position: absolute;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.custom-bool input + label > .status-switch:before {
+  background-color: white;
+  color: black;
+  box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.2);
+  left: 3px;
+  z-index: 10;
+  content: attr(data-no);
+}
+.custom-bool input[value="1"] + label > .status-switch {
+  background-color: var(--data-yes-color);
+}
+.custom-bool input[value="1"] + label > .status-switch:before {
+  color: var(--data-yes-color);
+  left: 50%;
+  content: attr(data-yes);
+}

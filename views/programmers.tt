@@ -21,10 +21,20 @@
             <span class="row-contents"></span>
             <input class="row-edit" name="email" hidden required />
         </div>
-        <div name="is_superuser" class="display-row" column-type="checkbox-item">
+        <div name="is_superuser" class="display-row" column-type="bool-item">
             <span class="row-label">Super User?</span>
             <span class="row-contents"></span>
-            <input type="checkbox" value="1" class="row-edit" name="is_superuser" hidden />
+           <div class="custom-bool row-edit">
+              <input name="is_superuser" type="hidden">
+              <label for="is_superuser">
+                <div class="status-switch"
+                     style="--data-yes-color: #0099f7"
+                     data-yes="Yes"
+                     data-no="No"
+                >
+                </div>
+              </label>
+           </div> 
         </div>
         <input type="hidden" name="programmer_id"/>
         <div name="series_id" class="display-row" column-type="list-item" model-name="series" table-name="series" >

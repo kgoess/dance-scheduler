@@ -261,6 +261,16 @@
         },
     });
 
+
+    // make our fancy slide switches actually function
+    $('.custom-bool').click(function (){
+        const theInput = $(this).find('input');
+        if (theInput.val() != "1")
+            theInput.val(1);
+        else
+            theInput.val(0);
+    }); 
+
 });
 
 
@@ -341,13 +351,17 @@ function displayItemRow(currentRow, targetObj) {
             currentRow.children('.row-contents').html(displayText);
             currentRow.children('.row-edit').val(theText);
             break;
-        case 'checkbox-item':
-            const theCheckbox = targetObj
+        case 'bool-item':
+            const theBool = targetObj
                 ? targetObj[currentRow.attr('name')]
                 : '';
-            const isChecked = !!theCheckbox;
-            currentRow.children('.row-edit').prop('checked', isChecked);
-            currentRow.children('.row-contents').html(isChecked ? 'Yes': 'No');
+            currentRow.find('.row-edit input').val(theBool);
+            const divWithAttributes = currentRow.find('.status-switch');
+            currentRow.children('.row-contents').html(
+                theBool == "1"
+                ? divWithAttributes.attr('data-yes')
+                : divWithAttributes.attr('data-no')
+                );
             break;
         case 'hidden-item':
             const theValue = targetObj
