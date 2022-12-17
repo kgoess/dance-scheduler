@@ -30,7 +30,7 @@
                 <% caller.name %><% IF !loop.last() %>, <% END %>
             <% END %>
         <% END %>
-        <% IF event.band.size() %>
+        <% IF event.bands.size() %>
             Band: 
             <% FOREACH band IN event.bands %>
                 <% band.name %><% IF !loop.last() %>, <% END %>
