@@ -1,0 +1,50 @@
+
+<% class_for_type = {
+    SPECIAL => 'special',
+    WOODSHED => 'woodshed',
+    WORKSHOP => 'workshop',
+}
+%>
+<% FOREACH event IN events %>
+    <% style_names = [];
+       FOREACH style IN event.styles;
+        style_names.push(style.name);
+       END;
+    %>
+    <!-- TYPE = <% style_names.join(',') %>-->
+    <div class="<% FOREACH style_name IN style_names %><% class_for_type.$style_name %><% END %>">
+        <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
+        <p class="dance">
+            <b class="date">
+                <a href="<% request.uri_for('/serieslister', { event_id => event.event_id }) %>">
+                    <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
+                </a>
+            </b>
+        <br />
+        <% FOREACH venue IN event.venues %>
+            <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
+        <% END %>
+        <% IF event.callers.size() %>
+            Caller: 
+            <% FOREACH caller IN event.callers %>
+                <% caller.name %><% IF !loop.last() %>, <% END %>
+            <% END %>
+        <% END %>
+        <% IF event.band.size() %>
+            Band: 
+            <% FOREACH band IN event.bands %>
+                <% band.name %><% IF !loop.last() %>, <% END %>
+            <% END %>
+        <% END %>
+        <% IF event.talent.size() %>
+            with 
+            <% FOREACH talent IN event.talents %>
+                <% talent.name %><% IF !loop.last() %>, <% END %>
+            <% END %>
+        <% END %>
+        </p>
+        <p class="comment">
+            <% event.short_desc %>
+        </p>
+    </div>
+<% END %>

@@ -2,19 +2,20 @@
 use 5.16.0;
 use warnings;
 
-# this tests dancefinder and livecalendar and series-lister, both the backend
+# this tests dancefinder and livecalendar and serieslister, both the backend
 # and the url endpoints
 
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 36;
+use Test::More tests => 44;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
 use bacds::Scheduler::Util::Time qw/get_now/;
 
 use bacds::Scheduler::Model::DanceFinder;
+use bacds::Scheduler::Model::SeriesLister;
 
 setup_test_db;
 
@@ -224,11 +225,14 @@ sub setup_fixture {
 
     my $series1 = $dbh->resultset('Series')->new({
         name => "The Dance-A-Week Series",
-        series_url => "https://series-url/dance-a-week",
+        series_url => "https://bacds.org/dance-a-week/",
     });
     $series1->insert;
-    $event2->series_id($series1->series_id);
-    $event2->update;
+
+    foreach my $event ($oldevent, $event1, $event2, $deleted_event) {
+        $event->series_id($series1->series_id);
+        $event->update;
+    }
 
     return {
         band1 => $band1->band_id,
@@ -242,6 +246,7 @@ sub setup_fixture {
         style2 => $style2->style_id,
         venue1 => $venue1->venue_id,
         venue2 => $venue2->venue_id,
+        series1 => $series1->series_id,
         # add more if needed
     }
 }
@@ -377,7 +382,7 @@ sub test_dancefinder_results_endpoint {
 
     like $body, qr{
         Thursday,.28.April,.2022:.<strong>CONTRA</strong>.at. \s+
-        <a.href="https://series-url/dance-a-week">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+        <a.href="https://bacds.org/dance-a-week/">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
         </p>
     }x, "event2's title looks right, no event.name, no band, caller or talent";
 
@@ -478,7 +483,7 @@ sub test_livecalendar_endpoint {
         start => "2022-04-28",
         textColor => "black",
         title => "CONTRA  at Mr. Hooper\'s Store in Sunny Day.",
-        url => 'https://series-url/dance-a-week',
+        url => 'https://bacds.org/dance-a-week/',
       },
     ];
     eq_or_diff $data, $expected, "livecalendar two default events json";
@@ -504,7 +509,7 @@ sub test_livecalendar_endpoint {
             "at Mr. Hooper's Store in Sunny Day, and Batman's Cave in Gotham City. ".
             "Led by Alice Ackerby and Bob Bronson. ".
             "Music by Raging Rovers, Blasting Berzerkers.",
-        url => undef,
+        url => 'https://bacds.org/dance-a-week/',
       },
     ];
     eq_or_diff $data, $expected, "livecalendar old event json";
@@ -515,11 +520,54 @@ sub test_livecalendar_endpoint {
 sub test_series_lister {
     my ($fixture) = @_;
 
-    # will there be any logic not in the endpoint?
+    my $c = 'bacds::Scheduler::Model::SeriesLister';
+
+    my ($data, $series);
+
+    #
+    # look up by series_id
+    #
+    $data = $c->get_upcoming_events_for_series(series_id => $fixture->{series1});
+
+    $series = $data->{series};
+    is $series->name, 'The Dance-A-Week Series';
+    is scalar  @{ $data->{events} }, 2, "two events coming up in this series";
+    is $data->{events}[0]->synthetic_name, 'test event 1 synthname';
+    is $data->{events}[1]->synthetic_name, 'test event 2 synthname';
+
+    #
+    # look up by event path
+    #
+    $data = $c->get_upcoming_events_for_series(series_path => 'dance-a-week');
+
+    $series = $data->{series};
+    is $series->name, 'The Dance-A-Week Series';
+    is scalar  @{ $data->{events} }, 2, "two events coming up in this series";
+    is $data->{events}[0]->synthetic_name, 'test event 1 synthname';
+    is $data->{events}[1]->synthetic_name, 'test event 2 synthname';
 }
 
 sub test_series_lister_endpoint {
-    $Test->get_ok("/series-lister", "GET /series-lister ok");
+    my ($fixture) = @_;
 
-    is $Test->content, 'this is your stub series-lister', 'series-lister content ok';
+    my $series_id = $fixture->{series1};
+    $Test->get_ok("/serieslister?series_id=$series_id", "GET /serieslister ok");
+
+    like $Test->content, qr{
+        <!--.TYPE.=.CONTRA--> \s+
+        <div.class=""> \s+
+            <a.name="2022-04-28-CONTRA"></a> \s+
+            <p.class="dance"> \s+
+                <b.class="date"> \s+
+                <a.href="http://localhost/serieslister\?event_id=2"> \s+
+                Thursday,.April.28 \s+
+                </a> \s+
+                </b> \s+
+                <br./> \s+
+                Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+        </p> \s+
+        <p.class="comment"> \s+
+        </p> \s+
+        </div>
+    }x, 'serieslist output ok';
 }

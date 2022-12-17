@@ -1456,7 +1456,7 @@ sub _colors_for_livecalendar {
 }
 
 
-=head2 GET /series-lister
+=head2 GET /serieslister
 
 While we're beta-testing, the httpd.conf has this set:
 
@@ -1465,12 +1465,12 @@ While we're beta-testing, the httpd.conf has this set:
 and the index.html pages will have this SSI:
 
     <!--#if expr='v("is_preview_test") = "1"' -->
-    <!--#include virtual="/dance-scheduler/series-lister"-->
+    <!--#include virtual="/dance-scheduler/serieslister"-->
     <!--#else -->
     <!--#include file="content.html" -->
     <!--#endif -->
 
-/series-lister will show either one of:
+/serieslister will show either one of:
 
     a) the list of upcoming dances for the series
     b) the details of the one particular dance the user clicked on
@@ -1482,13 +1482,30 @@ This is a replacement for the old serieslists.pl
 
 =cut
 
-get '/series-lister' => sub {
-#get '/series-lister' => with_types [
-#    ['query', 'start', 'Timestamp'],
-#    ['query', 'end', 'Timestamp'],
-#] => sub {
+get '/serieslister' => with_types [
+    'optional' => ['query', 'series_id', 'SchedulerId'],
+    'optional' => ['query', 'event_id', 'SchedulerId'],
+] => sub {
 
-    send_as html => 'this is your stub series-lister',
+    my ($data, $template);
+
+    my $c = 'bacds::Scheduler::Model::SeriesLister';
+
+    if (my $event_id = query_parameters->get('event_id')) {
+        $data = $c->get_event_details(event_id => $event_id);
+        $template = 'serieslister/single-event';
+    } else {
+        $data = $c->get_upcoming_events_for_series(
+            series_id => query_parameters->get('series_id')//'',
+            series_path => path()//'',
+        );
+        $template = 'serieslister/upcoming-events';
+    }
+
+    template($template, $data,
+        {layout => undef},
+    );
+
 };
 
 true;
