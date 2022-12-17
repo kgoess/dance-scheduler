@@ -89,6 +89,15 @@ a regular series dance? if there's a reason, then add a help button.
 
 this series_path, add an index to it? canonicalize it? find another way?
 
+if I manually add OSEGB band with members, it doesn't seem to add the members
+to an existing event?
+
+check out the short_desc in the template for https://bacds.org/series/english/berkeley_sat/, is that right?
+
+event_path or event_id in the index.html?
+
+what about the <style> tags in upcoming-events.tt
+
 
 phase II:
 

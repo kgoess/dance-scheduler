@@ -1,50 +1,86 @@
+<h1 class="dance"><% series.name %></h1>
+<div>
+    <% series.display_text %>
+</div>
 
-<% class_for_type = {
-    SPECIAL => 'special',
-    WOODSHED => 'woodshed',
-    WORKSHOP => 'workshop',
+<hr />
+
+<style>
+.event-content-container {
+    display: flex;
 }
-%>
-<% FOREACH event IN events %>
-    <% style_names = [];
-       FOREACH style IN event.styles;
-        style_names.push(style.name);
-       END;
-    %>
-    <!-- TYPE = <% style_names.join(',') %>-->
-    <div class="<% FOREACH style_name IN style_names %><% class_for_type.$style_name %><% END %>">
-        <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
-        <p class="dance">
-            <b class="date">
-                <a href="<% request.uri_for('/serieslister', { event_id => event.event_id }) %>">
-                    <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
-                </a>
-            </b>
-        <br />
-        <% FOREACH venue IN event.venues %>
-            <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
-        <% END %>
-        <% IF event.callers.size() %>
-            Caller: 
-            <% FOREACH caller IN event.callers %>
-                <% caller.name %><% IF !loop.last() %>, <% END %>
-            <% END %>
-        <% END %>
-        <% IF event.bands.size() %>
-            Band: 
-            <% FOREACH band IN event.bands %>
-                <% band.name %><% IF !loop.last() %>, <% END %>
-            <% END %>
-        <% END %>
-        <% IF event.talent.size() %>
-            with 
-            <% FOREACH talent IN event.talent %>
-                <% talent.name %><% IF !loop.last() %>, <% END %>
-            <% END %>
-        <% END %>
-        </p>
-        <p class="comment">
-            <% event.short_desc %>
-        </p>
+
+.event-content-details {
+    width: 75%;
+}
+.event-content-sidebar {
+    width: 25%;
+}
+</style>
+
+<div class="event-content-container">
+
+<div class="event-content-details">
+    <div class="center">
+    <h2> <% series.short_desc %> </h2>
     </div>
-<% END %>
+    <% class_for_type = {
+        SPECIAL => 'special',
+        WOODSHED => 'woodshed',
+        WORKSHOP => 'workshop',
+    }
+    %>
+    <% FOREACH event IN events %>
+        <% style_names = [];
+           FOREACH style IN event.styles;
+            style_names.push(style.name);
+           END;
+        %>
+        <!-- TYPE = <% style_names.join(',') %>-->
+        <div class="<% FOREACH style_name IN style_names %><% class_for_type.$style_name %><% END %>">
+            <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
+            <p class="dance">
+                <b class="date">
+                    <a href="<% request.uri_for('/serieslister', { event_id => event.event_id }) %>">
+                        <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
+                    </a>
+                </b>
+            <br />
+            <% FOREACH venue IN event.venues %>
+                <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
+            <% END %>
+            <% IF event.callers.size() %>
+                Caller:
+                <% FOREACH caller IN event.callers %>
+                    <% caller.name %><% IF !loop.last() %>, <% END %>
+                <% END %>
+            <% END %>
+            <% IF event.bands.size() %>
+                Band:
+                <% FOREACH band IN event.bands %>
+                    <% band.name %><% IF !loop.last() %>, <% END %>
+                <% END %>
+            <% END %>
+            <% IF event.talent.size() %>
+                with
+                <% FOREACH talent IN event.talent %>
+                    <% talent.name %><% IF !loop.last() %>, <% END %>
+                <% END %>
+            <% END %>
+            </p>
+            <p class="comment">
+                <% event.short_desc %>
+            </p>
+        </div>
+    <% END %>
+</div>
+<div class="event-content-sidebar">
+<% sidebar %>
+</div>
+</div>
+
+<div class="center">
+    <a href="/">
+    <img src="../../shared/bacdsmission.gif" alt="The BACDS mission: Promoting, preserving, performing, and teaching traditional English and American music &amp; dance" />
+    </a>
+</div>

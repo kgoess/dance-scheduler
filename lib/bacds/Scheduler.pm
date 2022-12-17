@@ -1503,6 +1503,12 @@ get '/serieslister' => with_types [
         $template = 'serieslister/upcoming-events';
     }
 
+    if (my $sidebar = $data->{series}->sidebar) {
+        $sidebar =~ s{<!--#include virtual="(.+?)" -->}
+                    {_virtual_include($1)}eg;
+        $data->{sidebar} = $sidebar;
+    }
+
     template($template, $data,
         {layout => undef},
     );
