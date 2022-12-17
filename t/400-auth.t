@@ -283,6 +283,7 @@ sub test_can_edit {
         custom_pricing => '¥4,000',
         name           => "saturday night test event £ ウ",
         is_canceled    => 0,
+        is_template    => 0,
         synthetic_name => 'Saturday Night Test',
     };
     my ($content, $res, $res_data);
@@ -374,6 +375,7 @@ sub test_can_edit {
         custom_pricing => '99',
         name           => "some other event",
         is_canceled    => 0,
+        is_template    => 0,
         synthetic_name => 'some other event',
     };
     # verify that this programmer doesn't have permissions to create

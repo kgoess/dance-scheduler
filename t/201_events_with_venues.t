@@ -39,6 +39,7 @@ subtest 'POST /event' => sub {
         end_date    => "2022-05-01",
         end_time    => "22:00",
         is_canceled => 1,
+        is_template => 0,
         short_desc  => "this is the short desc",
         name        => "saturday night test event",
         series_id   => undef,
@@ -68,6 +69,7 @@ subtest 'POST /event' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
+        is_template => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -127,7 +129,8 @@ subtest 'POST /event/# with venues' => sub{
         start_time  => "20:00",
         end_date    => "2022-05-03",
         end_time    => "22:00",
-        is_canceled     => 1,
+        is_canceled => 1,
+        is_template => 0,
         short_desc   => "this is the short desc",
         name        => "saturday night test event",
         series_id   => undef,
