@@ -61,11 +61,15 @@ phase I:
  DONE make the UI clear which fields are required and which are optional
  DONE add "help" buttons to the UI?
  DONE add "directions" field to venues
+ DONE new bug: shouldn't the BOOL colmns like is_canceled, is_superuser and
+    is_template be NOT NULL? But that raises problems with the checkbox in the web
+    UI, because unchecked checkboxes aren't sent to the server
+    and because of that you can't un-cancel a dance, or un-superuser a programmer
+ DONE the event.is_canceled control isn't getting the Yes/No behavior from
+    displayItemRow's checkbox-item logic
+
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
- - work out that is_deleted field--it shouldn't be exposed (there should be a
-   'delete' button), and it should do something on the backend
-FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING DISPLAYED IN THE DROPDOWN INSTEAD
  - function handleError(err) * TODO this should be added to all the requests
  - adding a dup caller just throws a server error--be more helpful
        Route exception: DBIx::Class::Storage::DBI::_dbh_execute(): DBI Exception:
@@ -76,17 +80,12 @@ FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING D
  - better styling for dancefinder results page? at least a "back to search"
    link? and for the search page?
 
-new bug: shouldn't the BOOL colmns like is_canceled, is_superuser and
-is_template be NOT NULL? But that raises problems with the checkbox in the web
-UI, because unchecked checkboxes aren't sent to the server
 
-and because of that you can't un-cancel a dance, or un-superuser a programmer
-
+ - work out that is_deleted field--it shouldn't be exposed (there should be a
+   'delete' button), and it should do something on the backend
+FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING DISPLAYED IN THE DROPDOWN INSTEAD
 new question: why is short desc a required field? it seems to be not needed for
 a regular series dance? if there's a reason, then add a help button.
-
-the event.is_canceled control isn't getting the Yes/No behavior from
-displayItemRow's checkbox-item logic
 
 
 phase II:
