@@ -60,6 +60,11 @@ sub create_bands {
             'Dave Wright',
             'Sue Jones',
         ],
+        'Odd Sundays Garage Band' => [
+            'Shira Kammen',
+            'Judy Linsenberg',
+            'Patti Cobb',
+        ],
     );
 
     foreach my $band_name (sort keys %bands) {
