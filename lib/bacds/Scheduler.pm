@@ -37,6 +37,7 @@ use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
 use bacds::Scheduler::Model::Programmer;
+use bacds::Scheduler::Model::SeriesLister;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
@@ -1497,7 +1498,7 @@ get '/serieslister' => with_types [
     } else {
         $data = $c->get_upcoming_events_for_series(
             series_id => query_parameters->get('series_id')//'',
-            series_path => path()//'',
+            series_path => query_parameters->get('series_path')//'',
         );
         $template = 'serieslister/upcoming-events';
     }

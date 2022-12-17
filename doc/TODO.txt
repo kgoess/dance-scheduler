@@ -87,6 +87,8 @@ FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING D
 new question: why is short desc a required field? it seems to be not needed for
 a regular series dance? if there's a reason, then add a help button.
 
+this series_path, add an index to it? canonicalize it? find another way?
+
 
 phase II:
 

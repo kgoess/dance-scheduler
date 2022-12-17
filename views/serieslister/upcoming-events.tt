@@ -38,7 +38,7 @@
         <% END %>
         <% IF event.talent.size() %>
             with 
-            <% FOREACH talent IN event.talents %>
+            <% FOREACH talent IN event.talent %>
                 <% talent.name %><% IF !loop.last() %>, <% END %>
             <% END %>
         <% END %>
