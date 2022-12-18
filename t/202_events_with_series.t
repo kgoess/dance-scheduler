@@ -86,8 +86,8 @@ subtest 'POST /series' => sub {
 
     my $new_series = {
         name       => 'Bree Trewsday English',
+        series_xid => 'BREE-TREW-ENG',
         frequency  => 'fourth Trewsday',
-        
     };
     $test->post_ok('/series/', $new_series );
     ok($test->success, 'created series');
@@ -99,6 +99,7 @@ subtest 'POST /series' => sub {
     my $expected = {
         series_id             => $Series_Id,
         name                  => 'Bree Trewsday English',
+        series_xid            => 'BREE-TREW-ENG',
         frequency             => 'fourth Trewsday',
         created_ts            => '2022-04-28T02:18:05',
         modified_ts           => '2022-04-28T02:18:05',
@@ -139,7 +140,8 @@ subtest 'POST /event/# with series' => sub {
         series => [
           {
             id => 1,
-            name => 'Bree Trewsday English'
+            name => 'Bree Trewsday English',
+            #series_xid => 'BREE-TREW-ENG',
           }
         ],
     };
@@ -162,7 +164,8 @@ subtest "GET /event/# with series" => sub {
         series => [
           {
             id => 1,
-            name => 'Bree Trewsday English'
+            name => 'Bree Trewsday English',
+            #series_xid => 'BREE-TREW-ENG',
           }
         ],
     };
@@ -177,6 +180,7 @@ subtest "PUT /event/# with series" => sub {
 
     my $other_series = {
         name        => 'Fifth Mersday in Michel Delving',
+        series_xid => 'MICHDELV-MONTHLY',
         frequency   => 'monthly',
     };
     $test->post_ok('/series/', $other_series );
@@ -208,6 +212,7 @@ subtest "PUT /event/# with series" => sub {
           {
             id => 2,
             name => 'Fifth Mersday in Michel Delving',
+            #series_xid => 'MICHDELV-MONTHLY',
           }
         ],
     };
@@ -275,7 +280,8 @@ subtest 'POST /event/# template for series' => sub {
         series => [
           {
             id => 1,
-            name => 'Bree Trewsday English'
+            name => 'Bree Trewsday English',
+            #series_xid => 'BREE-TREW-ENG',
           }
         ],
     };

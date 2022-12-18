@@ -41,6 +41,12 @@ __PACKAGE__->table("series");
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 series_xid
+
+  data_type: 'char'
+  is_nullable: 0
+  size: 24
+
 =head2 name
 
   data_type: 'varchar'
@@ -110,6 +116,8 @@ __PACKAGE__->table("series");
 __PACKAGE__->add_columns(
   "series_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
+  "series_xid",
+  { data_type => "char", is_nullable => 0, size => 24 },
   "name",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "frequency",
@@ -155,6 +163,20 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("series_id");
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<series_xid_idx>
+
+=over 4
+
+=item * L</series_xid>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("series_xid_idx", ["series_xid"]);
+
 =head1 RELATIONS
 
 =head2 events
@@ -188,8 +210,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6rtGhFlqWhHUUU2JDXTaeA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-18 09:00:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vN+vx0OEW2SKVWk0XomVow
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

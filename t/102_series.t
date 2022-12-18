@@ -49,6 +49,7 @@ subtest 'POST /series' => sub{
 
     my $new_series = {
         name       => 'Bree Trewsday English',
+        series_xid => 'BREE-TREW-ENG',
         frequency  => 'second and fourth Trewday',
         series_id   => '', # the webapp sends
                            # name=New+Series&frequency=monthly&is_deleted=0&series_id=
@@ -67,6 +68,7 @@ subtest 'POST /series' => sub{
     $expected = {
         series_id             => 1,
         name                  => 'Bree Trewsday English',
+        series_xid            => 'BREE-TREW-ENG',
         frequency             => 'second and fourth Trewday',
         display_text          => 'this is display text',
         short_desc            => 'this is short desc',
@@ -97,6 +99,7 @@ subtest 'GET /series/#' => sub {
     $expected = {
         series_id             => 1,
         name                  => 'Bree Trewsday English',
+        series_xid            => 'BREE-TREW-ENG',
         frequency             => 'second and fourth Trewday',
         display_text          => 'this is display text',
         series_url            => 'https://bree.me',
@@ -121,6 +124,7 @@ subtest 'PUT /series/1' => sub {
 
     my $edit_series = {
         name              => 'Bree Trewsday WEEKLY English',
+        series_xid            => 'BREE-TREW-ENG',
         frequency         => 'second and fourth Trewsday',
         display_text      => 'this is display text',
         short_desc        => 'this is short desc',
@@ -136,6 +140,7 @@ subtest 'PUT /series/1' => sub {
     $expected = {
         series_id             => 1,
         name                  => 'Bree Trewsday WEEKLY English',
+        series_xid            => 'BREE-TREW-ENG',
         frequency             => 'second and fourth Trewsday',
         display_text          => 'this is display text',
         short_desc            => 'this is short desc',
@@ -183,6 +188,7 @@ subtest 'GET /seriesAll' => sub {
         {
             series_id             => 1,
             name                  => 'Bree Trewsday WEEKLY English',
+            series_xid            => 'BREE-TREW-ENG',
             frequency             => 'second and fourth Trewsday',
             display_text          => 'this is display text',
             short_desc            => 'this is short desc',

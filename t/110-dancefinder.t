@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 44;
+use Test::More tests => 47;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -225,6 +225,7 @@ sub setup_fixture {
 
     my $series1 = $dbh->resultset('Series')->new({
         name => "The Dance-A-Week Series",
+        series_xid => 'DAW',
         series_url => "https://bacds.org/dance-a-week/",
     });
     $series1->insert;
@@ -531,6 +532,7 @@ sub test_series_lister {
 
     $series = $data->{series};
     is $series->name, 'The Dance-A-Week Series';
+    is $series->series_xid, 'DAW';
     is scalar  @{ $data->{events} }, 2, "two events coming up in this series";
     is $data->{events}[0]->synthetic_name, 'test event 1 synthname';
     is $data->{events}[1]->synthetic_name, 'test event 2 synthname';
@@ -538,7 +540,7 @@ sub test_series_lister {
     #
     # look up by event path
     #
-    $data = $c->get_upcoming_events_for_series(series_path => 'dance-a-week');
+    $data = $c->get_upcoming_events_for_series(series_xid => 'DAW');
 
     $series = $data->{series};
     is $series->name, 'The Dance-A-Week Series';
@@ -550,8 +552,11 @@ sub test_series_lister {
 sub test_series_lister_endpoint {
     my ($fixture) = @_;
 
+    #
+    # test with series_id
+    #
     my $series_id = $fixture->{series1};
-    $Test->get_ok("/serieslister?series_id=$series_id", "GET /serieslister ok");
+    $Test->get_ok("/serieslister?series_id=$series_id", "GET /serieslister?series_id ok");
 
     like $Test->content, qr{
         <!--.TYPE.=.CONTRA--> \s+
@@ -569,5 +574,28 @@ sub test_series_lister_endpoint {
         <p.class="comment"> \s+
         </p> \s+
         </div>
-    }x, 'serieslist output ok';
+    }x, 'serieslist id output ok';
+
+    #
+    # test with the XID
+    #
+    $Test->get_ok("/serieslister?series_xid=DAW", "GET /serieslister?series_xid ok");
+
+    like $Test->content, qr{
+        <!--.TYPE.=.CONTRA--> \s+
+        <div.class=""> \s+
+            <a.name="2022-04-28-CONTRA"></a> \s+
+            <p.class="dance"> \s+
+                <b.class="date"> \s+
+                <a.href="http://localhost/serieslister\?event_id=2"> \s+
+                Thursday,.April.28 \s+
+                </a> \s+
+                </b> \s+
+                <br./> \s+
+                Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+        </p> \s+
+        <p.class="comment"> \s+
+        </p> \s+
+        </div>
+    }x, 'serieslist xid output ok';
 }

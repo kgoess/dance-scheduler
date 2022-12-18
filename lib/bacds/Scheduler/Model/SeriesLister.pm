@@ -4,7 +4,15 @@ bacds::Scheduler::Model::SeriesLister - fetch data for upcoming events in a seri
 
 =head1 SYNOPSIS
 
+    $data = $c->get_upcoming_events_for_series(
+        # one of these two:
+        series_id => 123,
+        series_xid => 'BERK-ENGLISH',
+    );
+
 =head1 DESCRIPTION
+
+This is replacing the functions of the old serieslists.pl.
 
 =head1 METHODS
 
@@ -25,7 +33,7 @@ use bacds::Scheduler::Util::Time qw/get_now/;
 
 args can be either:
 
- - series_path: e.g. /series/english/berkeley_wed/
+ - series_xid e.g. BERK-CONTRA
  - series_id: e.g. 12345
 
 =cut
@@ -33,31 +41,25 @@ args can be either:
 sub get_upcoming_events_for_series {
     my ($class, %args) = @_;
 
+    croak "missing required args in call to get_upcoming_events_for_series, ".
+          "need either series_id or series_xid "
+        unless ($args{series_id} || $args{series_xid});
+
     my $dbh = get_dbh(debug => 0);
 
     my $series;
 
-    if (my $path = $args{series_path}) {
-        # is this even a good idea? is fragile. should have an
-        # index on series_url
-        $path =~ s{^/}{};
-        $path =~ s{/$}{};
-        my $full_url = "https://bacds.org/$path/";
-        $series = $dbh->resultset('Series')->find({
-            is_deleted => 0,
-            series_url => $full_url,
-        }) or croak "get_upcoming_events_for_series can't ".
-                    "find any series for $path -> $full_url";
+    my @search_arg =
+        $args{series_xid}
+        ? (series_xid => $args{series_xid})
+        : (series_id => $args{series_id})
+    ;
 
-    } elsif (my $series_id = $args{series_id}) {
-        $series = $dbh->resultset('Series')->find({
-            is_deleted => 0,
-            series_id => $series_id,
-        }) or die "can't find any series for series_id $series_id";
-        
-    } else {
-        croak "missing required args series_path or series_id in call to get_upcoming_events_for_series";
-    }
+    $series = $dbh->resultset('Series')->find({
+        is_deleted => 0,
+        @search_arg,
+    }) or croak "get_upcoming_events_for_series can't ".
+                "find any series for @search_arg";
 
     my @events = $dbh->resultset('Event')->search({
         is_deleted => 0,

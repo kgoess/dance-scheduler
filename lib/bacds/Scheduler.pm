@@ -59,6 +59,10 @@ register_type_check 'Timestamp' => sub {
     return unless $_[0] >= 0;
     return 1;
 };
+# usable for series.series_xid or venue.vkey
+register_type_check 'XID' => sub {
+    return $_[0] =~ /^[A-Z0-9._-]{3,32}$/;
+};
 
 =head2 before hook
 
@@ -1466,7 +1470,7 @@ While we're beta-testing, the httpd.conf has this set:
 and the index.html pages will have this SSI:
 
     <!--#if expr='v("is_preview_test") = "1"' -->
-    <!--#include virtual="/dance-scheduler/serieslister"-->
+    <!--#include virtual="/dance-scheduler/serieslister?series_xid=BERK-CONTRA"-->
     <!--#else -->
     <!--#include file="content.html" -->
     <!--#endif -->
@@ -1485,6 +1489,7 @@ This is a replacement for the old serieslists.pl
 
 get '/serieslister' => with_types [
     'optional' => ['query', 'series_id', 'SchedulerId'],
+    'optional' => ['query', 'series_xid', 'XID'],
     'optional' => ['query', 'event_id', 'SchedulerId'],
 ] => sub {
 
@@ -1498,7 +1503,7 @@ get '/serieslister' => with_types [
     } else {
         $data = $c->get_upcoming_events_for_series(
             series_id => query_parameters->get('series_id')//'',
-            series_path => query_parameters->get('series_path')//'',
+            series_xid => query_parameters->get('series_xid')//'',
         );
         $template = 'serieslister/upcoming-events';
     }

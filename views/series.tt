@@ -14,6 +14,13 @@
                 required => 1,
             },
             {
+                name => "series_xid",
+                label => "External ID",
+                required => 1,
+                # "help" is unused, but we should add it
+                help => "This is a short, permanent ID for the series, general enough to survive name changesa, used for example in links in HTML files on the filesystem.",
+            },
+            {
                 name => "frequency",
                 label => "Frequency",
             },

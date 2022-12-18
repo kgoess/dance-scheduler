@@ -243,6 +243,7 @@ sub test_can_edit {
     $series_programmer->insert;
     my $series = $dbh->resultset('Series')->new({
         name => 'a series',
+        series_xid => 'ASERIES',
         is_deleted => 0,
     });
     $series->insert;

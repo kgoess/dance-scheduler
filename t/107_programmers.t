@@ -60,14 +60,17 @@ $Event3->insert;
 
 my $Series1 = $dbh->resultset('Series')->new({
     name => 'test series 1',
+    series_xid => 'TS1',
 });
 $Series1->insert;
 my $Series2 = $dbh->resultset('Series')->new({
     name => 'test series 1',
+    series_xid => 'TS2',
 });
 $Series2->insert;
 my $Series3 = $dbh->resultset('Series')->new({
     name => 'test series 3',
+    series_xid => 'TS3',
 });
 $Series3->insert;
 

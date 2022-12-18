@@ -19,6 +19,7 @@ sub create_series {
     my @series = (
         {
             name => 'Berkeley Contra',
+            series_xid => 'BERK-CONTRA',
             frequency => 'first, third and fifth Wednesdays',
             series_url => 'https://bacds.org/series/contra/berkeley_wed/',
             is_deleted => 0,
@@ -32,12 +33,14 @@ EOL
         },
         {
             name => 'San Francisco Contra',
+            series_xid => 'SF-CONTRA',
             frequency => 'first and third Saturdays',
             series_url => 'https://bacds.org/series/contra/san_francisco/',
             is_deleted => 0,
         },
         {
             name => 'Palo Alto Contra',
+            series_xid => 'PA-CONTRA',
             frequency => 'second, fourth and fifth Saturdays',
             series_url => 'https://bacds.org/series/contra/palo_alto/',
             is_deleted => 0,
@@ -51,6 +54,7 @@ EOL
         },
         {
             name => 'Palo Alto English',
+            series_xid => 'PA-ENGLISH',
             frequency => 'first, third, and fifth Fridays',
             series_url => 'https://bacds.org/series/english/palo_alto/',
             is_deleted => 0,
@@ -64,6 +68,7 @@ EOL
         },
         {
             name => 'South Bay Contra',
+            series_xid => 'SB-CONTRA',
             frequency => 'third Sunday afternoons, 3:00–6:00, lesson at 2:30',
             series_url => 'https://bacds.org/series/contra/san_jose/',
             is_deleted => 0,
@@ -76,6 +81,7 @@ EOL
         },
         {
             name => 'Hayward Contra',
+            series_xid => 'HAYWARD-CONTRA',
             frequency => 'fourth and fifth Sunday afternoons of each month, 4:00–7:00, lesson at 3:30',
             is_deleted => 0,
             sidebar => <<'EOL', # ./english/hayward/content.html:
@@ -85,6 +91,7 @@ EOL
         },
         {
             name => 'Peninsula English (Palo Alto)',
+            series_xid => 'PEN-ENGLISH',
             frequency => 'first, third, and fifth Tuesday evenings of each month (with a break from late June through Labor Day).',
             series_url => 'https://bacds.org/series/english/peninsula/',
             is_deleted => 0,
@@ -97,6 +104,7 @@ EOL
         },
         {
             name => 'Berkeley English',
+            series_xid => 'BERK-ENGLISH',
             frequency => 'second and fourth Wednesday',
             series_url => 'https://bacds.org/series/english/berkeley_wed/',
             is_deleted => 0,
@@ -109,6 +117,7 @@ EOL
         },
         {
             name => 'Berkeley Fourth Saturday Experienced Dance',
+            series_xid => 'BERK-EXP-ENGLISH',
             frequency => 'fourth Saturday',
             series_url => 'https://bacds.org/series/english/berkeley_sat/',
             is_deleted => 0,
@@ -121,6 +130,7 @@ EOL
         },
         {
             name => 'San Francisco English',
+            series_xid => 'SF-ENGLISH',
             frequency => 'second Saturday',
             series_url => 'https://bacds.org/series/english/san_francisco/',
             is_deleted => 0,
@@ -133,6 +143,7 @@ EOL
         },
         {
             name => 'San Jose English',
+            series_xid => 'SJ-ENGLISH',
             frequency => 'second Sunday afternoons of the month, September through June',
             series_url => 'https://bacds.org/series/english/san_jose/',
             is_deleted => 0,
@@ -145,6 +156,7 @@ EOL
         },
         {
             name => 'Atherton Woodshed',
+            series_xid => 'ATH-WOODSHED',
             frequency => 'second Tuesday',
             is_deleted => 0,
             sidebar => <<'EOL', # ./woodshed/atherton/content.html:
@@ -156,6 +168,7 @@ EOL
         },
         {
             name => 'English Ceilidh',
+            series_xid => 'ENGLISH-CEILIDH',
             frequency => 'occasional',
             is_deleted => 0,
             sidebar => <<'EOL', # ./ceilidh/oakland/content.html:
@@ -167,31 +180,37 @@ EOL
         },
         {
             name => 'Odd Sundays Online',
+            series_xid => 'ODD-SUNDAYS-ONLINE',
             frequency => 'odd-numbered Sundays',
             is_deleted => 0,
         },
         {
             name => 'Online Concerts',
+            series_xid => 'ONLINE-CONCERTS',
             frequency => 'occasional',
             is_deleted => 0,
         },
         {
             name => 'Hey Days English Week',
+            series_xid => 'HEYDAYS',
             frequency => 'annual',
             is_deleted => 0,
         },
         {
             name => 'Family Week',
+            series_xid => 'FAMWK',
             frequency => 'annual',
             is_deleted => 0,
         },
         {
             name => 'Balance the Bay',
+            series_xid => 'BTB',
             frequency => 'annual',
             is_deleted => 0,
         },
         {
             name => 'English Regency',
+            series_xid => 'ENGLISH-REGENCY',
             frequency => 'second Fridays',
             series_url => 'https://bacds.org/series/english/palo_alto_reg/',
             is_deleted => 0,
@@ -205,6 +224,7 @@ EOL
 
         $new->$_( $series->{$_} ) for qw/
             name
+            series_xid
             frequency
             series_url
             sidebar

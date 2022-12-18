@@ -1,5 +1,6 @@
 CREATE TABLE series (
     series_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    series_xid CHAR(24) NOT NULL,
     name VARCHAR(255),
     frequency VARCHAR(128),
     short_desc varchar(2048),
@@ -12,5 +13,6 @@ CREATE TABLE series (
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 
-    INDEX series_name_idx (name)
+    INDEX series_name_idx (name),
+    UNIQUE INDEX series_xid_idx(series_xid)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
