@@ -87,6 +87,7 @@ sub get_tester {
 
     my $test = Test::WWW::Mechanize::PSGI->new(
         app => $app,
+        $args{env} ? (env => $args{env}) : (),
         max_redirect => $max_redirect,
     );
 

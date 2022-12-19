@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 47;
+use Test::More tests => 49;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -33,8 +33,9 @@ test_dancefinder_form_endpoint();
 test_dancefinder_results_endpoint($fixture);
 test_search_events($fixture);
 test_livecalendar_endpoint($fixture);
-test_series_lister($fixture);
-test_series_lister_endpoint($fixture);
+test_serieslister($fixture);
+test_serieslister_endpoint($fixture);
+test_serieslister_single_event_endpoint($fixture);
 
 sub setup_fixture {
 
@@ -236,6 +237,8 @@ sub setup_fixture {
     }
 
     return {
+        event1 => $event1->event_id,
+        event2 => $event2->event_id,
         band1 => $band1->band_id,
         band2 => $band2->band_id,
         caller1 => $caller1->caller_id,
@@ -518,7 +521,7 @@ sub test_livecalendar_endpoint {
     #dump $data;
 }
 
-sub test_series_lister {
+sub test_serieslister {
     my ($fixture) = @_;
 
     my $c = 'bacds::Scheduler::Model::SeriesLister';
@@ -549,7 +552,7 @@ sub test_series_lister {
     is $data->{events}[1]->synthetic_name, 'test event 2 synthname';
 }
 
-sub test_series_lister_endpoint {
+sub test_serieslister_endpoint {
     my ($fixture) = @_;
 
     #
@@ -579,7 +582,7 @@ sub test_series_lister_endpoint {
     #
     # test with the XID
     #
-    $Test->get_ok("/serieslister?series_xid=DAW", "GET /serieslister?series_xid ok");
+    $Test->get_ok("/serieslister?series_xid=DAW", "GET /serieslister?series_xid");
 
     like $Test->content, qr{
         <!--.TYPE.=.CONTRA--> \s+
@@ -598,4 +601,26 @@ sub test_series_lister_endpoint {
         </p> \s+
         </div>
     }x, 'serieslist xid output ok';
+}
+
+sub test_serieslister_single_event_endpoint {
+    my ($fixture) = @_;
+
+    my $tester = get_tester(
+        debug => 0,
+        env => {
+            QUERY_STRING_UNESCAPED => "event_id=$fixture->{event1}",
+            REQUEST_URI => "/series/english/berkeley_wed?event_id=$fixture->{event1}",
+        },
+    );
+
+    # if this works without a series_xid parameter, then we're
+    # exercising the code paths for single events
+    $tester->get_ok("/serieslister", 'GET /serieslister w/ SSI event_id param');
+
+    # this is the same href as the above test
+    like $tester->content,
+         qr{<a href="http://localhost/series/english/berkeley_wed\?event_id=1">},
+         'single event request worked, href is correct';
+
 }

@@ -77,12 +77,28 @@ sub get_upcoming_events_for_series {
 
 Display the data for this one event.
 
+Returns the same data structure as get_upcoming_events_for_series
+
 =cut 
+
 sub get_event_details {
     my ($class, %args) = @_;
 
     my $event_id = $args{event_id}
         or croak "missing arg event_id in call to get_event_details";
+
+    my $dbh = get_dbh(debug => 0);
+
+    my $event = $dbh->resultset('Event')->find({
+        #ask for it explicitly and you can get it even if it's deleted
+        #is_deleted => 0,
+        event_id => $event_id,
+    });
+
+    return {
+        series => $event->series,
+        events => [$event],
+    }
 }
 
 1;

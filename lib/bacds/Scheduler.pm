@@ -26,9 +26,12 @@ use Dancer2::Core::Cookie;
 use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Dancer2::Plugin::ParamTypes;
 use Data::Dump qw/dump/;
+use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
 use Scalar::Util qw/looks_like_number/;
+use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref/;
+
 
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Plugin::Auth;
@@ -1307,6 +1310,7 @@ get '/dancefinder-results' => with_types [
 sub _virtual_include {
     my ($path) = @_;
     my $docroot = "/var/www/bacds.org/public_html";
+    $path =~ s/\.\.//g; # prevent shenanigans
     my $fullpath = "$docroot/$path";
     open my $fh, "<", $fullpath or do {
         warn "can't read $fullpath $!";
@@ -1493,31 +1497,117 @@ get '/serieslister' => with_types [
     'optional' => ['query', 'event_id', 'SchedulerId'],
 ] => sub {
 
-    my ($data, $template);
+    my $event_id;
+    if (my $document_q = document_args()) {
+        $event_id = $document_q->get('event_id')
+    }
+    $event_id ||= query_parameters->get('event_id'); # might still be empty
+
+    my ($data);
 
     my $c = 'bacds::Scheduler::Model::SeriesLister';
 
-    if (my $event_id = query_parameters->get('event_id')) {
+    if ($event_id) {
         $data = $c->get_event_details(event_id => $event_id);
-        $template = 'serieslister/single-event';
     } else {
         $data = $c->get_upcoming_events_for_series(
             series_id => query_parameters->get('series_id')//'',
             series_xid => query_parameters->get('series_xid')//'',
         );
-        $template = 'serieslister/upcoming-events';
     }
 
     if (my $sidebar = $data->{series}->sidebar) {
         $sidebar =~ s{<!--#include virtual="(.+?)" -->}
-                    {_virtual_include($1)}eg;
+                     {_virtual_include($1)}eg;
         $data->{sidebar} = $sidebar;
     }
+    if (my $display_text = $data->{series}->display_text) {
+        $display_text =~ s{<!--#include virtual="(.+?)" -->}
+                          {_virtual_include($1)}eg;
+        $data->{display_text} = $display_text;
+    }
 
-    template($template, $data,
+    $data->{ssi_uri_for} = \&ssi_uri_for;
+
+    template('serieslister/upcoming-events', $data,
         {layout => undef},
     );
-
 };
+
+
+=head2 document_args
+
+For a virtual include that leads to the dance-scheduler, if we want
+to get the *original* query-string args, we need to get them from
+this:
+
+    In addition to the variables in the standard CGI environment,
+    these are available...to any program invoked by the document:
+
+    DOCUMENT_ARGS
+    This variable contains the query string of the active SSI
+    document, or the empty string if a query string is not included.
+    For subrequests invoked through the include SSI directive,
+    QUERY_STRING will represent the query string of the subrequest
+    and DOCUMENT_ARGS will represent the query string of the SSI
+    document.
+    https://httpd.apache.org/docs/2.4/mod/mod_include.html
+
+Ok, sure, but observation shows this is what we actually get in Dancer2:
+for a request to https://bacds.org/series/contra/palo_alto/?foo=bar
+
+  "DOCUMENT_NAME"           => "index.html",
+  "DOCUMENT_ROOT"           => "/var/www/bacds.org/public_html",
+  "DOCUMENT_URI"            => "/series/contra/palo_alto/index.html",
+  "QUERY_STRING"            => "series_xid=PA-CONTRA",
+  "QUERY_STRING_UNESCAPED"  => "foo=bar",
+  "REQUEST_URI"             => "/series/contra/palo_alto/?foo=bar",
+
+=cut
+
+sub document_args {
+
+    my $document_args = request->env->{QUERY_STRING_UNESCAPED}
+        or return;
+
+    # borrowed all this from Dancer2::Core::Request
+    # and thence Plack::Request
+
+    return Hash::MultiValue->new(
+        @{parse_urlencoded_arrayref($document_args)}
+    );
+}
+
+=head2 ssi_uri_for
+
+If running through a virtual include, uses the original request
+path from REQUEST_URI (see notes in document_args()), otherwise
+uses the application path.
+
+=cut
+
+sub ssi_uri_for {
+    my ($params) = @_;
+
+    my ($path) = request->env->{REQUEST_URI} =~ s/\?.*//r;
+
+    # borrowing this from Dancer2::Core::Request->_common_uri
+    my $port   = request->env->{SERVER_PORT};
+    my $server = request->env->{SERVER_NAME};
+    my $host   = request->host;
+    my $scheme = request->scheme;
+
+    my $uri = URI->new;
+    $uri->scheme($scheme);
+    $uri->authority( $host || "$server:$port" );
+    $uri->path( $path      || '/' );
+
+    $uri->query_form($params) if $params;
+
+    # extra ${} from Dancer2's uri_for, w/ever
+    return ${ $uri->canonical };
+}
+
+
 
 true;

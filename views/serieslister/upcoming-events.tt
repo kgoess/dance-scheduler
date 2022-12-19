@@ -1,6 +1,6 @@
 <h1 class="dance"><% series.name %></h1>
 <div>
-    <% series.display_text %>
+    <% display_text %>
 </div>
 
 <hr />
@@ -41,7 +41,7 @@
             <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
             <p class="dance">
                 <b class="date">
-                    <a href="<% request.uri_for('/serieslister', { event_id => event.event_id }) %>">
+                    <a href="<% ssi_uri_for({ event_id => event.event_id }) %>">
                         <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
                     </a>
                 </b>
