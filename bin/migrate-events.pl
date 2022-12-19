@@ -17,10 +17,12 @@ my %Series_Lookup = (
     'FUM-CONTRA/SPECIAL' => 'Palo Alto Contra',
     'FUM-ENGLISH/SPECIAL' => 'Palo Alto English',
     'HVC-CONTRA' => 'Hayward Contra',
-    'FSJ-CONTRA' => 'South Bay Contra',
-    'ASE-ENGLISH' => 'Peninsula English',
+    'FSJ-CONTRA' => 'South Bay Contra Dance Series',
+    'ASE-ENGLISH' => 'Peninsula English (Palo Alto)',
     'CCB-ENGLISH' => 'Berkeley English',
-    'STM-ENGLISH' => 'Palo Alto English', # SME and STM are dups?
+    # ASE,FBC,MT,FHL,SME,STM are all Peninsula English if Tue/Wed/Thu
+    'STM-ENGLISH' => 'Peninsula English (Palo Alto)',
+    'SME-ENGLISH' => 'Palo Alto Friday English Dance',
     # ???
     #'CCB-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
     'SJP-ENGLISH' => 'San Francisco English',
@@ -41,7 +43,6 @@ my %Series_Lookup = (
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
     'JPC-CONTRA/SPECIAL' => 'Balance the Bay',
     'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay', # are these not the same thing?
-    'SME-ENGLISH' => 'Palo Alto English', # SME and STM are dups?
     'SME-ENGLISH/REGENCY' => 'English Regency',
     'STM-ENGLISH/REGENCY' => 'English Regency',
     'ACC-ENGLISH' => 'Arlington Community Church English',

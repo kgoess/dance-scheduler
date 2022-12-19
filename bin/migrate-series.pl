@@ -30,6 +30,12 @@ sub create_series {
 <!--#include virtual="/series/shared/price_weeknight.html" -->
 <!--#include virtual="/series/shared/directions_gnc.html" -->
 EOL
+            display_text => <<'EOL',
+<div class="center">
+<h1 class="dance">Berkeley Wednesday (through August 2022 and then) Thursday Contra Dance</h1>
+</div>
+EOL
+
         },
         {
             name => 'San Francisco Contra',
@@ -39,44 +45,68 @@ EOL
             is_deleted => 0,
         },
         {
-            name => 'Palo Alto Contra',
+            name => 'Palo Alto Contra Dance',
             series_xid => 'PA-CONTRA',
             frequency => 'second, fourth and fifth Saturdays',
             series_url => 'https://bacds.org/series/contra/palo_alto/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./contra/palo_alto/content.html:
-<!--#include virtual="/series/shared/role_name_lr.html" -->
 <!--#include virtual="/series/shared/location_pa.html" -->
 <!--#include virtual="/series/shared/time_late_lesson_180.html" -->
 <!--#include virtual="/series/shared/price_weekend.html" -->
 <!--#include virtual="/series/shared/directions_pa.html" -->
 EOL
-        },
-        {
-            name => 'Palo Alto English',
-            series_xid => 'PA-ENGLISH',
-            frequency => 'first, third, and fifth Fridays',
-            series_url => 'https://bacds.org/series/english/palo_alto/',
-            is_deleted => 0,
-            sidebar => <<'EOL', # ./english/peninsula/content.html:
-<!--#include virtual="/series/shared/location_ast.html" -->
-<!--#include virtual="/series/shared/time_mid_120.html" -->
-<!--#include virtual="/series/shared/price_standard.html" -->
-<!--#include virtual="/series/shared/directions_jls.html" -->
-<!--#include virtual="/series/shared/directions_ast.html" -->
+            display_text => <<'EOL',
+<h2 class="dance" align="center">First United Methodist Church of Palo Alto</h2>
+<!--#include virtual="/series/shared/role_name_lr.html" -->
 EOL
         },
         {
-            name => 'South Bay Contra',
+            name => 'Palo Alto Friday English Dance',
+            series_xid => 'PA-ENGLISH',
+            frequency => 'first Fridays',
+            series_url => 'https://bacds.org/series/english/palo_alto/',
+            is_deleted => 0,
+            sidebar => <<'EOL', # ./english/palo_alto/content.html:
+<!--#include virtual="/series/shared/location_sme.html" --> 
+<!--#include virtual="/series/shared/time_late_lesson.html" -->
+<!--#include virtual="/series/shared/price_weekend.html" -->
+<!--#include virtual="/series/shared/directions_sme.html" -->
+EOL
+            display_text => <<'EOL',
+<div class="center">
+<h2 class="dance">1st Fridays - Saint Mark's Episcopal Church Parish Hall</h2>
+</div>
+EOL
+        },
+        {
+            name => 'South Bay Contra Dance Series',
             series_xid => 'SB-CONTRA',
             frequency => 'third Sunday afternoons, 3:00–6:00, lesson at 2:30',
             series_url => 'https://bacds.org/series/contra/san_jose/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./contra/san_jose/content.html:
+<a target="_blank" href="https://www.facebook.com/groups/SouthBayContraDance/">
+    <img border="0" src="/images/logofb.png" width="45" height="45" align=center valign=top alt="Find us on Facebook"></a>&nbsp;
+<a target="_blank" href="http://www.meetup.com/South-Bay-Contra-Dance-Meetup" alt="Find us on Meetup">
+    <img border="0" src="/images/meetup.jpg" width="70" height="45" align=center valign=top></a>
 <!--#include virtual="/series/shared/location_fsj.html" -->
 <!--#include virtual="/series/shared/time_aft_180_3.html" -->
 <!--#include virtual="/series/shared/price_weekend_sbc.html" -->
 <!--#include virtual="/series/shared/directions_fsj.html" -->
+EOL
+            display_text => <<'EOL',
+<div class="center"><h2 class="dance">a welcoming, intergenerational dance on 3rd Sundays</h2></div>
+<h1>This series is currently on hiatus.  If you don't see a calendar entry listed below, there is no dance.</h1>
+        <div align="center"><table><tr><td><em><ul style="margin-top: 0em;">
+            <li>Newcomer's Introduction at 2:30pm
+            <li>Take the intro at 2:30 pm and get a 2nd dance Free pass </li>
+            <li>Kid-friendly dance before the potluck snack break
+            <li>Gender-free calling (Larks/Robins)
+        </ul></em></td></tr></table></div>
+        <br><a href="mailto:SouthBayContra-info@bacds.org" style="text-decoration:none">
+            <input type="button" value="Questions or comments? Email us!"/></a><br><br>
+
 EOL
         },
         {
@@ -84,9 +114,15 @@ EOL
             series_xid => 'HAYWARD-CONTRA',
             frequency => 'fourth and fifth Sunday afternoons of each month, 4:00–7:00, lesson at 3:30',
             is_deleted => 0,
-            sidebar => <<'EOL', # ./english/hayward/content.html:
-<!--#include virtual="/series/shared/location_hayward.html" -->
-<!--#include virtual="/series/shared/time_aft_180_4.html" -->
+            sidebar => <<'EOL', # ./contra/hayward/content.html:
+EOL
+            display_text => <<'EOL',
+<p>
+At present, the Hayward Contra is running independently, not as a BACDS dance.
+</p>
+<p>
+For information about the Hayward Contra series visit <a href="https://sfbaycontra.org">sfbaycontra.org</a>
+</p>
 EOL
         },
         {
@@ -95,11 +131,23 @@ EOL
             frequency => 'first, third, and fifth Tuesday evenings of each month (with a break from late June through Labor Day).',
             series_url => 'https://bacds.org/series/english/peninsula/',
             is_deleted => 0,
-            sidebar => <<'EOL', # ./english/palo_alto/content.html:
-<!--#include virtual="/series/shared/location_mt.html" -->
-<!--#include virtual="/series/shared/time_late_lesson_150.html" -->
-<!--#include virtual="/series/shared/price_weekend.html" -->
-<!--#include virtual="/series/shared/directions_mt.html" -->
+            sidebar => <<'EOL', # ./english/peninsula/content.html:
+<!--#include virtual="/series/shared/location_ast.html" -->
+<!--#include virtual="/series/shared/time_mid_120.html" -->
+<!--#include virtual="/series/shared/price_standard.html" -->
+<!--#include virtual="/series/shared/directions_ast.html" -->
+EOL
+            display_text => <<'EOL',
+<div class="center">
+<h2 class="dance">1st, 3rd &amp; 5th Tuesdays, September through June<br />
+Regular location: All Saints Episcopal, Palo Alto<br />
+<br /><br />
+<!--
+Special October 2015 Location: First Baptist Church, 305 North California Avenue,
+Palo Alto, CA - Thursday nights! 
+-->
+</h2>
+</div>
 EOL
         },
         {
@@ -109,12 +157,37 @@ EOL
             series_url => 'https://bacds.org/series/english/berkeley_wed/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./english/berkeley_wed/content.html:
+<a target="_blank" href="http://facebook.com/groups/Berkeley.Wednesday.ECD"><img border="0" src="/images/FindUsOnFacebook.gif" width="175" height="50" alt="Find us on Facebook"></a>
+<br />
+<a href="/email/?l=berkeley-wed-english" style="text-decoration: none"><input type="button" value="Sign up for our E-mail list" /></a>
+<br /><br />
+
+<div align="left">
+<p class="location">
+<ul>
+    <li>When you arrive at the hall, you will have to fill out a form answering
+    questions about Covid symptoms. You will not have to provide contact
+    information a second time. To see the questions ahead of time, click <a
+    href="https://docs.google.com/document/d/1avctu_0x8vZoZ88BQ0eqqoiXe6jjcVvLXEQ7RgYLRtA/edit?usp=sharing">here</a>.</li>
+</ul>
+
+<br />
+<br />
+<br />
+<a href="https://www.bacds.org/COVID/">BACDS COVID level and safety precautions</a>
+</p>
+</div>
+<br />
 <!--#include virtual="/series/shared/time_special_bwe.html" -->
 <!--#include virtual="/series/shared/location_gnc.html" -->
 <!--#include virtual="/series/shared/price_weeknight.html" -->
 <!--#include virtual="/series/shared/directions_gnc.html" -->
 EOL
+        display_text => <<'EOL',
+<h1 class="dance">Berkeley Wednesday (through August 2022, then) Thursday English Dance</h1>
+EOL
         },
+
         {
             name => 'Berkeley Fourth Saturday Experienced Dance',
             series_xid => 'BERK-EXP-ENGLISH',
@@ -127,6 +200,20 @@ EOL
 <!--#include virtual="/series/shared/price_weekend.html" -->
 <!--#include virtual="/series/shared/directions_gnc.html" -->
 EOL
+            display_text => <<'EOL',
+<h1 class="dance">Berkeley Experienced English Country Dance</h1>
+<p>
+Are you comfortable dancing <b>heys for three</b> and <b>double figures of eight</b>? Do you 
+find it satisfying to move in time to the music and to match your fellow dancers surging in a line?
+<p>
+Welcome to the Fourth Saturday Experienced English Dance!
+<p>
+We spend some time each evening paying attention to styling, to make the dances go more smoothly and look nicer. Each program includes a few <b>challenging dances</b>, as well as many familiar and favorite dances that we can do with <b>quick walk-through calling</b>. Come enjoy the camaraderie, physical and mental stimuli, and the glorious music.
+
+<p>(If you have friends to whom you would like to introduce the joys of English Country Dancing, please bring them on the second and fourth 
+Thursdays to the dances in <a href="/series/english/berkeley_wed/">Berkeley</a>, or to the <a href="/series/english/san_francisco/">San Francisco<a>, <a href="/series/english/palo_alto">Palo Alto</a>, <a href="/series/english/peninsula/">Peninsula</a> or <a href="/series/english/san_jose/">South Bay</a> dances. Check the listings on the quarterly BACDS calendar flyer or on the calendar at www.bacds.org)
+</p>
+EOL
         },
         {
             name => 'San Francisco English',
@@ -135,10 +222,20 @@ EOL
             series_url => 'https://bacds.org/series/english/san_francisco/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./english/san_francisco/content.html:
+<a target="_blank" href="http://www.facebook.com/group.php?gid=196323749310">
+<img border="0" src="/images/FindUsOnFacebook.gif" width="175" height="50"
+  alt="Find us on Facebook"></a><br><br>
+<a target="_blank" href="http://www.secondsaturdayenglish.com">
+<img border="0" src="/images/blog.jpg" width="75" height="75"
+  alt="Follow our Blog"></a><br>
+<br> 
 <!--#include virtual="/series/shared/location_spc.html" -->
 <!--#include virtual="/series/shared/time_special_spc.html" -->
 <!--#include virtual="/series/shared/price_weekend.html" -->
 <!--#include virtual="/series/shared/directions_spc.html" -->
+EOL
+            display_text => <<'EOL',
+<h1 class="dance">San Francisco Saturday English Dance</h1>
 EOL
         },
         {
@@ -148,10 +245,16 @@ EOL
             series_url => 'https://bacds.org/series/english/san_jose/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./english/san_jose/content.html:
+<em>Regular Location</em><br />
 <!--#include virtual="/series/shared/location_fsj.html" -->
 <!--#include virtual="/series/shared/time_aft_150_3.html" -->
 <!--#include virtual="/series/shared/price_weekend.html" -->
 <!--#include virtual="/series/shared/directions_fsj.html" -->
+EOL
+            display_text => <<'EOL',
+<div class="center">
+<h2 class+"dance">September - June, 2nd Sundays <br /></h2>
+</div>
 EOL
         },
         {
@@ -165,6 +268,9 @@ EOL
 <!--#include virtual="/series/shared/price_woodshed.html" -->
 <!--#include virtual="/series/shared/directions_hpp.html" -->
 EOL
+            display_text => <<'EOL',
+<h1 class="dance">Palo Alto second-Monday Woodshed dance</h1>
+EOL
         },
         {
             name => 'English Ceilidh',
@@ -176,6 +282,20 @@ EOL
 <!--#include virtual="/series/shared/time_mid.html" -->
 <!--#include virtual="/series/shared/price_weekend.html" -->
 <!--#include virtual="/series/shared/directions_hum.html" -->
+EOL
+            display_text => <<'EOL',
+<h1 class="dance">Oakland (formerly Berkeley) English Ceilidh</h1>
+<p align=justify>
+English ceilidh ("kay-lee") dances, which you can call barn dances if you
+can't pronounce ceilidh, are raucous social dances similar to those found at
+pubs throughout England. Different in both style and music from both
+Scottish and Irish ceilidhs, English ceilidhs combine traditional English
+music performed by amplified ensembles with dances that are derived from but
+(usually) simpler English country dances. These are entry-level dances,
+extremely welcoming to groups of first-timers, children old enough to dance
+apart from their parents, and even morris dancers. Our English ceilidh
+dances are held occasionally, usually at Humanist Hall in Oakland.
+<p>	    
 EOL
         },
         {
@@ -214,6 +334,24 @@ EOL
             frequency => 'second Fridays',
             series_url => 'https://bacds.org/series/english/palo_alto_reg/',
             is_deleted => 0,
+            sidebar => <<'EOL',
+Regular Location:
+<!--#include virtual="/series/shared/location_sme.html" -->
+<!--#include virtual="time.html" -->
+<!--#include virtual="price.html" -->
+EOL
+            display_text => <<'EOL',
+<p>
+BACDS and <a href="http://baers.org">The Bay Area English Regency Society (BAERS) </a> co-sponsor second Friday Regency dance parties.  Strictly speaking, the Regency is the period from 1811-1820 when George III was too sick to rule and Parliament authorized his wastrel son (later George IV) as Prince Regent.  This is the era of the Napoleonic Wars, the Romantic poets, composers like Beethoven, and the years when the novels of Jane Austen were published.  These focus on accessible dances with some connection to Jane Austen's lifetime (1778 - 1816), extending to the end of the Regency (1820), sometimes using American dances of the same period, which allows for longways (duple and triple) minors, three and four couple sets, and we'll do two-couple dances (which are out of period) if that's how many people are there at the start, so we will start on time.   We dance in the spirit of the Regency era, but usually in modern Englsh style.  Because the waltz becomes popular in England in our period, we usually have waltz country dances and several free waltzes, and occasionally some choreographed waltz couple dances.  The famous "Congress of Vienna" dance was invented for Regency dancing.  This is an excellent series for new dancers and people wanting to acquire fluency in country dance.  These second-Friday dance parties are casual-dress events.  BAERS also sponsors several balls a year with historical themes (see BAERS website, above) where we encourage historical, formal, or festive dress but don't require it.
+<p>
+Alan Winston is the series programmer and the most frequent leader for the dance parties, but other callers who share with Alan both an interest in the period and skill in teaching beginners sometimes share the evening or take the whole evening.  On rare occasions we repurpose the second-Friday evening to take advantage of visiting world-class talent, so our second-Friday dance parties have been called by Andrew Shaw, Graham Christian, and others.
+</p>
+<p>
+The house band, Divertimento, is usually led by BAERS Music Director James Langdell, with William Allen on piano, Paul Kostka on whistles and other instruments, Jeannette Langdell on violin, Bill Langdell on horns, and welcomes sit-ins from strong players who can sight-read.  Band and caller are all acoustic.
+<p>
+The entrance to the St. Mark's compound (sanctuary, social hall, and rectory) is fairly inconspicuous, on the South side of Colorado, mid-block, about a block and half West of Middlefield Road in mid-town, far from the train station but close to a bus route.  There's a very big parking lot which isn't visible from the street.  The dance is usually in the Social Hall (good acoustics and lighting, excellent floor), but is occasionally displaced into the Sanctuary (fantastic acoustics, dramatic lighting, linoleum-over-wood floor), usually in May when the St. Mark's takes a turn in the Hotel de Zink rotation.
+</p>
+EOL
         },
     );
 
