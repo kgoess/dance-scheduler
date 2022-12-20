@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 57;
+use Test::More tests => 59;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -37,7 +37,8 @@ test_livecalendar_endpoint($fixture);
 test_serieslister($fixture);
 test_serieslister_endpoint($fixture);
 test_serieslister_single_event_endpoint($fixture);
-test_calendar($fixture);
+test_calendar_get_events($fixture);
+test_calendar_get_venues($fixture);
 
 sub setup_fixture {
 
@@ -627,7 +628,7 @@ sub test_serieslister_single_event_endpoint {
 
 }
 
-sub test_calendar {
+sub test_calendar_get_events {
     my ($fixture) = @_;
 
     my @events = bacds::Scheduler::Model::Calendar->load_events_for_month('2022', '04');
@@ -640,4 +641,14 @@ sub test_calendar {
     is $events[0]->startday, '2022-04-14';
     is $events[1]->startday, '2022-04-28';
     is $events[2]->startday, '2022-04-28';
+}
+
+sub test_calendar_get_venues {
+    my ($fixture) = @_;
+
+    my @venues = bacds::Scheduler::Model::Calendar->load_venue_list_for_month('2022', '04');
+
+    is @venues, 1, 'just one venue';
+    is $venues[0], q{hop|Mr. Hooper's Store|123 Sesame St.|Sunny Day};
+
 }

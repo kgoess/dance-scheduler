@@ -34,15 +34,69 @@ package OldEvent {
     );
 }
 
+=head2 load_events_for_month
+
+=cut
+
 sub load_events_for_month {
     my ($class, $start_year, $start_month) = @_;
 
-    my $dbh = get_dbh(debug => 0);
+    my @events = _load_events($start_year, $start_month);
+
+    my @res;
+    foreach my $event (@events) {
+        my $old = OldEvent->new({
+            startday => $event->start_date->ymd,
+            endday   => ($event->end_date ? $event->end_date->ymd : ''),
+            type     => join('/', map $_->name, $event->styles->all),
+            loc      => join('/', map $_->vkey, $event->venues->all),
+            leader   => join(', ', map $_->name, $event->callers->all),
+            band     => join(', ', map $_->name, $event->bands->all),
+            comments => $event->short_desc, # maybe?
+        });
+        push @res, $old;
+    }
+    return @res;
+}
+
+=head2 load_venue_list_for_month
+
+=cut
+
+sub load_venue_list_for_month {
+    my ($class, $start_year, $start_month) = @_;
+
+    # silly doing this a second time on the page, will fix someday
+    my @events = _load_events($start_year, $start_month);
+
+    my (%seen, @venue_list);
+    foreach my $event (@events) {
+        my $venue = $event->venues->first;
+        next if $seen{$venue->vkey}++;
+        # making a data structure from a | string is silly, but I'm
+        # maintaining the old behavior
+        push @venue_list, join '|',
+            map { $venue->$_ } qw/
+                vkey
+                hall_name
+                address
+                city
+            /;
+            # 'comment' was the last item, but doesn't exist in the new schema
+    }
+    sort @venue_list
+
+}
+
+sub _load_events {
+    my ($start_year, $start_month) = @_;
 
     croak "bad value for start_year in load_events_for_month: '$start_year'"
         unless $start_year =~ /^[0-9]{4}$/;
     croak "bad value for start_month in load_events_for_month: '$start_month'"
         unless $start_month =~ /^[0-9]{1,2}$/;
+
+    my $dbh = get_dbh(debug => 0);
 
     my $date_param = sprintf "%04d-%02d-01", $start_year, $start_month;
     my $through_date = DateTime->last_day_of_month(
@@ -60,20 +114,8 @@ sub load_events_for_month {
         order_by => 'start_date',
     });
 
-    my @res;
-    foreach my $event (@events) {
-        my $old = OldEvent->new({
-            startday => $event->start_date->ymd,
-            endday   => ($event->end_date ? $event->end_date->ymd : ''),
-            type     => join('/', map $_->name, $event->styles->all),
-            loc      => join('/', map $_->vkey, $event->venues->all),
-            leader   => join(', ', map $_->name, $event->callers->all),
-            band     => join(', ', map $_->name, $event->bands->all),
-            comments => $event->short_desc, # maybe?
-        });
-        push @res, $old;
-    }
-    return @res;
+    return @events;
 }
+
 
 1;
