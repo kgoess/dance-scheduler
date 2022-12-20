@@ -366,6 +366,7 @@ EOL
             frequency
             series_url
             sidebar
+            display_text
         /;
         $new->is_deleted(0);
 
