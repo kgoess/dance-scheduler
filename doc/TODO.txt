@@ -79,6 +79,7 @@ phase I:
     -- create a sidebar options table that links to events, to allow including and sorting options as desired
  - better styling for dancefinder results page? at least a "back to search"
    link? and for the search page?
+ - some of the series pages, are broke--display text above or beside sidebar?
 
 
  - work out that is_deleted field--it shouldn't be exposed (there should be a

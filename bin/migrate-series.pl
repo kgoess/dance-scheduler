@@ -201,7 +201,14 @@ EOL
 <!--#include virtual="/series/shared/directions_gnc.html" -->
 EOL
             display_text => <<'EOL',
-<h1 class="dance">Berkeley Experienced English Country Dance</h1>
+<div class="center">
+    <h2>
+    Christ Church Berkeley
+    (formerly known as Grace North Church)<br />
+    2138 Cedar (between Shattuck and Oxford) <br />
+    </h2>
+</div>
+
 <p>
 Are you comfortable dancing <b>heys for three</b> and <b>double figures of eight</b>? Do you 
 find it satisfying to move in time to the music and to match your fellow dancers surging in a line?
@@ -216,7 +223,7 @@ Thursdays to the dances in <a href="/series/english/berkeley_wed/">Berkeley</a>,
 EOL
         },
         {
-            name => 'San Francisco English',
+            name => 'San Francisco Saturday English Dance',
             series_xid => 'SF-ENGLISH',
             frequency => 'second Saturday',
             series_url => 'https://bacds.org/series/english/san_francisco/',
@@ -235,7 +242,9 @@ EOL
 <!--#include virtual="/series/shared/directions_spc.html" -->
 EOL
             display_text => <<'EOL',
-<h1 class="dance">San Francisco Saturday English Dance</h1>
+<div class="center">
+<h2 class="dance">Second Saturday -- St. John&#39;s Presbyterian Church</h2>
+</div>
 EOL
         },
         {
@@ -404,7 +413,7 @@ sub setup_event_templates {
             is_template => 1,
         },
         {
-            series_name => "San Francisco English",
+            series_name => "San Francisco Saturday English Dance",
             start_time =>'19:30',
             style =>  'ENGLISH',
             venue =>  'SJP',

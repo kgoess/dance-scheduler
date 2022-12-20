@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 49;
+use Test::More tests => 57;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -16,6 +16,7 @@ use bacds::Scheduler::Util::Time qw/get_now/;
 
 use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::SeriesLister;
+use bacds::Scheduler::Model::Calendar;
 
 setup_test_db;
 
@@ -36,6 +37,7 @@ test_livecalendar_endpoint($fixture);
 test_serieslister($fixture);
 test_serieslister_endpoint($fixture);
 test_serieslister_single_event_endpoint($fixture);
+test_calendar($fixture);
 
 sub setup_fixture {
 
@@ -68,7 +70,7 @@ sub setup_fixture {
     my $deleted_event = $dbh->resultset('Event')->new({
         name => 'deleted event',
         synthetic_name => 'deleted event synthname',
-        short_desc => 'old <b> dance party &#9785;',
+        short_desc => 'deleted <b> dance party &#9785;',
         is_deleted => 1,
         start_date => get_now->ymd('-'),
         start_time => '20:00',
@@ -623,4 +625,19 @@ sub test_serieslister_single_event_endpoint {
          qr{<a href="http://localhost/series/english/berkeley_wed\?event_id=1">},
          'single event request worked, href is correct';
 
+}
+
+sub test_calendar {
+    my ($fixture) = @_;
+
+    my @events = bacds::Scheduler::Model::Calendar->load_events_for_month('2022', '04');
+
+    is scalar @events, 3, 'calendar gets all three undeleted events';
+    is $events[0]->band, 'Raging Rovers, Blasting Berzerkers';
+    is $events[0]->leader, 'Alice Ackerby, Bob Bronson';
+    is $events[0]->type, 'ENGLISH/CONTRA';
+    is $events[0]->loc, 'hop/bcv';
+    is $events[0]->startday, '2022-04-14';
+    is $events[1]->startday, '2022-04-28';
+    is $events[2]->startday, '2022-04-28';
 }

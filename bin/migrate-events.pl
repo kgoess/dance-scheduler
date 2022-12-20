@@ -25,7 +25,7 @@ my %Series_Lookup = (
     'SME-ENGLISH' => 'Palo Alto Friday English Dance',
     # ???
     #'CCB-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
-    'SJP-ENGLISH' => 'San Francisco English',
+    'SJP-ENGLISH' => 'San Francisco Saturday English Dance',
     'FSJ-ENGLISH' => 'San Jose English',
     'HPP-WOODSHED' => 'Atherton Woodshed',
     'STM-WOODSHED' => 'Atherton Woodshed',
@@ -46,7 +46,7 @@ my %Series_Lookup = (
     'SME-ENGLISH/REGENCY' => 'English Regency',
     'STM-ENGLISH/REGENCY' => 'English Regency',
     'ACC-ENGLISH' => 'Arlington Community Church English',
-    'SPC-ENGLISH' => 'San Francisco English',
+    'SPC-ENGLISH' => 'San Francisco Saturday English Dance',
 );
 
 my $dbh = get_dbh();
