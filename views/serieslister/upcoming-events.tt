@@ -72,6 +72,7 @@
                 <% event.short_desc %>
             </p>
         </div>
+        <% ldjson %>
     <% END %>
 </div>
 <div class="event-content-sidebar">
