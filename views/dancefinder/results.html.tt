@@ -78,7 +78,6 @@ Dances
         <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
     <%- END %>
     <%- IF event.callers %>
-        <%# FIXME this doesn't work if the search was for caller, wtf? '%>
         <%- FOREACH caller IN event.callers %>
             <% caller.name %><% IF !loop.last() %>, <% END %>
         <%- END %>
