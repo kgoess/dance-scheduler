@@ -42,30 +42,6 @@ Dances
     <% END %>
 <% END %>
 </div>
-<%#
-<!--
-        $loc_hall = $loc_city = ' ';
-        print ucfirst(lc($style)) . " " if $style;
-        print "Dances";
-        if ($venue) {
-            ($loc_hall, $loc_city) = get_hall_name_city($venue);
-            print " At " . $loc_hall . " in " . $loc_city;
-        }
-        if ($caller) {
-            print " Led By " . $caller;
-        }
-        if ($muso) {
-            print " Featuring " . $muso;
-        }
-        if ($numdays) {
-            print " During The Next " . $numdays;
-            ($numdays == 1) ? print " Day" : print " Days";
-        }
-        print "\n</h1>\n";
-    }
-}
--->
-%>
 
 <% FOREACH event IN events %>
     <p class="listing">
