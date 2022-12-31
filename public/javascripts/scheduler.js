@@ -344,37 +344,14 @@ function getLabelForDisplayInItemListbox (modelName, data) {
  * "style" or "venue".
  */
 function displayItemRow(currentRow, targetObj) {
-
     currentRow.children('.row-contents').show();
     currentRow.children('.row-edit').hide();
+    let singleValue = targetObj
+        ? targetObj[currentRow.attr('name')]
+        : '';
+    if (singleValue == null) // to prevent the displayed "null" on unfilled fields.
+        singleValue = '';
     switch(currentRow.attr('column-type')) {
-        case 'text-item':
-            const theText = targetObj
-                ? targetObj[currentRow.attr('name')]
-                : '';
-            let displayText = escapeHtml(theText);
-            displayText = displayText.replace(/\n/g, '<br/>');
-            currentRow.children('.row-contents').html(displayText);
-            currentRow.children('.row-edit').val(theText);
-            break;
-        case 'bool-item':
-            const theBool = targetObj
-                ? targetObj[currentRow.attr('name')]
-                : '';
-            currentRow.find('.row-edit input').val(theBool);
-            const divWithAttributes = currentRow.find('.status-switch');
-            currentRow.children('.row-contents').html(
-                theBool == "1"
-                ? divWithAttributes.attr('data-yes')
-                : divWithAttributes.attr('data-no')
-                );
-            break;
-        case 'hidden-item':
-            const theValue = targetObj
-                ? targetObj[currentRow.attr('name')]
-                : '';
-            currentRow.children('.row-edit').val(theValue);
-            break;
         case 'list-item':
             const modelName = currentRow.attr('model-name');
             const tableName = currentRow.attr('table-name');
@@ -387,7 +364,24 @@ function displayItemRow(currentRow, targetObj) {
                 dataType: 'json'
             })
             .done((msg) => fillInItemRowList(currentRow, msg, selections, labelGetter));
-
+            break;
+        case 'text-item':
+            let displayText = escapeHtml(singleValue);
+            displayText = displayText.replace(/\n/g, '<br/>');
+            currentRow.children('.row-contents').html(displayText);
+            currentRow.children('.row-edit').val(singleValue);
+            break;
+        case 'bool-item':
+            currentRow.find('.row-edit input').val(singleValue);
+            const divWithAttributes = currentRow.find('.status-switch');
+            currentRow.children('.row-contents').html(
+                singleValue == "1"
+                ? divWithAttributes.attr('data-yes')
+                : divWithAttributes.attr('data-no')
+                );
+            break;
+        case 'hidden-item':
+            currentRow.children('.row-edit').val(singleValue);
             break;
         default:
             console.log(`displayItemRow's currentRow `, currentRow, `'s currentRow.attr('column-type') is ${currentRow.attr('column-type')}`);
@@ -502,7 +496,7 @@ function multiSelectOptionAdd() {
     const displayRow = $(this).closest('.display-row')
     const cloneTarget = displayRow.find('.multi-select-wrapper:last')
     const newSelectBoxDiv = cloneTarget.clone(true);
-    cloneTarget.append(newSelectBoxDiv);
+    cloneTarget.parent().append(newSelectBoxDiv);
     const newSelectBox = newSelectBoxDiv.find('select').first();
     newSelectBox.val('');
     newSelectBoxDiv.find('.remove-multi-select-button' ).click(function() {

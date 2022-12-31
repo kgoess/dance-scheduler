@@ -201,25 +201,80 @@ font-size: 10px;
 
 .model-display {
     border: 1px solid black;
+    display: flex;
+    flex-direction: column;
 }
 .display-row {
     border: 1px solid black;
     background: lightgrey;
     padding: 3px;
-}
-
-.display-row.has-textarea {
     display: flex;
+    flex-direction: row;
+    align-items: stretch;
 }
 
 .display-row:hover {
     background: salmon;
 }
 
-.display-row[column-type="hidden-item"] {
-    display: none;
+.row-label {
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 10em;
+    align-items: center;
+    gap: 5px;
 }
-    
+
+.row-contents {
+    display: flex;
+    flex: 1 0 40em;
+    cursor: pointer;
+}
+
+.multi-select-flex {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.multi-select-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
+
+.select-shortener {
+    display: flex;
+    flex: 1 0 90%;
+}
+
+.remove-multi-select-button {
+    background-color: red;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 0 5px black;
+    margin-left: 5px;
+    display: flex;
+    flex: 0 0 1em;
+    justify-content: center;
+}
+
+.add-multi-select-button {
+    background-color: green;
+    color: lightgreen;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 5em;
+    font-weight: bold;
+    box-shadow: 0 0 5px black;
+    margin-top: 5px;
+    display: flex;
+    align-self: center;
+    order: 99;
+    justify-content: center;
+}
+
 .button-container {
     display: flex;
     justify-content: center;
@@ -228,25 +283,17 @@ font-size: 10px;
 .button {
     margin: 0 5px;
 }
-.row-contents {
-    max-width: 40em;
-    cursor: pointer;
-}
 /* these two are to keep super long venue names from blowing out the series
  * default popup
  * https://stackoverflow.com/questions/10672586/how-to-make-select-elements-shrink-to-max-width-percent-style-within-fieldset
- */
+/
 .select-shortener {
     display:inline-block;
     max-width: 90%;
 }
+*/
 .select-shortener select {
     width: 100%;
-}
-.row-label {
-    display: inline-block;
-    width: 10em;
-    height: 100%;
 }
 
 /* so they'll be invisible if the javascript breaks */
@@ -270,9 +317,12 @@ form:invalid button {
 }
 
 /* the required-marker is the yellow * after the required fields */
-.required-marker {
+.required-marker:after {
+    content: "*";
+    font-weight: bold;
     color: yellow;
-    margin-left: .5em;
+    text-shadow: 0 0 2px red;
+    display: flex;
 }
 
 
@@ -284,8 +334,10 @@ form:invalid button {
     cursor: help;
     background-color: green;
     color: yellow;
-    text-align: center;
-    float: right;
+    display: flex;
+    justify-content: center;
+    order: 99;
+
 }
 
 /* 
@@ -351,7 +403,8 @@ form:invalid button {
 .custom-bool {
     display: inline-flex;
     width: 15em;
-    height: 1.5em;
+    height: 1.3em;
+    margin-bottom: 3px;
 }
 .custom-bool input {
     display: none;
