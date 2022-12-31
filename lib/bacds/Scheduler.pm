@@ -261,7 +261,7 @@ get '/' => requires_login sub {
         accordions => [
             { label => 'Events',
               modelName => 'event',
-              content => template("events.tt", {}, { layout=> undef }),
+              content => template("accordion.tt", {}, { layout=> undef }),
             },
             { label => 'Styles',
               modelName => 'style',

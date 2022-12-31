@@ -301,8 +301,14 @@ function displayItem(target, msg) {
         parentContainer.find('.display-row').each(
             (index, currentRow) => displayItemRow($(currentRow), targetObj)
         );
-        // this is the <input type=hidden name=${modelName}_id
-        parentContainer.find( `[name="${modelName}_id"]` ).val(targetObj ? targetObj[`${modelName}_id`] : '');
+        parentContainer.find('.display-form > input[type="hidden"]').each(
+            (index, currentInput) => {
+                const theValue = targetObj
+                    ? targetObj[currentInput.getAttribute('name')]
+                    : '';
+                currentInput.value = theValue;
+            }
+        );
         parentContainer.find('.model-display').show();
     }
 }
@@ -451,6 +457,11 @@ function displayListForModel(modelName, msg) {
     }
 }
 
+/* loadListForModel
+ *
+ * This pings the server for a list of items for the current accordian tab,
+ * then populates the .clickable-list with them via displayListForModel()
+ */
 function loadListForModel(modelName) {
 
     const urlForModel = {
