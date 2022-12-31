@@ -57,14 +57,14 @@ $( document ).ready(function() {
             });
         }
     });
-    $( '#band-selector' ).change(function() {
+    $( 'select[name="band_id"]' ).change(function() {
         bandDialog.bandId = $(this).val();
         bandDialog.dialog( 'open' );
     });
 
     /* This helper function will be run by saveAction() before submitting
      */
-    let foo = $('#event-display-form')[0].saveHelper.push(activeForm => {
+    $('#event-display-form')[0].saveHelper.push(activeForm => {
         let nameStr = $(activeForm.find('input[name="name"]')).val();
         if (!nameStr){
             const styles = [];

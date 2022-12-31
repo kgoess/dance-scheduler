@@ -500,11 +500,11 @@ function getParentContainerForModelName(modelName) {
 
 function multiSelectOptionAdd() {
     const displayRow = $(this).closest('.display-row')
-    const newSelectBoxDiv = displayRow.find('.multi-select-wrapper:first').clone(true);
-    displayRow.append(newSelectBoxDiv);
+    const cloneTarget = displayRow.find('.multi-select-wrapper:last')
+    const newSelectBoxDiv = cloneTarget.clone(true);
+    cloneTarget.append(newSelectBoxDiv);
     const newSelectBox = newSelectBoxDiv.find('select').first();
     newSelectBox.val('');
-    newSelectBoxDiv.append('<span class="remove-multi-select-button">x</span>');
     newSelectBoxDiv.find('.remove-multi-select-button' ).click(function() {
         $(this).closest('.multi-select-wrapper').remove();
     });

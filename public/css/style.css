@@ -236,11 +236,11 @@ font-size: 10px;
  * default popup
  * https://stackoverflow.com/questions/10672586/how-to-make-select-elements-shrink-to-max-width-percent-style-within-fieldset
  */
-.multi-select-wrapper .select-shortener {
+.select-shortener {
     display:inline-block;
     max-width: 90%;
 }
-.multi-select-wrapper .select-shortener select {
+.select-shortener select {
     width: 100%;
 }
 .row-label {
