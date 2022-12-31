@@ -51,30 +51,30 @@
     />
 <% END %>
 <% MACRO handle_input_dropdown(column) BLOCK %>
-    <% IF column.help_id %>
-        <div class="help-button" id="<% column.help_id %>">?</div>
-    <% END %>
-    <div class="multi-select-wrapper">
-        <div class="select-shortener">
-            <select
-                name="<% column.name %>"
-                class="<% column.extra_classes.join(' ') %>"
-                <% IF column.required %>required<% END %>
-            >
-            </select>
-        <% IF column.allow_multi_select %>
-        <% END %>
+    <div class="multi-select-flex">
+        <div class="multi-select-wrapper">
+            <div class="select-shortener">
+                <select
+                    name="<% column.name %>"
+                    class="<% column.extra_classes.join(' ') %>"
+                    <% IF column.required %>required<% END %>
+                >
+                </select>
+            <% IF column.allow_multi_select %>
+            <% END %>
+            </div>
+            <span class="remove-multi-select-button">x</span>
         </div>
-        <span class="remove-multi-select-button">x</span>
-    </div>
     <% IF column.allow_multi_select %>
          <span class="add-multi-select-button">+</span>
     <% END %>
+    </div>
 <% END %>
 
-<% FOREACH script IN scripts %>
-    <script type="text/javascript" src="<% request.uri_base %>/javascripts/<% script %>.js"></script>
-<% END %>
+<% FOREACH script IN scripts %><script
+    type="text/javascript"
+    src="<% request.uri_base _ '/javascripts/' _ script _ '.js' %>"
+></script><% END %>
 <form><!-- This is filled via loadListForModel() --> 
     <select class="clickable-list" size="5">
     </select>
@@ -90,22 +90,33 @@
                 <% NEXT %>
             <% END %>
             <div name="<% column.name %>" 
-                class="display-row <% column.type == "textarea" && "has-textarea" %>"
-                column-type="<% column.display_type || "text-item" %>"
-                <% IF column.type == "dropdown" %>
+                class="display-row"
+                column-type="<%
+                    IF column.type == 'dropdown';
+                        'list-item';
+                    ELSIF column.type == 'bool';
+                        'bool-item';
+                    ELSE;
+                        'text-item';
+                    END %>"
+                <% IF column.type == 'dropdown' %>
                     model-name="<% column.model_name %>"
                     table-name="<% column.table_name %>"
                 <% END %>
             >
-                <label for="<% column.name %>" class="row-label">
+                <label
+                    for="<% column.name %>"
+                    class="row-label <% column.required && 'required-marker' %>"
+                >
                     <% column.label %>
-                    <% IF column.required %>
-                        <span class="required-marker">*</span>
+                    <% IF column.help_id %>
+                        <div class="help-button" id="<% column.help_id %>">?</div>
                     <% END %>
                 </label>
-                <span class="row-contents"></span>
-                <% macro_name = "handle_input_" _ column.type %>
-                <% $macro_name(column) %>
+                <% if column.type != 'dropdown' %><span class="row-contents"></span><% END %>
+                <%  macro_name = 'handle_input_' _ column.type;
+                    $macro_name(column)
+                %>
             </div>
         <% END %>
         <span class="button-container">
