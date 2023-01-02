@@ -29,7 +29,7 @@ use Dancer2::Serializer::JSON qw/to_json/;
 use Encode qw/decode_utf8/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
-use bacds::Scheduler::Util::Time qw/get_now/;
+use bacds::Scheduler::Util::Time qw/get_today/;
 
 =head2 get_upcoming_events_for_series
 
@@ -66,7 +66,7 @@ sub get_upcoming_events_for_series {
     my @events = $dbh->resultset('Event')->search({
         is_deleted => 0,
         series_id => $series->series_id,
-        start_date => { '>=' => get_now()->ymd },
+        start_date => { '>=' => get_today()->ymd },
     });
 
     return {
