@@ -1,0 +1,241 @@
+---
+# This config drives the webui's "accordion folds" display, where
+# bacds::Scheduler's main/root route uses
+# bacds::Scheduler::Plugin::AccordionConfig to load it, and then feeds it to
+# the views/accordion.tt template.
+
+band_columns:
+  - label: Name
+    name: name
+    required: 1
+    type: text
+  - allow_multi_select: 1
+    label: Talent
+    model_name: talent
+    name: talent_id
+    table_name: talents
+    type: dropdown
+  - name: band_id
+    type: hidden
+
+caller_columns:
+  - label: Name
+    name: name
+    required: 1
+    type: text
+  - name: caller_id
+    type: hidden
+
+event_columns:
+  - extra_classes:
+      - series-for-event
+    help_id: template-help
+    label: Series
+    model_name: series
+    name: series_id
+    table_name: series
+    type: dropdown
+  - allow_multi_select: 1
+    label: Style
+    model_name: style
+    name: style_id
+    required: 1
+    table_name: styles
+    type: dropdown
+  - allow_multi_select: 1
+    label: Venue
+    model_name: venue
+    name: venue_id
+    required: 1
+    table_name: venues
+    type: dropdown
+  - allow_multi_select: 1
+    label: Caller
+    model_name: caller
+    name: caller_id
+    table_name: callers
+    type: dropdown
+  - allow_multi_select: 1
+    label: Parent Org
+    model_name: parent_org
+    name: parent_org_id
+    required: 1
+    table_name: parent_orgs
+    type: dropdown
+  - label: 'Name (for camps, special events)'
+    name: name
+    type: text
+  - label: Start Date
+    name: start_date
+    required: 1
+    type: date
+  - label: Start Time
+    name: start_time
+    type: time
+  - label: End Date
+    name: end_date
+    type: date
+  - label: End Time
+    name: end_time
+    type: time
+  - label: Short Desc.
+    name: short_desc
+    required: 1
+    type: textarea
+  - label: Custom URL
+    name: custom_url
+    type: text
+  - label: Custom Pricing
+    name: custom_pricing
+    type: textarea
+  - label: Canceled
+    name: is_canceled
+    no: No
+    type: bool
+    yes: Canceled
+    yes_color: red
+  - allow_multi_select: 1
+    label: Band
+    model_name: band
+    name: band_id
+    table_name: bands
+    type: dropdown
+  - allow_multi_select: 1
+    label: Talent
+    model_name: talent
+    name: talent_id
+    table_name: talent
+    type: dropdown
+  - name: is_template
+    type: hidden
+  - name: event_id
+    type: hidden
+  - name: synthetic_name
+    type: hidden
+
+parent_org_columns:
+  - label: Name
+    name: full_name
+    required: 1
+    type: text
+  - label: Abbreviation
+    name: abbreviation
+    required: 1
+    type: text
+  - name: parent_org_id
+    type: hidden
+
+programmer_columns:
+  - label: Name
+    name: name
+    required: 1
+    type: text
+  - label: Email
+    name: email
+    required: 1
+    type: text
+  - label: Super User?
+    name: is_superuser
+    no: No
+    type: bool
+    yes: Yes
+    yes_color: '#09f'
+  - allow_multi_select: 1
+    label: Can Edit Series
+    model_name: series
+    name: series_id
+    table_name: series
+    type: dropdown
+  - allow_multi_select: 1
+    label: Can Edit Event
+    model_name: event
+    name: event_id
+    table_name: events
+    type: dropdown
+  - name: programmer_id
+    type: hidden
+
+series_columns:
+  - label: Name
+    name: name
+    required: 1
+    type: text
+  - help: >
+        This is a short, permanent ID for the series, general enough to survive
+        name changes, used for example in links in HTML files on the filesystem.
+    label: External ID
+    name: series_xid
+    required: 1
+    type: text
+  - label: Frequency
+    name: frequency
+    type: text
+  - label: Short Description
+    name: short_desc
+    type: textarea
+  - label: Sidebar
+    name: sidebar
+    type: textarea
+  - label: Display Text
+    name: display_text
+    type: textarea
+  - label: Programmer Notes
+    name: programmer_notes
+    type: textarea
+  - label: Series URL
+    name: series_url
+    type: text
+  - label: Manager Name(s)
+    name: manager
+    type: text
+  - name: series_id
+    type: hidden
+
+style_columns:
+  - label: Name
+    name: name
+    required: 1
+    type: text
+  - name: style_id
+    type: hidden
+
+talent_columns:
+  - label: Name
+    name: name
+    required: 1
+    type: text
+  - name: talent_id
+    type: hidden
+
+venue_columns:
+  - label: vkey
+    name: vkey
+    required: 1
+    type: text
+  - label: Hall Name
+    name: hall_name
+    required: 1
+    type: text
+  - label: Street Address
+    name: address
+    required: 1
+    type: text
+  - label: City
+    name: city
+    required: 1
+    type: text
+  - label: Zip
+    name: zip
+    type: text
+  - label: Programmer Notes
+    name: programmer_notes
+    type: textarea
+  - label: Sidebar
+    name: sidebar
+    type: textarea
+  - label: Directions
+    name: directions
+    type: textarea
+  - name: venue_id
+    type: hidden
+
