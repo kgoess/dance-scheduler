@@ -1,3 +1,10 @@
+<%# The dance-scheduler web UI is displayed as "accordion folds". This template drives that display.
+#
+# The main/root route in bacds::Scheduler drives this template by using
+# bacds::Scheduler::Plugin::AccordionConfig to load the config from
+# accordions-webui.yml YAML file which is installed in the application dir.
+#
+%>
 <% MACRO handle_input_textarea(column) BLOCK %>
     <textarea
         class="row-edit"
