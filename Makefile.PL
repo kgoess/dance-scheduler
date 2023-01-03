@@ -18,6 +18,7 @@ WriteMakefile(
     EXE_FILES => [
         'bin/dance-scheduler-user-password.pl',
         'bin/dance-scheduler-add-programmer.pl',
+        'bin/dancefinder.pl',
     ],
     PL_FILES            => {},
     BUILD_REQUIRES => {

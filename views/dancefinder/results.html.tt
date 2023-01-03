@@ -43,43 +43,8 @@ Dances
 <% END %>
 </div>
 
-<% FOREACH event IN events %>
-    <p class="listing">
-    <% event.start_date.strftime("%A, %e %B, %Y") %>: <strong>
-    <%- FOREACH style IN event.styles %>
-        <%- style.name %><% IF !loop.last() %>/<% END %>
-    <%- END %></strong>
-    <%- IF event.venues %> at <% END %>
-    <%- FOREACH venue IN event.venues %>
-        <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
-    <%- END %>
-    <%- IF event.callers %>
-        <%- FOREACH caller IN event.callers %>
-            <% caller.name %><% IF !loop.last() %>, <% END %>
-        <%- END %>
-        <%- IF event.bands || event.talent %>with<% END %>
-    <%- ELSE %>
-        <%- IF event.bands || event.talent %>
-            Music by
-        <% END %>
-    <%- END %>
-    <%- FOREACH band IN event.bands %>
-        <%- band.name %><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
-    <%- END %>
-    <%- IF event.talent %>
-        <%- FOREACH talent IN event.talent %>
-            <%- talent.name %><% IF !loop.last() %>, <% END %>
-        <%- END %>
-    <%- END %>
-    <%- IF event.name %>
-        <%# if it's a special event, print out the title.'%>
-        <em><% event.name %></em>
-    <%- END %>
-    <% event.short_desc %>
+<% include dancefinder/listings.tt events => events %>
 
-    </p>
-<% END %>
-<% content %>
 
 </body>
 </html>

@@ -56,6 +56,9 @@ How To Make Schema Changes
 Install
 ----
 
+    # unless you ran it already:
+    eval $(perl -Mlocal::lib=/var/lib/dance-scheduler)
+
     perl Makefile.PL
     make
     make test
