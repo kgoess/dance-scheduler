@@ -26,7 +26,7 @@ GetOptions (
 pod2usage(1) if $help;
 
 my $end_date;
-if ($days) {
+if (defined $days) {
     looks_like_number($days) or pod2usage(1);
     $end_date = get_today()->add(days => $days)->ymd;
 }
