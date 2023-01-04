@@ -8,7 +8,7 @@ background-color: #ddd;
 background-repeat: no-repeat;
 background-position: top left;
 background-opacity: 0.1;
-background-image: conic-gradient(green, yellow, orange, yellow, green);
+background-image: conic-gradient(#bde, teal, green, teal, #bde);
 
 
 font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
@@ -205,12 +205,15 @@ font-size: 10px;
     flex-direction: column;
 }
 .display-row {
-    border: 1px solid black;
-    background: lightgrey;
+    border-bottom: 1px solid black;
+    background-color: #bde;
     padding: 3px;
     display: flex;
     flex-direction: row;
     align-items: stretch;
+}
+.display-form .button-container {
+    background-color: #bde;
 }
 
 .display-row:hover {
@@ -249,36 +252,41 @@ font-size: 10px;
 }
 
 .remove-multi-select-button {
-    background-color: red;
+    background-color: #e55;
+    font-size: 75%;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     box-shadow: 0 0 5px black;
-    margin-left: 5px;
+    margin-left: 3px;
+    height: 1.5em;
     display: flex;
     flex: 0 0 1em;
+    align-self: center;
     justify-content: center;
 }
 
 .add-multi-select-button {
-    background-color: green;
+    background-color: #484;
+    font-size: 75%;
+    height: 1.5em;
     color: lightgreen;
     border-radius: 6px;
     cursor: pointer;
     width: 5em;
     font-weight: bold;
     box-shadow: 0 0 5px black;
-    margin-top: 5px;
+    margin: 5px 3px 0px;
     display: flex;
-    align-self: center;
     order: 99;
     justify-content: center;
+    justify-self: 
 }
 
 .button-container {
     display: flex;
     justify-content: center;
-    margin: 5px;
+    padding: 5px;
 }
 .button {
     margin: 0 5px;
@@ -332,7 +340,7 @@ form:invalid button {
     width: 1.2em;
     height: 1.2em;
     cursor: help;
-    background-color: green;
+    background-color: #484;
     color: yellow;
     display: flex;
     justify-content: center;
