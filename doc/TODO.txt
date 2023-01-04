@@ -80,25 +80,21 @@ phase I:
  - better styling for dancefinder results page? at least a "back to search"
    link? and for the search page?
  - some of the series pages, are broke--display text above or beside sidebar?
-
+ DONE get the ld+json for the individual event pages
 
  - work out that is_deleted field--it shouldn't be exposed (there should be a
    'delete' button), and it should do something on the backend
 FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING DISPLAYED IN THE DROPDOWN INSTEAD
-new question: why is short desc a required field? it seems to be not needed for
-a regular series dance? if there's a reason, then add a help button.
-
-this series_path, add an index to it? canonicalize it? find another way?
-
-if I manually add OSEGB band with members, it doesn't seem to add the members
-to an existing event?
-
-check out the short_desc in the template for https://bacds.org/series/english/berkeley_sat/, is that right?
-
-event_path or event_id in the index.html?
-
-what about the <style> tags in upcoming-events.tt
-
+ - new question: why is short desc a required field? it seems to be not needed for
+    a regular series dance? if there's a reason, then add a help button.
+ - BUG! if I manually add OSEGB band with members, it doesn't seem to add the members
+    to an existing event?
+ - check out the short_desc in the template for https://bacds.org/series/english/berkeley_sat/, is that right?
+ - what about the <style> tags in upcoming-events.tt? good enough or what?
+ - make sure the serieslister is getting all the related stuff in one query
+ - make a beta test cookie getter/setter
+ - fix it so you can develop on a copy of the production database
+ - I suspect we want a long_desc in the events table
 
 phase II:
 

@@ -1642,6 +1642,7 @@ uses the application path.
 =cut
 
 sub ssi_uri_for {
+    shift if $_[0] eq __PACKAGE__;
     my ($params) = @_;
 
     my ($path) = request->env->{REQUEST_URI} =~ s/\?.*//r;

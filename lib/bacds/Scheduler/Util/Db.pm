@@ -13,7 +13,6 @@ package bacds::Scheduler::Util::Db;
 use 5.16.0;
 use warnings;
 
-use Dancer2;
 use Data::Dump qw/dump/;
 
 use Exporter 'import';
@@ -93,4 +92,4 @@ sub _get_password {
     return $_password;
 }
 
-true;
+1;

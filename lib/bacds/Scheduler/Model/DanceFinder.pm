@@ -18,7 +18,7 @@ use warnings;
 use Data::Dump qw/dump/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
-use bacds::Scheduler::Util::Time qw/get_now/;
+use bacds::Scheduler::Util::Time qw/get_today/;
 
 =head2 related_entities_for_upcoming_events
 
@@ -104,7 +104,7 @@ sub _all_upcoming_events {
         {event_band_maps => {band => { band_memberships => 'talent'}}},
     );
 
-    my $start_date = get_now()->ymd;
+    my $start_date = get_today()->ymd;
 
     # wrt join and prefetch see:
     # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
@@ -145,10 +145,11 @@ sub search_events {
     my $band_arg       = delete $args{band}       || [];
     my $muso_arg       = delete $args{muso}       || [];
     my $style_arg      = delete $args{style}      || [];
+    my $dbix_debug     = delete $args{dbix_debug};
     die "unrecognized args in call to search_events ".join(', ', sort keys %args)
         if %args;
 
-    my $dbh = get_dbh(debug => 0);
+    my $dbh = get_dbh(debug => $dbix_debug);
 
     # These prefetches means all the data is fetched with one big
     # JOIN, you can verify that by adding debug=>1 in the
@@ -170,7 +171,7 @@ sub search_events {
         @$band_arg ? 'event_band_maps' : (),
     );
 
-    my $start_date = $start_date_arg || get_now()->ymd;
+    my $start_date = $start_date_arg || get_today()->ymd;
 
     # wrt join and prefetch see:
     # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
@@ -181,7 +182,8 @@ sub search_events {
             @$style_arg  ? ('event_styles_maps.style_id'   => $style_arg)  : (),
             @$muso_arg   ? ('event_talent_maps.talent_id'  => $muso_arg)   : (),
             @$band_arg   ? ('event_band_maps.band_id'      => $band_arg)   : (),
-            start_date => $end_date_arg
+            start_date =>
+                $end_date_arg
                 ? { '-between' => [$start_date, $end_date_arg] }
                 : { '>=' => $start_date },
             '-not_bool' => 'is_deleted',

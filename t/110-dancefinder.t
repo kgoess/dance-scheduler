@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 59;
+use Test::More tests => 61;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -37,8 +37,9 @@ test_livecalendar_endpoint($fixture);
 test_serieslister($fixture);
 test_serieslister_endpoint($fixture);
 test_serieslister_single_event_endpoint($fixture);
-test_calendar_get_events($fixture);
-test_calendar_get_venues($fixture);
+test_serieslister_ldjson($fixture);
+test_calendar_get_events();
+test_calendar_get_venues();
 
 sub setup_fixture {
 
@@ -626,10 +627,128 @@ sub test_serieslister_single_event_endpoint {
          qr{<a href="http://localhost/series/english/berkeley_wed\?event_id=1">},
          'single event request worked, href is correct';
 
+    like $tester->content, qr{\Q<script type="application/ld+json">},
+        'ld+json was included in single event listing';
+        # (contents of ld+json are tested in test_serieslister_ldjson)
+
+}
+sub test_serieslister_ldjson {
+    my ($fixture) = @_;
+
+    my $event_id = $fixture->{event1};
+
+    my $event = $dbh->resultset('Event')->find({
+        event_id => $event_id,
+    });
+
+    my $mock_request = Dancer2::Core::Request->new(env => {
+        REQUEST_METHOD => 'GET',
+        SCRIPT_NAME => '/dancefinder/serieslister',
+        PATH_INFO => '',
+        REQUEST_URI => "/dancefinder/serieslister?event_id=$event_id",
+        QUERY_STRING => "event_id=$event_id",
+        SERVER_NAME => 'www.bacds.org',
+        SERVER_PORT => '80',
+        SERVER_PROTOCOL => 'HTTP/1.1',
+        CONTENT_LENGTH => 0,
+        CONTENT_TYPE => 'text/html',
+        'psgi.version' => [1,1],
+        'psgi.url_scheme' => 'http',
+    });
+    no warnings 'redefine';
+    local *bacds::Scheduler::request = sub { $mock_request };
+    my $json = bacds::Scheduler::Model::SeriesLister->generate_ldjson($event);
+
+    # is is a bretty blunt test. so shoot me
+    eq_or_diff $json, <<'EOL', 'ldjson generated ok';
+    <script type="application/ld+json">
+    {
+   "performer" : [
+      {
+         "name" : "test band 1, test band 2",
+         "@type" : "MusicGroup"
+      },
+      {
+         "name" : "",
+         "@type" : "Person"
+      }
+   ],
+   "eventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
+   "location" : {
+      "@context" : "http://schema.org",
+      "name" : "Mr. Hooper's Store",
+      "address" : {
+         "streetAddress" : "123 Sesame St.",
+         "addressCountry" : "USA",
+         "addressLocality" : "Sunny Day",
+         "addressRegion" : "California",
+         "postalCode" : null,
+         "@type" : "PostalAddress"
+      },
+      "@type" : "Place"
+   },
+   "name" : " Dancing, calling by  to the music of test band 1, test band 2",
+   "description" : " Dancing at Mr. Hooper's Store in Sunny Day. Everyone welcome, beginners and experts! No partner necessary. big <b> dance party &#9786 (Prices may vary for special events or workshops. Check the calendar or website for specifics.)",
+   "eventStatus" : "https://schema.org/EventScheduled",
+   "image" : "https://www.bacds.org/graphics/bacdsweblogomed.gif",
+   "organizer" : {
+      "@context" : "http://schema.org",
+      "url" : "https://www.bacds.org/",
+      "name" : "Bay Area Country Dance Society",
+      "@type" : "Organization"
+   },
+   "@context" : "http://schema.org",
+   "offers" : [
+      {
+         "availability" : "http://schema.org/LimitedAvailability",
+         "priceCurrency" : "USD",
+         "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "name" : "supporters",
+         "price" : "25.00",
+         "validFrom" : "2022-04-28",
+         "@type" : "Offer"
+      },
+      {
+         "availability" : "http://schema.org/LimitedAvailability",
+         "priceCurrency" : "USD",
+         "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "name" : "non-members",
+         "price" : "20.00",
+         "validFrom" : "2022-04-28",
+         "@type" : "Offer"
+      },
+      {
+         "availability" : "http://schema.org/LimitedAvailability",
+         "priceCurrency" : "USD",
+         "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "name" : "members",
+         "price" : "15.00",
+         "validFrom" : "2022-04-28",
+         "@type" : "Offer"
+      },
+      {
+         "availability" : "http://schema.org/LimitedAvailability",
+         "priceCurrency" : "USD",
+         "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "name" : "students or low-income or pay what you can",
+         "price" : "6.00",
+         "validFrom" : "2022-04-28",
+         "@type" : "Offer"
+      }
+   ],
+   "endDate" : "2022-04-28T00:00:00",
+   "startDate" : "2022-04-28T20:00",
+   "@type" : [
+      "Event",
+      "DanceEvent"
+   ]
+}
+
+    </script>
+EOL
 }
 
 sub test_calendar_get_events {
-    my ($fixture) = @_;
 
     my @events = bacds::Scheduler::Model::Calendar->load_events_for_month('2022', '04');
 
@@ -644,7 +763,6 @@ sub test_calendar_get_events {
 }
 
 sub test_calendar_get_venues {
-    my ($fixture) = @_;
 
     my @venues = bacds::Scheduler::Model::Calendar->load_venue_list_for_month('2022', '04');
 
