@@ -95,6 +95,7 @@ FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING D
  - make a beta test cookie getter/setter
  - fix it so you can develop on a copy of the production database
  - I suspect we want a long_desc in the events table
+ - want audit logs!
 
 phase II:
 
