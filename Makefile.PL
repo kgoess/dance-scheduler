@@ -80,6 +80,7 @@ app-install:
 	install -d $(APPDIR) --mode 2755
 	install bin/app.psgi $(APPDIR)
 	install config.yml   $(APPDIR)
+	install accordions-webui.yml   $(APPDIR)
 	install README.md    $(APPDIR)
 	install -d $(APPDIR)/environments --mode 2755
 	install -d $(APPDIR)/views        --mode 2755
