@@ -484,12 +484,12 @@ function escapeHtml(unsafe) {
 }
 
 function getParentAndModelName(element) {
-    const parentContainer = $(element).closest('[modelName]');
-    const modelName = parentContainer.attr('modelName');
+    const parentContainer = $(element).closest('[fold_model]');
+    const modelName = parentContainer.attr('fold_model');
     return [parentContainer, modelName];
 }
 function getParentContainerForModelName(modelName) {
-    return $( `.accordion-container[modelName="${modelName}"]` );
+    return $( `.accordion-container[fold_model="${modelName}"]` );
 }
 
 function multiSelectOptionAdd() {

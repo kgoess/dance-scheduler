@@ -1,135 +1,72 @@
-<%# The dance-scheduler web UI is displayed as "accordion folds". This template drives that display.
-#
-# The main/root route in bacds::Scheduler drives this template by using
-# bacds::Scheduler::Plugin::AccordionConfig to load the config from
-# accordions-webui.yml YAML file which is installed in the application dir.
-#
-%>
-<% MACRO handle_input_textarea(column) BLOCK %>
-    <textarea
-        class="row-edit"
-        name="<% column.name %>"
-        rows="8"
-        cols="70"
-        hidden
-        <% IF column.required %>required<% END %>
-    / >
-    </textarea>
-<% END %>
-<% MACRO handle_input_date(column) BLOCK %>
-    <input
-        class="row-edit datepicker"
-        name="<% column.name %>"
-        size="10"
-        maxlength="10"
-        hidden
-        <% IF column.required %>required<% END %>
-    />
-<% END %>
-<% MACRO handle_input_time(column) BLOCK %>
-    <input
-        class="row-edit"
-        name="<% column.name %>"
-        size="5"
-        maxlength="5"
-        hidden
-        <% IF column.required %>required<% END %>
-    />
-<% END %>
-<% MACRO handle_input_bool(column) BLOCK %>
-   <div class="custom-bool row-edit">
-      <input name="<% column.name %>" type="hidden">
-      <label for="<% column.name %>">
-        <div class="status-switch"
-             style="--data-yes-color: <% column.yes_color %>"
-             data-yes="<% column.yes %>"
-             data-no="<% column.no %>"
-        >
-        </div>
-      </label>
-   </div> 
-<% END %>
-<% MACRO handle_input_text(column) BLOCK %>
-    <input class="row-edit"
-        name="<% column.name %>"
-        size="40"
-        hidden
-        <% IF column.required %>required<% END %>
-    />
-<% END %>
-<% MACRO handle_input_dropdown(column) BLOCK %>
-    <div class="multi-select-flex">
-        <div class="multi-select-wrapper">
-            <div class="select-shortener">
-                <select
-                    name="<% column.name %>"
-                    class="<% column.extra_classes.join(' ') %>"
-                    <% IF column.required %>required<% END %>
-                >
-                </select>
-            <% IF column.allow_multi_select %>
-            <% END %>
-            </div>
-            <span class="remove-multi-select-button">x</span>
-        </div>
-    <% IF column.allow_multi_select %>
-         <span class="add-multi-select-button">+</span>
-    <% END %>
-    </div>
-<% END %>
-
-<% FOREACH script IN scripts %><script
-    type="text/javascript"
-    src="<% request.uri_base _ '/javascripts/' _ script _ '.js' %>"
-></script><% END %>
-<form><!-- This is filled via loadListForModel() --> 
-    <select class="clickable-list" size="5">
-    </select>
-</form>
-<span class="button-container">
-    <button class="button create-new-button">Create New</button>
-</span>
-<div class="model-display" hidden>
-    <form <% IF form_id %>id="<% form_id %>"<% END %> class="display-form">
-        <% FOREACH column IN columns %>
-            <% IF column.type == "hidden" %>
-                <input name="<% column.name %>" type="hidden">
-                <% NEXT %>
-            <% END %>
-            <div name="<% column.name %>" 
-                class="display-row"
-                column-type="<%
-                    IF column.type == 'dropdown';
-                        'list-item';
-                    ELSIF column.type == 'bool';
-                        'bool-item';
-                    ELSE;
-                        'text-item';
-                    END %>"
-                <% IF column.type == 'dropdown' %>
-                    model-name="<% column.model_name %>"
-                    table-name="<% column.table_name %>"
-                <% END %>
-            >
-                <label
-                    for="<% column.name %>"
-                    class="row-label <% column.required && 'required-marker' %>"
-                >
-                    <% column.label %>
-                    <% IF column.help_id %>
-                        <div class="help-button" id="<% column.help_id %>">?</div>
-                    <% END %>
-                </label>
-                <% if column.type != 'dropdown' %><span class="row-contents"></span><% END %>
-                <%  macro_name = 'handle_input_' _ column.type;
-                    $macro_name(column)
-                %>
-            </div>
-        <% END %>
-        <span class="button-container">
-            <button class="button save-button">Save</button>
-            <button class="button delete-button">Delete</button>
-        </span>
-    </form>
+    <div id="page">
+<!--
+      <div id="sidebar">
+        <ul id="sidebar-items">
+          <li>
+              Sidebar!
+          </li>
+        </ul>
+      </div>
+-->
+      <div id="content">
+<div id="header">
+    <span id="header-title">
+        The BACDS Dance Scheduler
+    </span>
+    <span id="header-info">
+        You are signed in as <% signed_in_as %><br>
+        <a href="<% request.uri_base %>/signout">Log out</a>
+    </span>
 </div>
+        <div class="accordion">
+            <hr>
+            <% FOR fold IN accordion %>
+                <div class="accordion-container" fold_model="<% fold.fold_model %>">
+                    <div class="accordion-label"><% fold.label %></div>
+                    <div class="content">
+                        <% INCLUDE fold.tt content = fold.fold_vars %>
+                    </div>
+                </div>
+                <hr>
+            <% END %>
+        </div>
+      </div>
+    </div>
+    <!-- These divs in "the-modal-zone" are hidden divs used by jquery's dialog()
+         in scheduler.js, e.g.
 
+             insufficientPermissionsModal = $( '#insufficient-permissions-modal' ).dialog({
+     -->
+    <div class="the-modal-zone">
+        <div id="login-redirect-modal">
+            You are not/no longer signed in. <a id="login-redirect-modal-link" target="_blank">Click here</a> to open the signin page.
+        </div>
+        <div id="insufficient-permissions-modal">
+            You do not have permissions to do that. Talk to the owner of the event/series or somebody on bacds-web-committee@.
+        </div>
+        <div id="template-help-modal">
+            <p>The yellow star means the field is required</p>
+            <p>Selecting a Series for a new Event fills in some fields for that
+               Event from the "template" fields for the selected Series.</p>
+            <p>Check out the "Manage Template" button underneath the Series
+               section and it will make more sense.</p>
+            <p>If there's anything filled in for the Event then changing the
+               Series won't apply the "template" to the Event.</p>
+        </div>
+        <div id="delete-confirmation-modal">
+            <form>
+            Are you sure you want to delete <span id="delete-confirmation-what"></span>?
+            <input type="hidden" name="model-name">
+            <input type="hidden" id="delete-confirmation-modal-id-el">
+            </form>
+        </div>
+        <div id="add-band-dialog" title="Band Membership">
+            <!-- when they pick a band we generate an <ol> with the members and
+                 drop it into this div -->
+            <p>
+                Would you like to add these members of <span id="band-name-in-popup"></span> to your event?
+            </p>
+            <div class="talent-names">
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,135 @@
+<%# The dance-scheduler web UI is displayed as "accordion folds". This template drives that display.
+#
+# The main/root route in bacds::Scheduler drives this template by using
+# bacds::Scheduler::Plugin::AccordionConfig to load the config from
+# accordions-webui.yml YAML file which is installed in the application dir.
+#
+%>
+<% MACRO handle_input_textarea(column) BLOCK %>
+    <textarea
+        class="row-edit"
+        name="<% column.name %>"
+        rows="8"
+        cols="70"
+        hidden
+        <% IF column.required %>required<% END %>
+    / >
+    </textarea>
+<% END %>
+<% MACRO handle_input_date(column) BLOCK %>
+    <input
+        class="row-edit datepicker"
+        name="<% column.name %>"
+        size="10"
+        maxlength="10"
+        hidden
+        <% IF column.required %>required<% END %>
+    />
+<% END %>
+<% MACRO handle_input_time(column) BLOCK %>
+    <input
+        class="row-edit"
+        name="<% column.name %>"
+        size="5"
+        maxlength="5"
+        hidden
+        <% IF column.required %>required<% END %>
+    />
+<% END %>
+<% MACRO handle_input_bool(column) BLOCK %>
+   <div class="custom-bool row-edit">
+      <input name="<% column.name %>" type="hidden">
+      <label for="<% column.name %>">
+        <div class="status-switch"
+             style="--data-yes-color: <% column.yes_color %>"
+             data-yes="<% column.yes %>"
+             data-no="<% column.no %>"
+        >
+        </div>
+      </label>
+   </div> 
+<% END %>
+<% MACRO handle_input_text(column) BLOCK %>
+    <input class="row-edit"
+        name="<% column.name %>"
+        size="40"
+        hidden
+        <% IF column.required %>required<% END %>
+    />
+<% END %>
+<% MACRO handle_input_dropdown(column) BLOCK %>
+    <div class="multi-select-flex">
+        <div class="multi-select-wrapper">
+            <div class="select-shortener">
+                <select
+                    name="<% column.name %>"
+                    class="<% column.dropdown_classes.join(' ') %>"
+                    <% IF column.required %>required<% END %>
+                >
+                </select>
+            <% IF column.allow_multi_select %>
+            <% END %>
+            </div>
+            <span class="remove-multi-select-button">x</span>
+        </div>
+    <% IF column.allow_multi_select %>
+         <span class="add-multi-select-button">+</span>
+    <% END %>
+    </div>
+<% END %>
+
+<% FOREACH script IN content.scripts %><script
+    type="text/javascript"
+    src="<% request.uri_base _ '/javascripts/' _ script _ '.js' %>"
+></script><% END %>
+<form><!-- This is filled via loadListForModel() --> 
+    <select class="clickable-list" size="5">
+    </select>
+</form>
+<span class="button-container">
+    <button class="button create-new-button">Create New</button>
+</span>
+<div class="model-display" hidden>
+    <form <% IF content.form_id %>id="<% content.form_id %>"<% END %> class="display-form">
+        <% FOREACH column IN content.columns %>
+            <% IF column.type == "hidden" %>
+                <input name="<% column.name %>" type="hidden">
+                <% NEXT %>
+            <% END %>
+            <div name="<% column.name %>" 
+                class="display-row"
+                column-type="<%
+                    IF column.type == 'dropdown';
+                        'list-item';
+                    ELSIF column.type == 'bool';
+                        'bool-item';
+                    ELSE;
+                        'text-item';
+                    END %>"
+                <% IF column.type == 'dropdown' %>
+                    model-name="<% column.model_name %>"
+                    table-name="<% column.table_name %>"
+                <% END %>
+            >
+                <label
+                    for="<% column.name %>"
+                    class="row-label <% column.required && 'required-marker' %>"
+                >
+                    <% column.label %>
+                    <% IF column.help_id %>
+                        <div class="help-button" id="<% column.help_id %>">?</div>
+                    <% END %>
+                </label>
+                <% if column.type != 'dropdown' %><span class="row-contents"></span><% END %>
+                <%  macro_name = 'handle_input_' _ column.type;
+                    $macro_name(column)
+                %>
+            </div>
+        <% END %>
+        <span class="button-container">
+            <button class="button save-button">Save</button>
+            <button class="button delete-button">Delete</button>
+        </span>
+    </form>
+</div>
+

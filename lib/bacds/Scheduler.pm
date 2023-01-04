@@ -260,89 +260,12 @@ The display page. This is the only endpoint that serves html.
 get '/' => requires_login sub {
 
     # see accordions-webui.yml
-    my $accordions = get_accordion_config();
+    my $accordion = get_accordion_config();
 
-    template 'index' => {
+    template 'accordion' => {
         title => 'Dance Scheduler',
         signed_in_as => vars->{signed_in_as},
-        accordions => [
-            { label => 'Events',
-              modelName => 'event',
-              content => template(
-                "accordion.tt",
-                {
-                    form_id => "event-display-form",
-                    columns => $accordions->{event_columns},
-                    scripts => ["events"],
-                },
-                { layout => undef },
-              ),
-            },
-            { label => 'Styles',
-              modelName => 'style',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{style_columns} },
-                { layout => undef },
-              ),
-            },
-            { label => 'Venues',
-              modelName => 'venue',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{venue_columns} },
-                { layout => undef },
-              ),
-            },
-            { label => 'Series',
-              modelName => 'series',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{series_columns} },
-                { layout => undef },
-              ),
-            },
-            { label => 'Callers',
-              modelName => 'caller',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{caller_columns} },
-                { layout => undef }
-              ),
-            },
-            { label => 'Bands',
-              modelName => 'band',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{band_columns} },
-                { layout=> undef }
-              ),
-            },
-            { label => 'Talent',
-              modelName => 'talent',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{talent_columns} },
-                { layout => undef },
-              ),
-            },
-            { label => 'Parent Org',
-              modelName => 'parent_org',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{parent_org_columns} },
-                { layout => undef },
-              ),
-            },
-            { label => 'Programmers',
-              modelName => 'programmer',
-              content => template(
-                "accordion.tt",
-                { columns => $accordions->{programmer_columns} },
-                { layout => undef },
-                ),
-            },
-        ],
+        accordion => $accordion,
     };
 };
 

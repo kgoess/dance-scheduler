@@ -3,239 +3,292 @@
 # bacds::Scheduler's main/root route uses
 # bacds::Scheduler::Plugin::AccordionConfig to load it, and then feeds it to
 # the views/accordion.tt template.
+#
+# - label: the displayed name of the tab
+#   fold_model: the dbix model name for the accordion fold
+#   fold_vars: a dictionary of vars to send to accordion.tt
+#     form_id: an html ID to assign to the main form for the fold.
+#     scripts: an array of additional js files to load
+#     columns: an array of db columns to represent
+#     - label: the displayed name for the column
+#       name: the dbix column name
+#       type: the html form element type (eg text, hidden;
+#           dropdown and bool are custom implimented)
+#       required: set to 1 to make the field required
+#       help_id: a modal-zone id to lookup for a tooltip
+#       help: TODO aspirational field to replace help_id
+#       dropdown_classes: additional classes to apply to the select element 
+#           (only for dropdown types)
+#       model_name: the dbix model name for the dropdown
+#           FIXME: Why is this lowercase?
+#       table_name: the table name for the dropdown 
+#           FIXME: Why do we need both?
+#       allow_multi_select: set to 1 to allow the user to select multiple 
+#           items from the dropdown
 
-band_columns:
-  - label: Name
-    name: name
-    required: 1
-    type: text
-  - allow_multi_select: 1
-    label: Talent
-    model_name: talent
-    name: talent_id
-    table_name: talents
-    type: dropdown
-  - name: band_id
-    type: hidden
+      
+- label: Events
+  fold_model: event
+  fold_vars:
+    form_id: event_display_form
+    scripts:
+      - events
+    columns:
+    - label: Series
+      name: series_id
+      type: dropdown
+      help_id: template-help
+      model_name: series
+      table_name: series
+      dropdown_classes:
+        - series-for-event
+    - label: Style
+      name: style_id
+      required: 1
+      type: dropdown
+      allow_multi_select: 1
+      model_name: style
+      table_name: styles
+    - label: Venue
+      name: venue_id
+      required: 1
+      type: dropdown
+      model_name: venue
+      table_name: venues
+      allow_multi_select: 1
+    - label: Parent Org
+      name: parent_org_id
+      required: 1
+      type: dropdown
+      model_name: parent_org
+      table_name: parent_orgs
+      allow_multi_select: 1
+    - label: Caller
+      name: caller_id
+      type: dropdown
+      model_name: caller
+      table_name: callers
+      allow_multi_select: 1
+    - label: 'Name (for camps, special events)'
+      name: name
+      type: text
+    - label: Start Date
+      name: start_date
+      required: 1
+      type: date
+    - label: Start Time
+      name: start_time
+      type: time
+    - label: End Date
+      name: end_date
+      type: date
+    - label: End Time
+      name: end_time
+      type: time
+    - label: Short Desc.
+      name: short_desc
+      required: 1
+      type: textarea
+    - label: Custom URL
+      name: custom_url
+      type: text
+    - label: Custom Pricing
+      name: custom_pricing
+      type: textarea
+    - label: Canceled
+      name: is_canceled
+      no: No
+      type: bool
+      yes: Canceled
+      yes_color: red
+    - label: Band
+      name: band_id
+      type: dropdown
+      model_name: band
+      table_name: bands
+      allow_multi_select: 1
+    - label: Talent
+      name: talent_id
+      type: dropdown
+      model_name: talent
+      table_name: talent
+      allow_multi_select: 1
+    - name: is_template
+      type: hidden
+    - name: event_id
+      type: hidden
+    - name: synthetic_name
+      type: hidden
 
-caller_columns:
-  - label: Name
-    name: name
-    required: 1
-    type: text
-  - name: caller_id
-    type: hidden
+- label: Styles
+  fold_model: style
+  fold_vars:
+    columns:
+    - label: Name
+      name: name
+      required: 1
+      type: text
+    - name: style_id
+      type: hidden
 
-event_columns:
-  - extra_classes:
-      - series-for-event
-    help_id: template-help
-    label: Series
-    model_name: series
-    name: series_id
-    table_name: series
-    type: dropdown
-  - allow_multi_select: 1
-    label: Style
-    model_name: style
-    name: style_id
-    required: 1
-    table_name: styles
-    type: dropdown
-  - allow_multi_select: 1
-    label: Venue
-    model_name: venue
-    name: venue_id
-    required: 1
-    table_name: venues
-    type: dropdown
-  - allow_multi_select: 1
-    label: Caller
-    model_name: caller
-    name: caller_id
-    table_name: callers
-    type: dropdown
-  - allow_multi_select: 1
-    label: Parent Org
-    model_name: parent_org
-    name: parent_org_id
-    required: 1
-    table_name: parent_orgs
-    type: dropdown
-  - label: 'Name (for camps, special events)'
-    name: name
-    type: text
-  - label: Start Date
-    name: start_date
-    required: 1
-    type: date
-  - label: Start Time
-    name: start_time
-    type: time
-  - label: End Date
-    name: end_date
-    type: date
-  - label: End Time
-    name: end_time
-    type: time
-  - label: Short Desc.
-    name: short_desc
-    required: 1
-    type: textarea
-  - label: Custom URL
-    name: custom_url
-    type: text
-  - label: Custom Pricing
-    name: custom_pricing
-    type: textarea
-  - label: Canceled
-    name: is_canceled
-    no: No
-    type: bool
-    yes: Canceled
-    yes_color: red
-  - allow_multi_select: 1
-    label: Band
-    model_name: band
-    name: band_id
-    table_name: bands
-    type: dropdown
-  - allow_multi_select: 1
-    label: Talent
-    model_name: talent
-    name: talent_id
-    table_name: talent
-    type: dropdown
-  - name: is_template
-    type: hidden
-  - name: event_id
-    type: hidden
-  - name: synthetic_name
-    type: hidden
+- label: Venues
+  fold_model: venue
+  fold_vars:
+    columns:
+    - label: vkey
+      name: vkey
+      required: 1
+      type: text
+    - label: Hall Name
+      name: hall_name
+      required: 1
+      type: text
+    - label: Street Address
+      name: address
+      required: 1
+      type: text
+    - label: City
+      name: city
+      required: 1
+      type: text
+    - label: Zip
+      name: zip
+      type: text
+    - label: Programmer Notes
+      name: programmer_notes
+      type: textarea
+    - label: Sidebar
+      name: sidebar
+      type: textarea
+    - label: Directions
+      name: directions
+      type: textarea
+    - name: venue_id
+      type: hidden
+  
+- label: Series
+  fold_model: series
+  fold_vars:
+    columns:
+    - label: Name
+      name: name
+      required: 1
+      type: text
+    - label: External ID
+      name: series_xid
+      help: >
+          This is a short, permanent ID for the series, general enough to survive
+          name changes, used for example in links in HTML files on the filesystem.
+      required: 1
+      type: text
+    - label: Frequency
+      name: frequency
+      type: text
+    - label: Short Description
+      name: short_desc
+      type: textarea
+    - label: Sidebar
+      name: sidebar
+      type: textarea
+    - label: Display Text
+      name: display_text
+      type: textarea
+    - label: Programmer Notes
+      name: programmer_notes
+      type: textarea
+    - label: Series URL
+      name: series_url
+      type: text
+    - label: Manager Name(s)
+      name: manager
+      type: text
+    - name: series_id
+      type: hidden
 
-parent_org_columns:
-  - label: Name
-    name: full_name
-    required: 1
-    type: text
-  - label: Abbreviation
-    name: abbreviation
-    required: 1
-    type: text
-  - name: parent_org_id
-    type: hidden
+- label: Callers
+  fold_model: caller
+  fold_vars:
+    columns:
+    - label: Name
+      name: name
+      required: 1
+      type: text
+    - name: caller_id
+      type: hidden
 
-programmer_columns:
-  - label: Name
-    name: name
-    required: 1
-    type: text
-  - label: Email
-    name: email
-    required: 1
-    type: text
-  - label: Super User?
-    name: is_superuser
-    no: No
-    type: bool
-    yes: Yes
-    yes_color: '#09f'
-  - allow_multi_select: 1
-    label: Can Edit Series
-    model_name: series
-    name: series_id
-    table_name: series
-    type: dropdown
-  - allow_multi_select: 1
-    label: Can Edit Event
-    model_name: event
-    name: event_id
-    table_name: events
-    type: dropdown
-  - name: programmer_id
-    type: hidden
+- label: Bands
+  fold_model: band
+  fold_vars:
+    columns:
+    - label: Name
+      name: name
+      required: 1
+      type: text
+    - label: Talent
+      name: talent_id
+      type: dropdown
+      model_name: talent
+      table_name: talents
+      allow_multi_select: 1
+    - name: band_id
+      type: hidden
 
-series_columns:
-  - label: Name
-    name: name
-    required: 1
-    type: text
-  - help: >
-        This is a short, permanent ID for the series, general enough to survive
-        name changes, used for example in links in HTML files on the filesystem.
-    label: External ID
-    name: series_xid
-    required: 1
-    type: text
-  - label: Frequency
-    name: frequency
-    type: text
-  - label: Short Description
-    name: short_desc
-    type: textarea
-  - label: Sidebar
-    name: sidebar
-    type: textarea
-  - label: Display Text
-    name: display_text
-    type: textarea
-  - label: Programmer Notes
-    name: programmer_notes
-    type: textarea
-  - label: Series URL
-    name: series_url
-    type: text
-  - label: Manager Name(s)
-    name: manager
-    type: text
-  - name: series_id
-    type: hidden
+- label: Talent
+  fold_model: talent
+  fold_vars:
+    columns:
+    - label: Name
+      name: name
+      required: 1
+      type: text
+    - name: talent_id
+      type: hidden
 
-style_columns:
-  - label: Name
-    name: name
-    required: 1
-    type: text
-  - name: style_id
-    type: hidden
+- label: Parent Org
+  fold_model: parent_org
+  fold_vars:
+    columns:
+    - label: Name
+      name: full_name
+      required: 1
+      type: text
+    - label: Abbreviation
+      name: abbreviation
+      required: 1
+      type: text
+    - name: parent_org_id
+      type: hidden
 
-talent_columns:
-  - label: Name
-    name: name
-    required: 1
-    type: text
-  - name: talent_id
-    type: hidden
-
-venue_columns:
-  - label: vkey
-    name: vkey
-    required: 1
-    type: text
-  - label: Hall Name
-    name: hall_name
-    required: 1
-    type: text
-  - label: Street Address
-    name: address
-    required: 1
-    type: text
-  - label: City
-    name: city
-    required: 1
-    type: text
-  - label: Zip
-    name: zip
-    type: text
-  - label: Programmer Notes
-    name: programmer_notes
-    type: textarea
-  - label: Sidebar
-    name: sidebar
-    type: textarea
-  - label: Directions
-    name: directions
-    type: textarea
-  - name: venue_id
-    type: hidden
+- label: Programmers
+  fold_model: programmer
+  fold_vars:
+    columns:
+    - label: Name
+      name: name
+      required: 1
+      type: text
+    - label: Email
+      name: email
+      required: 1
+      type: text
+    - label: Super User?
+      name: is_superuser
+      no: No
+      type: bool
+      yes: Yes
+      yes_color: '#09f'
+    - label: Can Edit Series
+      name: series_id
+      allow_multi_select: 1
+      model_name: series
+      table_name: series
+      type: dropdown
+    - allow_multi_select: 1
+      label: Can Edit Event
+      model_name: event
+      name: event_id
+      table_name: events
+      type: dropdown
+    - name: programmer_id
+      type: hidden
 
