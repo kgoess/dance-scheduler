@@ -6,135 +6,52 @@
     // Create empty lists for adding helper functions
     $('.display-form').each(function() {this.saveHelper = []});
 
-    $( '.clickable-list' ).change(function() {
-        const rowId = $(this).val();
-        const [parentContainer, modelName] = getParentAndModelName(this);
-        $.ajax({
-            url: `${appUriBase}/${modelName}/${rowId}`,
-            dataType: 'json'
-        })
-        .done( (msg) => {
-            // Only the "series" container has this. If they started
-            // creating a new series template but didn't, then we need
-            // to turn the button back on.
-            parentContainer.find('.select-template-button').prop('disabled', false);
-            displayItem(modelName, msg)
-        });
-    });
+    // Load up an item from the list when it's been clicked on
+    $( '.clickable-list' ).change( clickableListOnchange );
 
-    $( '.display-row' ).click(function() {
-        const display = $(this).find('.row-contents');
-        if (display.is(':hidden')) {
-            return;
-        }
-        display.toggle();
-        $(this).find('.row-edit').toggle().focus();
-    });
+    // Show the editable field when the user clickes the display
+    $( '.display-row' ).click( displayRowOnclick );
 
     // because we're handling the submit ourselves with the button
-    $( 'form' ).submit(function(e){
-        e.preventDefault();
-    });
+    $( 'form' ).submit(function(e){ e.preventDefault() });
 
-    $( '.save-button' ).click( function() {
-        saveAction(this)
+    $( '.save-button' ).click( saveButtonOnclick );
 
-        // Only the "series" container has this. If they created a new series
-        // template then we can turn the button back on
-        const [parentContainer, modelName] = getParentAndModelName(this);
-        parentContainer.find('.select-template-button').prop('disabled', false);
-    });
+    $( '.delete-button' ).click( confirmDelete );
 
-    $( '.delete-button' ).click( function() {
-        confirmDelete(this)
-    });
+    $( '.cancel-button' ).click( cancelButtonOnclick );
 
-    $( '.cancel-button' ).click( function() {
-       const [parentContainer, modelName] = getParentAndModelName(this);
-       parentContainer.find('.model-display').hide(); 
-    });
-
-
-    $( '.create-new-button' ).click(function() {
-
-        const [parentContainer, modelName] = getParentAndModelName(this);
-
-        displayItem(modelName, false);
-
-        parentContainer.each(
-            function(index) {
-                $(this).find('.row-contents').hide();
-                $(this).find('.row-contents').text('');
-                $(this).find('.row-edit').show();
-                $(this).find('.row-edit').val('');
-            }
-        );
-        // De-select anything they might have clicked on in the list
-        parentContainer.find('select option').prop('selected', false);
-
-        // Only the "series" container has this. we need to turn off the button
-        // until they save the new series, otherwise it doesn't make any sense
-        parentContainer.find('.select-template-button').prop('disabled', true);
-
-    });
+    $( '.create-new-button' ).click( createNewButtonOnclick );
 
     /* when they click the line with the '+' on an accordion, toggle the
      * open/close
      */
-    $( '.accordion .accordion-label' ).click(function() {
-        const [parentContainer, modelName] = getParentAndModelName(this);
-        const thisWasActive = parentContainer.hasClass('active');
-        $( '.accordion-container' ).removeClass('active').find('.model-display').hide();
-        if (thisWasActive) {
-            return;
-        }
-        parentContainer.toggleClass('active')
-        if (parentContainer.hasClass('active')) {
-            loadListForModel(modelName);
-        }
-    });
+    $( '.accordion .accordion-label' ).click( accordionOnclick );
 
-    $( '.add-multi-select-button' ).click(multiSelectOptionAdd);
-
-    const labelGetter = row => getLabelForDisplayInItemListbox('band', row);
-
+    $( '.add-multi-select-button' ).click( multiSelectOptionAdd );
 
     /*
      * This sets values for this new event to the default values from the series'
      * default event template
      */
-    $( '.series-for-event' ).change(function() {
-        const [parentContainer, modelName] = getParentAndModelName(this);
-        // don't update the defaults when editing an existing event, just for a new one
-        if (parentContainer.find('[name="event_id"]').val()) {
-            return;
-        }
-        const seriesId = $(this).val();
-        $.ajax({
-            url: `${appUriBase}/series/${seriesId}/template-event`,
-            dataType: 'json'
-        })
-        .done( (msg) => {
-            displayItem('event', msg);
-            const eventContainer = getParentContainerForModelName('event');
+    $( '.series-for-event' ).change( seriesForEventOnchange );
 
-            // keep them from editing an existing event_id, because this is
-            // only for *new* events
-            eventContainer.find('[name="event_id"]').val('');
-
-            // copying this in from create-new-button, should we re-use it instead?
-            eventContainer.each(
-                function(index) {
-                    $(this).find('.row-contents').hide();
-                    $(this).find('.row-edit').show();
-                }
-            );
-
-            // this is not a template
-            eventContainer.find('[name="is_template"]').attr('0');
-
-        });
+    $( '#template-help' ).click(function() {
+        templateHelpDialog.dialog( 'open' );
     });
+    $( '#manage-template-help' ).click(function() {
+        templateHelpDialog.dialog( 'open' );
+    });
+
+    /* this is the button on the series accordion the starts the popup with the
+    * series' default event
+    */
+    $( '.select-template-button' ).click(function() {
+        eventTemplateDialog.dialog( 'open' );
+    });
+
+    // make our fancy slide switches actually function
+    $('.custom-bool').click( customBoolOnclick ); 
 
     /* This is from the button on the series accordion to popup the default
      * event for the series in a modal.  We copy the container for "event" and
@@ -223,19 +140,6 @@
           dateFormat: "yy-mm-dd"
     });
 
-    $( '#template-help' ).click(function() {
-        templateHelpDialog.dialog( 'open' );
-    });
-    $( '#manage-template-help' ).click(function() {
-        templateHelpDialog.dialog( 'open' );
-    });
-
-    /* this is the button on the series accordion the starts the popup with the
-    * series' default event
-    */
-    $( '.select-template-button' ).click(function() {
-        eventTemplateDialog.dialog( 'open' );
-    });
 
     loginRedirectModal = $( '#login-redirect-modal' ).dialog({
         autoOpen: false,
@@ -269,19 +173,128 @@
     });
 
 
-    // make our fancy slide switches actually function
-    $('.custom-bool').click(function (){
-        const theInput = $(this).find('input');
-        if (theInput.val() != "1")
-            theInput.val(1);
-        else
-            theInput.val(0);
-    }); 
 
 });
 
 
+// ********************************************
+// Event handlers
+// ********************************************
 
+function clickableListOnchange() {
+    const rowId = $(this).val();
+    const [parentContainer, modelName] = getParentAndModelName(this);
+    $.ajax({
+        url: `${appUriBase}/${modelName}/${rowId}`,
+        dataType: 'json'
+    })
+    .done( (msg) => {
+        // Only the "series" container has this. If they started
+        // creating a new series template but didn't, then we need
+        // to turn the button back on.
+        parentContainer.find('.select-template-button').prop('disabled', false);
+        displayItem(modelName, msg)
+    });
+}
+
+function displayRowOnclick() {
+    const display = $(this).find('.row-contents');
+    if (display.is(':hidden')) {
+        return;
+    }
+    display.toggle();
+    $(this).find('.row-edit').toggle().focus();
+}
+
+function saveButtonOnclick() {
+    saveAction(this)
+
+    // Only the "series" container has this. If they created a new series
+    // template then we can turn the button back on
+    const [parentContainer, modelName] = getParentAndModelName(this);
+    parentContainer.find('.select-template-button').prop('disabled', false);
+}
+
+function cancelButtonOnclick() {
+   const [parentContainer, modelName] = getParentAndModelName(this);
+   parentContainer.find('.model-display').hide(); 
+}
+
+function createNewButtonOnclick() {
+    const [parentContainer, modelName] = getParentAndModelName(this);
+
+    displayItem(modelName, false);
+
+    parentContainer.each(
+        function(index) {
+            $(this).find('.row-contents').hide();
+            $(this).find('.row-contents').text('');
+            $(this).find('.row-edit').show();
+            $(this).find('.row-edit').val('');
+        }
+    );
+    // De-select anything they might have clicked on in the list
+    parentContainer.find('select option').prop('selected', false);
+
+    // Only the "series" container has this. we need to turn off the button
+    // until they save the new series, otherwise it doesn't make any sense
+    parentContainer.find('.select-template-button').prop('disabled', true);
+
+}
+
+function accordionOnclick() {
+    const [parentContainer, modelName] = getParentAndModelName(this);
+    const thisWasActive = parentContainer.hasClass('active');
+    $( '.accordion-container' ).removeClass('active').find('.model-display').hide();
+    if (thisWasActive) {
+        return;
+    }
+    parentContainer.toggleClass('active')
+    if (parentContainer.hasClass('active')) {
+        loadListForModel(modelName);
+    }
+}
+
+function seriesForEventOnchange() {
+    const [parentContainer, modelName] = getParentAndModelName(this);
+    // don't update the defaults when editing an existing event, just for a new one
+    if (parentContainer.find('[name="event_id"]').val()) {
+        return;
+    }
+    const seriesId = $(this).val();
+    $.ajax({
+        url: `${appUriBase}/series/${seriesId}/template-event`,
+        dataType: 'json'
+    })
+    .done( (msg) => {
+        displayItem('event', msg);
+        const eventContainer = getParentContainerForModelName('event');
+
+        // keep them from editing an existing event_id, because this is
+        // only for *new* events
+        eventContainer.find('[name="event_id"]').val('');
+
+        // copying this in from create-new-button, should we re-use it instead?
+        eventContainer.each(
+            function(index) {
+                $(this).find('.row-contents').hide();
+                $(this).find('.row-edit').show();
+            }
+        );
+
+        // this is not a template
+        eventContainer.find('[name="is_template"]').attr('0');
+
+    });
+}
+
+function customBoolOnclick(){
+    const theInput = $(this).find('input');
+    if (theInput.val() != "1")
+        theInput.val(1);
+    else
+        theInput.val(0);
+}
 // ********************************************
 // other functions
 // ********************************************
