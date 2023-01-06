@@ -281,7 +281,7 @@ font-size: 10px;
     color: lightgreen;
     border-radius: 6px;
     cursor: pointer;
-    width: 2em;
+    width: 8em;
     font-weight: bold;
     box-shadow: 0 0 5px black;
     margin: 5px 3px 0px;
@@ -314,6 +314,7 @@ font-size: 10px;
     background-color: #d7f2ff;
     border: 1px solid #8fdaff;
     border-radius: 10px;
+    cursor: pointer;
 }
 /* these two are to keep super long venue names from blowing out the series
  * default popup
