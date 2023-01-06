@@ -82,13 +82,15 @@
     type="text/javascript"
     src="<% request.uri_base _ '/javascripts/' _ script _ '.js' %>"
 ></script><% END %>
-<form><!-- This is filled via loadListForModel() --> 
-    <select class="clickable-list" size="10">
-    </select>
-</form>
-<span class="button-container">
-    <button class="button create-new-button">Create New</button>
-</span>
+<div class="list-and-button">
+    <form><!-- This is filled via loadListForModel() --> 
+        <select class="clickable-list" size="10">
+        </select>
+    </form>
+    <span class="button-container create-new-container">
+        <button class="button create-new-button">Create New</button>
+    </span>
+</div>
 <div class="model-display" hidden>
     <form <% IF content.form_id %>id="<% content.form_id %>"<% END %> class="display-form">
         <% FOREACH column IN content.columns %>
