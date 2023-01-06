@@ -28,7 +28,7 @@
             return;
         }
         display.toggle();
-        $(this).find('.row-edit').toggle();
+        $(this).find('.row-edit').toggle().focus();
     });
 
     // because we're handling the submit ourselves with the button
