@@ -49,6 +49,11 @@
         confirmDelete(this)
     });
 
+    $( '.cancel-button' ).click( function() {
+       const [parentContainer, modelName] = getParentAndModelName(this);
+       parentContainer.find('.model-display').hide(); 
+    });
+
 
     $( '.create-new-button' ).click(function() {
 

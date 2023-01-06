@@ -129,8 +129,9 @@
             </div>
         <% END %>
         <span class="button-container">
-            <button class="button save-button">Save</button>
-            <button class="button delete-button">Delete</button>
+            <button class="button save-button disableable">Save</button>
+            <button class="button delete-button disableable">Delete</button>
+            <button class="button cancel-button">Cancel</button>
         </span>
     </form>
 </div>

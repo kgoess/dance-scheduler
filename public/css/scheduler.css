@@ -343,7 +343,7 @@ font-size: 10px;
 /* this disables the submit button until all the "required" fields are filled in
  *  https://developer.mozilla.org/en-US/docs/Web/CSS/:invalid#showing_sections_in_stages
  * */
-form:invalid button {
+form:invalid button.disableable {
     opacity: 0.3;
     pointer-events: none;
 }
