@@ -25,7 +25,9 @@
 <script>
 var appUriBase = "<% request.uri_base %>";
 </script>
-<script src="<% request.uri_base %>/js/scheduler.js"></script>
+<script type="module" src="<% request.uri_base %>/js/scheduler.js"></script>
+<script type="module" src="<% request.uri_base %>/js/event-handlers.js"></script>
+<script type="module" src="<% request.uri_base %>/js/helper-functions.js"></script>
 
 </head>
 <body>

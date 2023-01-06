@@ -75,6 +75,8 @@ public/js/events.js
 public/js/jquery-ui.js
 public/js/jquery.js
 public/js/scheduler.js
+public/js/event-handlers.js
+public/js/helper-functions.js
 public/signin.html
 README.md
 schemas/band_membership.sql

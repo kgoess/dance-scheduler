@@ -79,7 +79,7 @@
 <% END %>
 
 <% FOREACH script IN content.scripts %><script
-    type="text/javascript"
+    type="module"
     src="<% request.uri_base _ '/js/' _ script _ '.js' %>"
 ></script><% END %>
 <div class="list-and-button">
