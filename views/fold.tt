@@ -80,7 +80,7 @@
 
 <% FOREACH script IN content.scripts %><script
     type="text/javascript"
-    src="<% request.uri_base _ '/javascripts/' _ script _ '.js' %>"
+    src="<% request.uri_base _ '/js/' _ script _ '.js' %>"
 ></script><% END %>
 <div class="list-and-button">
     <form><!-- This is filled via loadListForModel() --> 
