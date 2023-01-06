@@ -83,7 +83,7 @@
     src="<% request.uri_base _ '/javascripts/' _ script _ '.js' %>"
 ></script><% END %>
 <form><!-- This is filled via loadListForModel() --> 
-    <select class="clickable-list" size="5">
+    <select class="clickable-list" size="10">
     </select>
 </form>
 <span class="button-container">
