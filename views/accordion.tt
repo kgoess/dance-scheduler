@@ -47,11 +47,11 @@
         <div id="template-help-modal">
             <p>The yellow star means the field is required</p>
             <p>Selecting a Series for a new Event fills in some fields for that
-               Event from the "template" fields for the selected Series.</p>
-            <p>Check out the "Manage Template" button underneath the Series
+               Event from the "default" fields for the selected Series.</p>
+            <p>Check out the "Manage Defaults" button underneath the Series
                section and it will make more sense.</p>
             <p>If there's anything filled in for the Event then changing the
-               Series won't apply the "template" to the Event.</p>
+               Series won't apply the "default" to the Event.</p>
         </div>
         <div id="delete-confirmation-modal">
             <form>
@@ -66,7 +66,7 @@
             <p>
                 Would you like to add these members of <span id="band-name-in-popup"></span> to your event?
             </p>
-            <div class="talent-names">
-            </div>
+            <div class="talent-names"></div>
         </div>
+        <div id="series-template-modal"></div>
     </div>

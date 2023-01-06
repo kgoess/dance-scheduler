@@ -169,6 +169,9 @@
 - label: Series
   fold_model: series
   fold_vars:
+    extra_buttons:
+    - label: Manage Defaults
+      classes: select-template-button
     columns:
     - label: Name
       name: name

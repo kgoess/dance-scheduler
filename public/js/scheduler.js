@@ -5,6 +5,8 @@ import {
     displayItem,
     loadListForModel,
     multiSelectOptionAdd,
+    saveAction,
+    escapeHtml,
 } from "./helper-functions.js";
 
 $( document ).ready(function() {
@@ -67,7 +69,7 @@ $( document ).ready(function() {
      * re-use it in the popup.
     */
     const eventContainer = getParentContainerForModelName('event');
-    const templateEventPopup = $('#series-template');
+    const templateEventPopup = $('#series-template-modal');
 
     templateEventPopup.attr('title', 'Defaults for new event in this series');
 
@@ -84,7 +86,7 @@ $( document ).ready(function() {
 
     templateEventPopup.find('select[name="series_id"]').remove();
 
-    templateEventPopup.attr('modelName', 'event');
+    templateEventPopup.attr('fold_model', 'event');
 
     const templateHelpDialog = $( '#template-help-modal' ).dialog({
         autoOpen: false,
@@ -93,14 +95,14 @@ $( document ).ready(function() {
         modal: true,
     });
 
-    const eventTemplateDialog = $( '#series-template' ).dialog({
+    const eventTemplateDialog = $( '#series-template-modal' ).dialog({
         autoOpen: false,
         height: 400,
         width: 400,
         modal: true,
         buttons: {
             Save: function() {
-                saveAction(templateEventPopup, () => eventTemplateDialog.dialog("close"))
+                saveAction(popupForm, () => eventTemplateDialog.dialog("close"))
             },
             Cancel: function() {
                 eventTemplateDialog.dialog("close");
