@@ -30,7 +30,7 @@
 - label: Events
   fold_model: event
   fold_vars:
-    form_id: event_display_form
+    form_id: event-display-form
     scripts:
       - events
     columns:
