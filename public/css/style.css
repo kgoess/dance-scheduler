@@ -278,14 +278,14 @@ font-size: 10px;
     color: lightgreen;
     border-radius: 6px;
     cursor: pointer;
-    width: 5em;
+    width: 2em;
     font-weight: bold;
     box-shadow: 0 0 5px black;
     margin: 5px 3px 0px;
     display: flex;
     order: 99;
     justify-content: center;
-    justify-self: 
+    align-self: end;
 }
 
 .button-container {
