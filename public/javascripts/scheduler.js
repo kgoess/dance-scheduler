@@ -1,5 +1,7 @@
-
  $( document ).ready(function() {
+    $('.remove-multi-select-button' ).click(function() {
+        $(this).closest('.multi-select-wrapper').remove();
+    });
 
     // Create empty lists for adding helper functions
     $('.display-form').each(function() {this.saveHelper = []});
@@ -499,9 +501,6 @@ function multiSelectOptionAdd() {
     cloneTarget.parent().append(newSelectBoxDiv);
     const newSelectBox = newSelectBoxDiv.find('select').first();
     newSelectBox.val('');
-    newSelectBoxDiv.find('.remove-multi-select-button' ).click(function() {
-        $(this).closest('.multi-select-wrapper').remove();
-    });
     newSelectBoxDiv.attr('cloned-selectlist', 1);
     return newSelectBox;
 }

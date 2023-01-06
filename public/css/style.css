@@ -251,6 +251,11 @@ font-size: 10px;
     flex: 1 0 90%;
 }
 
+/* Hide the red 'x' button if there is only one dropdown. */
+.multi-select-wrapper:only-of-type .remove-multi-select-button {
+    display: none;
+}
+
 .remove-multi-select-button {
     background-color: #e55;
     font-size: 75%;
