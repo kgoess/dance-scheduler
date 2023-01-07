@@ -1124,6 +1124,35 @@ put '/programmer/:programmer_id' => requires_superuser sub {
     return $results->format;
 };
 
+=head3 GET /betatest-cookie
+
+The DBIX_TEST=1 cookie lets you see the pages as produced by this new system.
+
+=cut
+
+get '/betatest-cookie' => sub {
+
+    my $curr_val = cookie 'DBIX_TEST';
+    template 'betatest-cookie' => {
+        curr_val => $curr_val,
+    },
+    {layout => undef},
+};
+
+post '/betatest-cookie' => sub {
+
+    my $new_val = body_parameters->get('beta-cookie');
+    if (!defined $new_val || !length $new_val) {
+        die "missing beta-cookie parameter in form submit";
+    }
+    if ($new_val eq 'on') {
+        cookie DBIX_TEST => 1,  domain => 'bacds.org', expires => '6 months';
+    } else {
+        cookie DBIX_TEST => 0,  domain => 'bacds.org', expires => '-1 day';
+    }
+    redirect '/betatest-cookie' => 303;
+};
+
 =head3 GET /dancefinder
 
 Replacing the old dancefinder cgi, display the form
