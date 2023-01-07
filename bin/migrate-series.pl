@@ -68,7 +68,7 @@ EOL
             series_url => 'https://bacds.org/series/english/palo_alto/',
             is_deleted => 0,
             sidebar => <<'EOL', # ./english/palo_alto/content.html:
-<!--#include virtual="/series/shared/location_sme.html" --> 
+<!--#include virtual="/series/shared/location_sme.html" -->
 <!--#include virtual="/series/shared/time_late_lesson.html" -->
 <!--#include virtual="/series/shared/price_weekend.html" -->
 <!--#include virtual="/series/shared/directions_sme.html" -->
@@ -304,7 +304,7 @@ music performed by amplified ensembles with dances that are derived from but
 extremely welcoming to groups of first-timers, children old enough to dance
 apart from their parents, and even morris dancers. Our English ceilidh
 dances are held occasionally, usually at Humanist Hall in Oakland.
-<p>	    
+<p>
 EOL
         },
         {
@@ -312,6 +312,63 @@ EOL
             series_xid => 'ODD-SUNDAYS-ONLINE',
             frequency => 'odd-numbered Sundays',
             is_deleted => 0,
+
+            series_url => 'https://bacds.org/series/virtual/oddsundays.html',
+            sidebar => <<'EOL',
+<b>NOTE:</b> as of November 2021, this series has moved to the <b>even</b>
+Sundays of the month, and is now the <i>Oddly Even Sunday English Dance
+Party</i>. Doors open 1:00 pm PDT (sound check and chat), dance starts at
+1:30PM PDT. Link will appear the Thursday or Friday before the dance on
+bacds-announce mailing list
+(subscribe <a href=https://www.bacds.org/mailman/listinfo/bacds-announce>here</a>)
+and on the Odd Sundays mailchimp list (to learn how to join that Odd Sundays
+email list, email Sharon at <script src="https://bacds.org/javascript/sg-addr.js"></script>).
+            </p>
+EOL
+            display_text => <<'EOL',
+<a href="#oddsundays"></a>
+<h2>Odd Sundays English Dance Party</b> in the cloud!</h2>
+<p>
+The <b>Odd Sundays Dance</b> features either Sharon Green or Kalia Kliban
+calling solo adaptations of English country dances either to recorded or live
+music.
+<!--
+<p>
+<b>NOTE:</b> beginning in September, this series moves to the <b>even</b>
+Sundays of the month, when it will become the <i>Even Odder Sundays English
+Dance Party</i>.
+-->
+<p>
+500 persons max.
+<p>
+We are still learning how to run dances on Zoom. There will be glitches. Bring
+your patience, sense of humor, and love of ECD.
+<p>
+Before the meeting, clear a safe, spacious (to some degree of spacious) area in
+which you can dance. Put on your dance shoes.
+<p>
+When you join, please  keep your mic muted, except when you speak, and then
+re-mute immediately. (Computer users: If you mute your mic  yourself, you can
+quickly unmute yourself by pressing the space bar. Hold it down while you
+speak. When you release the space bar, that automatically will re-mute you.)
+<p>
+Click on Participants at the bottom of your screen to see who else is online.
+Click on Chat to follow conversations or to write comments.
+<p>
+Please raise your hands (use the icon, if you have that option) to signal that
+you want to speak. If we continue to have a large number of dancers, it will be
+hard to spot the raised hands. Forgive us if we miss your signal.
+<p>
+<b>Doors open 1:00 pm PDT (sound check and chat), dance starts at 1:30PM PDT.
+</b> The Zoom invitation will <b>not</b> be posted online; it will be shared
+via the <a href="https://www.bacds.org/email/?l=bacds-announce:">BACDS-announce</a>
+email list a couple of days before the event and on the Odd Sundays mailchimp
+list (to learn how to join that Odd Sundays email list, email Sharon at
+<script src="https://bacds.org/javascript/sg-addr.js"></script>).
+<p>
+Sharon or Kalia will post the tentative dance &amp; set list a few days before the event.
+<p>
+EOL
         },
         {
             name => 'Online Concerts',
