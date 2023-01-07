@@ -5,6 +5,10 @@
 body {
     margin: 50px;
     max-width: 500px;
+    padding: 50px;
+    <% IF curr_val %>
+        border: 20px double red;
+    <% END %>
 }
 
 div {
@@ -45,6 +49,9 @@ form {
     </div>
     <input type="submit">
 </form>
+<div>
+<a href="/">Return to homepage</a>
+</div>
 
 </body>
 </html>
