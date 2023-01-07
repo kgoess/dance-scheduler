@@ -3,6 +3,15 @@ This is used for the dancefinder results page as well as to generate
 the tonight.html, 18-day.html, and specialevents.html bits of the main
 page.
 %>
+<style>
+
+/* during the beta a/b testing this border lets you know if you're looking at
+     a new dbix page or an old server-side include page
+*/
+body {
+  border: 20px double red;
+}
+</style>
 <% FOREACH event IN events %>
     <p class="listing">
     <% event.start_date.strftime("%A, %e %B, %Y") %>: <strong>
