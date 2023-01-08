@@ -75,13 +75,8 @@ plugin_keywords requires_superuser => sub {
     my ($plugin, $route_sub, @args) = @_;
     return sub {
         my ($self) = @_;
-        my $email = $self->app->request->var('signed_in_as')
+        my $programmer = $self->app->request->var('signed_in_as')
             or return $plugin->login_redirect($self);
-
-        my $dbh = get_dbh();
-        my $programmer = $dbh->resultset('Programmer')->search({
-            email => $email,
-        })->first();
 
         if ($programmer->is_superuser) {
             return $route_sub->(@args);
@@ -121,14 +116,10 @@ plugin_keywords can_edit_event => sub {
     my ($plugin, $route_sub, @args) = @_;
     return sub {
         my ($self) = @_;
-        my $email = $self->app->request->var('signed_in_as')
+        my $programmer = $self->app->request->var('signed_in_as')
             or return $plugin->login_redirect($self);
 
         my $dbh = get_dbh();
-
-        my $programmer = $dbh->resultset('Programmer')->search({
-            email => $email,
-        })->first();
 
         if ($programmer->is_superuser) {
             return $route_sub->(@args);
@@ -179,14 +170,8 @@ plugin_keywords can_create_event => sub {
     my ($plugin, $route_sub, @args) = @_;
     return sub {
         my ($self) = @_;
-        my $email = $self->app->request->var('signed_in_as')
+        my $programmer = $self->app->request->var('signed_in_as')
             or return $plugin->login_redirect($self);
-
-        my $dbh = get_dbh();
-
-        my $programmer = $dbh->resultset('Programmer')->search({
-            email => $email,
-        })->first();
 
         if ($programmer->is_superuser) {
             return $route_sub->(@args);

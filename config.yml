@@ -36,6 +36,9 @@ engines:
       # Note: start_tag and end_tag are regexes
       start_tag: '<%'
       end_tag:   '%>'
+# https://metacpan.org/dist/Dancer2/view/lib/Dancer2/Manual.pod#Encoding
+#      ENCODING: utf8
+
 
 # session engine
 #

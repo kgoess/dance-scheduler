@@ -58,9 +58,18 @@ sub get_default_sorting { {-asc => [qw/start_date start_time/]} }
 sub filter_input {
     my ($class, $field, $value) = @_;
 
-    if ($field =~ /^( start_time|end_time )$/x and defined $value) {
+    if ($field =~ /^(?: start_time|end_time )$/x and defined $value) {
         if (($value =~ tr/:/:/) == 1) { # change 7:30 to 7:30:00
             $value .= ':00';
+        }
+    }
+
+    # this is just so the delta comparison for the auditor works--the value
+    # comes back from the database with T00:00:00 but the new incoming value
+    # from the web doesn't
+    if ($field =~ /^(?: start_date|end_date )$/x and defined $value) {
+        if ($value !~ /T00:00:00$/) {
+            $value .=  'T00:00:00';
         }
     }
 

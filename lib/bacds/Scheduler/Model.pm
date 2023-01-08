@@ -6,6 +6,7 @@ use warnings;
 use Dancer2;
 use DateTime;
 use Data::Dump qw/dump/;
+use Encode qw/is_utf8 encode_utf8/;
 use List::Util;
 use Scalar::Util qw/blessed/;
 
@@ -179,8 +180,9 @@ back if anything fails. I'll add that to our TODO.txt list for Phase II.
 =cut
 
 sub post_row {
-    my ($class, %incoming_data) = @_;
+    my ($class, $auditor, %incoming_data) = @_;
     my $model_name = $class->get_model_name;
+    $auditor->target($model_name);
     my @fields_for_input = $class->get_fields_for_input;
     my @fkey_fields = $class->get_fkey_fields;
     my $dbh = get_dbh();
@@ -209,6 +211,10 @@ sub post_row {
     my $pkey = $pkey[0]; #We're not using composite pkeys
     my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
 
+    $auditor->target_id($row->$pkey);
+    my $audit_name = $retrieved_row->can('name') ? ' "'.$retrieved_row->name.'"' : '';
+    $auditor->message(qq{created $model_name$audit_name});
+
     my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh);
 
     return $class->_row_to_result($retrieved_row, $other_tables);
@@ -225,9 +231,10 @@ in a transaction. I'll note that in our TODO.txt.
 =cut
 
 sub put_row {
-    my ($class, %incoming_data) = @_;
-    my $dbh = get_dbh();
+    my ($class, $auditor, %incoming_data) = @_;
     my $model_name = $class->get_model_name;
+    $auditor->target($model_name);
+    my $dbh = get_dbh();
 
     my $resultset = $dbh->resultset($model_name);
 
@@ -237,10 +244,15 @@ sub put_row {
     my $row = $resultset->find($incoming_data{$pkey})
         or return;
 
+    $auditor->target_id($row->$pkey);
+
     my @fields_for_input = $class->get_fields_for_input;
     foreach my $column (@fields_for_input) {
         next unless exists $incoming_data{$column};
         my $filtered_input = $class->filter_input($column, $incoming_data{$column});
+        $auditor->add_update_message($column, $filtered_input)
+            if ($row->$column//'') ne $filtered_input;
+
         $row->$column($filtered_input);
     };
 
@@ -251,7 +263,7 @@ sub put_row {
 
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
-    
+
     # This should all be wrapped in a transaction.
     $row->update();
 
@@ -259,7 +271,7 @@ sub put_row {
     # results
     my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
 
-    my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh);
+    my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh, $auditor);
 
     return $class->_row_to_result($retrieved_row, $other_tables);
 };
@@ -331,7 +343,7 @@ For docs on related tables see DBIx::Class::Relationship::Base
 =cut
 
 sub _update_relationships {
-    my ($class, $row, $incoming_data, $dbh) = @_;
+    my ($class, $row, $incoming_data, $dbh, $auditor) = @_;
 
     my @relationships = $class->get_many_to_manys;
     my $other_tables = {};
@@ -339,8 +351,11 @@ sub _update_relationships {
         my ($other_model, $other_table_name, $primary_key) = @$relationship;
 
         # start by clearing the existing mappings
+        my @before = $row->$other_table_name->all;
         my $remove = "remove_from_$other_table_name";
         $row->$remove($_) for $row->$other_table_name;
+
+        my @after;
 
         if ($incoming_data->{$primary_key}){
             # look up all the objects on the other end of the mappings
@@ -355,9 +370,18 @@ sub _update_relationships {
                  ordering => $i++,
              }) for @rs;
             $other_tables->{$other_table_name} = \@rs;
+            @after = @rs;
         }
         else{
             $other_tables->{$other_table_name} = [];
+        }
+
+        if ($auditor) { # don't bother for create/POST, only update/PUT
+            my $before = join ', ', sort map $_->can('name') ? $_->name : $_->$primary_key, @before;
+            my $after  = join ', ', sort map $_->can('name') ? $_->name : $_->$primary_key, @after;
+            if ($before ne $after) {
+                $auditor->add_update_message($other_table_name, $after);
+            }
         }
     }
 

@@ -33,6 +33,7 @@ use Scalar::Util qw/looks_like_number/;
 use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref/;
 
 
+use bacds::Scheduler::Auditor;
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Plugin::AccordionConfig;
 use bacds::Scheduler::Plugin::Auth;
@@ -74,7 +75,7 @@ preload_accordion_config;
 
 The "before" hook is set up to catch every dancer2 request, check for the
 LoginMethod cookie and associated login cookie, and if they check out then put
-the "signed_in_as" email in the var() stash.
+the "signed_in_as" programmer in the var() stash. It also creates an bacds::Scheduler::Auditor in the var() stash under "auditor".
 
 See bacds::Scheduler::FederatedAuth for what sets these cookies.
 
@@ -89,18 +90,20 @@ hook before => sub {
 
     my $login_method = $login_cookie->value;
 
+    my $signed_in_as;
+
     given ($login_method) {
         when ('google') {
             my $google_token = cookie GoogleToken
                 or return;
-            my ($res, $err) = bacds::Scheduler::FederatedAuth
+            my ($programmer, $err) = bacds::Scheduler::FederatedAuth
                 ->check_google_auth($google_token);
             if ($err) {
                 my ($code, $msg) = @$err;
                 warn qq{hook before check_google_auth: "$msg" for token '$google_token"};
                 return;
             }
-            var signed_in_as => $res->{email};
+            $signed_in_as = $programmer;
         }
         when ('session') {
             # this handles both facebook and bacds signins
@@ -115,8 +118,15 @@ hook before => sub {
                 return;
             };
 
-            var signed_in_as => $programmer->email;
+            $signed_in_as = $programmer;
         }
+    }
+    if ($signed_in_as) {
+        var signed_in_as => $signed_in_as;
+        var auditor => bacds::Scheduler::Auditor->new(
+            programmer => $signed_in_as,
+            http_method => request->method,
+        );
     }
 };
 
@@ -264,7 +274,7 @@ get '/' => requires_login sub {
 
     template 'accordion' => {
         title => 'Dance Scheduler',
-        signed_in_as => vars->{signed_in_as},
+        signed_in_as => vars->{signed_in_as}->email,
         accordion => $accordion,
     };
 };
@@ -375,11 +385,15 @@ Create a new event.
 =cut
 
 post '/event/' => can_create_event sub {
-    my $event = $event_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $event = $event_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($event) {
-        $results->data($event)
+        $results->data($event);
+        $auditor->save;
     } else {
         $results->add_error(1200, "Insert failed for new event");
     }
@@ -395,11 +409,15 @@ Update an existing event
 =cut
 
 put '/event/:event_id' => can_edit_event sub {
-    my $event = $event_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $event = $event_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($event) {
-        $results->data($event)
+        $results->data($event);
+        $auditor->save;
     } else {
         my $event_id = params->{event_id};
         $results->add_error(1300, "Update failed for PUT /event: event_id '$event_id' not found");
@@ -468,11 +486,15 @@ get '/style/:style_id' => sub {
 
 
 post '/style/' => requires_superuser sub {
-    my $style = $style_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $style = $style_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($style) {
-        $results->data($style)
+        $results->data($style);
+        $auditor->save;
     } else {
         $results->add_error(1500, "Insert failed for new style");
     }
@@ -482,11 +504,15 @@ post '/style/' => requires_superuser sub {
 
 
 put '/style/:style_id' => requires_superuser sub {
-    my $style = $style_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $style = $style_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($style) {
-        $results->data($style)
+        $results->data($style);
+        $auditor->save;
     } else {
         my $style_id = params->{style_id};
         $results->add_error(1600, "Update failed for PUT /style: style_id '$style_id' not found");
@@ -527,11 +553,15 @@ Create a new venue
 =cut
 
 post '/venue/' => requires_superuser sub {
-    my $venue = $venue_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $venue = $venue_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($venue) {
-        $results->data($venue)
+        $results->data($venue);
+        $auditor->save;
     } else {
         $results->add_error(1800, "Insert failed for new venue");
     }
@@ -546,11 +576,15 @@ Update an existing venue.
 =cut
 
 put '/venue/:venue_id' => requires_superuser sub {
-    my $venue = $venue_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $venue = $venue_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($venue) {
-        $results->data($venue)
+        $results->data($venue);
+        $auditor->save;
     } else {
         my $venue_id = params->{venue_id};
         $results->add_error(1900, "Update failed for PUT /venue: venue_id '$venue_id' not found");
@@ -647,11 +681,15 @@ Create a new series
 =cut
 
 post '/series/' => requires_superuser sub {
-    my $series = $series_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $series = $series_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($series) {
-        $results->data($series)
+        $results->data($series);
+        $auditor->save;
     } else {
         $results->add_error(2100, "Insert failed for new series");
     }
@@ -666,11 +704,15 @@ Update an existing series.
 =cut
 
 put '/series/:series_id' => requires_superuser sub {
-    my $series = $series_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $series = $series_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($series) {
-        $results->data($series)
+        $results->data($series);
+        $auditor->save;
     } else {
         my $series_id = params->{series_id};
         $results->add_error(2200, "Update failed for PUT /series: series_id '$series_id' not found");
@@ -728,11 +770,15 @@ Create a new band.
 =cut
 
 post '/band/' => requires_login sub {
-    my $band = $band_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $band = $band_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($band) {
-        $results->data($band)
+        $results->data($band);
+        $auditor->save;
     } else {
         $results->add_error(2400, "Insert failed for new band");
     }
@@ -747,11 +793,15 @@ Update an existing band.
 =cut
 
 put '/band/:band_id' => requires_login sub {
-    my $band = $band_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $band = $band_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($band) {
-        $results->data($band)
+        $results->data($band);
+        $auditor->save;
     } else {
         my $band_id = params->{band_id};
         $results->add_error(2500, "Update failed for PUT /band: band_id '$band_id' not found");
@@ -809,11 +859,15 @@ Create a new talent.
 =cut
 
 post '/talent/' => requires_login sub {
-    my $talent = $talent_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $talent = $talent_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($talent) {
-        $results->data($talent)
+        $results->data($talent);
+        $auditor->save;
     } else {
         $results->add_error(2700, "Insert failed for new talent");
     }
@@ -828,11 +882,15 @@ Update an existing talent.
 =cut
 
 put '/talent/:talent_id' => requires_login sub {
-    my $talent = $talent_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $talent = $talent_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($talent) {
-        $results->data($talent)
+        $results->data($talent);
+        $auditor->save;
     } else {
         my $talent_id = params->{talent_id};
         $results->add_error(2800, "Update failed for PUT /talent: talent_id '$talent_id' not found");
@@ -919,11 +977,15 @@ Create a new caller.
 =cut
 
 post '/caller/' => requires_login sub {
-    my $caller = $caller_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $caller = $caller_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($caller) {
-        $results->data($caller)
+        $results->data($caller);
+        $auditor->save;
     } else {
         $results->add_error(3000, "Insert failed for new caller");
     }
@@ -938,11 +1000,15 @@ Update a caller.
 =cut
 
 put '/caller/:caller_id' => requires_login sub {
-    my $caller = $caller_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $caller = $caller_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($caller) {
-        $results->data($caller)
+        $results->data($caller);
+        $auditor->save;
     } else {
         my $caller_id = params->{caller_id};
         $results->add_error(3100, "Update failed for PUT /caller: caller_id '$caller_id' not found");
@@ -1013,11 +1079,15 @@ Create a new parent_org.
 =cut
 
 post '/parent_org/' => requires_superuser sub {
-    my $parent_org = $parent_org_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $parent_org = $parent_org_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($parent_org) {
-        $results->data($parent_org)
+        $results->data($parent_org);
+        $auditor->save;
     } else {
         $results->add_error(3300, "Insert failed for new parent_org");
     }
@@ -1032,11 +1102,15 @@ Update a parent_org.
 =cut
 
 put '/parent_org/:parent_org_id' => requires_superuser sub {
-    my $parent_org = $parent_org_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $parent_org = $parent_org_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($parent_org) {
-        $results->data($parent_org)
+        $results->data($parent_org);
+        $auditor->save;
     } else {
         my $parent_org_id = params->{parent_org_id};
         $results->add_error(3400, "Update failed for PUT /parent_org: parent_org_id '$parent_org_id' not found");
@@ -1092,11 +1166,15 @@ Create a new programmer.
 =cut
 
 post '/programmer/' => requires_superuser sub {
-    my $programmer = $programmer_model->post_row(params);
+    my $auditor = request->var('auditor');
+
+    my $programmer = $programmer_model->post_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($programmer) {
-        $results->data($programmer)
+        $results->data($programmer);
+        $auditor->save;
     } else {
         $results->add_error(4300, "Insert failed for new programmer");
     }
@@ -1111,11 +1189,15 @@ Update a programmer.
 =cut
 
 put '/programmer/:programmer_id' => requires_superuser sub {
-    my $programmer = $programmer_model->put_row(params);
+    my $auditor = request->var('auditor');
+
+    my $programmer = $programmer_model->put_row($auditor, params);
+
     my $results = $Results_Class->new;
 
     if ($programmer) {
-        $results->data($programmer)
+        $results->data($programmer);
+        $auditor->save;
     } else {
         my $programmer_id = params->{programmer_id};
         $results->add_error(4400, "Update failed for PUT /programmer: programmer_id '$programmer_id' not found");

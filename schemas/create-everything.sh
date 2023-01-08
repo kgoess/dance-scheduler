@@ -19,6 +19,7 @@ schema_files="
     programmers.sql
     programmer_series_map.sql
     programmer_events_map.sql
+    audit_logs.sql
 "
 
 for schema_file in $schema_files ; do

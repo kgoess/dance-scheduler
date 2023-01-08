@@ -130,15 +130,18 @@ sub check_google_auth {
         return undef, [401, 'Login failed'];
     }
 
-    my $rows = bacds::Scheduler::Model::Programmer->get_multiple_rows({
+    my $dbh = get_dbh();
+
+    my $rs = $dbh->resultset('Programmer')->search({
          email => $decoded->{email}
     });
 
-    if (!@$rows) {
-        return undef, [401, "We don't recognize $decoded->{email} in our system"];
-    }
+    my $programmer = $rs->first
+        or return undef, [401, "No programmer found for '$decoded->{email}'"];
+    $programmer->is_deleted
+         and return undef, [403, "The account for '$decoded->{email}' is deleted"];
 
-    return $rows->[0];
+    return $programmer;
 }
 
 =head2 fetch_google_oauth_keys
@@ -277,7 +280,7 @@ sub check_facebook_auth {
     $programmer->is_deleted
          and return undef, [403, "The account for '$res->{email}' is deleted"];
 
-    return $programmer->email;
+    return $programmer;
 }
 
 sub _get_facebook_secret {

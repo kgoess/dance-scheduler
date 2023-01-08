@@ -17,6 +17,7 @@ tables="
     bands
     venues
     callers
+    audit_logs
     programmers
     parent_orgs
 "

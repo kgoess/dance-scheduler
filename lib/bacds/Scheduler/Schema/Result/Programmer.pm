@@ -142,6 +142,21 @@ __PACKAGE__->add_unique_constraint("programmer_email_idx", ["email"]);
 
 =head1 RELATIONS
 
+=head2 audit_logs
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::AuditLog>
+
+=cut
+
+__PACKAGE__->has_many(
+  "audit_logs",
+  "bacds::Scheduler::Schema::Result::AuditLog",
+  { "foreign.programmer_id" => "self.programmer_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 programmer_events_maps
 
 Type: has_many
@@ -173,8 +188,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-16 19:49:30
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4PlMJSz7yjAq7prlmAzhTg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-01-08 07:29:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:A8jBhmF21Y2fH9h8iliUqg
 
 
 use Role::Tiny::With;
