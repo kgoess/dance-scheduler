@@ -9,7 +9,7 @@ use open ':std', ':encoding(utf8)'; # "wide character in print" warnings from te
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 32;
+use Test::More tests => 41;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -32,6 +32,7 @@ my $i = 0;
 my $fixture = setup_fixture();
 test_create($test);
 test_update($test, $fixture);
+test_update_start_end_dates($test, $fixture);
 
 sub setup_fixture {
 
@@ -219,6 +220,72 @@ sub test_update {
     is $log->target_id, $fixture->{event1};
     is $log->action, 'update';
     is $log->message, 'styles to "CONTRA"';
+}
+
+# trying to get the string handling right. the js app sends end_date as an
+# empty string even if there's no value
+sub test_update_start_end_dates {
+    my ($test, $fixture) = @_;
+
+    my ($update, $log);
+
+    #
+    # start with a good zero state
+    #
+    $update= {
+        name => 'good times 派对',
+        start_date => '',
+        end_date => '',
+    };
+    $test->put_ok("/event/$fixture->{event1}", { content => $update } );
+
+    #
+    # set the start date
+    #
+    $update= {
+        name => 'good times 派对',
+        start_date => '2022-01-01',
+        end_date => '',
+    };
+    $test->put_ok("/event/$fixture->{event1}", { content => $update } );
+    $log = get_most_recent_log();
+    is $log->message, 'start_date to "2022-01-01"';
+
+    #
+    # set the end date
+    #
+    $update= {
+        name => 'good times 派对',
+        start_date => '2022-01-01',
+        end_date => '2022-01-05',
+    };
+    $test->put_ok("/event/$fixture->{event1}", { content => $update } );
+    $log = get_most_recent_log();
+    is $log->message, 'end_date to "2022-01-05"';
+
+    #
+    # un-set the end date
+    #
+    $update= {
+        name => 'good times 派对',
+        start_date => '2022-01-01',
+        end_date => '',
+    };
+    $test->put_ok("/event/$fixture->{event1}", { content => $update } );
+    $log = get_most_recent_log();
+    is $log->message, 'end_date to ""';
+
+    #
+    # change the name, end_date shouldn't change
+    #
+    $update= {
+        name => 'Володимир Зеленський',
+        start_date => '2022-01-01',
+        end_date => '',
+    };
+    $test->put_ok("/event/$fixture->{event1}", { content => $update } );
+    $log = get_most_recent_log();
+    is $log->message, 'name to "Володимир Зеленський"';
 }
 
 sub get_most_recent_log {

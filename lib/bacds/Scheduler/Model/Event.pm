@@ -67,7 +67,7 @@ sub filter_input {
     # this is just so the delta comparison for the auditor works--the value
     # comes back from the database with T00:00:00 but the new incoming value
     # from the web doesn't
-    if ($field =~ /^(?: start_date|end_date )$/x and defined $value) {
+    if ($field =~ /^(?: start_date|end_date )$/x and length $value) {
         if ($value !~ /T00:00:00$/) {
             $value .=  'T00:00:00';
         }
