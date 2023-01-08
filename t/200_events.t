@@ -5,7 +5,6 @@ use utf8;
 use Data::Dump qw/dump/;
 use DateTime::Format::Strptime qw/strptime/;
 use DateTime;
-use Encode qw/encode_utf8/;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
@@ -78,8 +77,8 @@ subtest 'POST /event' => sub {
         end_time       => $new_event->{end_time},
         short_desc     => $new_event->{short_desc},
         custom_url     => $new_event->{custom_url},
-        custom_pricing => encode_utf8('¥4,000'),
-        name           => encode_utf8($new_event->{name}),
+        custom_pricing => '¥4,000',
+        name           => $new_event->{name},
         is_canceled    => $new_event->{is_canceled},
         is_template    => 0,
         callers        => [],
@@ -187,7 +186,7 @@ subtest "PUT /event/#" => sub {
         talent      => [],
         is_deleted  => 0,
         is_template => 0,
-        custom_pricing => encode_utf8('¥4,000'),
+        custom_pricing => '¥4,000',
         synthetic_name => 'Saturday Night Test',
     };
     eq_or_diff $got, $expected, 'return matches';

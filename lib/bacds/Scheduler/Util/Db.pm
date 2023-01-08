@@ -42,13 +42,20 @@ sub get_dbh {
     my $hostname = 'localhost';
     my $port = 3306;
 
+    my $dbi_dsn = $ENV{TEST_DSN} ||
+                  "DBI:mysql:database=$database;host=$hostname;port=$port";
+
     my %dbi_params = (
         mysql_enable_utf8 => 1,
         AutoCommit => 1, # recommended by DBIx::Class::Schema
+        sqlite_unicode => 1,
     );
 
-    my $dbi_dsn = $ENV{TEST_DSN} || "DBI:mysql:database=$database;host=$hostname;port=$port";
-
+    if ($dbi_dsn =~ /^dbi::SQLite/) { # unit tests
+        require DBD::SQLite::Constants;
+        $dbi_params{sqlite_string_mode} =
+            DBD::SQLite::Constants::DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK();
+    }
 
     my $password = _get_password();
     my $user = 'scheduler';

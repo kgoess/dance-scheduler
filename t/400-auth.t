@@ -3,6 +3,7 @@
 
 use 5.16.0;
 use warnings;
+use utf8;
 
 use Data::Dump qw/dump/;
 use Encode qw/decode_utf8/;
@@ -311,7 +312,7 @@ sub test_can_edit {
         start_time     => "20:00",
         end_date       => "2022-05-01",
         end_time       => "22:00",
-        short_desc     => "¥tsa change",
+        short_desc     => "change 無為",
         custom_url     => 'https://event.url',
         custom_pricing => '¥4,000',
         name           => "saturday night test event £ ウ",
@@ -326,7 +327,7 @@ sub test_can_edit {
          'series programmer can edit the event');
     $content = $test_series_programmer->res->content;
     $res_data = decode_json $content;
-    is $res_data->{data}{short_desc}, "¥tsa change",
+    is $res_data->{data}{short_desc}, "change 無為",
         'the desc was changed to a UTF8 char';
 
     #
