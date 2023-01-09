@@ -1,3 +1,37 @@
+=head1 NAME
+
+bacds::Scheduler::Auditor - logs actions to audit_log table
+
+=head1 SYNOPSIS
+
+    $auditor = bacds::Scheduler::Auditor->new(
+        programmer_id => 123,
+        target => 'Venue',
+        target_id => 456,
+        action => 'change',
+    );
+
+    $auditor->add_update_message(hall_name => "Bob's Big Boy");
+    $auditor->add_update_message(city => "Gotham");
+
+    $auditor->save;
+
+    prgr  target      target_id   action      message
+    ----- ----------  ----------  ---------- -------------------------------------
+    123   Event       456         update      hall_name to "Bob's Big Boy", city to "Gotham"
+
+=head1 DESCRIPTION
+
+This simplistically tracks changes to the model from the web UI in the
+audit_log table, so we have some chance of figuring out changes if we're ever
+asked.
+
+"var auditor" is set up in the "hook before" in bacds::Scheduler. The
+individual routes are in charge of passing the auditor to put_row and post_row,
+and calling $auditor->save if the thing was successful.
+
+=cut
+
 package bacds::Scheduler::Auditor;
 
 use 5.16.0;
