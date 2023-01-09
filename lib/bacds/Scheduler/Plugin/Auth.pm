@@ -97,6 +97,20 @@ plugin_keywords requires_superuser => sub {
     };
 };
 
+=head2 requires_nothing
+
+Just exists to make the YAML-ized route construction in Scheduler.pm simpler.
+
+=cut
+
+plugin_keywords requires_nothing => sub {
+    my ($plugin, $route_sub, @args) = @_;
+    return sub {
+        my ($self) = @_;
+        $route_sub->(@args);
+    };
+};
+
 
 =head2 can_edit_event
 

@@ -40,8 +40,8 @@ subtest 'Invalid GET /talent/1' => sub{
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing Found for talent_id 1',
-            num => 2600,
+            msg => 'Nothing found for talent_id 1',
+            num => 2601,
         }]
     };
     eq_or_diff $decoded, $expected, 'error msg matches';

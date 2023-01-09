@@ -40,8 +40,8 @@ subtest 'Invalid GET /parent_org/1' => sub{
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing Found for parent_org_id 1',
-            num => 3200,
+            msg => 'Nothing found for parent_org_id 1',
+            num => 3201,
         }]
     };
     eq_or_diff $decoded, $expected, 'error msg matches';

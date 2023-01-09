@@ -31,18 +31,21 @@ use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
 use Scalar::Util qw/looks_like_number/;
 use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref/;
-
+use YAML qw/Load/;
 
 use bacds::Scheduler::Auditor;
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Plugin::AccordionConfig;
 use bacds::Scheduler::Plugin::Auth;
+use bacds::Scheduler::Model::Band;
 use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
 use bacds::Scheduler::Model::Programmer;
+use bacds::Scheduler::Model::Series;
 use bacds::Scheduler::Model::SeriesLister;
+use bacds::Scheduler::Model::Talent;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
@@ -371,7 +374,7 @@ get '/event/:event_id' => sub {
     if ($event) {
         $results->data($event)
     } else {
-        $results->add_error(1100, "Nothing Found for event_id $event_id");
+        $results->add_error(1101, "Nothing found for event_id $event_id");
     }
 
     return $results->format;
@@ -395,7 +398,7 @@ post '/event/' => can_create_event sub {
         $results->data($event);
         $auditor->save;
     } else {
-        $results->add_error(1200, "Insert failed for new event");
+        $results->add_error(1102, "Insert failed for new event");
     }
 
     return $results->format;
@@ -420,12 +423,16 @@ put '/event/:event_id' => can_edit_event sub {
         $auditor->save;
     } else {
         my $event_id = params->{event_id};
-        $results->add_error(1300, "Update failed for PUT /event: event_id '$event_id' not found");
+        $results->add_error(1103, "Update failed for PUT /event: event_id '$event_id' not found");
     }
 
     return $results->format;
 };
 
+
+=head2 Boilerplate getters/setters
+
+These are all described in the YAML in the code below:
 
 =head2 Styles
 
@@ -445,155 +452,23 @@ Returns all of the styles in the db not marked "is_deleted".
       ...
     "errors": [],
 
-=cut
-
-my $style_model = 'bacds::Scheduler::Model::Style';
-
-get '/styleAll' => sub {
-    my $results = $Results_Class->new;
-
-    $results->data($style_model->get_multiple_rows);
-
-    return $results->format;
-};
-
-
 =head3 GET /style/:style_id
 
-    "data": {
-      "style_id": 6,
-      "name": "CONTRA",
-      "is_deleted": 0
-    }
-    "errors": [],
+=head3 POST /style/
 
-
-=cut
-
-get '/style/:style_id' => sub {
-    my $style_id = params->{style_id};
-    my $results = $Results_Class->new;
-
-    my $style = $style_model->get_row($style_id);
-    if ($style) {
-        $results->data($style)
-    } else {
-        $results->add_error(1400, "Nothing Found for style_id $style_id");
-    }
-
-    return $results->format;
-};
-
-
-post '/style/' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $style = $style_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($style) {
-        $results->data($style);
-        $auditor->save;
-    } else {
-        $results->add_error(1500, "Insert failed for new style");
-    }
-
-    return $results->format;
-};
-
-
-put '/style/:style_id' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $style = $style_model->put_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($style) {
-        $results->data($style);
-        $auditor->save;
-    } else {
-        my $style_id = params->{style_id};
-        $results->add_error(1600, "Update failed for PUT /style: style_id '$style_id' not found");
-    }
-
-    return $results->format;
-};
-
+=head3 PUT /style/:style_id
 
 =head2 Venues
 
-=cut
-
-my $venue_model = 'bacds::Scheduler::Model::Venue';
+e.g. CCB Christ Church Berkeley
 
 =head3 GET '/venue/:venue_id'
 
-=cut
-
-get '/venue/:venue_id' => sub {
-    my $venue_id = params->{venue_id};
-    my $results = $Results_Class->new;
-
-    my $venue = $venue_model->get_row($venue_id);
-    if ($venue) {
-        $results->data($venue)
-    } else {
-        $results->add_error(1700, "Nothing Found for venue_id $venue_id");
-    }
-
-    return $results->format;
-};
-
 =head3 POST /venue/
 
-Create a new venue
+=head3 PUT /venue/:venue_id
 
-=cut
-
-post '/venue/' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $venue = $venue_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($venue) {
-        $results->data($venue);
-        $auditor->save;
-    } else {
-        $results->add_error(1800, "Insert failed for new venue");
-    }
-
-    return $results->format;
-};
-
-=head3 put /venue/:venue_id
-
-Update an existing venue.
-
-=cut
-
-put '/venue/:venue_id' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $venue = $venue_model->put_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($venue) {
-        $results->data($venue);
-        $auditor->save;
-    } else {
-        my $venue_id = params->{venue_id};
-        $results->add_error(1900, "Update failed for PUT /venue: venue_id '$venue_id' not found");
-    }
-
-    return $results->format;
-};
-
-=head3 get /venueAll
+=head3 GET /venueAll
 
 Return all the non-deleted venues
 
@@ -611,307 +486,46 @@ Return all the non-deleted venues
      ....
     "errors": [],
 
-
-=cut
-
-get '/venueAll' => sub {
-    my $results = $Results_Class->new;
-
-    $results->data($venue_model->get_multiple_rows);
-
-    return $results->format;
-};
-
-
 =head2 Series
 
-=cut
-
-my $series_model = 'bacds::Scheduler::Model::Series';
-use bacds::Scheduler::Model::Series;
-
+e.g. "Second Saturday English"
 
 =head3 GET '/series/:series_id'
 
-=cut
-
-get '/series/:series_id' => sub {
-    my $series_id = params->{series_id};
-    my $results = $Results_Class->new;
-
-    my $series = $series_model->get_row($series_id);
-    if ($series) {
-        $results->data($series)
-    } else {
-        $results->add_error(2000, "Nothing Found for series_id $series_id");
-    }
-
-    return $results->format;
-};
-
-=head3 GET '/series/:series_id/template-event'
-
-=cut
-
-get '/series/:series_id/template-event' => sub {
-    my $series_id = params->{series_id};
-    my $results = $Results_Class->new;
-
-    my $event = $series_model->get_template_event($series_id);
-
-    #This can be empty, indicating that there isn't a template for this
-    #series_id
-    if ($event) {
-        $results->data($event);
-    }
-    else {
-        $results->data({
-            series => [{id => $series_id}],
-            is_template => 1,
-        });
-    }
-
-    return $results->format;
-};
-
 =head3 POST /series/
 
-Create a new series
-
-=cut
-
-post '/series/' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $series = $series_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($series) {
-        $results->data($series);
-        $auditor->save;
-    } else {
-        $results->add_error(2100, "Insert failed for new series");
-    }
-
-    return $results->format;
-};
-
 =head3 PUT /series/:series_id
-
-Update an existing series.
-
-=cut
-
-put '/series/:series_id' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $series = $series_model->put_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($series) {
-        $results->data($series);
-        $auditor->save;
-    } else {
-        my $series_id = params->{series_id};
-        $results->add_error(2200, "Update failed for PUT /series: series_id '$series_id' not found");
-    }
-
-    return $results->format;
-};
 
 =head3 GET /seriesAll
 
 Return all the non-deleted seriess
 
-=cut
-
-get '/seriesAll' => sub {
-    my $results = $Results_Class->new;
-
-    $results->data($series_model->get_multiple_rows);
-
-    return $results->format;
-};
-
 =head2 Bands
-
-=cut
-
-my $band_model = 'bacds::Scheduler::Model::Band';
-use bacds::Scheduler::Model::Band;
-
 
 =head3 GET '/band/:band_id'
 
-Get all the info for one band.
-
-=cut
-
-get '/band/:band_id' => sub {
-    my $band_id = params->{band_id};
-    my $results = $Results_Class->new;
-
-    my $band = $band_model->get_row($band_id);
-    if ($band) {
-        $results->data($band)
-    } else {
-        $results->add_error(2300, "Nothing Found for band_id $band_id");
-    }
-
-    return $results->format;
-};
-
 =head3 POST /band/
 
-Create a new band.
-
-=cut
-
-post '/band/' => requires_login sub {
-    my $auditor = request->var('auditor');
-
-    my $band = $band_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($band) {
-        $results->data($band);
-        $auditor->save;
-    } else {
-        $results->add_error(2400, "Insert failed for new band");
-    }
-
-    return $results->format;
-};
-
 =head3 PUT /band/:band_id
-
-Update an existing band.
-
-=cut
-
-put '/band/:band_id' => requires_login sub {
-    my $auditor = request->var('auditor');
-
-    my $band = $band_model->put_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($band) {
-        $results->data($band);
-        $auditor->save;
-    } else {
-        my $band_id = params->{band_id};
-        $results->add_error(2500, "Update failed for PUT /band: band_id '$band_id' not found");
-    }
-
-    return $results->format;
-};
 
 =head3 GET /bandAll
 
 Return all the non-deleted bands
 
-=cut
+=head2 Talent
 
-get '/bandAll' => sub {
-    my $results = $Results_Class->new;
-
-    $results->data($band_model->get_multiple_rows);
-
-    return $results->format;
-};
-
-=head2 Talents
-
-=cut
-
-my $talent_model = 'bacds::Scheduler::Model::Talent';
-use bacds::Scheduler::Model::Talent;
-
+Ok, "Talent" is really just Musos, since Callers have their own class
+and we don't track SoundTechs.
 
 =head3 GET '/talent/:talent_id'
 
-Get all the info for one talent.
-
-=cut
-
-get '/talent/:talent_id' => sub {
-    my $talent_id = params->{talent_id};
-    my $results = $Results_Class->new;
-
-    my $talent = $talent_model->get_row($talent_id);
-    if ($talent) {
-        $results->data($talent)
-    } else {
-        $results->add_error(2600, "Nothing Found for talent_id $talent_id");
-    }
-
-    return $results->format;
-};
-
 =head3 POST /talent/
 
-Create a new talent.
-
-=cut
-
-post '/talent/' => requires_login sub {
-    my $auditor = request->var('auditor');
-
-    my $talent = $talent_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($talent) {
-        $results->data($talent);
-        $auditor->save;
-    } else {
-        $results->add_error(2700, "Insert failed for new talent");
-    }
-
-    return $results->format;
-};
-
 =head3 PUT /talent/:talent_id
-
-Update an existing talent.
-
-=cut
-
-put '/talent/:talent_id' => requires_login sub {
-    my $auditor = request->var('auditor');
-
-    my $talent = $talent_model->put_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($talent) {
-        $results->data($talent);
-        $auditor->save;
-    } else {
-        my $talent_id = params->{talent_id};
-        $results->add_error(2800, "Update failed for PUT /talent: talent_id '$talent_id' not found");
-    }
-
-    return $results->format;
-};
 
 =head3 GET /talentAll
 
 Return all the non-deleted talents
-
-=cut
-
-get '/talentAll' => sub {
-    my $results = $Results_Class->new;
-
-    $results->data($talent_model->get_multiple_rows);
-
-    return $results->format;
-};
 
 =head2 Callers
 
@@ -933,90 +547,11 @@ Returns all of the callers in the db not marked "is_deleted".
 
 =cut
 
-my $caller_model = 'bacds::Scheduler::Model::Caller';
-
-get '/callerAll' => sub {
-    my $results = $Results_Class->new;
-
-    $results->data($caller_model->get_multiple_rows);
-
-    return $results->format;
-};
-
-
 =head3 GET /caller/:caller_id
-
-    "data": {
-      "caller_id": 6,
-      "name": "Alice Smith",
-      "is_deleted": 0
-    }
-    "errors": [],
-
-
-=cut
-
-get '/caller/:caller_id' => sub {
-    my $caller_id = params->{caller_id};
-    my $results = $Results_Class->new;
-
-    my $caller = $caller_model->get_row($caller_id);
-    if ($caller) {
-        $results->data($caller)
-    } else {
-        $results->add_error(2900, "Nothing Found for caller_id $caller_id");
-    }
-
-    return $results->format;
-};
 
 =head3 POST /caller
 
-Create a new caller.
-
-=cut
-
-post '/caller/' => requires_login sub {
-    my $auditor = request->var('auditor');
-
-    my $caller = $caller_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($caller) {
-        $results->data($caller);
-        $auditor->save;
-    } else {
-        $results->add_error(3000, "Insert failed for new caller");
-    }
-
-    return $results->format;
-};
-
 =head3 PUT /caller/:caller_id
-
-Update a caller.
-
-=cut
-
-put '/caller/:caller_id' => requires_login sub {
-    my $auditor = request->var('auditor');
-
-    my $caller = $caller_model->put_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($caller) {
-        $results->data($caller);
-        $auditor->save;
-    } else {
-        my $caller_id = params->{caller_id};
-        $results->add_error(3100, "Update failed for PUT /caller: caller_id '$caller_id' not found");
-    }
-
-    return $results->format;
-};
-
 
 =head2 ParentOrgs
 
@@ -1041,84 +576,11 @@ Returns all of the parent orgs in the db not marked "is_deleted".
       ...
     "errors": [],
 
-=cut
-
-my $parent_org_model = 'bacds::Scheduler::Model::ParentOrg';
-
-get '/parent_orgAll' => sub {
-    my $results = $Results_Class->new;
-
-    $results->data($parent_org_model->get_multiple_rows);
-
-    return $results->format;
-};
-
-
 =head3 GET /parent_org/:parent_org_id
-
-=cut
-
-get '/parent_org/:parent_org_id' => sub {
-    my $parent_org_id = params->{parent_org_id};
-    my $results = $Results_Class->new;
-
-    my $parent_org = $parent_org_model->get_row($parent_org_id);
-    if ($parent_org) {
-        $results->data($parent_org)
-    } else {
-        $results->add_error(3200, "Nothing Found for parent_org_id $parent_org_id");
-    }
-
-    return $results->format;
-};
 
 =head3 POST /parent_org
 
-Create a new parent_org.
-
-=cut
-
-post '/parent_org/' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $parent_org = $parent_org_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($parent_org) {
-        $results->data($parent_org);
-        $auditor->save;
-    } else {
-        $results->add_error(3300, "Insert failed for new parent_org");
-    }
-
-    return $results->format;
-};
-
 =head3 PUT /parent_org/:parent_org_id
-
-Update a parent_org.
-
-=cut
-
-put '/parent_org/:parent_org_id' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $parent_org = $parent_org_model->put_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($parent_org) {
-        $results->data($parent_org);
-        $auditor->save;
-    } else {
-        my $parent_org_id = params->{parent_org_id};
-        $results->add_error(3400, "Update failed for PUT /parent_org: parent_org_id '$parent_org_id' not found");
-    }
-
-    return $results->format;
-};
-
 
 =head2 Programmers
 
@@ -1130,83 +592,173 @@ Returns all of the programmers in the db not marked "is_deleted".
 
 =cut
 
-my $programmer_model = 'bacds::Scheduler::Model::Programmer';
-
-get '/programmerAll' => requires_login sub {
-    my $results = $Results_Class->new;
-
-    $results->data($programmer_model->get_multiple_rows);
-
-    return $results->format;
-};
-
-
 =head3 GET /programmer/:programmer_id
-
-=cut
-
-get '/programmer/:programmer_id' => requires_login sub {
-    my $programmer_id = params->{programmer_id};
-    my $results = $Results_Class->new;
-
-    my $programmer = $programmer_model->get_row($programmer_id);
-    if ($programmer) {
-        $results->data($programmer)
-    } else {
-        $results->add_error(3200, "Nothing Found for programmer_id $programmer_id");
-    }
-
-    return $results->format;
-};
 
 =head3 POST /programmer
 
-Create a new programmer.
-
-=cut
-
-post '/programmer/' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $programmer = $programmer_model->post_row($auditor, params);
-
-    my $results = $Results_Class->new;
-
-    if ($programmer) {
-        $results->data($programmer);
-        $auditor->save;
-    } else {
-        $results->add_error(4300, "Insert failed for new programmer");
-    }
-
-    return $results->format;
-};
-
 =head3 PUT /programmer/:programmer_id
 
-Update a programmer.
+=cut
+
+my $routes_yaml = <<EOL;
+- model: style
+  err_code: 1400
+  write_perm: requires_superuser
+
+- model: venue
+  err_code: 1700
+  write_perm: requires_superuser
+
+- model: series
+  err_code: 2000
+  write_perm: requires_superuser
+
+- model: band
+  err_code: 2300
+  write_perm: requires_login
+
+- model: talent
+  err_code: 2600
+  write_perm: requires_login
+
+- model: caller
+  err_code: 2900
+  write_perm: requires_login
+
+- model: parent_org
+  err_code: 3200
+  write_perm: requires_superuser
+
+- model: programmer
+  err_code: 3400
+  read_perm: requires_login
+  write_perm: requires_superuser
+
+EOL
+
+my $routes = Load($routes_yaml);
+
+# This all looks more complicated and indirect at first glance than it
+# actually is. Check out the explicit code for Events above for what
+# it actually unspools to.
+foreach my $r (@$routes) {
+
+    my $pk_name = "$r->{model}_id";
+    my $class_name = 'bacds::Scheduler::Model::'.camelize($r->{model});
+
+    my $read_perm_name = $r->{read_perm} || 'requires_nothing';
+    my $read_perm = \&$read_perm_name;
+    my $write_perm = \&{$r->{write_perm}};
+
+    #
+    # GET /thing/1234
+    #
+    get "/$r->{model}/:$pk_name" => $read_perm->(sub {
+        my $pk = params->{$pk_name};
+
+        my $results = $Results_Class->new;
+
+        my $obj = $class_name->get_row($pk);
+        if ($obj) {
+            $results->data($obj);
+        } else {
+            my $err_code = $r->{err_code} + 1;
+            $results->add_error($err_code => "Nothing found for $pk_name $pk");
+        }
+        return $results->format;
+    });
+
+    #
+    # POST /thing - add a new thing
+    #
+    post "/$r->{model}/" => $write_perm->(sub {
+        my $auditor = var 'auditor';
+
+        my $obj = $class_name->post_row($auditor, params);
+
+        my $results = $Results_Class->new;
+
+        if ($obj) {
+            $results->data($obj);
+            $auditor->save;
+        } else {
+            my $err_code = $r->{err_code} + 2;
+            $results->add_error($r->{insert_error}, "Insert failed for new $r->{model}");
+        }
+        return $results->format;
+    });
+
+
+    #
+    # PUT /thing/1234 - update an existing thing
+    #
+    put "/$r->{model}/:$pk_name" => $write_perm->(sub {
+        my $auditor = request->var('auditor');
+
+        my $obj = $class_name->put_row($auditor, params);
+
+        my $results = $Results_Class->new;
+
+        if ($obj) {
+            $results->data($obj);
+            $auditor->save;
+        } else {
+            my $pk = params->{$pk_name};
+            my $err_code = $r->{err_code} + 3;
+            $results->add_error($err_code, "Update failed for PUT /$r->{model}: $pk_name '$pk' not found");
+        }
+
+        return $results->format;
+    });
+
+    #
+    # get /thingALL - retrieves all not-deleted of the thing
+    #
+    get "/$r->{model}All" => $read_perm->(sub {
+        my $results = $Results_Class->new;
+
+        $results->data($class_name->get_multiple_rows);
+
+        return $results->format;
+    });
+}
+
+# parent_org -> ParentOrg
+sub camelize { join '', map { ucfirst lc } split /_/, shift }
+
+
+=head2 GET '/series/:series_id/template-event'
+
+This is the set of defaults for new events in the series.
 
 =cut
 
-put '/programmer/:programmer_id' => requires_superuser sub {
-    my $auditor = request->var('auditor');
-
-    my $programmer = $programmer_model->put_row($auditor, params);
-
+get '/series/:series_id/template-event' => sub {
+    my $series_id = params->{series_id};
     my $results = $Results_Class->new;
 
-    if ($programmer) {
-        $results->data($programmer);
-        $auditor->save;
-    } else {
-        my $programmer_id = params->{programmer_id};
-        $results->add_error(4400, "Update failed for PUT /programmer: programmer_id '$programmer_id' not found");
+    my $event = bacds::Scheduler::Model::Series
+        ->get_template_event($series_id);
+
+    #This can be empty, indicating that there isn't a template for this
+    #series_id
+    if ($event) {
+        $results->data($event);
+    }
+    else {
+        $results->data({
+            series => [{id => $series_id}],
+            is_template => 1,
+        });
     }
 
     return $results->format;
 };
 
-=head3 GET /betatest-cookie
+
+=head2 Other routes, non-getter/setter ones
+
+=head2 GET /betatest-cookie
 
 The DBIX_TEST=1 cookie lets you see the pages as produced by this new system.
 
@@ -1235,7 +787,7 @@ post '/betatest-cookie' => sub {
     redirect '/betatest-cookie' => 303;
 };
 
-=head3 GET /dancefinder
+=head2 GET /dancefinder
 
 Replacing the old dancefinder cgi, display the form
 
@@ -1305,7 +857,7 @@ get '/dancefinder' => sub {
 
 };
 
-=head3 GET /dancefinder-results
+=head2 GET /dancefinder-results
 
 Replacing the old dancefinder cgi, display the results
 
@@ -1616,7 +1168,11 @@ get '/serieslister' => with_types [
 };
 
 
-=head2 document_args
+=head2 Helper Methods
+
+Not routes.
+
+=head3 document_args
 
 For a virtual include that leads to the dance-scheduler, if we want
 to get the *original* query-string args, we need to get them from
@@ -1659,7 +1215,7 @@ sub document_args {
     );
 }
 
-=head2 ssi_uri_for
+=head3 ssi_uri_for
 
 If running through a virtual include, uses the original request
 path from REQUEST_URI (see notes in document_args()), otherwise
@@ -1689,7 +1245,5 @@ sub ssi_uri_for {
     # extra ${} from Dancer2's uri_for, w/ever
     return ${ $uri->canonical };
 }
-
-
 
 true;
