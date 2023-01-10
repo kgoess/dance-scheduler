@@ -31,11 +31,12 @@ form {
 <div>
     Check out:
     <ul>
-        <li>the front page
-        <li>the individual series pages
-        <li>the individual event pages
-        <li>the dancefinder
-        <li>the live/interactive calendar
+        <li><a href="https://bacds.org">the front page</a>
+        <li><a href="https://www.bacds.org/series/contra/berkeley_wed/">the individual series pages</a>
+        <li><a href="https://www.bacds.org/series/contra/berkeley_wed/?single-event=2023-02-02">the individual event pages</a>
+        <li><a href="https://www.bacds.org/dancefinder/">the dancefinder</a>
+        <li><a href="https://www.bacds.org/livecalendar.html">the live/interactive calendar</a>
+        <li><a href="https://bacds.org/calendars/2022/09/">archive calendar pages</a>
     </ul>
 </div>
 <form method="POST">
