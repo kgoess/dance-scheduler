@@ -12,5 +12,6 @@ CREATE TABLE venues (
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 
-    UNIQUE INDEX vkey_idx (vkey)
+    UNIQUE INDEX vkey_idx (vkey),
+    UNIQUE INDEX hall_name (hall_name)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;

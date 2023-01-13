@@ -9,7 +9,8 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 5;
+use Test::More tests => 6;
+use Test::Warn;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -40,14 +41,14 @@ subtest 'Invalid GET /talent/1' => sub{
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing found for talent_id 1',
-            num => 2601,
+            msg => 'Nothing found for Talent: primary key "1"',
+            num => 404,
         }]
     };
     eq_or_diff $decoded, $expected, 'error msg matches';
 };
 
-subtest 'POST /talent' => sub{
+subtest 'POST /talent' => sub {
     plan tests=>2;
 
     my ($expected, $res, $decoded, $got);
@@ -80,8 +81,34 @@ subtest 'POST /talent' => sub{
     $Talent_Id = $Talent->talent_id;
 };
 
+subtest 'POST /style duplicate' => sub {
+    plan tests => 3;
 
-subtest 'GET /talent/#' => sub{
+    my ($expected, $res, $decoded, $got);
+    my $dup_talent = {
+        name        => "test talent",
+    };
+    local $ENV{TEST_DUP_VALUE} = 'test talent';
+    warning_is {
+        $res = $test->request(POST '/talent/', $dup_talent );
+    } 'UNIQUE constraint failed: talent.name: test talent';
+
+    ok($res->is_success, 'still a 200-OK though');
+
+    $got = decode_json($res->content);
+    $expected = {
+        data   => "",
+        errors => [ {
+            msg => "There is already an entry for 'test talent' under Talent",
+            num => 409,
+          },
+        ],
+    };
+    eq_or_diff $got, $expected, 'return matches';
+};
+
+
+subtest 'GET /talent/#' => sub {
     plan tests=>2;
 
     my ($res, $decoded, $got, $expected);
@@ -144,12 +171,12 @@ subtest 'PUT /talent/#' => sub {
     $test->put_ok('/talent/45789', { content => $edit_talent })
         or die $test->res->content;
     $decoded = decode_json($test->res->content);
-    is $decoded->{errors}[0]{msg}, "Update failed for PUT /talent: talent_id '45789' not found",
+    is $decoded->{errors}[0]{msg}, 'Nothing found for Talent: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
 };
 
 
-subtest 'GET /talentAll' => sub{
+subtest 'GET /talentAll' => sub {
     plan tests => 2;
 
     my ($res, $decoded, $got, $expected);

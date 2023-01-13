@@ -9,7 +9,8 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 6;
+use Test::More tests => 7;
+use Test::Warn;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -40,8 +41,8 @@ subtest 'Invalid GET /style/1' => sub{
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing found for style_id 1',
-            num => 1401,
+            msg => 'Nothing found for Style: primary key "1"',
+            num => 404,
         }]
     };
     eq_or_diff $decoded, $expected, 'error msg matches';
@@ -75,6 +76,34 @@ subtest 'POST /style' => sub{
     $Style = $dbh->resultset('Style')->find($decoded->{data}{style_id});
     $Style_Id = $Style->style_id;
 };
+
+subtest 'POST /style duplicate' => sub {
+    plan tests => 3;
+
+    my ($expected, $res, $decoded, $got);
+    my $dup_style = {
+        name        => "test style",
+        style_id   => '', # the webapp sends name=test+style&style_id=
+    };
+    local $ENV{TEST_DUP_VALUE} = 'test style';
+    warning_is {
+        $res = $test->request(POST '/style/', $dup_style );
+    } 'UNIQUE constraint failed: styles.name: test style';
+
+    ok($res->is_success, 'still a 200-OK though');
+
+    $got = decode_json($res->content);
+    $expected = {
+        data   => "",
+        errors => [ {
+            msg => "There is already an entry for 'test style' under Style",
+            num => 409,
+          },
+        ],
+    };
+    eq_or_diff $got, $expected, 'return matches';
+};
+
 
 
 subtest 'GET /style/#' => sub{
@@ -133,7 +162,7 @@ subtest 'PUT /style/#' => sub {
     $test->put_ok('/style/45789', { content => $edit_style })
         or die $test->res->content;
     $decoded = decode_json($test->res->content);
-    is $decoded->{errors}[0]{msg}, "Update failed for PUT /style: style_id '45789' not found",
+    is $decoded->{errors}[0]{msg}, 'Nothing found for Style: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
 };
 

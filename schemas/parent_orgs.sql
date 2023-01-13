@@ -6,5 +6,6 @@ CREATE TABLE parent_orgs (
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
 
-    UNIQUE INDEX parent_org_id_idx(full_name)
+    UNIQUE INDEX parent_org_id_idx(full_name),
+    UNIQUE INDEX abbreviation_idx(abbreviation)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;

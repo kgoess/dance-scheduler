@@ -368,15 +368,12 @@ the nested data structures.
 
 get '/event/:event_id' => sub {
     my $event_id = params->{event_id};
+    my ($event, $err) = $event_model->get_row($event_id);
+
+    return $err->format if $err;
+
     my $results = $Results_Class->new;
-
-    my $event = $event_model->get_row($event_id);
-    if ($event) {
-        $results->data($event)
-    } else {
-        $results->add_error(1101, "Nothing found for event_id $event_id");
-    }
-
+    $results->data($event);
     return $results->format;
 };
 
@@ -390,17 +387,14 @@ Create a new event.
 post '/event/' => can_create_event sub {
     my $auditor = request->var('auditor');
 
-    my $event = $event_model->post_row($auditor, params);
+    my ($event, $err) = $event_model->post_row($auditor, params);
+
+    return $err->format if $err;
+
+    $auditor->save;
 
     my $results = $Results_Class->new;
-
-    if ($event) {
-        $results->data($event);
-        $auditor->save;
-    } else {
-        $results->add_error(1102, "Insert failed for new event");
-    }
-
+    $results->data($event);
     return $results->format;
 };
 
@@ -414,18 +408,14 @@ Update an existing event
 put '/event/:event_id' => can_edit_event sub {
     my $auditor = request->var('auditor');
 
-    my $event = $event_model->put_row($auditor, params);
+    my ($event, $err) = $event_model->put_row($auditor, params);
+
+    return $err->format if $err;
+
+    $auditor->save;
 
     my $results = $Results_Class->new;
-
-    if ($event) {
-        $results->data($event);
-        $auditor->save;
-    } else {
-        my $event_id = params->{event_id};
-        $results->add_error(1103, "Update failed for PUT /event: event_id '$event_id' not found");
-    }
-
+    $results->data($event);
     return $results->format;
 };
 
@@ -545,8 +535,6 @@ Returns all of the callers in the db not marked "is_deleted".
       ...
     "errors": [],
 
-=cut
-
 =head3 GET /caller/:caller_id
 
 =head3 POST /caller
@@ -590,8 +578,6 @@ The people that are allowed to make changes
 
 Returns all of the programmers in the db not marked "is_deleted".
 
-=cut
-
 =head3 GET /programmer/:programmer_id
 
 =head3 POST /programmer
@@ -602,35 +588,27 @@ Returns all of the programmers in the db not marked "is_deleted".
 
 my $routes_yaml = <<EOL;
 - model: style
-  err_code: 1400
   write_perm: requires_superuser
 
 - model: venue
-  err_code: 1700
   write_perm: requires_superuser
 
 - model: series
-  err_code: 2000
   write_perm: requires_superuser
 
 - model: band
-  err_code: 2300
   write_perm: requires_login
 
 - model: talent
-  err_code: 2600
   write_perm: requires_login
 
 - model: caller
-  err_code: 2900
   write_perm: requires_login
 
 - model: parent_org
-  err_code: 3200
   write_perm: requires_superuser
 
 - model: programmer
-  err_code: 3400
   read_perm: requires_login
   write_perm: requires_superuser
 
@@ -656,15 +634,13 @@ foreach my $r (@$routes) {
     get "/$r->{model}/:$pk_name" => $read_perm->(sub {
         my $pk = params->{$pk_name};
 
-        my $results = $Results_Class->new;
 
-        my $obj = $class_name->get_row($pk);
-        if ($obj) {
-            $results->data($obj);
-        } else {
-            my $err_code = $r->{err_code} + 1;
-            $results->add_error($err_code => "Nothing found for $pk_name $pk");
-        }
+        my ($obj, $err) = $class_name->get_row($pk);
+
+        return $err->format if $err;
+
+        my $results = $Results_Class->new;
+        $results->data($obj);
         return $results->format;
     });
 
@@ -674,17 +650,13 @@ foreach my $r (@$routes) {
     post "/$r->{model}/" => $write_perm->(sub {
         my $auditor = var 'auditor';
 
-        my $obj = $class_name->post_row($auditor, params);
+        my ($obj, $err) = $class_name->post_row($auditor, params);
+
+        return $err->format if $err;
 
         my $results = $Results_Class->new;
-
-        if ($obj) {
-            $results->data($obj);
-            $auditor->save;
-        } else {
-            my $err_code = $r->{err_code} + 2;
-            $results->add_error($r->{insert_error}, "Insert failed for new $r->{model}");
-        }
+        $results->data($obj);
+        $auditor->save;
         return $results->format;
     });
 
@@ -695,19 +667,14 @@ foreach my $r (@$routes) {
     put "/$r->{model}/:$pk_name" => $write_perm->(sub {
         my $auditor = request->var('auditor');
 
-        my $obj = $class_name->put_row($auditor, params);
+        my ($obj, $err) = $class_name->put_row($auditor, params);
+
+        return $err->format if $err;
+
+        $auditor->save;
 
         my $results = $Results_Class->new;
-
-        if ($obj) {
-            $results->data($obj);
-            $auditor->save;
-        } else {
-            my $pk = params->{$pk_name};
-            my $err_code = $r->{err_code} + 3;
-            $results->add_error($err_code, "Update failed for PUT /$r->{model}: $pk_name '$pk' not found");
-        }
-
+        $results->data($obj);
         return $results->format;
     });
 

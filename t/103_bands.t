@@ -9,7 +9,8 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 5;
+use Test::More tests => 6;
+use Test::Warn;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -29,7 +30,7 @@ my $Created_Time;
 my $Modified_Time;
 
 
-subtest 'Invalid GET /band/1' => sub{
+subtest 'Invalid GET /band/1' => sub {
     plan tests=>2;
 
     my ($res, $decoded, $got, $expected);
@@ -40,14 +41,14 @@ subtest 'Invalid GET /band/1' => sub{
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing found for band_id 1',
-            num => 2301,
+            msg => 'Nothing found for Band: primary key "1"',
+            num => 404,
         }]
     };
     eq_or_diff $decoded, $expected, 'error msg matches';
 };
 
-subtest 'POST /band' => sub{
+subtest 'POST /band' => sub {
     plan tests=>2;
 
     my ($expected, $res, $decoded, $got);
@@ -79,6 +80,32 @@ subtest 'POST /band' => sub{
     # now save it for the subsequent tests
     $Band = $dbh->resultset('Band')->find($decoded->{data}{band_id});
     $Band_Id = $Band->band_id;
+};
+
+subtest 'POST /band duplicate' => sub {
+    plan tests => 3;
+
+    my ($expected, $res, $decoded, $got);
+    my $dup_band = {
+        name        => "test band",
+    };
+    local $ENV{TEST_DUP_VALUE} = 'test band';
+    warning_is {
+        $res = $test->request(POST '/band/', $dup_band );
+    } 'UNIQUE constraint failed: bands.name: test band';
+
+    ok($res->is_success, 'still a 200-OK though');
+
+    $got = decode_json($res->content);
+    $expected = {
+        data   => "",
+        errors => [ {
+            msg => "There is already an entry for 'test band' under Band",
+            num => 409,
+          },
+        ],
+    };
+    eq_or_diff $got, $expected, 'return matches';
 };
 
 
@@ -147,7 +174,7 @@ subtest 'PUT /band/#' => sub {
     $test->put_ok('/band/45789', { content => $edit_band })
         or die $test->res->content;
     $decoded = decode_json($test->res->content);
-    is $decoded->{errors}[0]{msg}, "Update failed for PUT /band: band_id '45789' not found",
+    is $decoded->{errors}[0]{msg}, 'Nothing found for Band: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
 };
 

@@ -139,7 +139,8 @@ Return all information for a single row by primary key. Uses
 get_many_to_manys() and get_one_to_manys() from the child class to
 include data from related tables.
 
-Returns false if nothing found for $row_id
+If nothing found for $row_id returns a bacds::Scheduler::Util::Results object
+with the error bits filled in.
 
 =cut
 
@@ -157,7 +158,7 @@ sub get_row {
         }
 
     my $row = $dbh->resultset($model_name)->find($row_id)
-        or return false;
+        or return $class->not_found_error($row_id);
 
     my $other_tables = {};
     foreach my $other_table_name (@other_table_names){
@@ -174,7 +175,10 @@ Insert a new row. Uses get_fields_for_input from the child class to
 decide which fields can be set, and get_fkey_fields to know which must
 be converted to C<undef>.
 
-Technically all these updates should be wrapped in a transaction and rolled
+On a unique index collision returns a bacds::Scheduler::Util::Results object
+from duplicate_row_error with a 409 code.
+
+All these updates should be wrapped in a transaction and rolled
 back if anything fails. I'll add that to our TODO.txt list for Phase II.
 
 =cut
@@ -201,14 +205,27 @@ sub post_row {
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
 
+
+    my @pkey = $row->primary_columns;
+    my $pkey = $pkey[0]; #We're not using composite pkeys
+
     # technically all this should be wrapped in a transaction and rolled back
     # if any part fails
-    $row->insert();
+    eval {
+        $row->insert();
+        1;
+    } or do {
+        my ($err) = $@;
+        if (my ($msg, $value) = is_duplicate_err($err)) {
+            warn "$msg: $value"; # would be nice if we could add signed_in_as?
+            return $class->duplicate_row_error($value);
+        } else {
+            die $err;
+        }
+    };
 
     # fetch the row from the db to return so that they're getting the actual
     # results
-    my @pkey = $row->primary_columns;
-    my $pkey = $pkey[0]; #We're not using composite pkeys
     my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
 
     $auditor->target_id($row->$pkey);
@@ -224,6 +241,9 @@ sub post_row {
 
 Updates an existing row. Uses get_model_name(),
 get_fields_for_input(), and get_fkey_fields from descendent class.
+
+If nothing found for $row_id returns a bacds::Scheduler::Util::Results object
+with the error bits filled in.
 
 The multiple table updates in here should really be wrapped
 in a transaction. I'll note that in our TODO.txt.
@@ -242,7 +262,7 @@ sub put_row {
     my $pkey = $pkeys[0]; #We're not using composite pkeys
 
     my $row = $resultset->find($incoming_data{$pkey})
-        or return;
+        or return $class->not_found_error($incoming_data{$pkey});
 
     $auditor->target_id($row->$pkey);
 
@@ -265,7 +285,19 @@ sub put_row {
     $row->is_deleted(0) if not $row->is_deleted;
 
     # This should all be wrapped in a transaction.
-    $row->update();
+    eval {
+        $row->update();
+        1;
+    } or do {
+        my ($err) = $@;
+        # Duplicate entry 'Alice Callerton' for key 'caller_id_idx'
+        if ($err =~ /(?<msg>Duplicate entry '(?<value>.+?') for key '(?<key_name>.+?'))/) {
+            warn "$+{msg}\n"; # would be nice if we could add signed_in_as?
+            return $class->duplicate_row_error($+{value});
+        } else {
+            die $err;
+        }
+    };
 
     # fetch the row from the db to return so that they're getting the actual
     # results
@@ -288,6 +320,28 @@ sub filter_input {
     return $value;
 }
 
+sub not_found_error {
+    my ($class, $pk) = @_;
+
+    my $model_name = $class->get_model_name;
+    my $message = qq{Nothing found for $model_name: primary key "$pk"};
+
+    my $error = bacds::Scheduler::Util::Results->new;
+    $error->add_error(404, $message);
+    return undef, $error;
+}
+
+sub duplicate_row_error {
+    my ($class, $value) = @_;
+
+    my $model_name = $class->get_model_name;
+    my $message = "There is already an entry for '$value' under $model_name";
+
+    my $error = bacds::Scheduler::Util::Results->new;
+    $error->add_error(409, $message); # HTTP 409-Conflict
+
+    return undef, $error;
+}
 
 =head2 _row_to_result()
 
@@ -400,6 +454,24 @@ sub _update_relationships {
     }
 
     return $other_tables;
+}
+
+sub is_duplicate_err {
+
+    if ($_[0] =~ m{
+        # mysql
+        # Duplicate entry 'Alice Callerton' for key 'caller_id_idx'
+        (?<msg>(?-x)Duplicate entry '(?<value>.+?') for key '(?<key_name>.+?'))
+        |
+        # sqlite (unit tests
+        # UNIQUE constraint failed: styles.name [for Statement "INSERT INTO styles ...etc
+        (?<msg>(?-x)UNIQUE constraint failed: (?<key_name>[a-z_.]+))
+    }x) {
+        # TEST_DUP_VALUE: no easy way to get the value out of the sqlite
+        # message, so we'll just cheat for the tests and
+        return $+{msg}, $ENV{TEST_DUP_VALUE} // $+{value};
+    }
+    return;
 }
 
 1;

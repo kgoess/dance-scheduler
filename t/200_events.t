@@ -35,8 +35,8 @@ subtest 'Invalid GET /event/1' => sub{
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing found for event_id 1',
-            num => 1101,
+            msg => 'Nothing found for Event: primary key "1"',
+            num => 404,
         }]
     };
     eq_or_diff $decoded, $expected, 'error msg matches';
@@ -205,7 +205,7 @@ subtest "PUT /event/#" => sub {
     $test->put_ok('/event/45789', { content => $edit_event })
         or die $test->res->content;
     $decoded = decode_json($test->res->content);
-    is $decoded->{errors}[0]{msg}, "Update failed for PUT /event: event_id '45789' not found",
+    is $decoded->{errors}[0]{msg}, 'Nothing found for Event: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
     
 };

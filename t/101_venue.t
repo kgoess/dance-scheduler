@@ -10,7 +10,8 @@ use Plack::Test;
 use Ref::Util qw/is_coderef/;
 
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 5;
+use Test::More tests => 6;
+use Test::Warn;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -36,14 +37,14 @@ subtest 'Invalid GET /venue/1' => sub{
     $expected = {
         data => '',
         errors => [{
-            msg => 'Nothing found for venue_id 1',
-            num => 1701,
+            msg => 'Nothing found for Venue: primary key "1"',
+            num => 404,
         }]
     };
     is_deeply $decoded, $expected, 'error msg matches';
 };
 
-subtest 'POST /venue' => sub{
+subtest 'POST /venue' => sub {
     plan tests=>2;
     my ($res, $decoded, $expected, $got);
 
@@ -87,6 +88,35 @@ subtest 'POST /venue' => sub{
     $Venue = $dbh->resultset('Venue')->find($decoded->{data}{venue_id});
     $Venue_Id = $Venue->venue_id;
 
+};
+
+subtest 'POST /venue duplicate' => sub {
+    plan tests => 3;
+
+    my ($expected, $res, $decoded, $got);
+    my $dup_venue = {
+        venue_id           => '', # the webapp sends name=test+venue&venue_id=
+        vkey               => 'ABC', # this is "vkey" in the schema
+        hall_name          => 'test venue name',
+    };
+    $ENV{TEST_NOW} = 1651112285;
+    local $ENV{TEST_DUP_VALUE} = 'ABC';
+    warning_is {
+        $res = $test->request(POST '/venue/', $dup_venue );
+    } 'UNIQUE constraint failed: venues.vkey: ABC';
+
+    ok($res->is_success, 'still a 200-OK though');
+
+    $got = decode_json($res->content);
+    $expected = {
+        data   => "",
+        errors => [ {
+            msg => "There is already an entry for 'ABC' under Venue",
+            num => 409,
+          },
+        ],
+    };
+    eq_or_diff $got, $expected, 'return matches';
 };
 
 
@@ -174,7 +204,7 @@ subtest 'PUT /venue/1' => sub {
     $test->put_ok('/venue/45789', { content => $edit_venue })
         or die $test->res->content;
     $decoded = decode_json($test->res->content);
-    is $decoded->{errors}[0]{msg}, "Update failed for PUT /venue: venue_id '45789' not found",
+    is $decoded->{errors}[0]{msg}, 'Nothing found for Venue: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
 
 };
