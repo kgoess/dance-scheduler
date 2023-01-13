@@ -9,7 +9,7 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -164,6 +164,38 @@ subtest 'PUT /style/#' => sub {
     $decoded = decode_json($test->res->content);
     is $decoded->{errors}[0]{msg}, 'Nothing found for Style: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
+};
+
+subtest 'PUT /style duplicate collision' => sub {
+    plan tests => 3;
+
+    my $collision = $dbh->resultset('Style')->new({
+        name => 'Style Collision',
+        is_deleted => 1, # so it doesn't show in the rest of the tests
+    });
+    $collision->insert;
+
+    my ($expected, $res, $decoded, $got);
+    my $dup_style = {
+        name        => 'Style Collision',
+    };
+    local $ENV{TEST_DUP_VALUE} = 'Style Collision';
+    warning_is {
+        $res = $test->request( PUT "/style/$Style_Id" , content => $dup_style);
+    } 'UNIQUE constraint failed: styles.name: Style Collision';
+
+    ok($res->is_success, 'still a 200-OK though');
+
+    $got = decode_json($res->content);
+    $expected = {
+        data   => "",
+        errors => [ {
+            msg => "There is already an entry for 'Style Collision' under Style",
+            num => 409,
+          },
+        ],
+    };
+    eq_or_diff $got, $expected, 'return matches';
 };
 
 

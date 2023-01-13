@@ -10,7 +10,7 @@ use Plack::Test;
 use Ref::Util qw/is_coderef/;
 
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -207,6 +207,41 @@ subtest 'PUT /venue/1' => sub {
     is $decoded->{errors}[0]{msg}, 'Nothing found for Venue: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
 
+};
+
+subtest 'PUT /venue duplicate collision' => sub {
+    plan tests => 3;
+
+    my $collision = $dbh->resultset('Venue')->new({
+        vkey => 'COLL',
+        hall_name => 'Name In Use',
+        is_deleted => 1, # so it doesn't show in the rest of the tests
+    });
+    $collision->insert;
+
+    my ($expected, $res, $decoded, $got);
+    my $dup_venue = {
+        vkey               => 'NONONO', # this is "vkey" in the schema
+        hall_name          => 'Name In Use',
+    };
+    $ENV{TEST_NOW} = 1651112285;
+    local $ENV{TEST_DUP_VALUE} = 'Name In Use';
+    warning_is {
+        $res = $test->request( PUT "/venue/$Venue_Id" , content => $dup_venue);
+    } 'UNIQUE constraint failed: venues.hall_name: Name In Use';
+
+    ok($res->is_success, 'still a 200-OK though');
+
+    $got = decode_json($res->content);
+    $expected = {
+        data   => "",
+        errors => [ {
+            msg => "There is already an entry for 'Name In Use' under Venue",
+            num => 409,
+          },
+        ],
+    };
+    eq_or_diff $got, $expected, 'return matches';
 };
 
 subtest 'GET /venueAll' => sub {

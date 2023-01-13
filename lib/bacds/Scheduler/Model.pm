@@ -291,9 +291,9 @@ sub put_row {
     } or do {
         my ($err) = $@;
         # Duplicate entry 'Alice Callerton' for key 'caller_id_idx'
-        if ($err =~ /(?<msg>Duplicate entry '(?<value>.+?') for key '(?<key_name>.+?'))/) {
-            warn "$+{msg}\n"; # would be nice if we could add signed_in_as?
-            return $class->duplicate_row_error($+{value});
+        if (my ($msg, $value) = is_duplicate_err($err)) {
+            warn "$msg: $value"; # would be nice if we could add signed_in_as?
+            return $class->duplicate_row_error($value);
         } else {
             die $err;
         }
