@@ -194,7 +194,7 @@ subtest "PUT /event/# with venues" => sub {
 
     my $other_venue = {
         vkey        => 'VZZ',
-        hall_name   => 'the hall',
+        hall_name   => 'the other hall',
         address     => '123 Sesame St.',
         city        => 'Gotham',
         zip         => '02134',
@@ -205,6 +205,7 @@ subtest "PUT /event/# with venues" => sub {
     ok($test->success, 'created venue') or die $test->content;
 
     $decoded = decode_json($test->content);
+    $decoded->{data} or dump $decoded;
     my $other_venue_id = $decoded->{data}{venue_id};
 
     my $edit_event = {
