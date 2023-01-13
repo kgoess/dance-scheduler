@@ -189,13 +189,15 @@ post '/facebook-signin' => sub {
     my $access_token = params->{access_token}
         or send_error 'missing parameter "access_token"' => 400;
 
-    my ($email, $err) = bacds::Scheduler::FederatedAuth
+    my ($programmer, $err) = bacds::Scheduler::FederatedAuth
         ->check_facebook_auth($access_token);
 
     if ($err) {
         my ($code, $msg) = @$err;
         send_error $msg => $code;
     }
+
+    my $email = $programmer->email;
 
     # Checking the facebook cookie requires making an HTTP request to facebook
     # every time, so instead of doing that, we'll use our own session cookie.
