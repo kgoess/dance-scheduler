@@ -71,6 +71,8 @@ phase I:
     displayItemRow's checkbox-item logic
  DONE WELL GOOD ENOUGH ANYWAY talk about "sidebar", see a47b7c918239
     -- create a sidebar options table that links to events, to allow including and sorting options as desired
+ DONE- add transactions in functions like bacds::Scheduler::Model->post_row and
+   ->put_row that update multiple tables
 
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
@@ -105,8 +107,6 @@ phase II:
  - the listbox showing existing things would be completely retooled, with
    filtering and who knows
  - CALDAV output
- - add transactions in functions like bacds::Scheduler::Model->post_row and
-   ->put_row that update multiple tables
  - add spinner for login buttons, see recommendation here:
     https://developers.facebook.com/docs/facebook-login/web/login-button/
  - add spinner for other document loading stuff in the main page?

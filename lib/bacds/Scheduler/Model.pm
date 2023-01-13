@@ -178,8 +178,8 @@ be converted to C<undef>.
 On a unique index collision returns a bacds::Scheduler::Util::Results object
 from duplicate_row_error with a 409 code.
 
-All these updates should be wrapped in a transaction and rolled
-back if anything fails. I'll add that to our TODO.txt list for Phase II.
+All these updates are wrapped in a transaction and rolled back if anything
+fails.
 
 =cut
 
@@ -209,32 +209,35 @@ sub post_row {
     my @pkey = $row->primary_columns;
     my $pkey = $pkey[0]; #We're not using composite pkeys
 
-    # technically all this should be wrapped in a transaction and rolled back
-    # if any part fails
-    eval {
-        $row->insert();
-        1;
-    } or do {
-        my ($err) = $@;
-        if (my ($msg, $value) = is_duplicate_err($err)) {
-            warn "$msg: $value"; # would be nice if we could add signed_in_as?
-            return $class->duplicate_row_error($value);
-        } else {
-            die $err;
-        }
+    # all this is wrapped in a transaction so rolled back if any part fails
+    my $inserter = sub {
+        eval {
+            $row->insert();
+            1;
+        } or do {
+            my ($err) = $@;
+            if (my ($msg, $value) = is_duplicate_err($err)) {
+                warn "$msg: $value"; # would be nice if we could add signed_in_as?
+                return $class->duplicate_row_error($value);
+            } else {
+                die $err;
+            }
+        };
+
+        # fetch the row from the db to return so that they're getting the actual
+        # results
+        my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
+
+        $auditor->target_id($row->$pkey);
+        my $audit_name = $retrieved_row->can('name') ? ' "'.$retrieved_row->name.'"' : '';
+        $auditor->message(qq{created $model_name$audit_name});
+
+        my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh);
+
+        return $class->_row_to_result($retrieved_row, $other_tables);
     };
 
-    # fetch the row from the db to return so that they're getting the actual
-    # results
-    my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
-
-    $auditor->target_id($row->$pkey);
-    my $audit_name = $retrieved_row->can('name') ? ' "'.$retrieved_row->name.'"' : '';
-    $auditor->message(qq{created $model_name$audit_name});
-
-    my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh);
-
-    return $class->_row_to_result($retrieved_row, $other_tables);
+    return $dbh->txn_do($inserter);
 }
 
 =head2 put_row()
@@ -245,8 +248,8 @@ get_fields_for_input(), and get_fkey_fields from descendent class.
 If nothing found for $row_id returns a bacds::Scheduler::Util::Results object
 with the error bits filled in.
 
-The multiple table updates in here should really be wrapped
-in a transaction. I'll note that in our TODO.txt.
+The multiple table updates in here is wrapped in a transaction.
+See https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#TRANSACTIONS
 
 =cut
 
@@ -284,28 +287,32 @@ sub put_row {
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
 
-    # This should all be wrapped in a transaction.
-    eval {
-        $row->update();
-        1;
-    } or do {
-        my ($err) = $@;
-        # Duplicate entry 'Alice Callerton' for key 'caller_id_idx'
-        if (my ($msg, $value) = is_duplicate_err($err)) {
-            warn "$msg: $value"; # would be nice if we could add signed_in_as?
-            return $class->duplicate_row_error($value);
-        } else {
-            die $err;
-        }
+    # all this is wrapped in a transaction so rolled back if any part fails
+    my $updater = sub {
+        eval {
+            $row->update();
+            1;
+        } or do {
+            my ($err) = $@;
+            # Duplicate entry 'Alice Callerton' for key 'caller_id_idx'
+            if (my ($msg, $value) = is_duplicate_err($err)) {
+                warn "$msg: $value"; # would be nice if we could add signed_in_as?
+                return $class->duplicate_row_error($value);
+            } else {
+                die $err;
+            }
+        };
+
+        # fetch the row from the db to return so that they're getting the actual
+        # results
+        my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
+
+        my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh, $auditor);
+
+        return $class->_row_to_result($retrieved_row, $other_tables);
     };
 
-    # fetch the row from the db to return so that they're getting the actual
-    # results
-    my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
-
-    my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh, $auditor);
-
-    return $class->_row_to_result($retrieved_row, $other_tables);
+    return $dbh->txn_do($updater);
 };
 
 =head2 filter_input($field, $value)
@@ -469,7 +476,15 @@ sub is_duplicate_err {
     }x) {
         # TEST_DUP_VALUE: no easy way to get the value out of the sqlite
         # message, so we'll just cheat for the tests and
-        return $+{msg}, $ENV{TEST_DUP_VALUE} // $+{value};
+        my $value = $+{value} // $ENV{TEST_DUP_VALUE};
+        if (! $value) {
+            if ($0 =~ /\.t$/) {
+                $value = 'Set ENV{TEST_DUP_VALUE} in your test if you want something here';
+            } else {
+                $value = '(value unavailable)'
+            }
+        };
+        return $+{msg}, $value;
     }
     return;
 }
