@@ -28,7 +28,7 @@ Knows to use $ENV{TEST_DSN} from the unit tests if set.
 If using the production mysql dsn will read the mysql password from the first
 readable one of:
 
-    /var/www/bacds.org/dance-scheduler/private/mysql-password'
+    /var/www/bacds.org/dance-scheduler/private/mysql-password
     ~/.mysql-password
 
 Can also set $ENV{DBIX_DEBUG} instead of passing debug => 1.
@@ -48,13 +48,13 @@ sub get_dbh {
     my %dbi_params = (
         mysql_enable_utf8 => 1,
         AutoCommit => 1, # recommended by DBIx::Class::Schema
-        sqlite_unicode => 1,
     );
 
     if ($dbi_dsn =~ /^dbi::SQLite/) { # unit tests
         require DBD::SQLite::Constants;
         $dbi_params{sqlite_string_mode} =
             DBD::SQLite::Constants::DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK();
+        $dbi_params{sqlite_unicode} = 1,
     }
 
     my $password = _get_password();

@@ -266,7 +266,7 @@ sub check_facebook_auth {
 
     my $dbh = get_dbh();
     # This had been using:
-    #     my $rows = bacds::Scheduler::Model::Programmer->get_multiple_rows({
+    #     my $rows = bacds::Scheduler::Model::Programmer->get_multiple_rows
     # but that is more verbose, we don't want multiple rows, and we want
     # a Programmer object we can call methods on, not a generic hash
     # (for which a mis-typed key can silently fail to give you data).
