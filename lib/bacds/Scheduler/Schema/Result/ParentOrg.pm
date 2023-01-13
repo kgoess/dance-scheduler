@@ -112,6 +112,18 @@ __PACKAGE__->set_primary_key("parent_org_id");
 
 =head1 UNIQUE CONSTRAINTS
 
+=head2 C<abbreviation_idx>
+
+=over 4
+
+=item * L</abbreviation>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("abbreviation_idx", ["abbreviation"]);
+
 =head2 C<parent_org_id_idx>
 
 =over 4
@@ -142,8 +154,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GtPoMAeR66n/xoMqrZtUDA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-01-12 22:02:37
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Tfyf31s9E4Hhd/qNUT2kkQ
 
 
 use Role::Tiny::With;
