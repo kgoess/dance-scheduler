@@ -45,6 +45,7 @@ body {
         <em><% event.name %></em>
     <%- END %>
     <% event.short_desc %>
+    <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
 
     </p>
 <% END %>
