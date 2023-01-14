@@ -73,31 +73,30 @@ phase I:
     -- create a sidebar options table that links to events, to allow including and sorting options as desired
  DONE- add transactions in functions like bacds::Scheduler::Model->post_row and
    ->put_row that update multiple tables
+ DONE adding a dup caller just throws a server error--be more helpful
+ DONE fix it so you can develop on a copy of the production database
+ DONE want audit logs!
+ DONE refactor all that repetition in the templates
+ DONE - work out that is_deleted field--it shouldn't be exposed (there should be a
+   'delete' button), and it should do something on the backend
+   this doesn't seem like an issue currently? "fixed but has display bug with
+    events, synthetic field--just get the row being displayed in the dropdown
+    instead"
+ WORKING NOW- BUG! if I manually add OSEGB band with members, it doesn't seem to add the members
+    to an existing event?
+ DONE make sure the serieslister is getting all the related stuff in one query
+ DONE new question: why is short_desc a required field? it seems to be not needed for
+    a regular series dance? if there's a reason, then add a help button.
 
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
  - function handleError(err) * TODO this should be added to all the requests
- - adding a dup caller just throws a server error--be more helpful
-       Route exception: DBIx::Class::Storage::DBI::_dbh_execute(): DBI Exception:
-       DBD::mysql::st execute failed: Duplicate entry 'Bruce Herbold' for key
-       'caller_id_idx' [for Statement "INSERT INTO callers
  - better styling for dancefinder results page? at least a "back to search"
    link? and for the search page?
  - some of the series pages, are broke--display text above or beside sidebar?
-
- - work out that is_deleted field--it shouldn't be exposed (there should be a
-   'delete' button), and it should do something on the backend
-FIXED BUT HAS DISPLAY BUG WITH EVENTS, SYNTHETIC FIELD--JUST GET THE ROW BEING DISPLAYED IN THE DROPDOWN INSTEAD
- - new question: why is short desc a required field? it seems to be not needed for
-    a regular series dance? if there's a reason, then add a help button.
- - BUG! if I manually add OSEGB band with members, it doesn't seem to add the members
-    to an existing event?
  - check out the short_desc in the template for https://bacds.org/series/english/berkeley_sat/, is that right?
  - what about the <style> tags in upcoming-events.tt? good enough or what?
- - make sure the serieslister is getting all the related stuff in one query
- - fix it so you can develop on a copy of the production database
  - I suspect we want a long_desc in the events table
- - want audit logs!
 
 phase II:
 
@@ -111,4 +110,3 @@ phase II:
     https://developers.facebook.com/docs/facebook-login/web/login-button/
  - add spinner for other document loading stuff in the main page?
  - create "pricing" table that maps to events
- - refactor all that repetition in the templates
