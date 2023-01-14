@@ -1,3 +1,7 @@
+import {
+    multiSelectOptionAdd,
+} from "./helper-functions.js";
+
 $( document ).ready(function() {
 
     /* This is the code for the modal that pops up when you add a band to an event.
