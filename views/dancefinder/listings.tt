@@ -26,7 +26,7 @@ body {
         <%- FOREACH caller IN event.callers %>
             <% caller.name %><% IF !loop.last() %>, <% END %>
         <%- END %>
-        <%- IF event.bands || event.talent %>with<% END %>
+        <%- IF event.bands || event.talent %> with <% END %>
     <%- ELSE %>
         <%- IF event.bands || event.talent %>
             Music by
@@ -44,7 +44,7 @@ body {
         <%# if it's a special event, print out the title.'%>
         <em><% event.name %></em>
     <%- END %>
-    <% event.short_desc %>
+    <% IF event.short_desc %> - <% END %><% event.short_desc %>
     <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
 
     </p>

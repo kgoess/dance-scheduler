@@ -61,14 +61,19 @@ body {
                     <% caller.name %><% IF !loop.last() %>, <% END %>
                 <% END %>
             <% END %>
-            <% IF event.bands.size() %>
+            <br/>
+            <% IF event.bands.size() || event.talent.size() %>
                 Band:
+            <% END %>
+            <% IF event.bands.size() %>
                 <% FOREACH band IN event.bands %>
                     <% band.name %><% IF !loop.last() %>, <% END %>
                 <% END %>
+                <% IF event.talent.size() %>
+                    with
+                <% END %>
             <% END %>
             <% IF event.talent.size() %>
-                with
                 <% FOREACH talent IN event.talent %>
                     <% talent.name %><% IF !loop.last() %>, <% END %>
                 <% END %>
