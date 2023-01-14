@@ -87,7 +87,7 @@
       type: time
     - label: Short Desc.
       name: short_desc
-      required: 1
+      required: 0
       type: textarea
     - label: Custom URL
       name: custom_url
