@@ -24,5 +24,5 @@ schema_files="
 
 for schema_file in $schema_files ; do
 	echo $schema_file
-	mysql -uscheduler --password=`cat ~/.mysql-password` schedule < $script_dir/$schema_file
+	mysql -uscheduler --password=`cat /var/www/bacds.org/dance-scheduler/private/mysql-password` schedule < $script_dir/$schema_file
 done

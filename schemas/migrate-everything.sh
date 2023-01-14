@@ -5,6 +5,9 @@ script_dir=$(dirname "$0")
 
 export PERL5LIB=$script_dir/../lib:$PERL5LIB
 
+# trigger bacds::Scheduler::Util::Db to use database "scheduler" not "scheduler_test"
+export DANCER_ENVIRONMENT=production
+
 $script_dir/../bin/migrate-talent.pl
 $script_dir/../bin/migrate-bands.pl
 $script_dir/../bin/migrate-styles.pl

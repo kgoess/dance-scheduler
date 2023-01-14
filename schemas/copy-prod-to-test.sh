@@ -22,6 +22,12 @@ tables="
 "
 
 for table in $tables; do
-	echo $table
-	mysql -uscheduler --password=`cat /var/www/bacds.org/dance-scheduler/private/mysql-password` schedule -e "drop table $table"
+    echo $table
+	mysql -uscheduler_test --password=`cat ~/.mysql-password` schedule_test -e "drop table $table"
 done
+
+set -x
+
+sudo mysqldump -uroot schedule > schedule.dump
+sudo mysql -uroot schedule_test < schedule.dump
+rm schedule.dump
