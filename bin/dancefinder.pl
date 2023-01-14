@@ -14,16 +14,21 @@ use bacds::Scheduler::Util::Time qw/get_today/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 
-my ($days, @style, $basedir, $verbose, $help);
+my ($days, @style, $basedir, $db, $dbuser, $verbose, $help);
 GetOptions (
     'days=i'         => \$days,
     'style=s'        => \@style,
     'b|basedir=s'    => \$basedir,
+    'db=s'           => \$db,
+    'dbuser=s'       => \$dbuser,
     "h|help"         => \$help,
     "verbose|debug"  => \$verbose,
 );
 
 pod2usage(1) if $help;
+
+$db ||= 'schedule';
+$dbuser ||= 'scheduler';
 
 my $end_date;
 if (defined $days) {
@@ -35,7 +40,7 @@ $basedir ||= '/var/www/bacds.org/dance-scheduler';
 
 
 # need to translate the style names to style_ids
-my $dbh = get_dbh(dbix_debug => $verbose);
+my $dbh = get_dbh(dbix_debug => $verbose, db => $db, user => $dbuser);
 my @style_ids;
 if (@style) {
     foreach my $style_name (@style) {
@@ -52,6 +57,8 @@ my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
     end_date   => $end_date,
     style      => \@style_ids,
     dbix_debug => $verbose,
+    db         => $db,
+    dbuser     => $dbuser
 );
 my @events = $rs->all;
 say "found ".scalar(@events)." events" if $verbose;
@@ -81,10 +88,13 @@ the front page, via cron.
 Usage: dancefinder.pl [options]
 
  Options:
-   --days        number of days to search 
-   --style       (multiple allowed) e.g. CAMP
+   --days     number of days to search
+   --style    (multiple allowed) e.g. CAMP
+   --db       (defaults to "schedule", is if you want "schedule_test")
+   --dbuser   (defaults to "scheduler", is if you want "scheduler_test")
+
    -b|--basedir  defaults to /var/www/bacds.org/dance-scheduler
-   -v|--verbose 
+   -v|--verbose
    -h|--help     this help message
 
 

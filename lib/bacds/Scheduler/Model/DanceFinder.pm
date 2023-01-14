@@ -146,10 +146,13 @@ sub search_events {
     my $muso_arg       = delete $args{muso}       || [];
     my $style_arg      = delete $args{style}      || [];
     my $dbix_debug     = delete $args{dbix_debug};
+    # db and dbuser are for dancefinder.pl
+    my $db_arg         = delete $args{db};
+    my $dbuser_arg     = delete $args{dbuser};
     die "unrecognized args in call to search_events ".join(', ', sort keys %args)
         if %args;
 
-    my $dbh = get_dbh(debug => $dbix_debug);
+    my $dbh = get_dbh(debug => $dbix_debug, db => $db_arg, user => $dbuser_arg);
 
     # These prefetches means all the data is fetched with one big
     # JOIN, you can verify that by adding debug=>1 in the
