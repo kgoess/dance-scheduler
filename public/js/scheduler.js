@@ -150,22 +150,4 @@ $( document ).ready(function() {
     $( '.datepicker' ).datepicker({
           dateFormat: "yy-mm-dd"
     });
-
-
-    const loginRedirectModal = $( '#login-redirect-modal' ).dialog({
-        autoOpen: false,
-        height: 400,
-        width: 400,
-        modal: true,
-    });
-    const insufficientPermissionsModal = $( '#insufficient-permissions-modal' ).dialog({
-        autoOpen: false,
-        height: 400,
-        width: 400,
-        modal: true,
-    });
-
-
-
-
 });
