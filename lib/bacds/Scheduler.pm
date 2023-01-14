@@ -280,6 +280,7 @@ get '/' => requires_login sub {
     template 'accordion' => {
         title => 'Dance Scheduler',
         signed_in_as => vars->{signed_in_as}->email,
+        test_db_name => bacds::Scheduler::Util::Db->using_test_db,
         accordion => $accordion,
     };
 };

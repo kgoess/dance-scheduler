@@ -3,25 +3,21 @@
 use 5.16.0;
 use warnings;
 
+# local::lib is a no-op if already loaded
+use local::lib '/var/lib/dance-scheduler';
+
 use Getopt::Long;
 use Pod::Usage qw/pod2usage/;
 
-eval {
-    require bacds::Scheduler::Util::Db;
-    require bacds::Scheduler::FederatedAuth;
-};
-if ($@) {
-   die "\nERROR: Loading the code failed, try running this first:\n\n".
-    "       eval \$(perl -Mlocal::lib=/var/lib/dance-scheduler)\n\n".
-    "Error was:\n$@\\nn";
-}
-bacds::Scheduler::Util::Db->import( qw/get_dbh/ );
+use bacds::Scheduler::Util::Db qw/get_dbh/;
+use bacds::Scheduler::FederatedAuth;
 
-
-my ($email, $unset, $help);
+my ($email, $unset, $db, $dbuser, $help);
 GetOptions(
     'email=s' => \$email,
     'unset' => \$unset,
+    'db=s' => \$db,
+    'dbuser=s' => \$dbuser,
     'h|help' => \$help,
 ) or die("Error in command line arguments\n");
 
@@ -29,7 +25,9 @@ if ($help || !$email) {
     pod2usage(-verbose => 2);
 }
 
-my $dbh = get_dbh();
+$db ||= 'schedule';
+$dbuser ||= 'scheduler';
+my $dbh = get_dbh(db => $db, user => $dbuser);
 my $rs = $dbh->resultset('Programmer')->search({
     email => $email
 });
@@ -70,6 +68,11 @@ dance-scheduler-user-password.pl - set the password for a user
 Or to unset a password (and force them to log in via facebook/google)
 
     $ dance-scheduler-user-password.pl --email foo@bar.com --unset
+
+Also accepts:
+
+    --db (defaults to "schedule", is if you want "schedule_test")
+    --dbuser (defaults to "scheduler", is if you want "scheduler_test")
 
 =head1 DESCRIPTION
 

@@ -15,6 +15,7 @@
     </span>
     <span id="header-info">
         You are signed in as <% signed_in_as %><br>
+        <% IF test_db_name %>(using the <% test_db_name %> db)<br><% END %>
         <a href="<% request.uri_base %>/signout">Log out</a>
     </span>
 </div>

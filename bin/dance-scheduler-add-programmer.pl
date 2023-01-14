@@ -3,26 +3,21 @@
 use 5.16.0;
 use warnings;
 
+# local::lib is a no-op if already loaded
+use local::lib '/var/lib/dance-scheduler';
+
 use Getopt::Long;
 use Pod::Usage qw/pod2usage/;
 
-eval {
-     require bacds::Scheduler::Util::Db;
-};
-if ($@) {
-   die "\nERROR: Loading the code failed, try running this first:\n\n".
-    "       eval \$(perl -Mlocal::lib=/var/lib/dance-scheduler)\n\n".
-    "Error was:\n$@\\nn";
-}
+use bacds::Scheduler::Util::Db qw/get_dbh/;
 
-bacds::Scheduler::Util::Db->import( qw/get_dbh/ );
-
-
-my ($name, $email, $is_superuser, $help);
+my ($name, $email, $is_superuser, $db, $dbuser, $help);
 GetOptions(
     'n|name=s' => \$name,
     'e|email=s' => \$email,
     'is-superuser' => \$is_superuser,
+    'db=s' => \$db,
+    'dbuser=s' => \$dbuser,
     'h|help' => \$help,
 ) or die("Error in command line arguments\n");
 
@@ -30,7 +25,11 @@ if ($help || !($name && $email)) {
     pod2usage(-verbose => 2);
 }
 
-my $dbh = get_dbh();
+$db ||= 'schedule';
+$dbuser ||= 'scheduler';
+$is_superuser //= 0;
+
+my $dbh = get_dbh(db => $db, user => $dbuser);
 my $new = $dbh->resultset('Programmer')->new({
     name => $name,
     is_superuser => $is_superuser,
@@ -40,7 +39,7 @@ my $new = $dbh->resultset('Programmer')->new({
 
 $new->insert;
 
-say "New user $email/$name has been added to the database";
+say qq{New user $email/$name has been added to the "$db" database};
 
 exit;
 
@@ -54,7 +53,11 @@ dance-scheduler-add-programmer.pl - add a login for a programmer
 
     $ dance-scheduler-add-programmer.pl --name 'Alice Programmer' --email alice@example.com
 
-Also accepts --is-superuser.
+Also accepts:
+
+    --is-superuser.
+    --db (defaults to "schedule", is if you want "schedule_test")
+    --dbuser (defaults to "scheduler", is if you want "scheduler_test")
 
 =head1 DESCRIPTION
 
