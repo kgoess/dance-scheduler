@@ -10,6 +10,12 @@ bacds::Scheduler::Model::SeriesLister - fetch data for upcoming events in a seri
         series_xid => 'BERK-ENGLISH',
     );
 
+or
+
+    $data = $c->get_event_details(
+        event_id => 123,
+    );
+
 =head1 DESCRIPTION
 
 This is replacing the functions of the old serieslists.pl.
@@ -57,17 +63,35 @@ sub get_upcoming_events_for_series {
         : (series_id => $args{series_id})
     ;
 
-    $series = $dbh->resultset('Series')->find({
-        is_deleted => 0,
-        @search_arg,
-    }) or croak "get_upcoming_events_for_series can't ".
+    $series = $dbh->resultset('Series')->find(
+        {
+            is_deleted => 0,
+            @search_arg,
+        },
+    ) or croak "get_upcoming_events_for_series can't ".
                 "find any series for @search_arg";
 
-    my @events = $dbh->resultset('Event')->search({
-        is_deleted => 0,
-        series_id => $series->series_id,
-        start_date => { '>=' => get_today()->ymd },
-    });
+    # These prefetches means all the data is fetched with one big
+    # JOIN, you can verify that by adding debug=>1 in the
+    # get_dbh call above
+    my @prefetches = (
+        {event_callers_maps => 'caller'},
+        {event_styles_maps => 'style'},
+        {event_talent_maps => 'talent'},
+        {event_venues_maps => 'venue'},
+        {event_band_maps => {band => { band_memberships => 'talent'}}},
+    );
+
+    my @events = $dbh->resultset('Event')->search(
+        {
+            'me.is_deleted' => 0,
+            'me.series_id' => $series->series_id,
+            'me.start_date' => { '>=' => get_today()->ymd },
+        },
+        {
+            prefetch => \@prefetches,
+        },
+    );
 
     return {
         series => $series,
@@ -91,11 +115,29 @@ sub get_event_details {
 
     my $dbh = get_dbh(debug => 0);
 
-    my $event = $dbh->resultset('Event')->find({
-        #ask for it explicitly and you can get it even if it's deleted
-        #is_deleted => 0,
-        event_id => $event_id,
-    });
+    # These prefetches means all the data is fetched with one big
+    # JOIN, you can verify that by adding debug=>1 in the
+    # get_dbh call above
+    my @prefetches = (
+        'series',
+        {event_callers_maps => 'caller'},
+        {event_styles_maps => 'style'},
+        {event_talent_maps => 'talent'},
+        {event_venues_maps => 'venue'},
+        {event_band_maps => {band => { band_memberships => 'talent'}}},
+    );
+
+    my $event = $dbh->resultset('Event')->find(
+        {
+            #ask for an event explicitly and we'll give it to you even
+            #if it's deleted
+            #is_deleted => 0,
+            event_id => $event_id,
+        },
+        {
+            prefetch => \@prefetches,
+        },
+    );
 
     return {
         series => $event->series,

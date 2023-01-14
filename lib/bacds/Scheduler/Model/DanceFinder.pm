@@ -22,8 +22,8 @@ use bacds::Scheduler::Util::Time qw/get_today/;
 
 =head2 related_entities_for_upcoming_events
 
-Loads events within the date range, preloading all the related tables the
-dancefinder needs to display the input form.
+Load events within the date range, and load the stuff from the related
+tables the dancefinder needs to display the input form.
 
 =cut
 
@@ -32,6 +32,7 @@ sub related_entities_for_upcoming_events {
 
     my $rs = _all_upcoming_events();
 
+    # this all is for displaying the dropdowns on the input form:
     my (%stylehash, %venuehash, %bandhash, %musohash, %callerhash);
     while (my $event = $rs->next) {
         # grab the callers
@@ -84,11 +85,10 @@ sub related_entities_for_upcoming_events {
     };
 }
 
-# _all_upcoming_events is a simpler version of do_search, it takes no args and
-# it doesn't do the subselect make sure all the related tables are loaded
-# whether they match the args or not, so this is more suited for the front-page
-# display.
-# It also includes is_deleted objects, those are filtered in the caller.
+# _all_upcoming_events is a simpler version of search_events, it takes
+# no args and it doesn't do the subselect. It makes sure all the
+# related tables are loaded whether they match the args or not, so
+# this is more suited for displaying the form with its drop-downs.
 sub _all_upcoming_events {
 
     my $dbh = get_dbh(debug => 0);
