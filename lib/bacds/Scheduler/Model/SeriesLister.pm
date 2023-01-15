@@ -90,6 +90,7 @@ sub get_upcoming_events_for_series {
         },
         {
             prefetch => \@prefetches,
+            order_by => 'start_date',
         },
     );
 
