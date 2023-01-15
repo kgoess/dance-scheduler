@@ -3,6 +3,15 @@ This is used for the dancefinder results page as well as to generate
 the tonight.html, 18-day.html, and specialevents.html bits of the main
 page.
 %>
+
+<% MACRO maybe_linkit(string, url) BLOCK %>
+    <% IF url %>
+        <a href="<% url %>"><% string %></a>
+    <% ELSE %>
+        <% string %>
+    <% END %>
+<% END %>
+
 <style>
 
 /* during the beta a/b testing this border lets you know if you're looking at
@@ -33,7 +42,7 @@ body {
         <% END %>
     <%- END %>
     <%- FOREACH band IN event.bands %>
-        <%- band.name %><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
+        <%- maybe_linkit(band.name, band.url) %><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
     <%- END %>
     <%- IF event.talent %>
         <%- FOREACH talent IN event.talent %>
