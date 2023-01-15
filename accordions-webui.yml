@@ -216,6 +216,12 @@
       name: name
       required: 1
       type: text
+    - label: Caller URL (Unused)
+      name: url
+      type: text
+    - label: Photo URL (Unused)
+      name: photo_url
+      type: text
     - name: caller_id
       type: hidden
 
@@ -226,6 +232,12 @@
     - label: Name
       name: name
       required: 1
+      type: text
+    - label: Band URL
+      name: url
+      type: text
+    - label: Photo URL (Unused)
+      name: photo_url
       type: text
     - label: Talent
       name: talent_id
@@ -243,6 +255,12 @@
     - label: Name
       name: name
       required: 1
+      type: text
+    - label: Talent URL (Unused)
+      name: url
+      type: text
+    - label: Photo URL (Unused)
+      name: photo_url
       type: text
     - name: talent_id
       type: hidden
