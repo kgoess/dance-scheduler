@@ -391,6 +391,7 @@ sub test_dancefinder_results_endpoint {
     like $body, qr{
         Thursday,.28.April,.2022:.<strong>CONTRA</strong>.at. \s+
         <a.href="https://bacds.org/dance-a-week/">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+        <a.href="https://bacds.org/dance-a-week/">More.Info</a> \s+
         </p>
     }x, "event2's title looks right, no event.name, no band, caller or talent";
 
@@ -577,6 +578,7 @@ sub test_serieslister_endpoint {
                 </b> \s+
                 <br./> \s+
                 Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+        <br./> \s+
         </p> \s+
         <p.class="comment"> \s+
         </p> \s+
@@ -600,6 +602,7 @@ sub test_serieslister_endpoint {
                 </b> \s+
                 <br./> \s+
                 Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+        <br./> \s+
         </p> \s+
         <p.class="comment"> \s+
         </p> \s+
