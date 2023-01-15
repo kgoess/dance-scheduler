@@ -963,9 +963,13 @@ get '/livecalendar-results' => with_types [
             $titlestring .= join ' and ', map $_->name, $event->callers->all;
             $titlestring .= '.';
         }
-        if ($event->bands != 0) {
+        if ($event->bands != 0 || $event->talent != 0) {
             $titlestring .= ' Music by ';
             $titlestring .= join ', ', map $_->name, $event->bands->all;
+            if ($event->bands != 0) {
+                $titlestring .= ': ';
+            }
+            $titlestring .= join ', ', map $_->name, $event->talent->all;
             $titlestring .= '.';
         }
 
