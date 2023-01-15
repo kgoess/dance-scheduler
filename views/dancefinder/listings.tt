@@ -42,10 +42,23 @@ body {
 <% FOREACH event IN events %>
     <div <% special_class(event) %>>
     <p class="listing">
-    <% event.start_date.strftime("%A, %e %B, %Y") %>: <strong>
+    <% event.start_date.strftime("%A, %e %B, %Y") %>: 
+    <% IF event.styles.grep('^SPECIAL$') && event.name %>
+        <% emphasize_name_over_style = 1 %>
+    <% END %>
+    <% IF emphasize_name_over_style %>
+        <span class="special-event-name"><% event.name %></span> (
+    <% ELSE %>
+        <strong>
+    <% END %>
     <%- FOREACH style IN event.styles %>
         <%- style.name %><% IF !loop.last() %>/<% END %>
-    <%- END %></strong>
+    <%- END %>
+    <% IF emphasize_name_over_style %>
+        )
+    <% ELSE %>
+        </strong>
+    <% END %>
     <%- IF event.venues %> at <% END %>
     <%- FOREACH venue IN event.venues %>
         <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
@@ -68,9 +81,9 @@ body {
             <%- talent.name %><% IF !loop.last() %>, <% END %>
         <%- END %>
     <%- END %>
-    <%- IF event.name %>
+    <% IF !emphasize_name_over_style && event.name %>
         <%# if it's a special event, print out the title.'%>
-        <em><% event.name %></em>
+        <span class="special-event-name"><% event.name %></span>
     <%- END %>
     <% IF event.short_desc %> - <% END %><% event.short_desc %>
     <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
