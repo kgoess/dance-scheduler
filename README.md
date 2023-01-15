@@ -31,8 +31,8 @@ The files in lib/bacds/Scheduler/Schema\* were generated via
          -o debug=1 \
          -o skip_load_external=1 \
          bacds::Scheduler::Schema \
-         'dbi:mysql:dbname=schedule' \
-         scheduler \
+         'dbi:mysql:dbname=schedule_test' \
+         scheduler_test \
          $(cat ~/.mysql-password)
 
 To start up dancer2 serving the content in the git repo on port :5000, e.g.
@@ -40,17 +40,28 @@ http://www.bacds.org:5000/signin.html run this:
 
     plackup -Ilib -p 5000 bin/app.psgi
 
+Live and Test Databases
+----
+
+The live database is "schedule" with the user "scheduler", password is in
+/var/www/bacds.org/dance-scheduler/private/. You can use
+schemas/copy-prod-to-test.sh to dump that to a "schedule_test" database
+accessible with the user "scheduler_test". If you use plackup to run a local
+copy of the app on like port 5000, it'll be using "schedule_test".
 
 How To Make Schema Changes
 ----
 
-1) Make your table changes
-2) In this git repo, run that "eval" and "dbicdump" command in the
-   "Development" section above, that will update the perl code.
-3) Update the relevant files in the "schemas/" directory.
-4) Run "make test" (see the "Install" section below for details) to see any
+1) Run schemas/copy-prod-to-test.sh
+2) Make your table changes in "schedule_test"
+3) In this git repo, run that "eval" and "dbicdump" command in the
+   "Development" section above, that will generate new the perl code.
+4) Update the relevant files in the "schemas/" directory.
+5) Run "make test" (see the "Install" section below for details) to see any
    changes needed in the unit tests and fix them up until they pass.
-5) Then see the "Install" section below.
+6) Then see the "Install" section below.
+7) ...and coordinate that with making your schema changes in the "schedule"
+   database.
 
 
 Install
@@ -90,9 +101,10 @@ Code Layout
 ./environments/development.yml
 ./environments/production.yml
 ./config.yml
+./accordions-webui.yml
 ./bin/app.psgi
 
-# these are TemplateToolkit templates that produce the html, dancer2 called the
+# these are TemplateToolkit templates that produce the html. dancer2 called the
 # directory "view" as part of the MVC pattern
 ./views/
 ./views/accordion2.tt
@@ -101,11 +113,11 @@ Code Layout
 ./views/index.tt
 #...etc.
 
-# lib contains the perl modules, they get installed to
-# /var/lib/dance-scheduler/lib/perl5
+# lib contains the perl modules, they get installed
+# to /var/lib/dance-scheduler/lib/perl5
 ./lib/
 
-# this is the main module and has all the url routes defined. It's the
+# this is the main module and is where all the url routes are defined. It's the
 # "Controller" in MVC
 ./lib/bacds/Scheduler.pm
 
@@ -113,19 +125,22 @@ Code Layout
 # with the additions we added in the marked "safe to update" sections
 ./lib/bacds/Scheduler/Schema.pm
 ./lib/bacds/Scheduler/Schema/Result
-./lib/bacds/Scheduler/Schema/Result/EventStylesMap.pm
-./lib/bacds/Scheduler/Schema/Result/Style.pm
-./lib/bacds/Scheduler/Schema/Result/Talent.pm
-#...etc.
+                            /Result/EventStylesMap.pm
+                            /Result/Style.pm
+                            /Result/Talent.pm
+                             #...etc.
 
 # these "Model" classes drive that part of the MVC in the app, and handle
 # requests and responses to the javascript app.
 ./lib/bacds/Scheduler/Model.pm
-./lib/bacds/Scheduler/Model/Band.pm
-./lib/bacds/Scheduler/Model/Caller.pm
-./lib/bacds/Scheduler/Model/Style.pm
-./lib/bacds/Scheduler/Model/Talent.pm
-# ..etc
+                     /Model/Band.pm
+                     /Model/Caller.pm
+                     /Model/Style.pm
+                     /Model/Talent.pm
+                     # ..etc
+# and these to drive the data for their own uses:
+                     /Model/Dancefinder.pm
+                     /Model/SeriesLister.pm
 
 # FederatedAuth handles the different auth schemes--Google, Facebook, BACDS,
 # etc.
@@ -140,10 +155,9 @@ Code Layout
 ./doc/TODO.txt
 
 
+# database manipulation stuff
 ./schemas/
-./schemas/drop-everything.sh
-./schemas/create-everything.sh
-./schemas/migrate-everything.sh
+./schemas/copy-prod-to-test.sh
 ./schemas/programmer_series_map.sql
 ./schemas/programmers.sql
 ./schemas/styles.sql
@@ -160,16 +174,12 @@ Code Layout
 ./bin/
 ./bin/dance-scheduler-user-password.pl
 ./bin/dance-scheduler-add-programmer.pl
-./bin/migrate-bands.pl
-./bin/migrate-talent.pl
-./bin/migrate-venues.pl
-# ...etc
 
 # css, javascript and static un-templated HTML
 ./public/
 ./public/css/
 ./public/images/
-./public/javascripts/
+./public/js/
 ./public/signin.html
 ./public/bacds-signin.html
 
