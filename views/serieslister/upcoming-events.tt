@@ -1,13 +1,9 @@
 <% MACRO maybe_linkit(string, url) BLOCK %>
-    <% IF url %>
-        <a href="<% url %>"><% string %></a>
-    <% ELSE %>
-        <% string %>
-    <% END %>
+    <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
 <% END %>
 
 <h1 class="dance"><% series.name %></h1>
-<div>
+<div class="series-display-text">
     <% display_text %>
 </div>
 
@@ -69,7 +65,7 @@ body {
                     <% caller.name %><% IF !loop.last() %>, <% END %>
                 <% END %>
             <% END %>
-            <br/>
+            <br />
             <% IF event.bands.size() || event.talent.size() %>
                 Band:
             <% END %>

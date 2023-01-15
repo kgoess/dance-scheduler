@@ -5,15 +5,33 @@ page.
 %>
 
 <% MACRO maybe_linkit(string, url) BLOCK %>
-    <% IF url %>
-        <a href="<% url %>"><% string %></a>
-    <% ELSE %>
-        <% string %>
+    <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+<% END %>
+
+<% MACRO special_class(event) BLOCK %>
+    <% IF highlight_special_types %>
+        <%-
+         # from the old dancefinder.pl:
+         #     my $class = "special";
+         #     $class = "workshop" if ( $type =~ /WORKSHOP/ );
+         #     $class = "woodshed" if ( $type =~ /WOODSHED/ );
+         #     $class = "camp"     if ( $type =~ /CAMP/ );
+         found_styles = [];
+         special_styles = { special => 1, workshop => 1, woodshed => 1, camp => 1 };
+         FOREACH style IN event.styles;
+            style_name = style.name.lower;
+            IF special_styles.$style_name;
+                 found_styles.push(style_name);
+            END;
+         END;
+         IF found_styles.size() -%>
+            class="<% found_styles.join(' ') %>"
+         <%- END -%>
     <% END %>
 <% END %>
 
-<style>
 
+<style>
 /* during the beta a/b testing this border lets you know if you're looking at
      a new dbix page or an old server-side include page
 */
@@ -22,6 +40,7 @@ body {
 }
 </style>
 <% FOREACH event IN events %>
+    <div <% special_class(event) %>>
     <p class="listing">
     <% event.start_date.strftime("%A, %e %B, %Y") %>: <strong>
     <%- FOREACH style IN event.styles %>
@@ -42,7 +61,7 @@ body {
         <% END %>
     <%- END %>
     <%- FOREACH band IN event.bands %>
-        <%- maybe_linkit(band.name, band.url) %><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
+        <%- maybe_linkit(band.name, band.url) -%><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
     <%- END %>
     <%- IF event.talent %>
         <%- FOREACH talent IN event.talent %>
@@ -57,4 +76,5 @@ body {
     <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
 
     </p>
+    </div>
 <% END %>

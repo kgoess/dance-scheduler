@@ -72,6 +72,7 @@ my $tt = Template->new(
 
 $tt->process('dancefinder/listings.tt' => {
     events => \@events,
+    highlight_special_types => 0,
 }) || die $tt->error;
 
 

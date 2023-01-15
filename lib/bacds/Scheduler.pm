@@ -894,6 +894,7 @@ get '/dancefinder-results' => with_types [
         style_arg  => $results{style},
 
         events => \@events,
+        highlight_special_types => 1,
         virtual_include => {
             meta_tags => _virtual_include('/shared/meta-tags.html'),
             navbar    => _virtual_include('/shared/navbar.html'),
