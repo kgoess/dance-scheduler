@@ -38,7 +38,7 @@ The files in lib/bacds/Scheduler/Schema\* were generated via
 To start up dancer2 serving the content in the git repo on port :5000, e.g.
 http://www.bacds.org:5000/signin.html run this:
 
-    plackup bin/app.psgi
+    plackup -Ilib -p 5000 bin/app.psgi
 
 
 How To Make Schema Changes
