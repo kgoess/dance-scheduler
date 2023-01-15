@@ -1,0 +1,50 @@
+#!/bin/bash
+
+backupdir=/var/lib/dance-scheduler/backups
+
+mkdir -p $backupdir
+chown root.root $backupdir
+chmod 700 $backupdir
+ 
+# %A is: Sunday, Monday, etc..
+day_of_week=$(date +%A)
+day_of_month=$(date +%d)
+
+mysqldump -uroot schedule > $backupdir/$day_of_week
+
+if [ $day_of_month = '01' ]; then
+    if [ -e $backupdir/monthly-old ]; then
+        mv $backupdir/monthly-old $backupdir/monthly-older
+    fi
+    if [ -e $backupdir/monthly ]; then
+        mv $backupdir/monthly $backupdir/monthly-old
+    fi
+    cp $backupdir/$day_of_week $backupdir/monthly
+fi
+
+if [ $day_of_week = 'Sunday' ]; then
+
+    if [ -e $backupdir/weekly-old ]; then
+        mv $backupdir/weekly-old $backupdir/weekly-older
+    fi
+    if [ -e $backupdir/weekly ]; then
+        mv $backupdir/weekly $backupdir/weekly-old
+    fi
+    cp $backupdir/$day_of_week $backupdir/weekly
+fi
+
+# while we're in beta, I want to track changes to the old file
+datadir=/var/www/bacds.org/public_html/data
+if [ ! -e $backupdir/schedule-latest.csv ]; then
+    cp $datadir/schedule $backupdir/schedule-latest.csv
+fi
+current_md5sum=$(md5sum $datadir/schedule | awk '{ print $1 }')
+latest_md5sum=$(md5sum $backupdir/schedule-latest.csv | awk '{ print $1 }')
+if [ "$latest_md5sum" != "$current_md5sum" ]; then
+    cp -p $datadir/schedule $backupdir/schedule-latest.csv
+    cp -p $datadir/schedule $backupdir/schedule-$(date --iso-8601)
+fi
+    
+
+
+exit 0
