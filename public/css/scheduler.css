@@ -254,8 +254,11 @@ font-size: 10px;
     flex: 1 0 90%;
 }
 
-/* Hide the red 'x' button if there is only one dropdown. */
-.multi-select-wrapper:only-of-type .remove-multi-select-button {
+/* Hide the red 'x' button if there is only one dropdown.
+ * OR for the first dropdown, because removing the first dropdown means
+ * the next data refresh from the server won't have any place to hang its data
+ * and none of the selectboxes will show  */
+.multi-select-wrapper:first-of-type .remove-multi-select-button {
     display: none;
 }
 
