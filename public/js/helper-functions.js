@@ -212,8 +212,8 @@ export function getParentContainerForModelName(modelName) {
 }
 
 export function multiSelectOptionAdd() {
-    const displayRow = $(this).closest('.display-row')
-    const cloneTarget = displayRow.find('.multi-select-wrapper:last')
+    const displayRow = $(this).closest('.display-row');
+    const cloneTarget = displayRow.find('.multi-select-wrapper:last');
     const newSelectBoxDiv = cloneTarget.clone(true);
     cloneTarget.parent().append(newSelectBoxDiv);
     const newSelectBox = newSelectBoxDiv.find('select').first();
