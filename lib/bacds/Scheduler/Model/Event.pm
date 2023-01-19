@@ -18,7 +18,7 @@ sub get_fields_for_output {
         short_desc
         custom_url
         custom_pricing
-        is_template
+        is_series_defaults
         created_ts
         modified_ts
         is_canceled
@@ -36,7 +36,7 @@ sub get_fields_for_input {
         short_desc
         custom_url
         custom_pricing
-        is_template
+        is_series_defaults
         is_canceled
         is_deleted
         series_id

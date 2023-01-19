@@ -92,11 +92,10 @@ __PACKAGE__->table("events");
   data_type: 'mediumtext'
   is_nullable: 1
 
-=head2 is_template
+=head2 is_series_defaults
 
   data_type: 'tinyint'
-  default_value: 0
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 series_id
 
@@ -152,8 +151,8 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "custom_pricing",
   { data_type => "mediumtext", is_nullable => 1 },
-  "is_template",
-  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
+  "is_series_defaults",
+  { data_type => "tinyint", is_nullable => 1 },
   "series_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
   "is_canceled",
@@ -315,8 +314,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-16 19:49:30
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Q7phKBMy6q+e09kYSiBg7Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-01-18 20:50:18
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KUZ4X/WoDQ1V8tXBKWYVyA
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

@@ -58,7 +58,7 @@ subtest 'POST /event' => sub {
         custom_pricing => '¥4,000',
         name           => "saturday night test event ꙮ",
         is_canceled    => 0,
-        is_template    => 0,
+        is_series_defaults    => 0,
         synthetic_name => 'Saturday Night Test',
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -80,7 +80,7 @@ subtest 'POST /event' => sub {
         custom_pricing => '¥4,000',
         name           => $new_event->{name},
         is_canceled    => $new_event->{is_canceled},
-        is_template    => 0,
+        is_series_defaults    => 0,
         callers        => [],
         parent_orgs    => [],
         series         => [],
@@ -121,7 +121,7 @@ subtest "GET /event/#" => sub{
         custom_pricing => $Event->custom_pricing,
         name           => $Event->name,
         is_canceled    => $Event->is_canceled,
-        is_template    => $Event->is_template,
+        is_series_defaults    => $Event->is_series_defaults,
         created_ts     => "2022-04-28T02:18:05",
         modified_ts    => "2022-04-28T02:18:05",
         callers        => [],
@@ -185,7 +185,7 @@ subtest "PUT /event/#" => sub {
         bands       => [],
         talent      => [],
         is_deleted  => 0,
-        is_template => 0,
+        is_series_defaults => 0,
         custom_pricing => '¥4,000',
         synthetic_name => 'Saturday Night Test',
     };
@@ -223,7 +223,7 @@ subtest 'POST /event #2' => sub{
         end_time    => "23:00",
         short_desc  => "itsa shortdesc",
         is_canceled => 0,
-        is_template => 0,
+        is_series_defaults => 0,
         name        => "saturday night test event",
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -255,7 +255,7 @@ subtest 'POST /event #2' => sub{
         bands       => [],
         talent      => [],
         is_deleted  => 0,
-        is_template => 0,
+        is_series_defaults => 0,
     };
     eq_or_diff $got, $expected, 'return from POST matches';
 
@@ -289,11 +289,11 @@ subtest 'GET /eventAll' => sub {
         custom_pricing => $Event->custom_pricing,
         name           => $Event->name,
         is_canceled    => $Event->is_canceled,
-        is_template    => $Event->is_template,
+        is_series_defaults    => $Event->is_series_defaults,
         created_ts     => "2022-04-28T02:18:05",
         modified_ts    => "2022-04-28T02:19:45",
         is_deleted     => 0,
-        is_template => 0,
+        is_series_defaults => 0,
         synthetic_name => "Saturday Night Test",
       },
       {
@@ -307,11 +307,11 @@ subtest 'GET /eventAll' => sub {
         short_desc     => $Second_Event->short_desc,
         custom_url     => undef,
         custom_pricing => undef,
-        is_template    => $Second_Event->is_template,
+        is_series_defaults    => $Second_Event->is_series_defaults,
         modified_ts    => "2022-04-28T02:18:05",
         created_ts     => "2022-04-28T02:18:05",
         is_deleted     => 0,
-        is_template => 0,
+        is_series_defaults => 0,
         synthetic_name => undef,
       },
     ];

@@ -144,7 +144,7 @@ sub test_create {
         name        => "saturday night 無為",
         style_id    => undef,
         is_canceled => 0,
-        is_template => 0,
+        is_series_defaults => 0,
     };
     $test->post_ok('/event/', $new_event );
 

@@ -43,22 +43,22 @@ $( document ).ready(function() {
 
     /*
      * This sets values for this new event to the default values from the series'
-     * default event template
+     * defaults event
      */
     $( '.series-for-event' ).change( h.seriesForEventOnchange );
 
-    $( '#template-help' ).click(function() {
-        templateHelpDialog.dialog( 'open' );
+    $( '#series-defaults-help' ).click(function() {
+        seriesDefaultsHelpDialog.dialog( 'open' );
     });
-    $( '#manage-template-help' ).click(function() {
-        templateHelpDialog.dialog( 'open' );
+    $( '#manage-defaults-help' ).click(function() {
+        seriesDefaultsHelpDialog.dialog( 'open' );
     });
 
     /* this is the button on the series accordion the starts the popup with the
     * series' default event
     */
-    $( '.select-template-button' ).click(function() {
-        eventTemplateDialog.dialog( 'open' );
+    $( '.select-series-defaults-button' ).click(function() {
+        seriesDefaultsDialog.dialog( 'open' );
     });
 
     // make our fancy slide switches actually function
@@ -69,43 +69,43 @@ $( document ).ready(function() {
      * re-use it in the popup.
     */
     const eventContainer = getParentContainerForModelName('event');
-    const templateEventPopup = $('#series-template-modal');
+    const seriesDefaultsPopup = $('#series-defaults-modal');
 
-    templateEventPopup.attr('title', 'Defaults for new event in this series');
+    seriesDefaultsPopup.attr('title', 'Defaults for new event in this series');
 
     const eventDisplayForm = eventContainer.find('#event-display-form').first();
     const popupForm = eventDisplayForm.clone(true);
     popupForm[0].saveHelper = eventDisplayForm[0].saveHelper;
-    popupForm.appendTo(templateEventPopup).attr('id', 'template-event-popup');
+    popupForm.appendTo(seriesDefaultsPopup).attr('id', 'series-defaults-popup');
 
-    templateEventPopup.find('button').remove();
+    seriesDefaultsPopup.find('button').remove();
 
-    const seriesSelectboxParent = templateEventPopup
+    const seriesSelectboxParent = seriesDefaultsPopup
         .find('select[name="series_id"]')
         .parent();
 
-    templateEventPopup.find('select[name="series_id"]').remove();
+    seriesDefaultsPopup.find('select[name="series_id"]').remove();
 
-    templateEventPopup.attr('fold_model', 'event');
+    seriesDefaultsPopup.attr('fold_model', 'event');
 
-    const templateHelpDialog = $( '#template-help-modal' ).dialog({
+    const seriesDefaultsHelpDialog = $( '#series-defaults-help-modal' ).dialog({
         autoOpen: false,
         height: 400,
         width: 400,
         modal: true,
     });
 
-    const eventTemplateDialog = $( '#series-template-modal' ).dialog({
+    const seriesDefaultsDialog = $( '#series-defaults-modal' ).dialog({
         autoOpen: false,
         height: 400,
         width: 400,
         modal: true,
         buttons: {
             Save: function() {
-                saveAction(popupForm, () => eventTemplateDialog.dialog("close"))
+                saveAction(popupForm, () => seriesDefaultsDialog.dialog("close"))
             },
             Cancel: function() {
-                eventTemplateDialog.dialog("close");
+                seriesDefaultsDialog.dialog("close");
             },
         },
         close: function() {
@@ -118,7 +118,7 @@ $( document ).ready(function() {
                 return this.nodeType === 3; //Node.TEXT_NODE
             }).remove();
 
-            templateEventPopup.find('form').get(0).reset();
+            seriesDefaultsPopup.find('form').get(0).reset();
         },
         open: function() {
             const seriesContainer = getParentContainerForModelName('series');
@@ -138,11 +138,11 @@ $( document ).ready(function() {
             seriesSelectboxParent.append(seriesNameEl);
 
             $.ajax({
-                url: `${appUriBase}/series/${seriesId}/template-event`,
+                url: `${appUriBase}/series/${seriesId}/series-defaults-event`,
                 dataType: 'json'
             })
             .done( (msg) => {
-                displayItem(templateEventPopup, msg);
+                displayItem(seriesDefaultsPopup, msg);
             });
         },
     });

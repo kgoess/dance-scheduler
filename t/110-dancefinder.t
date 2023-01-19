@@ -381,20 +381,19 @@ sub test_dancefinder_results_endpoint {
         'vanilla results header with no params';
 
     like $body, qr{
-        Thursday,.28.April,.2022:.<strong></strong>.at \s+
-        <a.href="http://custom-url/test-event-1">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+        Thursday,.28.April,.2022:\s+<strong>\s*</strong>\s+at\s+
+        <a.href="http://custom-url/test-event-1">Mr\..Hooper's.Store.in.Sunny.Day</a>\.\s+
             Music.by \s+
             test.band.1,.test.band.2:.muso.3 \s+
-        <em>test.event.1</em>
+        <span.class="special-event-name">\s*test.event.1\s*</span>
     }x, "event1's title looks right";
 
     like $body, qr{
-        Thursday,.28.April,.2022:.<strong>CONTRA</strong>.at. \s+
-        <a.href="https://bacds.org/dance-a-week/">Mr..Hooper's.Store.in.Sunny.Day</a>. \s+
+        Thursday,.28.April,.2022:\s+<strong>\s*CONTRA\s*</strong>\s+at\s+
+        <a.href="https://bacds.org/dance-a-week/">Mr\..Hooper's.Store.in.Sunny.Day</a>\. \s+
         <a.href="https://bacds.org/dance-a-week/">More.Info</a> \s+
         </p>
     }x, "event2's title looks right, no event.name, no band, caller or talent";
-
 
     #
     # with more params
@@ -480,7 +479,7 @@ sub test_livecalendar_endpoint {
         id => 1,
         start => "2022-04-28",
         textColor => "black",
-        title => " test event 1 at Mr. Hooper\'s Store in Sunny Day. Music by test band 1, test band 2. - big  dance party \x{263a}",
+        title => " test event 1 at Mr. Hooper's Store in Sunny Day. Music by test band 1, test band 2: muso 3. - big  dance party \x{263a}",
         url => 'http://custom-url/test-event-1',
       },
       {
@@ -517,7 +516,7 @@ sub test_livecalendar_endpoint {
             "Ye Oldde Ewent ".
             "at Mr. Hooper's Store in Sunny Day, and Batman's Cave in Gotham City. ".
             "Led by Alice Ackerby and Bob Bronson. ".
-            "Music by Raging Rovers, Blasting Berzerkers.",
+            "Music by Raging Rovers, Blasting Berzerkers: muso 4.",
         url => 'https://bacds.org/dance-a-week/',
       },
     ];

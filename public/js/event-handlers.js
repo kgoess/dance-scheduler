@@ -17,9 +17,9 @@ export function clickableListOnchange() {
     })
     .done( (msg) => {
         // Only the "series" container has this. If they started
-        // creating a new series template but didn't, then we need
+        // creating a new series defaults event but didn't, then we need
         // to turn the button back on.
-        parentContainer.find('.select-template-button').prop('disabled', false);
+        parentContainer.find('.select-series-defaults-button').prop('disabled', false);
         displayItem(modelName, msg)
     });
 }
@@ -37,9 +37,9 @@ export function saveButtonOnclick() {
     saveAction(this)
 
     // Only the "series" container has this. If they created a new series
-    // template then we can turn the button back on
+    // defaults event then we can turn the button back on
     const [parentContainer, modelName] = getParentAndModelName(this);
-    parentContainer.find('.select-template-button').prop('disabled', false);
+    parentContainer.find('.select-series-defaults-button').prop('disabled', false);
 }
 
 export function cancelButtonOnclick() {
@@ -65,7 +65,7 @@ export function createNewButtonOnclick() {
 
     // Only the "series" container has this. we need to turn off the button
     // until they save the new series, otherwise it doesn't make any sense
-    parentContainer.find('.select-template-button').prop('disabled', true);
+    parentContainer.find('.select-series-defaults-button').prop('disabled', true);
 
 }
 
@@ -90,7 +90,7 @@ export function seriesForEventOnchange() {
     }
     const seriesId = $(this).val();
     $.ajax({
-        url: `${appUriBase}/series/${seriesId}/template-event`,
+        url: `${appUriBase}/series/${seriesId}/series-defaults-event`,
         dataType: 'json'
     })
     .done( (msg) => {
@@ -109,8 +109,8 @@ export function seriesForEventOnchange() {
             }
         );
 
-        // this is not a template
-        eventContainer.find('[name="is_template"]').attr('0');
+        // this is not a series' defaults
+        eventContainer.find('[name="is_series_defaults"]').attr('0');
 
     });
 }

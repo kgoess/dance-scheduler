@@ -9,7 +9,7 @@ CREATE TABLE events (
     short_desc VARCHAR(2048),    
     custom_url VARCHAR(255),
     custom_pricing TEXT(32866),
-    is_template BOOLEAN NOT NULL DEFAULT 0,
+    is_series_defaults BOOLEAN NOT NULL DEFAULT 0,
     series_id INT,
     is_canceled BOOLEAN NOT NULL DEFAULT 0,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
@@ -24,8 +24,8 @@ CREATE TABLE events (
         REFERENCES series(series_id)
       ON DELETE RESTRICT
 
-    -- nope, that only works if is_template is either 1 or null
-    -- UNIQUE KEY (series_id, is_template)
+    -- nope, that only works if is_series_defaults is either 1 or null
+    -- UNIQUE KEY (series_id, is_series_defaults)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
 

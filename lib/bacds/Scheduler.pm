@@ -697,20 +697,20 @@ foreach my $r (@$routes) {
 sub camelize { join '', map { ucfirst lc } split /_/, shift }
 
 
-=head2 GET '/series/:series_id/template-event'
+=head2 GET '/series/:series_id/series-defaults-event'
 
 This is the set of defaults for new events in the series.
 
 =cut
 
-get '/series/:series_id/template-event' => sub {
+get '/series/:series_id/series-defaults-event' => sub {
     my $series_id = params->{series_id};
     my $results = $Results_Class->new;
 
     my $event = bacds::Scheduler::Model::Series
-        ->get_template_event($series_id);
+        ->get_series_defaults_event($series_id);
 
-    #This can be empty, indicating that there isn't a template for this
+    #This can be empty, indicating that there isn't a defaults set for this
     #series_id
     if ($event) {
         $results->data($event);
@@ -718,7 +718,7 @@ get '/series/:series_id/template-event' => sub {
     else {
         $results->data({
             series => [{id => $series_id}],
-            is_template => 1,
+            is_series_defaults => 1,
         });
     }
 

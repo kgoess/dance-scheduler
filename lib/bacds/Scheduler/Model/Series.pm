@@ -59,22 +59,22 @@ sub get_many_to_manys { }
 sub get_one_to_manys { }
 sub get_default_sorting { {-asc=>'name'} }
 
-=head3 get_template_event()
+=head3 get_series_defaults_event()
 
-Looks for an event with is_template set to true and the provided
+Looks for an event with is_series_defaults set to true and the provided
 series_id
 
 Returns false if nothing found.
 
 =cut
 
-sub get_template_event {
+sub get_series_defaults_event {
     my ($class, $series_id) = @_;
 
     my $dbh = get_dbh();
     my $rs = $dbh->resultset('Event')->search({
         series_id => $series_id,
-        is_template => 1,
+        is_series_defaults => 1,
     });
     my $row = $rs->single or return;
     my $event_id = $row->event_id;

@@ -36,7 +36,7 @@ my $english_dance = $dbh->resultset('Event')->new({
     is_camp => 0,
     long_desc => 'this is long desc',
     short_desc => 'this is short desc',
-    is_template => 0
+    is_series_defaults => 0
 });
 
 $english_dance->insert;

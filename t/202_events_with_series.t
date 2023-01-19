@@ -41,7 +41,7 @@ subtest 'POST /event' => sub {
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
         is_canceled => 0,
-        is_template => 0,
+        is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     $test->post_ok('/event/', $new_event );
@@ -68,7 +68,7 @@ subtest 'POST /event' => sub {
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
         is_canceled => 0,
-        is_template => 0,
+        is_series_defaults => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -123,7 +123,7 @@ subtest 'POST /event/# with series' => sub {
         name        => "saturday night test event",
         series_id   => $Series_Id,
         is_canceled => 0,
-        is_template => 0,
+        is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
@@ -226,18 +226,18 @@ subtest "PUT /event/# with series" => sub {
 };
 
 
-subtest 'GET /event/#/template_event for series when empty' => sub {
+subtest 'GET /event/#/series_defaults_event for series when empty' => sub {
     plan tests => 3;
 
     my ($res, $decoded, $got);
 
-    $test->get_ok("/series/$Series_Id/template-event");
+    $test->get_ok("/series/$Series_Id/series-defaults-event");
     ok($test->success, 'returned success');
     $decoded = decode_json($test->content);
     my $expected = {
         data => {
             series => [{id=>$Series_Id}],
-            is_template => 1,
+            is_series_defaults => 1,
         },
         errors => [],
     };
@@ -247,7 +247,7 @@ subtest 'GET /event/#/template_event for series when empty' => sub {
 };
 
 
-subtest 'POST /event/# template for series' => sub {
+subtest 'POST /event/# series defaults for series' => sub {
     plan tests => 6;
 
     my ($res, $decoded, $got);
@@ -262,7 +262,7 @@ subtest 'POST /event/# template for series' => sub {
         short_desc  => "itsa shortdesc",
         name        => "saturday night test event",
         series_id   => $Series_Id,
-        is_template => 1,
+        is_series_defaults => 1,
         is_canceled => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -290,7 +290,7 @@ subtest 'POST /event/# template for series' => sub {
 
     $Seriesed_Event = $dbh->resultset('Event')->find($Seriesed_Event_Id);
 
-    $test->get_ok("/series/$Series_Id/template-event");
+    $test->get_ok("/series/$Series_Id/series-defaults-event");
     ok($test->success, 'returned success');
     $decoded = decode_json($test->content);
     $got = $decoded->{data};

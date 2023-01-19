@@ -58,9 +58,9 @@ sub test_dancefinder {
     die "ERROR: $stderr" if $exit;
     die "ERROR: $stderr" if $stderr;
  
-    like $stdout, qr{<em>test event 1</em>};
+    like $stdout, qr{<span class="special-event-name">test event 1</span>};
     like $stdout, qr{big <b> dance party &\#9786};
-    like $stdout, qr{<em>test event 2</em>};
+    like $stdout, qr{<span class="special-event-name">test event 2</span>};
 }
 
 

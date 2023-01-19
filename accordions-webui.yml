@@ -37,7 +37,7 @@
     - label: Series
       name: series_id
       type: dropdown
-      help_id: template-help
+      help_id: defaults-help
       model_name: series
       table_name: series
       dropdown_classes:
@@ -113,7 +113,7 @@
       model_name: talent
       table_name: talent
       allow_multi_select: 1
-    - name: is_template
+    - name: is_series_defaults
       type: hidden
     - name: event_id
       type: hidden
@@ -171,7 +171,7 @@
   fold_vars:
     extra_buttons:
     - label: Manage Defaults
-      classes: select-template-button
+      classes: select-series-defaults-button
     columns:
     - label: Name
       name: name

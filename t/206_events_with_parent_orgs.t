@@ -40,7 +40,7 @@ subtest 'POST /event' => sub {
 
         short_desc  => "itsa shortdesc",
         is_canceled => 0,
-        is_template => 0,
+        is_series_defaults => 0,
         name        => "saturday night test event",
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -68,7 +68,7 @@ subtest 'POST /event' => sub {
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,
         is_canceled  => 0,
-        is_template => 0,
+        is_series_defaults => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
@@ -122,7 +122,7 @@ subtest 'POST /event/# with parent_org' => sub {
         parent_org_id => $Parent_Org_Id,
         is_deleted    => 0,
         is_canceled   => 0,
-        is_template => 0,
+        is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
     my $now_ts = DateTime
