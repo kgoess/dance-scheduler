@@ -120,7 +120,9 @@ export function fillInItemRowList(currentRow, msg, selections, labelGetter) {
         const name = currentRow.attr('name');
         const insertTarget = currentRow.find('select');
         insertTarget.find('option').remove();
-        currentRow.find('[cloned-selectlist=1]').remove();
+        // Remove any copies of the dropdown after the first, since we want to
+        // start fresh (but we do need at least one)
+        currentRow.find('.multi-select-wrapper:nth-of-type(n+2)').remove();
         const emptyOption = document.createElement('option');
         emptyOption.innerHTML = '--';
         emptyOption.setAttribute('value', '');
@@ -135,7 +137,6 @@ export function fillInItemRowList(currentRow, msg, selections, labelGetter) {
         if (selections && selections.length) {
             insertTarget.val(selections[0]['id']);
             for (var i = 1; i < selections.length; i++) {
-                //const clone = insertTarget.clone();
                 const clone = multiSelectOptionAdd.call(insertTarget);
                 clone.val(selections[i]['id']);
             }
@@ -194,7 +195,7 @@ export function loadListForModel(modelName) {
 }
 
 export function escapeHtml(unsafe) {
-    unsafe = new String(unsafe); // is that right? else "unsafe.replace is not a function"
+    unsafe = new String(unsafe); 
     return unsafe
          .replace(/&/g, '&amp;')
          .replace(/</g, '&lt;')
@@ -219,7 +220,6 @@ export function multiSelectOptionAdd() {
     cloneTarget.parent().append(newSelectBoxDiv);
     const newSelectBox = newSelectBoxDiv.find('select').first();
     newSelectBox.val('');
-    newSelectBoxDiv.attr('cloned-selectlist', 1);
     return newSelectBox;
 }
 
