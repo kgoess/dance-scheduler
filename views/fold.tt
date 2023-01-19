@@ -133,8 +133,8 @@
             <button class="button <% button.classes %>"><% button.label %></button>
             <% END %>
             <button class="button save-button disableable">Save</button>
-            <button class="button delete-button disableable">Delete</button>
-            <button class="button cancel-button">Cancel</button>
+            <button type="button" class="button delete-button disableable">Delete</button>
+            <button type="button" class="button cancel-button">Cancel</button>
         </span>
     </form>
 </div>
