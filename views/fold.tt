@@ -121,6 +121,11 @@
                     <% IF column.help_id %>
                         <div class="help-button" id="<% column.help_id %>">?</div>
                     <% END %>
+                    <% IF column.help %>
+                        <div class="help-button v2">?
+                            <div class="help-content"><% column.help %></div>
+                        </div>
+                    <% END %>
                 </label>
                 <% if column.type != 'dropdown' %><span class="row-contents"></span><% END %>
                 <%  macro_name = 'handle_input_' _ column.type;

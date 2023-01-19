@@ -95,6 +95,22 @@ $( document ).ready(function() {
         modal: true,
     });
 
+    $('.help-button.v2').each(
+        function (){
+            const theButton = $(this);
+            const newDialog = 
+                theButton.find('.help-content').dialog({
+                    autoOpen: false,
+                    height: 400,
+                    width: 400,
+                    modal: true,
+                });
+            theButton.click(function() {
+                newDialog.dialog('open');
+            });
+        }
+    );
+
     const seriesDefaultsDialog = $( '#series-defaults-modal' ).dialog({
         autoOpen: false,
         height: 400,

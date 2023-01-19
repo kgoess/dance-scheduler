@@ -370,8 +370,9 @@ form:invalid button.disableable {
     display: flex;
     justify-content: center;
     order: 99;
-
 }
+
+.help-content {display: none;}
 
 /* 
  * accordion nav menu!
