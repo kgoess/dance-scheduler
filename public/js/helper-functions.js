@@ -22,8 +22,9 @@ export function displayItem(target, msg) {
         );
         parentContainer.find('.display-form > input[type="hidden"]').each(
             (index, currentInput) => {
-                const theValue = targetObj
-                    ? targetObj[currentInput.getAttribute('name')]
+                const theName = currentInput.getAttribute('name');
+                const theValue = targetObj.hasOwnProperty(theName)
+                    ? targetObj[theName]
                     : '';
                 currentInput.value = theValue;
             }
@@ -230,14 +231,8 @@ export function saveAction(target, onSuccess) {
 
     const [parentContainer, modelName] = getParentAndModelName(target);
 
-    let rowId = parentContainer.find(`[name="${modelName}_id"]` ).val();
+    const rowId = parentContainer.find(`[name="${modelName}_id"]` ).val();
 
-    // for a new series template, the "save" button is getting us here with the
-    // string "undefined", which triggers a PUT instead of a POST, which fails
-    // because there is no event_id="undefined. Not sure why. FIXME later
-    if (rowId === "undefined") {
-        rowId = "";
-    }
     const activeForm = parentContainer.find( '.display-form' );
     
     // Run any helper functions that have been attached to the form
