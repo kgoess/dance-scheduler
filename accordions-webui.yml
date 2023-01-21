@@ -77,6 +77,8 @@
     - label: 'Name (for camps, special events)'
       name: name
       type: text
+      help: >
+        For example "Hey Days" or "Playford Ball". A regular dance series doesn't need anything here.
     - label: Start Date
       name: start_date
       required: 1
@@ -144,6 +146,8 @@
       name: vkey
       required: 1
       type: text
+      help: >
+        "vkey" should be a short all-caps identifier for the venue that won't ever change, like "CCB".
     - label: Hall Name
       name: hall_name
       required: 1
@@ -162,6 +166,9 @@
     - label: Programmer Notes
       name: programmer_notes
       type: textarea
+      help: >
+        Programmer Notes aren't displayed anywhere but here. The idea is to
+        support stuff like "Hall will reopen after the lava flows are cleared away".
     - label: Sidebar
       name: sidebar
       type: textarea
@@ -204,12 +211,18 @@
     - label: Programmer Notes
       name: programmer_notes
       type: textarea
+      help: >
+        Programmer Notes aren't displayed anywhere but here. The idea is to
+        support stuff like "Reminder: don't book Alice Loupgarou on a full moon".
     - label: Series URL
       name: series_url
       type: text
     - label: Manager Name(s)
       name: manager
       type: text
+      help: >
+        "Manager Names" is not displayed anywhere but here. We just added this
+        if the dance programmers wanted a reminder who the managers are for the dance.
     - name: series_id
       type: hidden
 
