@@ -15,8 +15,7 @@
 #       type: the html form element type (eg text, hidden;
 #           dropdown and bool are custom implimented)
 #       required: set to 1 to make the field required
-#       help_id: a modal-zone id to lookup for a tooltip
-#       help: TODO aspirational field to replace help_id
+#       help: text to popup when they click the '?' on that row
 #       dropdown_classes: additional classes to apply to the select element 
 #           (only for dropdown types)
 #       model_name: the dbix model name for the dropdown
@@ -37,11 +36,17 @@
     - label: Series
       name: series_id
       type: dropdown
-      help_id: defaults-help
       model_name: series
       table_name: series
       dropdown_classes:
         - series-for-event
+      help: >
+          <p>Selecting a Series for a new Event fills in some fields for that
+          Event from the "default" fields for the selected Series.</p>
+          <p>Check out the "Manage Defaults" button underneath the Series
+          section and it will make more sense.</p>
+          <p>If there's anything filled in for the Event then changing the
+             Series won't apply the "default" to the Event.</p>
     - label: Style
       name: style_id
       required: 1
@@ -180,7 +185,7 @@
     - label: External ID
       name: series_xid
       help: >
-          This is a short, permanent ID for the series, general enough to survive
+          "External ID" is a short, permanent ID for the series, general enough to survive
           name changes, used for example in links in HTML files on the filesystem.
       required: 1
       type: text

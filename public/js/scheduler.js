@@ -88,13 +88,6 @@ $( document ).ready(function() {
 
     seriesDefaultsPopup.attr('fold_model', 'event');
 
-    const seriesDefaultsHelpDialog = $( '#series-defaults-help-modal' ).dialog({
-        autoOpen: false,
-        height: 400,
-        width: 400,
-        modal: true,
-    });
-
     $('.help-button.v2').each(
         function (){
             const theButton = $(this);

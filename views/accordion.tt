@@ -40,19 +40,13 @@
      -->
     <div class="the-modal-zone">
         <div id="login-redirect-modal">
-            You are not/no longer signed in. <a id="login-redirect-modal-link" target="_blank">Click here</a> to open the signin page.
+            You are not/no longer signed in. <a
+            id="login-redirect-modal-link" target="_blank">Click here</a> to open
+            the signin page in a new tab, then you can come back and continue
+            editing in this window.
         </div>
         <div id="insufficient-permissions-modal">
             You do not have permissions to do that. Talk to the owner of the event/series or somebody on bacds-web-committee@.
-        </div>
-        <div id="series-defaults-help-modal">
-            <p>The yellow star means the field is required</p>
-            <p>Selecting a Series for a new Event fills in some fields for that
-               Event from the "default" fields for the selected Series.</p>
-            <p>Check out the "Manage Defaults" button underneath the Series
-               section and it will make more sense.</p>
-            <p>If there's anything filled in for the Event then changing the
-               Series won't apply the "default" to the Event.</p>
         </div>
         <div id="delete-confirmation-modal">
             <form>
