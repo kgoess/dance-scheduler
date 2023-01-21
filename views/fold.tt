@@ -116,6 +116,7 @@
                 <label
                     for="<% column.name %>"
                     class="row-label <% column.required && 'required-marker' %>"
+                    <% IF column.required %>title="<% column.label %> is required"<% END %>
                 >
                     <% column.label %>
                     <% IF column.help_id %>
