@@ -232,9 +232,13 @@ https://developers.facebook.com/docs/reference/javascript/FB.getLoginStatus/
 
 https://developers.facebook.com/docs/facebook-login/guides
 
+https://developers.facebook.com/docs/facebook-login/web
+
 https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow/
 
 https://developers.facebook.com/apps/430760472446636/fb-login/quickstart/
+
+https://developers.facebook.com/apps/430760472446636/settings/basic/
 
 
 For the admin console:

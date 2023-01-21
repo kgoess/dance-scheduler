@@ -229,6 +229,7 @@ The response from Facebook's /me will look like this:
       },
     }
 
+A list of helpful facebook URLs is in the README.md.
 
 =cut
 
