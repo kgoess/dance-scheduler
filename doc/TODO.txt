@@ -87,16 +87,21 @@ phase I:
  DONE make sure the serieslister is getting all the related stuff in one query
  DONE new question: why is short_desc a required field? it seems to be not needed for
     a regular series dance? if there's a reason, then add a help button.
+ DONE(see unpackResults) function handleError(err) * TODO this should be added to all the requests
+ DONE BUG venues display changing apostrophes to double-quotes?
 
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
- - function handleError(err) * TODO this should be added to all the requests
  - better styling for dancefinder results page? at least a "back to search"
    link? and for the search page?
  - some of the series pages, are broke--display text above or beside sidebar?
  - check out the short_desc in the template for https://bacds.org/series/english/berkeley_sat/, is that right?
  - what about the <style> tags in upcoming-events.tt? good enough or what?
  - I suspect we want a long_desc in the events table
+
+
+# TODO: convert tonightheader.pl
+REQUEST_METHOD="" QUERY_STRING="" perl scripts/tonightheader.pl > tonight-dbix.html
 
 phase II:
 
@@ -109,4 +114,6 @@ phase II:
  - add spinner for login buttons, see recommendation here:
     https://developers.facebook.com/docs/facebook-login/web/login-button/
  - add spinner for other document loading stuff in the main page?
+   or make it so they don't take so long and be all redundant
  - create "pricing" table that maps to events
+ - rewrite the .done() handlers so they're not so complex/obscure/prolix
