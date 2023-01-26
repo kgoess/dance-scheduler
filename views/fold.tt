@@ -135,12 +135,12 @@
             </div>
         <% END %>
         <span class="button-container">
-            <% FOREACH button IN content.extra_buttons %>
-            <button class="button <% button.classes %>"><% button.label %></button>
-            <% END %>
             <button class="button save-button disableable">Save</button>
             <button type="button" class="button delete-button disableable">Delete</button>
             <button type="button" class="button cancel-button">Cancel</button>
+            <% FOREACH button IN content.extra_buttons %>
+            <button class="button <% button.classes %>"><% button.label %></button>
+            <% END %>
         </span>
     </form>
 </div>
