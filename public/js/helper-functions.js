@@ -210,7 +210,7 @@ export function escapeHtml(unsafe) {
          .replace(/&/g, '&amp;')
          .replace(/</g, '&lt;')
          .replace(/>/g, '&gt;')
-         .replace(/'/g, '&quot;')
+         .replace(/"/g, '&quot;')
          .replace(/'/g, '&#039;');
 }
 
@@ -342,7 +342,7 @@ export function handleError(err) {
  * that would hit the ajax .fail() handler and end up in handleError above.
  *
  */
-export function  unpackResults(msg, cb) {
+export function unpackResults(msg, cb) {
     if (msg.errors && msg.errors.length) {
         msg.errors.map((error) => { alert(error.msg) });
     } else {
