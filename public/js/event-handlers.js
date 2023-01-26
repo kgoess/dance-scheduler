@@ -6,8 +6,14 @@ import {
     saveAction,
     getLabelForDisplayInItemListbox,
     deleteAction,
+    unpackResults,
 } from "./helper-functions.js";
 
+
+/* clickableListOnchange
+ * When they click on an item in a clickable list, we need to fetch the data
+ * for this row and display it.
+ */
 export function clickableListOnchange() {
     const rowId = $(this).val();
     const [parentContainer, modelName] = getParentAndModelName(this);
@@ -15,12 +21,17 @@ export function clickableListOnchange() {
         url: `${appUriBase}/${modelName}/${rowId}`,
         dataType: 'json'
     })
-    .done( (msg) => {
-        // Only the "series" container has this. If they started
-        // creating a new series defaults event but didn't, then we need
-        // to turn the button back on.
-        parentContainer.find('.select-series-defaults-button').prop('disabled', false);
-        displayItem(modelName, msg)
+    .done(msg => {
+        unpackResults(
+            msg,
+            (msg) => {
+                // Only the "series" container has this. If they started
+                // creating a new series defaults event but didn't, then we need
+                // to turn the button back on.
+                parentContainer.find('.select-series-defaults-button').prop('disabled', false);
+                displayItem(modelName, msg)
+            }
+        )
     });
 }
 
@@ -82,6 +93,13 @@ export function accordionOnclick() {
     }
 }
 
+/* seriesForEventOnchange
+ *
+ * When we're making a new event and they pick a series from the dropdown, this
+ * is where we fetch the default values for this event and populate them into
+ * the inputs here.
+ *
+ */
 export function seriesForEventOnchange() {
     const [parentContainer, modelName] = getParentAndModelName(this);
     // don't update the defaults when editing an existing event, just for a new one
@@ -93,25 +111,29 @@ export function seriesForEventOnchange() {
         url: `${appUriBase}/series/${seriesId}/series-defaults-event`,
         dataType: 'json'
     })
-    .done( (msg) => {
-        displayItem('event', msg);
-        const eventContainer = getParentContainerForModelName('event');
+    .done(msg => {
+        unpackResults(
+            msg,
+            (msg) => {
+                displayItem('event', msg);
+                const eventContainer = getParentContainerForModelName('event');
 
-        // keep them from editing an existing event_id, because this is
-        // only for *new* events
-        eventContainer.find('[name="event_id"]').val('');
+                // keep them from editing an existing event_id, because this is
+                // only for *new* events
+                eventContainer.find('[name="event_id"]').val('');
 
-        // copying this in from create-new-button, should we re-use it instead?
-        eventContainer.each(
-            function(index) {
-                $(this).find('.row-contents').hide();
-                $(this).find('.row-edit').show();
+                // copying this in from create-new-button, should we re-use it instead?
+                eventContainer.each(
+                    function(index) {
+                        $(this).find('.row-contents').hide();
+                        $(this).find('.row-edit').show();
+                    }
+                );
+
+                // this is not a series' defaults
+                eventContainer.find('[name="is_series_defaults"]').attr('0');
             }
-        );
-
-        // this is not a series' defaults
-        eventContainer.find('[name="is_series_defaults"]').attr('0');
-
+        )
     });
 }
 

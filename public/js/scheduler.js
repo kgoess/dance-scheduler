@@ -7,6 +7,7 @@ import {
     multiSelectOptionAdd,
     saveAction,
     escapeHtml,
+    unpackResults,
 } from "./helper-functions.js";
 
 $( document ).ready(function() {
@@ -150,8 +151,13 @@ $( document ).ready(function() {
                 url: `${appUriBase}/series/${seriesId}/series-defaults-event`,
                 dataType: 'json'
             })
-            .done( (msg) => {
-                displayItem(seriesDefaultsPopup, msg);
+            .done(msg => {
+                unpackResults(
+                    msg,
+                    (msg) => {
+                        displayItem(seriesDefaultsPopup, msg);
+                    }
+                )
             });
         },
     });

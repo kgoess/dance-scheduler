@@ -83,7 +83,12 @@ export function displayItemRow(currentRow, targetObj) {
                 url: `${appUriBase}/${modelName}All`,
                 dataType: 'json'
             })
-            .done((msg) => fillInItemRowList(currentRow, msg, selections, labelGetter));
+            .done(msg => {
+                unpackResults(
+                    msg,
+                    (msg) => fillInItemRowList(currentRow, msg, selections, labelGetter)
+                )
+            });
             break;
         case 'text-item':
             let displayText = escapeHtml(singleValue);
@@ -191,7 +196,12 @@ export function loadListForModel(modelName) {
         url: `${appUriBase}/${url}`,
         dataType: 'json'
     })
-    .done( (msg) => { displayListForModel(modelName, msg) });
+    .done(msg => {
+        unpackResults(
+            msg,
+            (msg) => displayListForModel(modelName, msg)
+        )
+    });
 }
 
 export function escapeHtml(unsafe) {
@@ -257,17 +267,18 @@ export function saveAction(target, onSuccess) {
         method: http_method,
         data: dataString
     })
-    .done( (msg) => {
-        if (msg.errors.length > 0) {
-            msg.errors.map((err) => alert(err.msg));
-            return;
-        }
-        loadListForModel(modelName);
-        displayItem(modelName, msg);
-        if (onSuccess) {
-            onSuccess();
-        }
-     })
+    .done(msg => {
+        unpackResults(
+            msg,
+            (msg) => {
+                loadListForModel(modelName);
+                displayItem(modelName, msg);
+                if (onSuccess) {
+                    onSuccess();
+                }
+            }
+        )
+    })
     .fail( (err) => {
         handleError(err);
     });
@@ -289,16 +300,17 @@ export function deleteAction() {
         method: 'put',
         data: 'is_deleted=1',
     })
-    .done( (msg) => {
-        if (msg.errors.length > 0) {
-            msg.errors.map((err) => alert(err.msg));
-            return;
-        }
-        loadListForModel(modelName);
-        // it's now deleted, so hide this item
-        const parentContainer = getParentContainerForModelName(modelName);
-        parentContainer.find('.model-display').hide();
-     })
+    .done(msg => {
+        unpackResults(
+            msg,
+            (msg) => {
+                loadListForModel(modelName);
+                // it's now deleted, so hide this item
+                const parentContainer = getParentContainerForModelName(modelName);
+                parentContainer.find('.model-display').hide();
+            }
+        )
+    })
     .fail( (err) => {
         handleError(err);
     });
@@ -321,6 +333,20 @@ export function handleError(err) {
         default:
             alert('something bad happened, update failed, see the server logs');
             console.log(err);
+    }
+}
+
+/* unpackResults
+ * Called by the .done() ajax handlers. The server returned a 200 response that
+ * might have an error field in it. As opposed to a 3xx or whatever response
+ * that would hit the ajax .fail() handler and end up in handleError above.
+ *
+ */
+export function  unpackResults(msg, cb) {
+    if (msg.errors && msg.errors.length) {
+        msg.errors.map((error) => { alert(error.msg) });
+    } else {
+        cb(msg);
     }
 }
 

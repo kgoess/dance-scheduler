@@ -1,5 +1,6 @@
 import {
     multiSelectOptionAdd,
+    unpackResults
 } from "./helper-functions.js";
 
 $( document ).ready(function() {
@@ -41,23 +42,33 @@ $( document ).ready(function() {
             }
         },
         open: function() {
+            // blank it out to start with otherwise it'll sit there with the
+            // last entry
+            $('#band-name-in-popup').text('');
+            $('#add-band-dialog .talent-names').text('loading...');
+
             $.ajax({
                 url: `${appUriBase}/band/${bandDialog.bandId}`,
                 dataType: 'json'
             })
             .done(msg => {
-                $('#band-name-in-popup').text(msg.data.name);
-                const spanForNames = $('#add-band-dialog .talent-names');
-                spanForNames.text('');
-                const olEl = $(document.createElement('ol'));
-                spanForNames.append(olEl);
-                bandDialog.talentIds = [];
-                msg.data.talents.forEach((talent, i) => {
-                    const itemEl = document.createElement('li');
-                    itemEl.textContent = talent.name;
-                    olEl.append(itemEl);
-                    bandDialog.talentIds.push(talent.id);
-                });
+                unpackResults(
+                    msg,
+                    (msg) => {
+                        $('#band-name-in-popup').text(msg.data.name);
+                        const spanForNames = $('#add-band-dialog .talent-names');
+                        spanForNames.text('');
+                        const olEl = $(document.createElement('ol'));
+                        spanForNames.append(olEl);
+                        bandDialog.talentIds = [];
+                        msg.data.talents.forEach((talent, i) => {
+                            const itemEl = document.createElement('li');
+                            itemEl.textContent = talent.name;
+                            olEl.append(itemEl);
+                            bandDialog.talentIds.push(talent.id);
+                        });
+                    }
+                )
             });
         }
     });
