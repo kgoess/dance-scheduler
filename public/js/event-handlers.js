@@ -24,13 +24,14 @@ export function clickableListOnchange() {
     .done(msg => {
         unpackResults(
             msg,
-            (msg) => {
+            (msg, modelName) => {
                 // Only the "series" container has this. If they started
                 // creating a new series defaults event but didn't, then we need
                 // to turn the button back on.
                 parentContainer.find('.select-series-defaults-button').prop('disabled', false);
                 displayItem(modelName, msg)
-            }
+            },
+            [msg, modelName]
         )
     });
 }
@@ -114,27 +115,33 @@ export function seriesForEventOnchange() {
     .done(msg => {
         unpackResults(
             msg,
-            (msg) => {
-                displayItem('event', msg);
-                const eventContainer = getParentContainerForModelName('event');
-
-                // keep them from editing an existing event_id, because this is
-                // only for *new* events
-                eventContainer.find('[name="event_id"]').val('');
-
-                // copying this in from create-new-button, should we re-use it instead?
-                eventContainer.each(
-                    function(index) {
-                        $(this).find('.row-contents').hide();
-                        $(this).find('.row-edit').show();
-                    }
-                );
-
-                // this is not a series' defaults
-                eventContainer.find('[name="is_series_defaults"]').attr('0');
-            }
+            afterSeriesForEventOnchangeSuccess,
+            [msg]
         )
     });
+}
+
+/*
+ * The callback for seriesForEventOnchange's ajax call
+ */
+function afterSeriesForEventOnchangeSuccess(){
+    displayItem('event', msg);
+    const eventContainer = getParentContainerForModelName('event');
+
+    // keep them from editing an existing event_id, because this is
+    // only for *new* events
+    eventContainer.find('[name="event_id"]').val('');
+
+    // copying this in from create-new-button, should we re-use it instead?
+    eventContainer.each(
+        function(index) {
+            $(this).find('.row-contents').hide();
+            $(this).find('.row-edit').show();
+        }
+    );
+
+    // this is not a series' defaults
+    eventContainer.find('[name="is_series_defaults"]').attr('0');
 }
 
 export function customBoolOnclick(){

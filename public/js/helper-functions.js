@@ -86,8 +86,9 @@ export function displayItemRow(currentRow, targetObj) {
             .done(msg => {
                 unpackResults(
                     msg,
-                    (msg) => fillInItemRowList(currentRow, msg, selections, labelGetter)
-                )
+                    fillInItemRowList,
+                    [currentRow, msg, selections, labelGetter]
+                );
             });
             break;
         case 'text-item':
@@ -199,8 +200,9 @@ export function loadListForModel(modelName) {
     .done(msg => {
         unpackResults(
             msg,
-            (msg) => displayListForModel(modelName, msg)
-        )
+            displayListForModel,
+            [modelName, msg]
+        );
     });
 }
 
@@ -270,18 +272,24 @@ export function saveAction(target, onSuccess) {
     .done(msg => {
         unpackResults(
             msg,
-            (msg) => {
-                loadListForModel(modelName);
-                displayItem(modelName, msg);
-                if (onSuccess) {
-                    onSuccess();
-                }
-            }
-        )
+            afterSaveSuccess,
+            [msg, modelName, onSuccess]
+        );
     })
     .fail( (err) => {
         handleError(err);
     });
+}
+
+/* 
+ * The callback function for saveAction's ajax call.
+ */
+function afterSaveSuccess(msg, modelName, onSuccess){
+    loadListForModel(modelName);
+    displayItem(modelName, msg);
+    if (onSuccess) {
+        onSuccess();
+    }
 }
 
 
@@ -342,11 +350,11 @@ export function handleError(err) {
  * that would hit the ajax .fail() handler and end up in handleError above.
  *
  */
-export function unpackResults(msg, cb) {
+export function unpackResults(msg, cb, args) {
     if (msg.errors && msg.errors.length) {
         msg.errors.map((error) => { alert(error.msg) });
     } else {
-        cb(msg);
+        cb(...args);
     }
 }
 

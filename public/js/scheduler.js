@@ -154,9 +154,8 @@ $( document ).ready(function() {
             .done(msg => {
                 unpackResults(
                     msg,
-                    (msg) => {
-                        displayItem(seriesDefaultsPopup, msg);
-                    }
+                    displayItem,
+                    [seriesDefaultsPopup, msg]
                 )
             });
         },
