@@ -370,6 +370,8 @@ form:invalid button.disableable {
     display: flex;
     justify-content: center;
     order: 99;
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 .help-content {display: none;}
