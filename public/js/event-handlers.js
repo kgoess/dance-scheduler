@@ -124,7 +124,7 @@ export function seriesForEventOnchange() {
 /*
  * The callback for seriesForEventOnchange's ajax call
  */
-function afterSeriesForEventOnchangeSuccess(){
+function afterSeriesForEventOnchangeSuccess(msg){
     displayItem('event', msg);
     const eventContainer = getParentContainerForModelName('event');
 
