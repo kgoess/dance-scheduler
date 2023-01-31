@@ -67,7 +67,8 @@ $( document ).ready(function() {
                             olEl.append(itemEl);
                             bandDialog.talentIds.push(talent.id);
                         });
-                    }
+                    },
+                    [msg]
                 )
             });
         }
