@@ -168,6 +168,5 @@ $( document ).ready(function() {
     $( '.datepicker' ).datepicker({
           dateFormat: "yy-mm-dd"
     });
-
     toastInit(window, $);
 }); // end document.ready

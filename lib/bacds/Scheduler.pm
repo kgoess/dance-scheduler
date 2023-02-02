@@ -74,6 +74,27 @@ register_type_check 'XID' => sub {
 
 preload_accordion_config;
 
+hook before => sub {
+    print STDERR "checking your checksum...\n";
+    if ( my $checksum_cookie = cookie 'Checksum' ){
+        if ( 
+            $checksum_cookie->value ne bacds::Scheduler::Util::Initialize::get_checksum() 
+        ){
+            print STDERR " doesn't match\n";
+            status 426;
+            my $results = $Results_Class->new;
+            $results->add_error(426, 
+                "You need to reload the page to be able to complete your request"
+            );
+            halt $results->format;
+        }
+    }else{
+        print STDERR " don't have one\n";
+        cookie 'Checksum' => bacds::Scheduler::Util::Initialize::get_checksum()
+    }
+
+};
+
 =head2 before hook
 
 The "before" hook is set up to catch every dancer2 request, check for the

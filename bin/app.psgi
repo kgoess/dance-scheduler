@@ -9,7 +9,12 @@ use lib "$FindBin::Bin/../lib";
 # use this block if you don't need middleware, and only have a single target Dancer app to run here
 use bacds::Scheduler;
 
-bacds::Scheduler->to_app;
+my $app = bacds::Scheduler->to_app;
+
+use bacds::Scheduler::Util::Initialize;
+bacds::Scheduler::Util::Initialize->initialize();
+
+return $app;
 
 =begin comment
 # use this block if you want to include middleware such as Plack::Middleware::Deflater
