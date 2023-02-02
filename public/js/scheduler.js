@@ -1,12 +1,12 @@
 import * as h from "./event-handlers.js";
 import {
+    displayItem,
+    escapeHtml,
     getParentAndModelName,
     getParentContainerForModelName,
-    displayItem,
     loadListForModel,
     multiSelectOptionAdd,
     saveAction,
-    escapeHtml,
     unpackResults,
 } from "./helper-functions.js";
 
@@ -20,6 +20,9 @@ $( document ).ready(function() {
 
     // Load up an item from the list when it's been clicked on
     $( '.clickable-list' ).change( h.clickableListOnchange );
+
+    // They type in the box and we filter the select list
+    $( '.clickable-list-input' ).keyup( h.listFilterOnchange );
 
     // Show the editable field when the user clickes the display
     $( '.display-row' ).click( h.displayRowOnclick );

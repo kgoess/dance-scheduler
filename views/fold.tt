@@ -84,8 +84,11 @@
 ></script><% END %>
 <div class="list-and-button">
     <form><!-- This is filled via loadListForModel() --> 
-        <select class="clickable-list" size="10">
-        </select>
+        <div class="flex-vertical">
+            <input class="clickable-list-input" placeholder="search...">
+            <select class="clickable-list" size="10">
+            </select>
+        </div>
     </form>
     <span class="button-container create-new-container">
         <button class="button create-new-button">Create New</button>

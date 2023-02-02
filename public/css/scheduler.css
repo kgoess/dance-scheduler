@@ -299,6 +299,10 @@ font-size: 10px;
     background-color: #bde;
     box-shadow: 3px 3px 5px 2px #456;
 }
+.flex-vertical {
+    display: flex;
+    flex-direction: column;
+}
 
 .button-container {
     display: flex;

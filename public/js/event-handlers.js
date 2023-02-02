@@ -1,14 +1,29 @@
 import {
+    deleteAction,
+    displayItem,
+    getLabelForDisplayInItemListbox,
     getParentAndModelName,
     getParentContainerForModelName,
-    displayItem,
     loadListForModel,
     saveAction,
-    getLabelForDisplayInItemListbox,
-    deleteAction,
     unpackResults,
 } from "./helper-functions.js";
 
+
+/* listFilterOnchange
+ * they type in the box and we filter the selectlist as they type
+ */
+export function listFilterOnchange() {
+    const selectList = $(this).next('select');
+    const filterText = $(this).val().toLowerCase();
+    selectList.children('option').each(function() {
+        if ($(this).text().toLowerCase().indexOf(filterText) == -1) {
+            $(this).hide();
+        } else {
+            $(this).show();
+        }
+    });
+}
 
 /* clickableListOnchange
  * When they click on an item in a clickable list, we need to fetch the data
@@ -56,7 +71,7 @@ export function saveButtonOnclick() {
 
 export function cancelButtonOnclick() {
    const [parentContainer, modelName] = getParentAndModelName(this);
-   parentContainer.find('.model-display').hide(); 
+   parentContainer.find('.model-display').hide();
 }
 
 export function createNewButtonOnclick() {
