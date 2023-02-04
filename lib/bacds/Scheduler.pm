@@ -976,7 +976,7 @@ get '/livecalendar-results' => with_types [
             }
         }
 
-        $titlestring .= ' - '.$event->short_desc
+        $titlestring .= ' '.ucfirst $event->short_desc
             if $event->short_desc;
 
         # fullcalendar doesn't support html in the text so remove the tags
