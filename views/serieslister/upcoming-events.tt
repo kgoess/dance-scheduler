@@ -50,6 +50,9 @@
                     </a>
                 </b>
             <br />
+            <% IF event.styles.grep('^SPECIAL$') && event.name %>
+                <span class="special-event-name"><% event.name %></span><br />
+            <% END %>
             <% FOREACH venue IN event.venues %>
                 <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
             <% END %>
