@@ -479,7 +479,7 @@ sub test_livecalendar_endpoint {
         id => 1,
         start => "2022-04-28",
         textColor => "black",
-        title => " test event 1 at Mr. Hooper's Store in Sunny Day. Music by test band 1, test band 2: muso 3. - big  dance party \x{263a}",
+        title => " test event 1 at Mr. Hooper's Store in Sunny Day. Music by test band 1, test band 2: muso 3. Big  dance party \x{263a}",
         url => 'http://custom-url/test-event-1',
       },
       {
