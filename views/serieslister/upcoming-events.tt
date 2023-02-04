@@ -20,12 +20,6 @@
 .event-content-sidebar {
     width: 25%;
 }
-/* during the beta a/b testing this border lets you know if you're looking at
-     a new dbix page or an old server-side include page
-*/
-body {
-  border: 20px double red;
-}
 </style>
 
 <div class="event-content-container">

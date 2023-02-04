@@ -31,14 +31,6 @@ page.
 <% END %>
 
 
-<style>
-/* during the beta a/b testing this border lets you know if you're looking at
-     a new dbix page or an old server-side include page
-*/
-body {
-  border: 20px double red;
-}
-</style>
 <% FOREACH event IN events %>
     <div <% special_class(event) %>>
     <p class="listing">
