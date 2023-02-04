@@ -190,7 +190,10 @@ sub generate_ldjson {
     # 		EventPostponed
     # 		EventRescheduled
     # 		EventScheduled
-    # just hard-coding them to start with
+    # just handling Cancelled to start with
+    my $event_status_url = $event->is_canceled
+        ? 'https://schema.org/EventCancelled'
+        : 'https://schema.org/EventScheduled';
 
     my %json_data = (
        '@context'  => 'http://schema.org',
@@ -199,7 +202,7 @@ sub generate_ldjson {
         startDate   => $start,
         endDate     => $end,
         eventAttendanceMode => 'https://schema.org/OfflineEventAttendanceMode',
-        eventStatus => 'https://schema.org/EventScheduled',
+        eventStatus => $event_status_url,
         organizer => {
            '@context' => 'http://schema.org',
            '@type'    => 'Organization',

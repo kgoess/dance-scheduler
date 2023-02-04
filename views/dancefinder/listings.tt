@@ -33,7 +33,7 @@ page.
 
 <% FOREACH event IN events %>
     <div <% special_class(event) %>>
-    <p class="listing">
+    <p class="listing<% IF event.is_canceled %> canceled-event<% END %>">
     <% event.start_date.strftime("%A, %e %B, %Y") %>: 
     <% IF event.styles.grep('^SPECIAL$') && event.name %>
         <% emphasize_name_over_style = 1 %>
@@ -55,6 +55,9 @@ page.
     <%- FOREACH venue IN event.venues %>
         <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
     <%- END %>
+    <% IF event.is_canceled %>
+        <strong>&mdash; CANCELED</strong>
+    <% END %>
     <%- IF event.callers %>
         <%- FOREACH caller IN event.callers %>
             <% caller.name %><% IF !loop.last() %>, <% END %>
