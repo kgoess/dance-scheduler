@@ -89,8 +89,14 @@
 </div>
 </div>
 
-<div class="center">
-    <a href="/">
-    <img src="../../shared/bacdsmission.gif" alt="The BACDS mission: Promoting, preserving, performing, and teaching traditional English and American music &amp; dance" />
-    </a>
-</div>
+<% IF events.size() && sidebar %>
+    <%# on like the hayward contra page where there's no content and no sidebar
+      #  this just looks dopey floating at the top. Until we re-structure these pages,
+      #  we'll just skip it
+     %>
+    <div class="center">
+        <a href="/">
+        <img src="../../shared/bacdsmission.gif" alt="The BACDS mission: Promoting, preserving, performing, and teaching traditional English and American music &amp; dance" />
+        </a>
+    </div>
+<% END %>
