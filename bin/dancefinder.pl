@@ -14,15 +14,17 @@ use bacds::Scheduler::Util::Time qw/get_today/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 
-my ($days, @style, $basedir, $db, $dbuser, $verbose, $help);
+my ($days, @style, $basedir, $highlight_specials, $db, $dbuser, $verbose, $help);
+$highlight_specials = 1; # defaults to on
 GetOptions (
-    'days=i'         => \$days,
-    'style=s'        => \@style,
-    'b|basedir=s'    => \$basedir,
-    'db=s'           => \$db,
-    'dbuser=s'       => \$dbuser,
-    "h|help"         => \$help,
-    "verbose|debug"  => \$verbose,
+    'days=i'              => \$days,
+    'style=s'             => \@style,
+    'highlight-specials!' => \$highlight_specials,
+    'b|basedir=s'         => \$basedir,
+    'db=s'                => \$db,
+    'dbuser=s'            => \$dbuser,
+    "h|help"              => \$help,
+    "verbose|debug"       => \$verbose,
 );
 
 pod2usage(1) if $help;
@@ -72,7 +74,7 @@ my $tt = Template->new(
 
 $tt->process('dancefinder/listings.tt' => {
     events => \@events,
-    highlight_special_types => 0,
+    highlight_special_types => $highlight_specials,
 }) || die $tt->error;
 
 
@@ -91,6 +93,10 @@ Usage: dancefinder.pl [options]
  Options:
    --days     number of days to search
    --style    (multiple allowed) e.g. CAMP
+   --highlight-specials
+               whether to draw a box around SPECIAL events, defaults
+               to "true", use --no-highlight-specials for e.g. the specials.html list (where
+               they're all specials and so don't need highlighting)
    --db       (defaults to "schedule", is if you want "schedule_test")
    --dbuser   (defaults to "scheduler", is if you want "scheduler_test")
 
