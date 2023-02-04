@@ -96,6 +96,12 @@
       name: short_desc
       required: 0
       type: textarea
+    - label: Long Desc.
+      name: long_desc
+      required: 0
+      type: textarea
+      help: >
+        This might be useful for one-off special events so we can host the entire page here in the app.
     - label: Custom URL
       name: custom_url
       type: text
@@ -120,6 +126,14 @@
       model_name: talent
       table_name: talent
       allow_multi_select: 1
+    - label: "...and friends"
+      name: and_friends
+      type: bool
+      no: No
+      yes: "&quot;&#8230;and friends&quot;"
+      yes_color: darksalmon
+      help: >
+        Show &quot;&#8230;and friends&quot; at the end of the &quot;Music by&quot; list
     - name: is_series_defaults
       type: hidden
     - name: event_id

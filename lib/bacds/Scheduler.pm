@@ -971,6 +971,9 @@ get '/livecalendar-results' => with_types [
             }
             $titlestring .= join ', ', map $_->name, $event->talent->all;
             $titlestring .= '.';
+            if ($event->and_friends) {
+                $titlestring .= '&#8230;and friends ';
+            }
         }
 
         $titlestring .= ' - '.$event->short_desc

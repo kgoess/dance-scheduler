@@ -57,11 +57,12 @@ How To Make Schema Changes
 3) In this git repo, run that "eval" and "dbicdump" command in the
    "Development" section above, that will generate new the perl code.
 4) Update the relevant files in the "schemas/" directory.
-5) Run "make test" (see the "Install" section below for details) to see any
+5) Make the appropriate changes in accordions-webui.yml for your new field.
+6) Run "make test" (see the "Install" section below for details) to see any
    changes needed in the unit tests and fix them up until they pass.
-6) Then see the "Install" section below.
-7) ...and coordinate that with making your schema changes in the "schedule"
-   database.
+7) Then see the "Install" section below.
+8) ...and coordinate that with repeating your schema changes in the live
+   "schedule" database.
 
 
 Install

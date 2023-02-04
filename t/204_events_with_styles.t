@@ -41,6 +41,7 @@ subtest 'POST /event' => sub {
         name        => "saturday night test event",
         style_id    => undef,
         is_canceled => 0,
+        and_friends => 0,
         is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -56,6 +57,7 @@ subtest 'POST /event' => sub {
         end_date    => $new_event->{end_date},
         end_time    => $new_event->{end_time},
         short_desc  => $new_event->{short_desc},
+        long_desc   => $new_event->{long_desc},
         name        => $new_event->{name},
         talent      => [],
         series      => [],
@@ -67,6 +69,7 @@ subtest 'POST /event' => sub {
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_canceled => 0,
+        and_friends => 0,
         is_deleted  => 0,
         is_series_defaults => 0,
     };
@@ -120,6 +123,7 @@ subtest 'POST /event/# with style' => sub {
         name        => "saturday night test event",
         style_id    => $Style_Id,
         is_canceled => 0,
+        and_friends => 0,
         is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;

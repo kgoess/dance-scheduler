@@ -128,6 +128,17 @@ __PACKAGE__->table("events");
   default_value: current_timestamp
   is_nullable: 0
 
+=head2 long_desc
+
+  data_type: 'mediumtext'
+  is_nullable: 1
+
+=head2 and_friends
+
+  data_type: 'tinyint'
+  default_value: 0
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -172,6 +183,10 @@ __PACKAGE__->add_columns(
     default_value => \"current_timestamp",
     is_nullable => 0,
   },
+  "long_desc",
+  { data_type => "mediumtext", is_nullable => 1 },
+  "and_friends",
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -314,8 +329,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-01-18 20:50:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KUZ4X/WoDQ1V8tXBKWYVyA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-02-04 11:32:52
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0lQQPFcT+HbqF5ALFFIu5Q
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');

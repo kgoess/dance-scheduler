@@ -16,11 +16,13 @@ sub get_fields_for_output {
         end_date
         end_time
         short_desc
+        long_desc
         custom_url
         custom_pricing
         is_series_defaults
         created_ts
         modified_ts
+        and_friends
         is_canceled
         is_deleted
     /
@@ -34,9 +36,11 @@ sub get_fields_for_input {
         end_date
         end_time
         short_desc
+        long_desc
         custom_url
         custom_pricing
         is_series_defaults
+        and_friends
         is_canceled
         is_deleted
         series_id

@@ -143,6 +143,7 @@ sub test_create {
         short_desc  => "itsa shortdesc",
         name        => "saturday night 無為",
         style_id    => undef,
+        and_friends => 0,
         is_canceled => 0,
         is_series_defaults => 0,
     };

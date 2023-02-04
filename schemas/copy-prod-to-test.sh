@@ -17,9 +17,11 @@ tables="
     venues
     callers
     audit_logs
-    programmers
     parent_orgs
 "
+
+# leaving programmers so we don't have to keep re-establishing the test passwords
+# programmers
 
 for table in $tables; do
     echo $table
