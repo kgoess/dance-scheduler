@@ -4,6 +4,7 @@
 <% INCLUDE dancefinder/title.html.tt %>
 <% virtual_include.meta_tags %>
 <link rel="stylesheet" title="base" type="text/css" href="<% bacds_uri_base %>/css/base.css" />
+<link rel="stylesheet" href="/css/cd-carousel.css" />
 <link rel="icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
 </head>
@@ -30,24 +31,8 @@ alt="BACDS Logo" height="108" width="81" class="logo"/></a>
 </td>
 </tr>
 </table>
-<table>
-<tr>
-<td>
-<a href="<% bacds_uri_base %>/events/SOTG/index.html" 
-title="Purchase the CD &quot;Swinging On The Gate&quot;">
-<img  src="<% bacds_uri_base %>/graphics/SOTG_thumb.jpg" class="logo" /></a>
-<a href="<% bacds_uri_base %>/events/WaltzCD/index.html" 
-title="Purchase the CD &quot;Waltzes Before Breakfast&quot;">
-<img  src="<% bacds_uri_base %>/graphics/WBB_thumb.jpg" class="logo" /></a>
-<a href="<% bacds_uri_base %>/events/WBB2/index.html" 
-title="Purchase the CD &quot;More Waltzes Before Breakfast&quot;">
-<img  src="<% bacds_uri_base %>/graphics/WBB2-thumb.jpg" class="logo" /></a>
-<a href="<% bacds_uri_base %>/events/WBB3/index.html" 
-title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;">
-<img  src="<% bacds_uri_base %>/graphics/WBB3-thumb.jpg" class="logo" /></a>
-</td>
-</tr>
-</table>
+<!--#include virtual="/shared/cd-carousel.html" -->
+<% virtual_include.carousel %>
 </td>
 </tr>
 <tr>

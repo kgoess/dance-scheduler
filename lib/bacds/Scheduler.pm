@@ -815,10 +815,11 @@ get '/dancefinder' => sub {
         musos   => \@musos,
         styles  => \@styles,
         virtual_include => {
+            copyright => _virtual_include('/shared/copyright.html'),
+            carousel  => _virtual_include('/shared/cd-carousel.html'),
+            menu      => _virtual_include('/shared/menu.html'),
             meta_tags => _virtual_include('/shared/meta-tags.html'),
             navbar    => _virtual_include('/shared/navbar.html'),
-            menu      => _virtual_include('/shared/menu.html'),
-            copyright => _virtual_include('/shared/copyright.html'),
         },
 
     },
