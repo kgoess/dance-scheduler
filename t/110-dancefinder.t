@@ -576,8 +576,9 @@ sub test_serieslister_endpoint {
                 </a> \s+
                 </b> \s+
                 <br./> \s+
-                Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
-        <br./> \s+
+                <span.class=""> \s+
+                    Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+                </span> \s+
         </p> \s+
         <p.class="comment"> \s+
         </p> \s+
@@ -600,8 +601,9 @@ sub test_serieslister_endpoint {
                 </a> \s+
                 </b> \s+
                 <br./> \s+
-                Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
-        <br./> \s+
+                <span.class=""> \s+
+                    Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+                </span> \s+
         </p> \s+
         <p.class="comment"> \s+
         </p> \s+
