@@ -42,7 +42,7 @@
         %>
         <!-- TYPE = <% style_names.join(',') %>-->
         <div class="<% FOREACH style_name IN style_names %><% class_for_type.$style_name %><% END %>">
-            <!-- I think this anchor is wrong, should be event_id maybe? -->
+            <%# I think this anchor is wrong, should be event_id maybe? %>
             <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
             <p class="dance">
                 <b class="date">
@@ -55,38 +55,38 @@
                 </b>
                 <br />
                 <span class="<% IF event.is_canceled %>canceled-event<% END %>">
-                    <% IF event.styles.grep('^SPECIAL$') && event.name %>
+                    <%- IF event.styles.grep('^SPECIAL$') && event.name %>
                         <span class="special-event-name"><% event.name %></span><br />
-                    <% END %>
-                    <% FOREACH venue IN event.venues %>
+                    <%- END %>
+                    <%- FOREACH venue IN event.venues %>
                         <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
-                    <% END %>
-                    <% IF event.callers.size() %>
+                    <%- END %>
+                    <%- IF event.callers.size() %>
                         Caller:
                         <% FOREACH caller IN event.callers %>
                             <% caller.name %><% IF !loop.last() %>, <% END %>
                         <% END %>
                         <br />
-                    <% END %>
-                    <% IF event.bands.size() || event.talent.size() %>
+                    <%- END %>
+                    <%- IF event.bands.size() || event.talent.size() %>
                         Band:
-                    <% END %>
-                    <% IF event.bands.size() %>
-                        <% FOREACH band IN event.bands %>
+                    <%- END %>
+                    <%- IF event.bands.size() %>
+                        <%- FOREACH band IN event.bands %>
                             <% maybe_linkit(band.name, band.url) %><% IF !loop.last() %>, <% END %>
-                        <% END %>
-                        <% IF event.talent.size() %>
+                        <%- END %>
+                        <%- IF event.talent.size() %>
                             with
-                        <% END %>
-                    <% END %>
-                    <% IF event.talent.size() %>
-                        <% FOREACH talent IN event.talent %>
+                        <%- END %>
+                    <%- END %>
+                    <%- IF event.talent.size() %>
+                        <%- FOREACH talent IN event.talent %>
                             <% talent.name %><% IF !loop.last() %>, <% END %>
-                        <% END %>
-                    <% END %>
+                        <%- END %>
+                    <%- END %>
                 </span>
             </p>
-            <p class="<% IF event.is_canceled %>canceled-event-comment <% END %>comment"">
+            <p class="<% IF event.is_canceled %>canceled-event-comment <% END %>comment">
                 <% event.short_desc %>
             </p>
         </div>
