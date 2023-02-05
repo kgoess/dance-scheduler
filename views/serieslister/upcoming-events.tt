@@ -84,6 +84,7 @@
                             <% talent.name %><% IF !loop.last() %>, <% END %>
                         <%- END %>
                     <%- END %>
+                    <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
                 </span>
             </p>
             <p class="<% IF event.is_canceled %>canceled-event-comment <% END %>comment">
