@@ -38,6 +38,7 @@
 
              insufficientPermissionsModal = $( '#insufficient-permissions-modal' ).dialog({
      -->
+    <div id="toasts"></div>
     <div class="the-modal-zone">
         <div id="login-redirect-modal">
             You are not/no longer signed in. <a

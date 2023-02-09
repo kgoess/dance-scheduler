@@ -287,6 +287,11 @@ export function saveAction(target, onSuccess) {
 function afterSaveSuccess(msg, modelName, onSuccess){
     loadListForModel(modelName);
     displayItem(modelName, msg);
+    $.toast({
+        type: 'success',
+        autoDismiss: true,
+        message: `Saved ${modelName} successfully.`
+      });
     if (onSuccess) {
         onSuccess();
     }
@@ -372,6 +377,80 @@ const insufficientPermissionsModal = $( '#insufficient-permissions-modal' ).dial
     modal: true,
 });
 
+/* Toast popup code from
+ * https://codepen.io/kieran/pen/ajLvjm
+ * this is used for the popup message after a user hits the save button
+ */
+export function toastInit(window, $){
 
+  var toastDefaultConfig = {
+    type: '',
+    autoDismiss: false,
+    container: '#toasts',
+    autoDismissDelay: 4000,
+    transitionDuration: 500
+  };
 
+  $.toast = function(config){
+    var size = arguments.length;
+    var isString = typeof(config) === 'string';
+    
+    if(isString && size === 1){
+      config = {
+        message: config
+      };
+    }
 
+    if(isString && size === 2){
+      config = {
+        message: arguments[1],
+        type: arguments[0]
+      };
+    }
+    
+    return new toast(config);
+  };
+
+  var toast = function(config){
+    config = $.extend({}, toastDefaultConfig, config);
+    // show "x" or not
+    var close = config.autoDismiss ? '' : '&times;';
+    
+    // toast template
+    var toast = $([
+      '<div class="toast ' + config.type + '">',
+      '<p>' + config.message + '</p>',
+      '<div class="close">' + close + '</div>',
+      '</div>'
+    ].join(''));
+    
+    // handle dismiss
+    toast.find('.close').on('click', function(){
+      var toast = $(this).parent();
+
+      toast.addClass('hide');
+
+      setTimeout(function(){
+        toast.remove();
+      }, config.transitionDuration);
+    });
+    
+    // append toast to toasts container
+    $(config.container).append(toast);
+    
+    // transition in
+    setTimeout(function(){
+      toast.addClass('show');
+    }, config.transitionDuration);
+
+    // if auto-dismiss, start counting
+    if(config.autoDismiss){
+      setTimeout(function(){
+        toast.find('.close').click();
+      }, config.autoDismissDelay);
+    }
+
+    return this;
+  }
+  
+}
