@@ -99,10 +99,18 @@ export function createNewButtonOnclick() {
 export function accordionOnclick() {
     const [parentContainer, modelName] = getParentAndModelName(this);
     const thisWasActive = parentContainer.hasClass('active');
-    $( '.accordion-container' ).removeClass('active').find('.model-display').hide();
+    // Close all the currently open folds
+    $( '.accordion-container' )
+        .removeClass('active')
+        .find('.model-display').hide();
+    // Clear all the search boxes
+    $( '.clickable-list-input' ).val('');
+    // If the user clicked an active fold, they are just closing it.
+    // No need to take further action.
     if (thisWasActive) {
         return;
     }
+    // Open the fold they just clicked on.
     parentContainer.toggleClass('active')
     if (parentContainer.hasClass('active')) {
         loadListForModel(modelName);
