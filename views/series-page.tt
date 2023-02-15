@@ -1,0 +1,676 @@
+<% MACRO maybe_linkit(string, url) BLOCK %>
+    <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+<% END %>
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    notes:
+    details/summary spec https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details#browser_compatibility
+    jquery plugin: https://mathiasbynens.be/notes/html5-details-jquery
+    alternate to details/summary https://www.w3schools.com/howto/howto_js_collapsible.asp
+    polyfill for details/summary https://github.com/mathiasbynens/jquery-details
+  -->
+  <!-- <link rel="stylesheet" title="base" type="text/css" href="/css/base.css" /> -->
+
+  <meta name="viewport" content="width=device-width" />
+
+  <title>
+    BACDS -- The Bay Area Country Dance Society Website
+  </title>
+  <style>
+/*
+  This is the desktop layout. For the mobile layout,
+  everything is top-to-bottom or flex-direction:column.
+  + -----------------------------------------------------------+
+  | header                                                     |
+  +------------------------------------------------------------+
+  | div.navbar-and-body                                        |
+  | +-------------+----------------------------------------+   |
+  | | details.nav | div.body-and-sidebar                   |   |
+  | |             |   +--------------------------------+   |   |
+  | |             |   | div.body-top                   |   |   |
+  | |             |   |                                |   |   |
+  | |             |   +--------------------------------+   |   |
+  | |             |   | div.body-bottom                |   |   |
+  | |             |   | +--------------------------+   |   |   |
+  | |             |   | | main     | aside.sidebar |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | +----------+---------------+   |   |   |
+  | |             |   |                                |   |   |
+  | |             |   |                                |   |   |
+  | |             |   +--------------------------------+   |   |
+  | |             |                                        |   |
+  | +-------------+----------------------------------------+   |
+  +------------------------------------------------------------+
+  | footer                                                     |
+  +------------------------------------------------------------+
+
+
+*/
+    /* start flexbox layout, see diagram above */
+    .navbar-and-body {
+      display: flex;
+      flex-direction: column;
+    }
+    @media (min-width: 600px) {
+      .navbar-and-body {
+        flex-direction: row;
+      }
+    }
+    .body-and-sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+    .body-bottom {
+      display: flex;
+      flex-direction: column;
+    }
+    @media (min-width: 600px) {
+      .body-bottom {
+        flex-direction: row;
+      }
+    }
+    main {
+      flex-basis: auto;
+      flex-grow: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between; /* forces the mission-statement to the bottom */
+    }
+    aside.sidebar {
+      flex-basis: 25%;
+      flex-grow: 1;
+    }
+    /* end flexbox layout */
+
+    body {
+      width: fit-content;
+    }
+
+    aside.sidebar {
+      margin: 20px;
+      min-width: 15em;
+    }
+    @media (min-width: 600px) {
+      .sidebar-sep {
+        display: none;
+      }
+    }
+
+    .desktop-only {
+      display: none;
+    }
+    @media (min-width: 600px) {
+      span.desktop-only {
+        display: inline;
+      }
+      div.desktop-only {
+        display: block;
+      }
+    }
+
+    summary {
+      padding: 5px;
+    }
+
+    body {
+      font-family: Verdana, sans-serif;
+    }
+    header {
+      color: #bbbbbb;
+      background-color: #0000ff;
+      min-width: 100%;
+    }
+    /* carousel stuff just for local dev */
+    header .cd-carousel-bg {
+      color: #ffffff;
+    }
+    header .cd-carousel-bg a {
+      color: #ffffff;
+    }
+    header .masthead {
+      display: flex;
+      flex-direction: row;
+    }
+    header .masthead a:any-link {
+      text-decoration: none;
+    }
+    header .breadcrumbs a:any-link {
+      color: #ffffff;
+      font-style: italic;
+      font-weight: bold;
+    }
+    header .masthead-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin: 2px;
+      margin-left: 10px;
+    }
+    header .masthead-title a:any-link {
+      color: #bbbbbb;
+    }
+
+    header .masthead-logo {
+      margin: 2px;
+      align-self: top;
+    }
+    header .breadcrumbs {
+      margin: 2px;
+      margin-left: 10px;
+      font-size: 80%;
+    }
+    @media (min-width: 600px) {
+      header .breadcrumbs {
+        font-size: 1em;
+      }
+    }
+    header ul {
+      margin: 0px; /* ul defaults to 16px top and bottom */
+    }
+
+    .body-top {
+      margin: 10px;
+    }
+
+    main .event-content-title {
+      color: #993300;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    details.nav {
+      width: auto;
+      border: 2px solid #0000ff;
+    }
+    @media (min-width: 600px) {
+      details.nav {
+        width: 100%;
+      }
+    }
+
+    @media (min-width: 600px) {
+      details.nav {
+        max-width: 16em;
+      }
+    }
+    summary.nav {
+      background-color: #bbddff;
+    }
+    nav {
+      background-color: #bbddff;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+    nav .navsection {
+      margin: 5px;
+      padding: 5px;
+    }
+    nav .navsubsection {
+      padding: 5px;
+      margin: 5px;
+    }
+    nav .navitem {
+      font-style: italic;
+    }
+
+    .series-description .series-name {
+      color: #993300;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+    }
+    .series-description .series-name-sub {
+      font-size: 1.2em;
+      font-weight: bold;
+      padding-left: 5px;
+      text-align: center;
+    }
+    .series-description .series-display-text {
+      padding: 10px;
+    }
+
+    /* importing from base.css */
+    p.dance {
+      margin: 1.5em 0 0 0;
+      font-family: Verdana, Arial, Helvetica, sans-serif;
+      /* font-size: 12pt; */
+      color: #000000;
+      text-align: left;
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    /* the new date links on each entry, they're just there for google to crawl,
+     * so take off the italics we added, and take off the standard underline for links  */
+    p.dance b.date a {
+      text-decoration:           none;
+    }
+    p.dance b.date a:link {
+      font-style:                normal;
+    }
+    p.comment {
+      margin: 0 1em 3em 1em;
+      text-align: left;
+      color: #0000ff;
+    }
+    p.canceled-event-comment {
+      color: IndianRed;
+    }
+    .canceled-event {
+      text-decoration: line-through;
+      color: purple;
+      font-style: italic;
+    }
+    .special-event-name {
+      font-size: 120%;
+      font-weight: bolder;
+      font-style: italic;
+      font-variant: small-caps;
+      font: italic small-caps bold;
+    }
+
+    div.tonight, div.workshop, div.special, div.camp {
+      border: solid;
+      border-color: #0000ff;
+      border-width: 3px;
+    }
+
+    aside.mission-statement {
+      text-align: center;
+      font-weight: bold;
+    }
+    aside.mission-statement.mobile-only {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 5px;
+      size: auto;
+    }
+    aside.mission-statement.desktop-only {
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-top: .5em;
+      padding-bottom: .5em;
+      margin-bottom: 0px;
+      width: 36em;
+      display: none;
+    }
+    @media (min-width: 600px) {
+      aside.mission-statement.mobile-only {
+        display: none;
+      }
+      aside.mission-statement.desktop-only {
+        display: flex;
+        justify-content: center;
+      }
+    }
+    aside.mission-statement .mission-container {
+      background-color: #0000ff;
+      padding: 10px 40px 10px 40px;
+    }
+    aside.mission-statement .mission-title {
+      color: #fffb00;
+      font-size: 150%;
+    }
+    aside.mission-statement .mission-text {
+      color: #ffffff;
+      font-size: 50%;
+      text-align: center;
+    }
+    aside.mission-statement a:any-link {
+      text-decoration: none;
+    }
+    aside.mission-statement a:any-link {
+      color: #ffffff;
+    }
+
+
+    footer {
+      background-color: #0000ff;
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-top: .3em;
+      padding-bottom: .3em;
+      margin-bottom: 3em;
+      color: #bbbbbb;
+      font-style: italic;
+      font-size: 0.8em;
+    }
+    footer a {
+      color: #ffffff;
+    }
+    .old {
+        display: none;
+    }
+
+
+    /* ************************ */
+    /* from base.css to handle html in like the Display Text form */
+    /* ************************ */
+
+/*
+    h1.dance {
+        font-size: 1.5em;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        color: #993300;
+        text-align: center;
+    }
+
+    h2.dance {
+        font-size: 1.2em;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+    }
+
+    h3.dance {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+    }
+*/
+    /* ************************ */
+    /* end from base.css */
+    /* ************************ */
+
+
+  </style>
+</head>
+<body>
+  <!-- ***************************** -->
+  <!-- header -->
+  <!-- ***************************** -->
+  <header>
+    <div class="masthead">
+        <div class="masthead-logo">
+          <a href="/">
+            <img src="https://bacds.org/graphics/bacdsweblogosmall.gif" alt="BACDS Logo" height="108" width="81" class="logo">
+          </a>
+        </div>
+        <div>
+          <div class="masthead-title">
+            <a href="/">
+              The Bay Area Country Dance Society
+            </a>
+          </div>
+          <div class="breadcrumbs">
+            <%- IF breadcrumbs %>
+                <span class="desktop-only">This page is <a href="/">www.bacds.org</a> > </span>
+                <%- FOREACH crumb IN breadcrumbs %>
+                    <a href="<% IF loop.last %>#top<% ELSE%><% crumb %><% END %>"><% crumb %></a>
+                    <%- IF ! loop.last %>&gt;<% END %>
+                <% END %>
+            <% END %>
+          </div>
+        </div>
+      </a>
+    </div>
+    <!-- needs css/cd-carousel.css loaded to work -->
+    <!-- https://www.cssscript.com/pure-css3-3d-cover-flow-effect/ -->
+    <details class="cd-carousel-bg">
+      <summary>Buy Our CDs</summary>
+      <ul id="cd-carousel">
+        <li>
+          <a href="/events/SOTG/index.html" title="Purchase the CD &quot;Swinging On The Gate&quot;">Swinging On The Gate</a>
+        </li>
+        <li class="highlighted">
+          <a href="/events/WaltzCD/index.html" title="Purchase the CD &quot;Waltzes Before Breakfast&quot;">Waltzes Before Breakfast</a>
+        </li>
+        <li>
+          <a href="/events/WBB2/index.html" title="Purchase the CD &quot;More Waltzes Before Breakfast&quot;">More Waltzes Before Breakfast</a>
+        </li>
+        <li>
+          <a href="/events/WBB3/index.html" title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;" >Chocolates Before Breakfast</a>
+        </li>
+        <li>
+          <a href="/odd-sundays" title="Download tunes by the Odd Sundays Garage Band" >Odd Sundays Garage Band</a>
+        </li>
+      </ul>
+    </details>
+  </header>
+
+  <div class="navbar-and-body">
+
+    <!-- ***************************** -->
+    <!-- nav -->
+    <!-- ***************************** -->
+    <details class="nav">
+      <summary class="nav">Navigation Links</summary>
+      <nav>
+        <div class="navsection">
+          <div class="navitem">
+            <a href="/">Home</a>
+          </div>
+        </div>
+        <div class="navsection">
+          <div class="navitem">
+            <a href="/membership/">Join Us!</a>
+          </div>
+        </div>
+        <div class="navsection">
+          <div class="navitem">
+            <a href="/COVID/">Covid dance safety guidelines</a>
+          </div>
+        </div>
+        <div class="navsection">
+            Dance Series
+          <div class="navsubsection">
+            <div class="navitem">
+              <a href="/series/contra">Contra and Square Dances</a>
+            </div>
+            <div class="navitem">
+              <a href="/series/english">English Country Dances</a>
+            </div>
+            <!--
+            <div class="navitem">
+              <a href="/series/ceilidh">English Ceilidh</a>
+            </div>
+            <div class="navitem">
+              <a href="/series/woodshed">"Woodshed" Dances</a>
+            </div>
+            -->
+            <div class="navitem">
+              <a href="/series/community">Other Community Dances</a>
+            </div>
+          </div><!-- end navsubsection -->
+          <div class="navitem">
+            <a href="/events/">Special Events and Projects</a>
+          </div>
+          <div class="navitem">
+            <a href="/camps/">Dance Camps &amp; Weekends</a>
+          </div>
+          <div class="navitem">
+            <a href="/teams/">Performance Teams</a>
+          </div>
+          <div class="navitem">
+            <a href="/organization/">Organization</a>
+          </div>
+        </div> <!-- end navsection -->
+        <div class="navsection">
+          <div class="navitem">
+            <a href="/links/">Dance/Music Links</a>
+          </div>
+          <div class="navitem">
+            <a href="/dancefinder/">Dancefinder</a>
+          </div>
+          <div class="navitem">
+            <a href="/scripts/dancefinder.pl?style=CONTRA">Contra Dance Events</a><br />
+          </div>
+          <div class="navitem">
+            <a href="/scripts/dancefinder.pl?style=ENGLISH">English Dance Events</a><br />
+          </div>
+          <div class="navitem">
+            <a href="/scripts/dancefinder.pl?style=BARN">Barn Dance Events</a><br />
+          </div>
+          <div class="navitem">
+            <a href="/scripts/dancefinder.pl">All dance Events</a><br />
+          </div>
+        </div>
+        <div class="navsection">
+          <div class="navitem">
+            <a href="/email/">E-mail discussion and announcement lists</a><br />
+          </div>
+        </div> <!-- end navsection -->
+        <div class="navsection">
+          <div class="navitem">
+            <a href="/calendars/">Online Calendars</a>
+          </div>
+          <div class="navitem">
+            <a href="/pdfs/">Printable Calendars</a>
+          </div>
+          <div class="navitem">
+            <a href="/transit/">Take Public Transit to Dances!</a>
+          </div>
+        </div> <!-- end navsection -->
+        <div class="navsection">
+          <div class="navitem">
+            Buy our CDs online
+            <br />
+            <a href="/events/SOTG/" title="Buy the Swinging on the Gate CD online"><img src="/graphics/SOTG_thumb.jpg"></a><br />
+            <a href="/events/WaltzCD/" title="Buy the Waltzes Before Breakfast CD online"><img src="/graphics/WBB_thumb.jpg"></a><br />
+            <a href="/events/WBB2/" title="Buy the More Waltzes Before Breakfast CD online"><img src="/graphics/WBB2-thumb.jpg"></a><br />
+            <a href="/events/WBB3/" title="Buy the new Chocolates Before Breakfast CD online"><img src="/graphics/WBB3-thumb.jpg"></a>
+            <br />
+          </div>
+        </div> <!-- end navsection -->
+        <div class="navsection">
+          <div class="navitem">
+            <a href="/contact/">For More Information</a>
+          </div>
+          <div class="navitem">
+            <a href="/donate/" title="Make a tax-deductible donation to BACDS"><img src="/graphics/Donate-button.png" align="center" border="0"></a>
+          </div>
+        </div>
+      </nav>
+    </details>
+    <div class="body-and-sidebar">
+      <div class="body-top">
+        <!-- ***************************** -->
+        <!-- series-description -->
+        <!-- ***************************** -->
+        <section class="series-description">
+          <div class="series-name">
+              <% series.name %>
+          </div>
+          <div class="series-name-sub">
+              <% series.short_desc %>
+          </div>
+          <div class="series-display-text">
+              <% display_text %>
+<!--
+            <p>
+            Are you comfortable dancing <b>heys for three</b> and <b>double figures of eight</b>? Do you
+            find it satisfying to move in time to the music and to match your fellow dancers surging in a line?
+            <p>
+            Welcome to the Fourth Saturday Experienced English Dance!
+            <p>
+            We spend some time each evening paying attention to styling, to
+            make the dances go more smoothly and look nicer. Each program
+            includes a few <b>challenging dances</b>, as well as many
+            familiar and favorite dances that we can do with <b>quick
+            walk-through calling</b>. Come enjoy the camaraderie, physical
+            and mental stimuli, and the glorious music.
+
+            <p>
+            (If you have friends to whom you would like to introduce the
+            joys of English Country Dancing, please bring them on the second
+            and fourth Thursdays to the dances in
+            <a href="/series/english/berkeley_wed/">Berkeley</a>, or to the
+            <a href="/series/english/san_francisco/">San Francisco<a>,
+            <a href="/series/english/palo_alto">Palo Alto</a>,
+            <a href="/series/english/peninsula/">Peninsula</a> or
+            <a href="/series/english/san_jose/">South Bay</a> dances. Check
+            the listings on the quarterly BACDS calendar flyer or on the
+            calendar at www.bacds.org)
+-->
+          </div> <!-- end series-display-text -->
+        </section> <!-- end series-description -->
+
+        <hr>
+
+      </div> <!-- end body-top -->
+
+      <div class="body-bottom">
+        <!-- ***************************** -->
+        <!-- events list -->
+        <!-- ***************************** -->
+        <main>
+          <div class="event-content-container">
+            <div class="event-content-title">
+              Upcoming Events:
+            </div>
+
+            <% INCLUDE "serieslister/events-for-series.tt" %>
+
+          </div> <!-- end event-content-container -->
+
+          <div class="sidebar-sep">
+            <hr>
+          </div>
+
+          <!-- ***************************** -->
+          <!-- mission statement -->
+          <!-- there are two of these in the HTML -->
+          <!-- ***************************** -->
+          <aside class="mission-statement desktop-only">
+            <div class="mission-container">
+              <div class="mission-title">BACDS</div>
+              <div class="mission-text">
+                <a href="/">Promoting, preserving, performing, and teaching<br>traditional English and American music &amp; dance</a>
+              </div>
+            </div>
+          </aside>
+        </main>
+
+        <!-- ***************************** -->
+        <!-- sidebar -->
+        <!-- ***************************** -->
+        <aside class="sidebar">
+            <% sidebar %>
+        </aside>
+      </div> <!-- end body-bottom -->
+    </div> <!-- end body-and-sidebar -->
+  </div> <!-- end navbar-and-body -->
+
+  <!-- ***************************** -->
+  <!-- mission statement -->
+  <!-- there are two of these in the HTML -->
+  <!-- ***************************** -->
+  <aside class="mission-statement mobile-only">
+    <div class="mission-container">
+      <div class="mission-title">BACDS</div>
+      <div class="mission-text">
+        <a href="/">Promoting, preserving, performing, and teaching<br>traditional English and American music &amp; dance</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ***************************** -->
+  <!-- footer -->
+  <!-- ***************************** -->
+  <footer>
+    <p>
+      Unless otherwise noted, layout and content Copyright &copy; 2002-2020, <a href="/">Bay Area Country Dance Society</a>.
+      All rights reserved.
+      <br>
+      <a href="/contact/">Contact us</a> for more information about this site or BACDS.</a>
+    </p>
+  </footer>
+<script>
+  // This toggles all the <details> tags open on regular desktop browsers
+  // Still kind of janky, I think I should move to an all-JS solution
+  // so that desktop browsers don't have the collapse-arrows
+  const mediaQueryList = window.matchMedia('(min-width: 600px)');
+  if (mediaQueryList.matches) {
+    var x = document.getElementsByTagName("details");
+    var i;
+    for (i = 0; i < x.length; i++) {
+         x[i].setAttribute("open", "true");
+    }
+  }
+
+</script>
+</body>
+</html>
+
