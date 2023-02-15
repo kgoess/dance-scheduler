@@ -1,0 +1,77 @@
+
+<div class="event-content-details">
+<%# FIXME what about this?
+
+    <div class="center">
+    <h2> < % series.short_desc % > </h2>
+    </div>
+%>
+    <% class_for_type = {
+        SPECIAL => 'special',
+        WOODSHED => 'woodshed',
+        WORKSHOP => 'workshop',
+    }
+    %>
+    <% FOREACH event IN events %>
+        <% style_names = [];
+           FOREACH style IN event.styles;
+            style_names.push(style.name);
+           END;
+        %>
+        <!-- TYPE = <% style_names.join(',') %>-->
+        <div class="<% FOREACH style_name IN style_names %><% class_for_type.$style_name %><% END %>">
+            <%# I think this anchor is wrong, should be event_id maybe? %>
+            <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
+            <p class="dance">
+                <b class="date">
+                    <a href="<% ssi_uri_for({ event_id => event.event_id }) %>">
+                        <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
+                    </a>
+                    <% IF event.is_canceled %>
+                        &mdash; CANCELED
+                    <% END %>
+                </b>
+                <br />
+                <span class="<% IF event.is_canceled %>canceled-event<% END %>">
+                    <%- IF event.styles.grep('^SPECIAL$') && event.name %>
+                        <span class="special-event-name"><% event.name %></span><br />
+                    <%- END %>
+                    <%- FOREACH venue IN event.venues %>
+                        <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
+                    <%- END %>
+                    <%- IF event.callers.size() %>
+                        Caller:
+                        <% FOREACH caller IN event.callers %>
+                            <% caller.name %><% IF !loop.last() %>, <% END %>
+                        <% END %>
+                        <br />
+                    <%- END %>
+                    <%- IF event.bands.size() || event.talent.size() %>
+                        Band:
+                    <%- END %>
+                    <%- IF event.bands.size() %>
+                        <%- FOREACH band IN event.bands %>
+                            <% maybe_linkit(band.name, band.url) %><% IF !loop.last() %>, <% END %>
+                        <%- END %>
+                        <%- IF event.talent.size() %>
+                            with
+                        <%- END %>
+                    <%- END %>
+                    <%- IF event.talent.size() %>
+                        <%- FOREACH talent IN event.talent %>
+                            <% talent.name %><% IF !loop.last() %>, <% END %>
+                        <%- END %>
+                    <%- END %>
+                    <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
+                </span>
+            </p>
+            <p class="<% IF event.is_canceled %>canceled-event-comment <% END %>comment">
+                <% event.short_desc %>
+            </p>
+        </div>
+        <% IF event.is_canceled %>
+            </s>
+        <% END %>
+        <% ldjson %>
+    <% END %>
+</div>

@@ -1107,8 +1107,16 @@ get '/serieslister' => with_types [
     'optional' => ['query', 'series_id', 'SchedulerId'],
     'optional' => ['query', 'series_xid', 'XID'],
     'optional' => ['query', 'event_id', 'SchedulerId'],
-] => sub {
+] => \&_details_for_series;
 
+
+get '/series-page' => with_types [
+    'optional' => ['query', 'series_id', 'SchedulerId'],
+    'optional' => ['query', 'series_xid', 'XID'],
+    'optional' => ['query', 'event_id', 'SchedulerId'],
+] => \&_details_for_series;
+
+sub _details_for_series {
     my $event_id;
     if (my $document_q = document_args()) {
         $event_id = $document_q->get('event_id')
@@ -1128,12 +1136,14 @@ get '/serieslister' => with_types [
         );
     }
 
-    if (my $sidebar = $data->{series}->sidebar) {
+    my $series = $data->{series};
+
+    if (my $sidebar = $series->sidebar) {
         $sidebar =~ s{<!--#include virtual="(.+?)" -->}
                      {_virtual_include($1)}eg;
         $data->{sidebar} = $sidebar;
     }
-    if (my $display_text = $data->{series}->display_text) {
+    if (my $display_text = $series->display_text) {
         $display_text =~ s{<!--#include virtual="(.+?)" -->}
                           {_virtual_include($1)}eg;
         $data->{display_text} = $display_text;
@@ -1141,7 +1151,18 @@ get '/serieslister' => with_types [
 
     $data->{ssi_uri_for} = \&ssi_uri_for;
 
-    template('serieslister/upcoming-events', $data,
+    if ($series->series_url =~ m{ /series/ (?<style>.+?) / (?<page>.+) / }x) {
+        $data->{breadcrumbs} = [
+            $+{style},
+            $+{page},
+        ];
+    }
+
+    my $template = request->path() eq '/serieslister'
+        ? 'serieslister/upcoming-events'
+        : 'series-page';
+
+    template($template, $data,
         {layout => undef},
     );
 };
