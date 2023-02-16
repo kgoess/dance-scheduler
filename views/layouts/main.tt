@@ -4,7 +4,7 @@
   <meta charset="<% settings.charset %>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title><% title %></title>
-  <link rel="stylesheet" href="<% request.uri_base %>/css/scheduler.css">
+  <link rel="stylesheet" href="<% request.uri_base %>/css/scheduler.css?checksum=<% checksum %>">
   <link rel="icon" type="image/x-icon" href="<% request.uri_base %>/images/favicon.ico">
 
 
@@ -25,9 +25,9 @@
 <script>
 var appUriBase = "<% request.uri_base %>";
 </script>
-<script type="module" src="<% request.uri_base %>/js/scheduler.js"></script>
-<script type="module" src="<% request.uri_base %>/js/event-handlers.js"></script>
-<script type="module" src="<% request.uri_base %>/js/helper-functions.js"></script>
+<script type="module" src="<% request.uri_base %>/js/scheduler.js?checksum=<% checksum %>"></script>
+<script type="module" src="<% request.uri_base %>/js/event-handlers.js?checksum=<% checksum %>"></script>
+<script type="module" src="<% request.uri_base %>/js/helper-functions.js?checksum=<% checksum %>"></script>
 
 </head>
 <body>

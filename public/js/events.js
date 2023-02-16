@@ -70,6 +70,9 @@ $( document ).ready(function() {
                     },
                     [msg]
                 )
+            })
+            .fail( (err) => {
+                handleError(err);
             });
         }
     });

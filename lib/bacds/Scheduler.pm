@@ -37,6 +37,7 @@ use bacds::Scheduler::Auditor;
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::Plugin::AccordionConfig;
 use bacds::Scheduler::Plugin::Auth;
+use bacds::Scheduler::Plugin::Checksum;
 use bacds::Scheduler::Model::Band;
 use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::DanceFinder;
@@ -278,9 +279,11 @@ get '/' => requires_login sub {
     # see accordions-webui.yml
     my $accordion = get_accordion_config();
 
-    cookie Checksum => bacds::Scheduler::Util::Initialize::get_checksum();
+    my $checksum = bacds::Scheduler::Util::Initialize::get_checksum();
+    cookie Checksum => $checksum;
 
     template 'accordion' => {
+        checksum => $checksum,
         title => 'Dance Scheduler',
         signed_in_as => vars->{signed_in_as}->email,
         test_db_name => bacds::Scheduler::Util::Db->using_test_db,
@@ -317,7 +320,7 @@ Returns the flat list of all events in the database
 
 my $event_model = 'bacds::Scheduler::Model::Event';
 
-get '/eventAll' => sub {
+get '/eventAll' => requires_checksum sub {
     my $results = $Results_Class->new;
 
     $results->data($event_model->get_multiple_rows);
@@ -331,7 +334,7 @@ Like /eventAll, but just events from yesterday on.
 
 =cut
 
-get '/eventsUpcoming' => sub {
+get '/eventsUpcoming' => requires_checksum sub {
     my $results = $Results_Class->new;
 
     $results->data($event_model->get_upcoming_rows);
@@ -372,7 +375,7 @@ the nested data structures.
 
 =cut
 
-get '/event/:event_id' => sub {
+get '/event/:event_id' => requires_checksum sub {
     my $event_id = params->{event_id};
     my ($event, $err) = $event_model->get_row($event_id);
 
@@ -390,7 +393,7 @@ Create a new event.
 
 =cut
 
-post '/event/' => can_create_event sub {
+post '/event/' => can_create_event requires_checksum sub {
     my $auditor = request->var('auditor');
 
     my ($event, $err) = $event_model->post_row($auditor, params);
@@ -411,7 +414,7 @@ Update an existing event
 
 =cut
 
-put '/event/:event_id' => can_edit_event sub {
+put '/event/:event_id' => requires_checksum can_edit_event sub {
     my $auditor = request->var('auditor');
 
     my ($event, $err) = $event_model->put_row($auditor, params);
@@ -637,7 +640,7 @@ foreach my $r (@$routes) {
     #
     # GET /thing/1234
     #
-    get "/$r->{model}/:$pk_name" => $read_perm->(sub {
+    get "/$r->{model}/:$pk_name" => requires_checksum $read_perm->(sub {
         my $pk = params->{$pk_name};
 
 
@@ -653,7 +656,7 @@ foreach my $r (@$routes) {
     #
     # POST /thing - add a new thing
     #
-    post "/$r->{model}/" => $write_perm->(sub {
+    post "/$r->{model}/" => requires_checksum $write_perm->(sub {
         my $auditor = var 'auditor';
 
         my ($obj, $err) = $class_name->post_row($auditor, params);
@@ -670,7 +673,7 @@ foreach my $r (@$routes) {
     #
     # PUT /thing/1234 - update an existing thing
     #
-    put "/$r->{model}/:$pk_name" => $write_perm->(sub {
+    put "/$r->{model}/:$pk_name" => requires_checksum $write_perm->(sub {
         my $auditor = request->var('auditor');
 
         my ($obj, $err) = $class_name->put_row($auditor, params);
@@ -687,7 +690,7 @@ foreach my $r (@$routes) {
     #
     # get /thingALL - retrieves all not-deleted of the thing
     #
-    get "/$r->{model}All" => $read_perm->(sub {
+    get "/$r->{model}All" => requires_checksum $read_perm->(sub {
         my $results = $Results_Class->new;
 
         $results->data($class_name->get_multiple_rows);

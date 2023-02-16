@@ -89,6 +89,9 @@ export function displayItemRow(currentRow, targetObj) {
                     fillInItemRowList,
                     [currentRow, msg, selections, labelGetter]
                 );
+            })
+            .fail( (err) => {
+                handleError(err);
             });
             break;
         case 'text-item':
@@ -203,6 +206,9 @@ export function loadListForModel(modelName) {
             displayListForModel,
             [modelName, msg]
         );
+    })
+    .fail( (err) => {
+        handleError(err);
     });
 }
 
@@ -342,6 +348,12 @@ export function handleError(err) {
             break;
         case 403:
             insufficientPermissionsModal.dialog( 'open' );
+            break;
+        case 426:
+            $.toast({
+                type: 'error',
+                message: 'The backend scripts have been updated; please reload the page to continue.',
+            });
             break;
         default:
             alert('something bad happened, update failed, see the server logs');

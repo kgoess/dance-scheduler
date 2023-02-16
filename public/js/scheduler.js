@@ -161,6 +161,9 @@ $( document ).ready(function() {
                     displayItem,
                     [seriesDefaultsPopup, msg]
                 )
+            })
+            .fail( (err) => {
+                handleError(err);
             });
         },
     });
