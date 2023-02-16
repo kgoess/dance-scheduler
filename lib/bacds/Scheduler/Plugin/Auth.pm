@@ -55,7 +55,7 @@ plugin_keywords requires_login => sub {
         $self->app->request->var('signed_in_as') 
             or return $plugin->login_redirect($self);
 
-        $route_sub->(@args);
+        $route_sub->($self, @args);
     };
 };
 
@@ -79,7 +79,7 @@ plugin_keywords requires_superuser => sub {
             or return $plugin->login_redirect($self);
 
         if ($programmer->is_superuser) {
-            return $route_sub->(@args);
+            return $route_sub->($self, @args);
         } else {
             my $results = bacds::Scheduler::Util::Results->new;
 
@@ -107,7 +107,7 @@ plugin_keywords requires_nothing => sub {
     my ($plugin, $route_sub, @args) = @_;
     return sub {
         my ($self) = @_;
-        $route_sub->(@args);
+        $route_sub->($self, @args);
     };
 };
 
@@ -136,7 +136,7 @@ plugin_keywords can_edit_event => sub {
         my $dbh = get_dbh();
 
         if ($programmer->is_superuser) {
-            return $route_sub->(@args);
+            return $route_sub->($self, @args);
         }
 
         my $event_id = $self->app->request->param('event_id')
@@ -151,7 +151,7 @@ plugin_keywords can_edit_event => sub {
              {  'event.event_id' => $event_id }
         );
         if (@series_rs or @event_rs) {
-            $route_sub->(@args); # this is success
+            $route_sub->($self, @args); # this is success
         } else {
             my $results = bacds::Scheduler::Util::Results->new;
 
@@ -188,7 +188,7 @@ plugin_keywords can_create_event => sub {
             or return $plugin->login_redirect($self);
 
         if ($programmer->is_superuser) {
-            return $route_sub->(@args);
+            return $route_sub->($self, @args);
         }
 
         my $series_id = $self->app->request->param('series_id');
@@ -196,7 +196,7 @@ plugin_keywords can_create_event => sub {
              { 'series.series_id' => $series_id }
         );
         if (@series_rs ) {
-            $route_sub->(@args); # this is success
+            return $route_sub->($self, @args); # this is success
         } else {
             my $results = bacds::Scheduler::Util::Results->new;
 

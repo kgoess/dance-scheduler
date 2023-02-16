@@ -4,6 +4,7 @@ import {
     getLabelForDisplayInItemListbox,
     getParentAndModelName,
     getParentContainerForModelName,
+    handleError,
     loadListForModel,
     saveAction,
     unpackResults,
@@ -48,6 +49,9 @@ export function clickableListOnchange() {
             },
             [msg, modelName]
         )
+    })
+    .fail( (err) => {
+        handleError(err);
     });
 }
 
@@ -141,6 +145,9 @@ export function seriesForEventOnchange() {
             afterSeriesForEventOnchangeSuccess,
             [msg]
         )
+    })
+    .fail( (err) => {
+        handleError(err);
     });
 }
 
