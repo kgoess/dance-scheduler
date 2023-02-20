@@ -372,6 +372,15 @@
     /* from base.css to handle html in like the Display Text form */
     /* ************************ */
 
+    .center {
+        text-align: center;
+    }
+    h1.dance {
+        text-align: center;
+        color: #993300;
+        /* this font-size not in base.css, but let's drop it down a notch anyway */
+        font-size: 1.2em;
+    }
 /*
     h1.dance {
         font-size: 1.5em;
