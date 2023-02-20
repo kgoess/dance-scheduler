@@ -4,13 +4,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    notes:
-    details/summary spec https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details#browser_compatibility
-    jquery plugin: https://mathiasbynens.be/notes/html5-details-jquery
-    alternate to details/summary https://www.w3schools.com/howto/howto_js_collapsible.asp
-    polyfill for details/summary https://github.com/mathiasbynens/jquery-details
-  -->
   <!-- <link rel="stylesheet" title="base" type="text/css" href="/css/base.css" /> -->
 
   <meta name="viewport" content="width=device-width" />
@@ -27,7 +20,7 @@
   +------------------------------------------------------------+
   | div.navbar-and-body                                        |
   | +-------------+----------------------------------------+   |
-  | | details.nav | div.body-and-sidebar                   |   |
+  | | nav         | div.body-and-sidebar                   |   |
   | |             |   +--------------------------------+   |   |
   | |             |   | div.body-top                   |   |   |
   | |             |   |                                |   |   |
@@ -114,9 +107,34 @@
       }
     }
 
-    summary {
-      padding: 5px;
+    /* emulate details/summary tags */
+    @media (max-width: 600px) {
+        .collapsible-title { /* like <summary */
+          padding: 5px;
+        }
+        .collapsible-title.collapsible-closed::before {
+          content: '►';
+          margin-right: 5px;
+          font-size: 80%;
+        }
+        .collapsible-title.collapsible-open::before {
+          content: '▼';
+          margin-right: 5px;
+          font-size: 80%;
+        }
+        /* in the mobile view the collapsibles start closed */
+        .collapsible-body-hidden {
+            display: none;
+        }
     }
+    @media (min-width: 601px) {
+        /* in the desktop view the collapsibles aren't collapsible so they're
+         * never closed */
+        .collapsible-body-hidden {
+            /* display: none; */
+        }
+    }
+    /* end details/summary emulation */
 
     body {
       font-family: Verdana, sans-serif;
@@ -184,23 +202,24 @@
       text-align: center;
     }
 
-    details.nav {
+    .collapsible-section.nav {
       width: auto;
       border: 2px solid #0000ff;
     }
     @media (min-width: 600px) {
-      details.nav {
+      .collapsible-section.nav {
         width: 100%;
       }
     }
 
     @media (min-width: 600px) {
-      details.nav {
+      .collapsible-section.nav {
         max-width: 16em;
       }
     }
-    summary.nav {
+    .collapsible-title.nav {
       background-color: #bbddff;
+      padding: 5px;
     }
     nav {
       background-color: #bbddff;
@@ -374,6 +393,16 @@
     /* end from base.css */
     /* ************************ */
 
+<% IF mark_as_beta %>
+    body {
+        border: 20px double red;
+    }
+<% END %>
+
+    .hidden {
+        display: none;
+    }
+
 
   </style>
 </head>
@@ -408,26 +437,28 @@
     </div>
     <!-- needs css/cd-carousel.css loaded to work -->
     <!-- https://www.cssscript.com/pure-css3-3d-cover-flow-effect/ -->
-    <details class="cd-carousel-bg">
-      <summary>Buy Our CDs</summary>
-      <ul id="cd-carousel">
-        <li>
-          <a href="/events/SOTG/index.html" title="Purchase the CD &quot;Swinging On The Gate&quot;">Swinging On The Gate</a>
-        </li>
-        <li class="highlighted">
-          <a href="/events/WaltzCD/index.html" title="Purchase the CD &quot;Waltzes Before Breakfast&quot;">Waltzes Before Breakfast</a>
-        </li>
-        <li>
-          <a href="/events/WBB2/index.html" title="Purchase the CD &quot;More Waltzes Before Breakfast&quot;">More Waltzes Before Breakfast</a>
-        </li>
-        <li>
-          <a href="/events/WBB3/index.html" title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;" >Chocolates Before Breakfast</a>
-        </li>
-        <li>
-          <a href="/odd-sundays" title="Download tunes by the Odd Sundays Garage Band" >Odd Sundays Garage Band</a>
-        </li>
-      </ul>
-    </details>
+    <div class="collapsible-section cd-carousel-bg"> <!-- like <details> -->
+      <div class="collapsible-title collapsible-closed">Buy Our CDs</div> <!-- like <summary> -->
+      <div class="collapsible-body collapsible-body-hidden"> <!-- the hideable part of <details> -->
+        <ul id="cd-carousel">
+          <li>
+            <a href="/events/SOTG/index.html" title="Purchase the CD &quot;Swinging On The Gate&quot;">Swinging On The Gate</a>
+          </li>
+          <li class="highlighted">
+            <a href="/events/WaltzCD/index.html" title="Purchase the CD &quot;Waltzes Before Breakfast&quot;">Waltzes Before Breakfast</a>
+          </li>
+          <li>
+            <a href="/events/WBB2/index.html" title="Purchase the CD &quot;More Waltzes Before Breakfast&quot;">More Waltzes Before Breakfast</a>
+          </li>
+          <li>
+            <a href="/events/WBB3/index.html" title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;" >Chocolates Before Breakfast</a>
+          </li>
+          <li>
+            <a href="/odd-sundays" title="Download tunes by the Odd Sundays Garage Band" >Odd Sundays Garage Band</a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </header>
 
   <div class="navbar-and-body">
@@ -435,115 +466,117 @@
     <!-- ***************************** -->
     <!-- nav -->
     <!-- ***************************** -->
-    <details class="nav">
-      <summary class="nav">Navigation Links</summary>
-      <nav>
-        <div class="navsection">
-          <div class="navitem">
-            <a href="/">Home</a>
-          </div>
-        </div>
-        <div class="navsection">
-          <div class="navitem">
-            <a href="/membership/">Join Us!</a>
-          </div>
-        </div>
-        <div class="navsection">
-          <div class="navitem">
-            <a href="/COVID/">Covid dance safety guidelines</a>
-          </div>
-        </div>
-        <div class="navsection">
-            Dance Series
-          <div class="navsubsection">
+    <div class="collapsible-section nav"> <!-- like <details> -->
+      <div class="collapsible-title collapsible-closed nav">Navigation Links</div> <!-- like <summary> -->
+      <div class="collapsible-body collapsible-body-hidden"> <!-- the hideable part of <details> -->
+        <nav>
+          <div class="navsection">
             <div class="navitem">
-              <a href="/series/contra">Contra and Square Dances</a>
+              <a href="/">Home</a>
+            </div>
+          </div>
+          <div class="navsection">
+            <div class="navitem">
+              <a href="/membership/">Join Us!</a>
+            </div>
+          </div>
+          <div class="navsection">
+            <div class="navitem">
+              <a href="/COVID/">Covid dance safety guidelines</a>
+            </div>
+          </div>
+          <div class="navsection">
+              Dance Series
+            <div class="navsubsection">
+              <div class="navitem">
+                <a href="/series/contra">Contra and Square Dances</a>
+              </div>
+              <div class="navitem">
+                <a href="/series/english">English Country Dances</a>
+              </div>
+              <!--
+              <div class="navitem">
+                <a href="/series/ceilidh">English Ceilidh</a>
+              </div>
+              <div class="navitem">
+                <a href="/series/woodshed">"Woodshed" Dances</a>
+              </div>
+              -->
+              <div class="navitem">
+                <a href="/series/community">Other Community Dances</a>
+              </div>
+            </div><!-- end navsubsection -->
+            <div class="navitem">
+              <a href="/events/">Special Events and Projects</a>
             </div>
             <div class="navitem">
-              <a href="/series/english">English Country Dances</a>
-            </div>
-            <!--
-            <div class="navitem">
-              <a href="/series/ceilidh">English Ceilidh</a>
+              <a href="/camps/">Dance Camps &amp; Weekends</a>
             </div>
             <div class="navitem">
-              <a href="/series/woodshed">"Woodshed" Dances</a>
+              <a href="/teams/">Performance Teams</a>
             </div>
-            -->
             <div class="navitem">
-              <a href="/series/community">Other Community Dances</a>
+              <a href="/organization/">Organization</a>
             </div>
-          </div><!-- end navsubsection -->
-          <div class="navitem">
-            <a href="/events/">Special Events and Projects</a>
+          </div> <!-- end navsection -->
+          <div class="navsection">
+            <div class="navitem">
+              <a href="/links/">Dance/Music Links</a>
+            </div>
+            <div class="navitem">
+              <a href="/dancefinder/">Dancefinder</a>
+            </div>
+            <div class="navitem">
+              <a href="/scripts/dancefinder.pl?style=CONTRA">Contra Dance Events</a><br />
+            </div>
+            <div class="navitem">
+              <a href="/scripts/dancefinder.pl?style=ENGLISH">English Dance Events</a><br />
+            </div>
+            <div class="navitem">
+              <a href="/scripts/dancefinder.pl?style=BARN">Barn Dance Events</a><br />
+            </div>
+            <div class="navitem">
+              <a href="/scripts/dancefinder.pl">All dance Events</a><br />
+            </div>
           </div>
-          <div class="navitem">
-            <a href="/camps/">Dance Camps &amp; Weekends</a>
+          <div class="navsection">
+            <div class="navitem">
+              <a href="/email/">E-mail discussion and announcement lists</a><br />
+            </div>
+          </div> <!-- end navsection -->
+          <div class="navsection">
+            <div class="navitem">
+              <a href="/calendars/">Online Calendars</a>
+            </div>
+            <div class="navitem">
+              <a href="/pdfs/">Printable Calendars</a>
+            </div>
+            <div class="navitem">
+              <a href="/transit/">Take Public Transit to Dances!</a>
+            </div>
+          </div> <!-- end navsection -->
+          <div class="navsection">
+            <div class="navitem">
+              Buy our CDs online
+              <br />
+              <a href="/events/SOTG/" title="Buy the Swinging on the Gate CD online"><img src="/graphics/SOTG_thumb.jpg"></a><br />
+              <a href="/events/WaltzCD/" title="Buy the Waltzes Before Breakfast CD online"><img src="/graphics/WBB_thumb.jpg"></a><br />
+              <a href="/events/WBB2/" title="Buy the More Waltzes Before Breakfast CD online"><img src="/graphics/WBB2-thumb.jpg"></a><br />
+              <a href="/events/WBB3/" title="Buy the new Chocolates Before Breakfast CD online"><img src="/graphics/WBB3-thumb.jpg"></a>
+              <br />
+            </div>
+          </div> <!-- end navsection -->
+          <div class="navsection">
+            <div class="navitem">
+              <a href="/contact/">For More Information</a>
+            </div>
+            <div class="navitem">
+              <a href="/donate/" title="Make a tax-deductible donation to BACDS"><img src="/graphics/Donate-button.png" align="center" border="0"></a>
+            </div>
           </div>
-          <div class="navitem">
-            <a href="/teams/">Performance Teams</a>
-          </div>
-          <div class="navitem">
-            <a href="/organization/">Organization</a>
-          </div>
-        </div> <!-- end navsection -->
-        <div class="navsection">
-          <div class="navitem">
-            <a href="/links/">Dance/Music Links</a>
-          </div>
-          <div class="navitem">
-            <a href="/dancefinder/">Dancefinder</a>
-          </div>
-          <div class="navitem">
-            <a href="/scripts/dancefinder.pl?style=CONTRA">Contra Dance Events</a><br />
-          </div>
-          <div class="navitem">
-            <a href="/scripts/dancefinder.pl?style=ENGLISH">English Dance Events</a><br />
-          </div>
-          <div class="navitem">
-            <a href="/scripts/dancefinder.pl?style=BARN">Barn Dance Events</a><br />
-          </div>
-          <div class="navitem">
-            <a href="/scripts/dancefinder.pl">All dance Events</a><br />
-          </div>
-        </div>
-        <div class="navsection">
-          <div class="navitem">
-            <a href="/email/">E-mail discussion and announcement lists</a><br />
-          </div>
-        </div> <!-- end navsection -->
-        <div class="navsection">
-          <div class="navitem">
-            <a href="/calendars/">Online Calendars</a>
-          </div>
-          <div class="navitem">
-            <a href="/pdfs/">Printable Calendars</a>
-          </div>
-          <div class="navitem">
-            <a href="/transit/">Take Public Transit to Dances!</a>
-          </div>
-        </div> <!-- end navsection -->
-        <div class="navsection">
-          <div class="navitem">
-            Buy our CDs online
-            <br />
-            <a href="/events/SOTG/" title="Buy the Swinging on the Gate CD online"><img src="/graphics/SOTG_thumb.jpg"></a><br />
-            <a href="/events/WaltzCD/" title="Buy the Waltzes Before Breakfast CD online"><img src="/graphics/WBB_thumb.jpg"></a><br />
-            <a href="/events/WBB2/" title="Buy the More Waltzes Before Breakfast CD online"><img src="/graphics/WBB2-thumb.jpg"></a><br />
-            <a href="/events/WBB3/" title="Buy the new Chocolates Before Breakfast CD online"><img src="/graphics/WBB3-thumb.jpg"></a>
-            <br />
-          </div>
-        </div> <!-- end navsection -->
-        <div class="navsection">
-          <div class="navitem">
-            <a href="/contact/">For More Information</a>
-          </div>
-          <div class="navitem">
-            <a href="/donate/" title="Make a tax-deductible donation to BACDS"><img src="/graphics/Donate-button.png" align="center" border="0"></a>
-          </div>
-        </div>
-      </nav>
-    </details>
+        </nav>
+      </div>
+    </div>
     <div class="body-and-sidebar">
       <div class="body-top">
         <!-- ***************************** -->
@@ -658,18 +691,26 @@
     </p>
   </footer>
 <script>
-  // This toggles all the <details> tags open on regular desktop browsers
-  // Still kind of janky, I think I should move to an all-JS solution
-  // so that desktop browsers don't have the collapse-arrows
-  const mediaQueryList = window.matchMedia('(min-width: 600px)');
-  if (mediaQueryList.matches) {
-    var x = document.getElementsByTagName("details");
-    var i;
-    for (i = 0; i < x.length; i++) {
-         x[i].setAttribute("open", "true");
-    }
+  /* this emulates the details/summary tags, e.g.
+    <div class="collapsible-title collapsible-closed">Buy Our CDs</div>
+    <div class="collapsible-body">
+      ...list of CDS...
+    </div>
+  With this approach, the two elements need to be right next to each
+  other, with nothing in between */
+  const collapsibleEls = document.getElementsByClassName("collapsible-title");
+  for (let i = 0; i < collapsibleEls.length; i++) {
+      /* in desktop view these are no-ops by virtue of the
+       * .collapsible-body-hidden not having any styles for "@media (min-width:
+       * 601px)"
+       */
+      collapsibleEls[i].addEventListener('click', function(event) {
+          collapsibleEls[i].classList.toggle('collapsible-open');
+          collapsibleEls[i].classList.toggle('collapsible-closed');
+          const bodyNode = collapsibleEls[i].nextElementSibling;
+          bodyNode.classList.toggle('collapsible-body-hidden');
+      });
   }
-
 </script>
 </body>
 </html>
