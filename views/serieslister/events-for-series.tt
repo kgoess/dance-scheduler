@@ -1,11 +1,6 @@
 
 <div class="event-content-details">
-<%# FIXME what about this?
 
-    <div class="center">
-    <h2> < % series.short_desc % > </h2>
-    </div>
-%>
     <% class_for_type = {
         SPECIAL => 'special',
         WOODSHED => 'woodshed',

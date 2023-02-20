@@ -126,10 +126,9 @@ series-page:
  DONE add beta-tester border
  DONE swap out the detail/summary for some js, or otherwise fix the desktop
    version
- - set up beta-testerage, work out a testing+rollout plan
+ DONE see the FIXME in there
+ DONE set up beta-testerage, work out a testing+rollout plan
  - break out CSS into separate page
- - see the FIXME in there
- - Still need to work out how apache's going to route it.
  - fixup the CDS carousel
  - add "Donate" and "Google Search" buttons
  - center subtitle
@@ -140,4 +139,6 @@ series-page:
  - Seasonal colors
  - Individual event pages broken
  - Check ldjson
+ - Still need to work out how apache's going to route it.
+ - retire old series-url?
 
