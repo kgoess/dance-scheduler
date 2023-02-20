@@ -102,9 +102,6 @@ phase I:
  - I suspect we want a long_desc in the events table
 
 
-# TODO: convert tonightheader.pl
-REQUEST_METHOD="" QUERY_STRING="" perl scripts/tonightheader.pl > tonight-dbix.html
-
 phase II:
 
  - need a way to see old events
@@ -119,3 +116,20 @@ phase II:
    or make it so they don't take so long and be all redundant
  - create "pricing" table that maps to events
  - rewrite the .done() handlers so they're not so complex/obscure/prolix
+
+series-page:
+
+ NO Do the breadcrumbs need to match the url?
+ YES is the help note about the short_desc only being used on the series
+   page actually correct?
+ NOT NEEDED add a unit test
+ DONE add beta-tester border
+ DONE swap out the detail/summary for some js, or otherwise fix the desktop
+   version
+ - set up beta-testerage, work out a testing+rollout plan
+ - break out CSS into separate page
+ - see the FIXME in there
+ - Still need to work out how apache's going to route it.
+ - fixup the CDS carousel
+ - add "Donate" and "Google Search" buttons
+

@@ -1109,6 +1109,14 @@ get '/serieslister' => with_types [
     'optional' => ['query', 'event_id', 'SchedulerId'],
 ] => \&_details_for_series;
 
+=head2 GET /series-page
+
+This is the replacement for the old series-pages with their virtual includes
+that called series-lister. It displays the entire page.
+
+
+=cut
+
 
 get '/series-page' => with_types [
     'optional' => ['query', 'series_id', 'SchedulerId'],
@@ -1161,6 +1169,8 @@ sub _details_for_series {
     my $template = request->path() eq '/serieslister'
         ? 'serieslister/upcoming-events'
         : 'series-page';
+
+    $data->{mark_as_beta} = request->path() eq '/series-page';
 
     template($template, $data,
         {layout => undef},
