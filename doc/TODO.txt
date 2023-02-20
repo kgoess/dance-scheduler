@@ -132,4 +132,12 @@ series-page:
  - Still need to work out how apache's going to route it.
  - fixup the CDS carousel
  - add "Donate" and "Google Search" buttons
+ - center subtitle
+ - check all the series
+ - match up navbar stuff I did with what's actually on the series pages
+ - Address that center TODO
+ - Better breadcrumbs last bit
+ - Seasonal colors
+ - Individual event pages broken
+ - Check ldjson
 
