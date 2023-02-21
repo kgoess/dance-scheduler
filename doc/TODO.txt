@@ -130,12 +130,12 @@ series-page:
  DONE set up beta-testerage, work out a testing+rollout plan
  DONE Individual event pages broken
  DONE center subtitle
+ DONE Better breadcrumbs last bit. Add individual page for page_id?
  - break out CSS into separate page
  - fixup the CDS carousel
  - add "Donate" and "Google Search" buttons
  - check all the series
  - match up navbar stuff I did with what's actually on the series pages
- - Better breadcrumbs last bit. Add individual page for page_id?
  - Seasonal colors
  - Check ldjson
  - Still need to work out how apache's going to route it.

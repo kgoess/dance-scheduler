@@ -180,7 +180,7 @@
     header .breadcrumbs {
       margin: 2px;
       margin-left: 10px;
-      font-size: 80%;
+      font-size: 70%;
     }
     @media (min-width: 600px) {
       header .breadcrumbs {
@@ -436,7 +436,7 @@
             <%- IF breadcrumbs %>
                 <span class="desktop-only">This page is <a href="/">www.bacds.org</a> > </span>
                 <%- FOREACH crumb IN breadcrumbs %>
-                    <a href="<% IF loop.last %>#top<% ELSE%><% crumb %><% END %>"><% crumb %></a>
+                    <a href="<% crumb.href %><% IF loop.last %>#top<% END %>"><% crumb.label %></a>
                     <%- IF ! loop.last %>&gt;<% END %>
                 <% END %>
             <% END %>
@@ -640,7 +640,7 @@
         <main>
           <div class="event-content-container">
             <div class="event-content-title">
-              Upcoming Events:
+              <% event_content_title %>:
             </div>
 
             <% INCLUDE "serieslister/events-for-series.tt" %>

@@ -1159,10 +1159,17 @@ sub _details_for_series {
 
     $data->{ssi_uri_for} = \&ssi_uri_for;
 
-    if ($series->series_url =~ m{ /series/ (?<style>.+?) / (?<page>.+) / }x) {
+    if ($series->series_url =~ m{ /series/ (?<style>.+?) / (?<series_path>.+) / }x) {
         $data->{breadcrumbs} = [
-            $+{style},
-            $+{page},
+            # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
+            # to uri_for if we break "/series/" into a separate app
+            { label => 'series',        href => 'https://bacds.org/series/' },
+            { label => $+{style},       href => "https://bacds.org/series/$+{style}" },
+            { label => $+{series_path}, href => $series->series_url  },
+            $event_id
+                ? { label => $data->{events}[0]->start_date->strftime("%b. %e"),
+                    href => $series->series_url."?event_id=$event_id" }
+                : (),
         ];
     }
 
@@ -1171,6 +1178,10 @@ sub _details_for_series {
         : 'series-page';
 
     $data->{mark_as_beta} = request->path() eq '/series-page';
+
+    $data->{event_content_title} = $event_id
+        ? 'This Dance'
+        : 'Upcoming Events';
 
     template($template, $data,
         {layout => undef},
