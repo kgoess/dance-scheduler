@@ -11,6 +11,7 @@
   <title>
     BACDS -- The Bay Area Country Dance Society Website
   </title>
+  <link rel="stylesheet" href="https://bacds.org/css/cd-carousel.css" />
   <style>
 /*
   This is the desktop layout. For the mobile layout,
@@ -56,6 +57,9 @@
       }
     }
     .body-and-sidebar {
+      /* needs border to match up with the navbar boarder otherwise you see the
+       * step */
+      border-top: 2px solid #0000ff;
       display: flex;
       flex-direction: column;
     }
@@ -108,7 +112,7 @@
     }
 
     /* emulate details/summary tags */
-    @media (max-width: 600px) {
+    @media (max-width: 599px) {
         .collapsible-title { /* like <summary */
           padding: 5px;
         }
@@ -127,7 +131,7 @@
             display: none;
         }
     }
-    @media (min-width: 601px) {
+    @media (min-width: 600px) {
         /* in the desktop view the collapsibles aren't collapsible so they're
          * never closed */
         .collapsible-body-hidden {
@@ -367,11 +371,86 @@
         display: none;
     }
 
+    /* the promo buttons are the "Buy Our CDs", "Donate!", "Search"...etc */
+    #promo-buttons {
+        display: flex;
+        flex-direction: row;
+        background-color: #0000ff;
+    }
+    .promo-button {
+        color: #000000;
+        background-color: #bbddff;
+        font-size: 90%;
+        padding: 8px 16px;;
+        padding: 0px 5px 5px 2px;
+        text-align: center;
+        box-shadow:
+            inset 0 0 2px 0 rgba(255,255,255,.4),
+            inset 0 0 3px 0 rgba(0,0,0,.4),
+            inset 0 0 3px 5px rgba(0,0,0,.05),
+            2px 2px 4px 0 rgba(0,0,0,.25);
+        border-radius: 5px;
+        vertical-align: center;
+        margin: 1px;
+    }
+    .promo-button a:link {
+        text-decoration: none;
+        color: #000000;
+    }
+    .promo-button:before, .promo-button:after {
+        content: '';
+        display: block;
+        left: 2px;
+        right: 2px;
+        height: 3px;
+    }
+    .promo-button:before {
+        top: 0;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        background: rgba(255,255,255,.6);
+        box-shadow: 0 1px 2px 0 rgba(255,255,255,.6);
+    }
+    /* it would be nice to get this bottom border working, but it's hugging the
+     * bottom of the text instead of the bottom of the button
+        .promo-button:after {
+            bottom: 0;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            background: rgba(0,0,0,.15);
+            box-shadow: 0 -1px 2px 0 rgba(0,0,0,.15);
+        }
+    */
+
+    header .cd-carousel-bg {
+        margin-top: 10px;
+        padding-bottom: 20px;
+        /* need to override the bottom margin from our cd-carousel.css or we
+           get a blank chunk between the carousel and the rest of the page */
+        margin-bottom: 0px;
+
+    }
+    @media (max-width: 599px) {
+        /* overriding cd-carousel.css for mobile */
+        header ul#cd-carousel li {
+            width: 60px;
+            height: 60px;
+        }
+    }
+
+    .google-searchbox-container {
+      margin: auto;
+      width: 100%;
+      min-width: 100%;
+      background-color: #0000ff;
+    }
+    .google-searchbox {
+        max-width: 500px;
+    }
 
     /* ************************ */
     /* from base.css to handle html in like the Display Text form */
     /* ************************ */
-
     .center {
         text-align: center;
     }
@@ -381,23 +460,6 @@
         /* this font-size not in base.css, but let's drop it down a notch anyway */
         font-size: 1.2em;
     }
-/*
-    h1.dance {
-        font-size: 1.5em;
-        font-family: Verdana, Arial, Helvetica, sans-serif;
-        color: #993300;
-        text-align: center;
-    }
-
-    h2.dance {
-        font-size: 1.2em;
-        font-family: Verdana, Arial, Helvetica, sans-serif;
-    }
-
-    h3.dance {
-        font-family: Verdana, Arial, Helvetica, sans-serif;
-    }
-*/
     /* ************************ */
     /* end from base.css */
     /* ************************ */
@@ -411,8 +473,6 @@
     .hidden {
         display: none;
     }
-
-
   </style>
 </head>
 <body>
@@ -444,28 +504,76 @@
         </div>
       </a>
     </div>
+
+    <section id="promo-buttons">
+      <div class="promo-button" data-promo-id="carousel">
+        Buy Our CDs
+      </div>
+      <div class="promo-button">
+        <a href="/donate/" title="Make a tax-deductible donation to BACDS">Donate!</a>
+      </div>
+      <div class="promo-button" data-promo-id="search">
+        Search
+      </div>
+      <div class="promo-button">
+        <a href="/COVID/">COVID Safety Info</a>
+      </div>
+    </section>
+
     <!-- needs css/cd-carousel.css loaded to work -->
     <!-- https://www.cssscript.com/pure-css3-3d-cover-flow-effect/ -->
-    <div class="collapsible-section cd-carousel-bg"> <!-- like <details> -->
-      <div class="collapsible-title collapsible-closed">Buy Our CDs</div> <!-- like <summary> -->
-      <div class="collapsible-body collapsible-body-hidden"> <!-- the hideable part of <details> -->
-        <ul id="cd-carousel">
-          <li>
-            <a href="/events/SOTG/index.html" title="Purchase the CD &quot;Swinging On The Gate&quot;">Swinging On The Gate</a>
-          </li>
-          <li class="highlighted">
-            <a href="/events/WaltzCD/index.html" title="Purchase the CD &quot;Waltzes Before Breakfast&quot;">Waltzes Before Breakfast</a>
-          </li>
-          <li>
-            <a href="/events/WBB2/index.html" title="Purchase the CD &quot;More Waltzes Before Breakfast&quot;">More Waltzes Before Breakfast</a>
-          </li>
-          <li>
-            <a href="/events/WBB3/index.html" title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;" >Chocolates Before Breakfast</a>
-          </li>
-          <li>
-            <a href="/odd-sundays" title="Download tunes by the Odd Sundays Garage Band" >Odd Sundays Garage Band</a>
-          </li>
-        </ul>
+    <div id="carousel" class="promo hidden cd-carousel-bg"> <!-- like <details> -->
+      <ul id="cd-carousel">
+        <li>
+          <a href="/events/SOTG/index.html" title="Purchase the CD &quot;Swinging On The Gate&quot;">Swinging On The Gate</a>
+        </li>
+        <li class="highlighted">
+          <a href="/events/WaltzCD/index.html" title="Purchase the CD &quot;Waltzes Before Breakfast&quot;">Waltzes Before Breakfast</a>
+        </li>
+        <li>
+          <a href="/events/WBB2/index.html" title="Purchase the CD &quot;More Waltzes Before Breakfast&quot;">More Waltzes Before Breakfast</a>
+        </li>
+        <li>
+          <a href="/events/WBB3/index.html" title="Purchase the new CD &quot;Chocolates Before Breakfast&quot;" >Chocolates Before Breakfast</a>
+        </li>
+        <li>
+          <a href="/odd-sundays" title="Download tunes by the Odd Sundays Garage Band" >Odd Sundays Garage Band</a>
+        </li>
+      </ul>
+    </div>
+    <div id="search" class="hidden promo">
+      <script>
+        (function() {
+        // I set these up here: https://cse.google.com/cse/all --kg 20170205
+        // per the css settings in /var/www/bacds.org/public_html/css/*-base.css
+        // which are managed by the script in /var/www/bacds.org/public_html/scripts/css-rotate.sh
+        // which is a cron job under the apache account
+        var searchbox_for_season = [
+          '004458889210186432126:se1gimrcxs0', // winter
+          '004458889210186432126:km9gtrwnpya', // spring
+          '004458889210186432126:i7zptaustsu', // summer
+          '004458889210186432126:wv_nqlzpbv4'  // fall
+          ];
+          var today = new Date();
+          var season = Math.trunc((today.getMonth()/3));
+
+          var cx = searchbox_for_season[season];
+
+          var gcse = document.createElement('script');
+          gcse.type = 'text/javascript';
+          gcse.async = true;
+          gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0];
+          s.parentNode.insertBefore(gcse, s);
+        })();
+      </script>
+      <div class="google-searchbox-container">
+      <div class="google-searchbox">
+        <!-- <div class="google-searchbox-caption">
+        Search for:
+        </div>
+        -->
+        <gcse:search></gcse:search>
       </div>
     </div>
   </header>
@@ -705,13 +813,13 @@
     <div class="collapsible-body">
       ...list of CDS...
     </div>
-  With this approach, the two elements need to be right next to each
-  other, with nothing in between */
+  With this approach using nextElementSibling, the two elements need to be
+  right next to each other, with nothing in between */
   const collapsibleEls = document.getElementsByClassName("collapsible-title");
   for (let i = 0; i < collapsibleEls.length; i++) {
       /* in desktop view these are no-ops by virtue of the
        * .collapsible-body-hidden not having any styles for "@media (min-width:
-       * 601px)"
+       * 600px)"
        */
       collapsibleEls[i].addEventListener('click', function(event) {
           collapsibleEls[i].classList.toggle('collapsible-open');
@@ -720,6 +828,28 @@
           bodyNode.classList.toggle('collapsible-body-hidden');
       });
   }
+
+  const promoButtons = document.getElementsByClassName("promo-button");
+  Array.from(promoButtons).map(promoButton => {
+      const promoId = promoButton.dataset.promoId;
+      if (!promoId) {
+          return;
+      }
+      const promo = document.getElementById(promoId);
+      if (!promo) {
+          console.log(`missing promo element ${promoId}, skipping`);
+          return;
+      }
+      /* hide any other promos that were previously open */
+      promoButton.addEventListener('click', function(event) {
+          promo.classList.toggle('hidden');
+          promos = document.getElementsByClassName('promo');
+          Array.from(promos)
+              .filter(promo => promo.id != promoButton.dataset.promoId)
+              .filter(promo => !promo.classList.contains('hidden'))
+              .map(   promo => promo.classList.add('hidden'));
+      });
+  })
 </script>
 </body>
 </html>

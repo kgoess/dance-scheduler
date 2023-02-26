@@ -132,12 +132,13 @@ series-page:
  DONE center subtitle
  DONE Better breadcrumbs last bit. Add individual page for page_id?
  - break out CSS into separate page
- - fixup the CDS carousel
- - add "Donate" and "Google Search" buttons
+ DONE fixup the CDS carousel
+ DONE add "Donate" and "Google Search" buttons
  - check all the series
  - match up navbar stuff I did with what's actually on the series pages
  - Seasonal colors
  - Check ldjson
  - Still need to work out how apache's going to route it.
  - retire old series-url? or base routing on it?
+ - problem in structured data: "Missing field "name" (in "performer")"
 
