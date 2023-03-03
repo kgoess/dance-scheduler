@@ -13,6 +13,36 @@
   </title>
   <link rel="stylesheet" href="https://bacds.org/css/cd-carousel.css" />
   <style>
+  :root {
+
+      <% IF season == "winter" %>
+          --header-color: #bbbbbb;
+          --header-background-color: #0000ff;
+          --nav-background: #bbddff;
+          --seasoned-text: #0000ff;
+          --special-event-border: #0000ff;
+       <% ELSIF season == "spring" %>
+          --header-color: #000000;
+          --header-background-color: #008822;
+          --nav-background: #ddffdd;
+          --seasoned-text: #006622;
+          --special-event-border: #009900;
+       <% ELSIF season == "summer" %>
+          --header-color: #000000;
+          --header-background-color: #c24f4f;
+          --nav-background: #ffdddd;
+          --seasoned-text: #aa1111;
+          --special-event-border: #bb3333;
+       <% ELSE %><%# season == "fall" %>
+          --header-color: #000000;
+          --header-background-color: #bb5820;
+          --nav-background: #e4dcc3;
+          --seasoned-text: #953100;
+          --special-event-border: #b55100;
+       <% END %>
+  }
+  </style>
+  <style>
 /*
   This is the desktop layout. For the mobile layout,
   everything is top-to-bottom or flex-direction:column.
@@ -59,13 +89,14 @@
     .body-and-sidebar {
       /* needs border to match up with the navbar boarder otherwise you see the
        * step */
-      border-top: 2px solid #0000ff;
+      border-top: 2px solid var(--header-background-color);
       display: flex;
       flex-direction: column;
     }
     .body-bottom {
       display: flex;
       flex-direction: column;
+      padding: 1px; /* separates the special event box from the nav column */
     }
     @media (min-width: 600px) {
       .body-bottom {
@@ -140,12 +171,16 @@
     }
     /* end details/summary emulation */
 
+    a {
+      color: var(--seasoned-text);
+    }
+
     body {
       font-family: Verdana, sans-serif;
     }
     header {
-      color: #bbbbbb;
-      background-color: #0000ff;
+      color: var(--header-color);
+      background-color: var(--header-background-color);
       min-width: 100%;
     }
     /* carousel stuff just for local dev */
@@ -167,14 +202,13 @@
       font-style: italic;
       font-weight: bold;
     }
-    header .masthead-title {
-      font-size: 1.5em;
+    header .masthead-title { font-size: 1.5em;
       font-weight: bold;
       margin: 2px;
       margin-left: 10px;
     }
     header .masthead-title a:any-link {
-      color: #bbbbbb;
+      color: var(--header-color);
     }
 
     header .masthead-logo {
@@ -208,7 +242,7 @@
 
     .collapsible-section.nav {
       width: auto;
-      border: 2px solid #0000ff;
+      border: 2px solid var(--header-background-color);
     }
     @media (min-width: 600px) {
       .collapsible-section.nav {
@@ -222,11 +256,11 @@
       }
     }
     .collapsible-title.nav {
-      background-color: #bbddff;
+      background-color: var(--nav-background);
       padding: 5px;
     }
     nav {
-      background-color: #bbddff;
+      background-color: var(--nav-background);
       display: flex;
       flex-direction: column;
       padding: 10px;
@@ -280,7 +314,7 @@
     p.comment {
       margin: 0 1em 3em 1em;
       text-align: left;
-      color: #0000ff;
+      color: var(--seasoned-text);
     }
     p.canceled-event-comment {
       color: IndianRed;
@@ -300,7 +334,7 @@
 
     div.tonight, div.workshop, div.special, div.camp {
       border: solid;
-      border-color: #0000ff;
+      border-color: var(--special-event-border);
       border-width: 3px;
     }
 
@@ -332,8 +366,9 @@
         justify-content: center;
       }
     }
+    /* the mission statement colors could be seasonalized? */
     aside.mission-statement .mission-container {
-      background-color: #0000ff;
+      background-color: var(--header-background-color);
       padding: 10px 40px 10px 40px;
     }
     aside.mission-statement .mission-title {
@@ -354,18 +389,18 @@
 
 
     footer {
-      background-color: #0000ff;
+      background-color: var(--header-background-color);
       padding-left: 15px;
       padding-right: 15px;
       padding-top: .3em;
       padding-bottom: .3em;
       margin-bottom: 3em;
-      color: #bbbbbb;
+      color: var(--header-color);
       font-style: italic;
       font-size: 0.8em;
     }
     footer a {
-      color: #ffffff;
+      color: var(--header-color);
     }
     .old {
         display: none;
@@ -375,11 +410,11 @@
     #promo-buttons {
         display: flex;
         flex-direction: row;
-        background-color: #0000ff;
+        background-color: var(--header-background-color);
     }
     .promo-button {
         color: #000000;
-        background-color: #bbddff;
+        background-color: var(--nav-background);
         font-size: 90%;
         padding: 8px 16px;;
         padding: 0px 5px 5px 2px;
@@ -442,7 +477,7 @@
       margin: auto;
       width: 100%;
       min-width: 100%;
-      background-color: #0000ff;
+      background-color: var(--header-background-color);
     }
     .google-searchbox {
         max-width: 500px;
@@ -801,7 +836,7 @@
   <!-- ***************************** -->
   <footer>
     <p>
-      Unless otherwise noted, layout and content Copyright &copy; 2002-2020, <a href="/">Bay Area Country Dance Society</a>.
+      Unless otherwise noted, layout and content Copyright &copy; 2002-2023, <a href="/">Bay Area Country Dance Society</a>.
       All rights reserved.
       <br>
       <a href="/contact/">Contact us</a> for more information about this site or BACDS.</a>

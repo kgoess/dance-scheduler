@@ -30,6 +30,7 @@ use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
 use Scalar::Util qw/looks_like_number/;
+use Time::Piece;
 use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref/;
 use YAML qw/Load/;
 
@@ -1178,6 +1179,7 @@ sub _details_for_series {
                 : (),
         ];
     }
+    
 
     my $template = request->path() eq '/serieslister'
         ? 'serieslister/upcoming-events'
@@ -1189,10 +1191,36 @@ sub _details_for_series {
         ? 'This Dance'
         : 'Upcoming Events';
 
+    $data->{season} = get_season();
+
     template($template, $data,
         {layout => undef},
     );
 };
+
+sub get_season {
+
+    state $season = {
+        January   => 'winter',
+        February  => 'winter',
+        March     => 'winter',
+
+        April     => 'spring',
+        May       => 'spring',
+        June      => 'spring',
+
+        July      => 'summer',
+        August    => 'summer',
+        September => 'summer',
+
+        October   => 'fall',
+        November  => 'fall',
+        Decenber  => 'fall',
+    };
+
+    # see Time::Piece for this localtime() usage
+    return $season->{localtime->fullmonth};
+}    
 
 
 =head2 Helper Methods
