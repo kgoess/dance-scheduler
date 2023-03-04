@@ -24,6 +24,9 @@ sub initialize{
 }
 
 sub get_checksum{
+    if (!$checksum) {
+        initialize();
+    }
     return $checksum;
 }
 

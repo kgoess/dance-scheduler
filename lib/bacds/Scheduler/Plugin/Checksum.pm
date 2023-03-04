@@ -48,15 +48,24 @@ plugin_keywords requires_checksum => sub {
     return sub {
         my ($self) = @_;
         my $checksum = $self->app->cookie('Checksum');
-        if ( 
-            $checksum->value ne bacds::Scheduler::Util::Initialize::get_checksum() 
-        ){
+        if (!$checksum) {
+            $self->app->response->status(400);
+            my $results = $Results_Class->new;
+            $results->add_error(400, 
+                "You have sent a JSON request without a checksum cookie. This "
+                . "shouldn't be possible. Please reload the page and try again."
+            );
+            $self->app->response->halt($results->format);
+            return;
+        }
+        if ($checksum->value ne bacds::Scheduler::Util::Initialize::get_checksum()) {
             $self->app->response->status(426);
             my $results = $Results_Class->new;
             $results->add_error(426, 
                 "You need to reload the page to be able to complete your request"
             );
             $self->app->response->halt($results->format);
+            return;
         }
 
         return $route_sub->($self, @args);

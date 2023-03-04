@@ -20,6 +20,7 @@ use LWP::ConsoleLogger::Easy qw/debug_ua/;
 use bacds::Scheduler;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession/;
+use bacds::Scheduler::Util::Initialize;
 use bacds::Scheduler::FederatedAuth;
 
 use Exporter 'import';
@@ -90,10 +91,25 @@ sub get_tester {
         $args{env} ? (env => $args{env}) : (),
         max_redirect => $max_redirect,
     );
+    
+    my @cookies;
 
     if ($args{auth}) {
-        $test->add_header(auth_cookie($args{user_email}));
+        push @cookies, auth_cookie($args{user_email});
     }
+    if ((! exists $args{checksum}) || $args{checksum} == 1) {
+        my $checksum = bacds::Scheduler::Util::Initialize::get_checksum();
+        push @cookies, "Checksum=$checksum";
+    }
+    elsif ($args{checksum}){
+        push @cookies, "Checksum=$args{checksum}";
+    }
+
+    if (@cookies) {
+        my $cookie_string = join ";", @cookies;
+        $test->add_header(Cookie => $cookie_string);
+    }
+
     my $debug = $args{debug} || $ENV{DEBUG_UA};
     if (defined $debug) {
         debug_ua($test, $debug);
@@ -109,7 +125,7 @@ sub auth_cookie {
     my $session_cookie = bacds::Scheduler::FederatedAuth
         ->create_session_cookie($email);
 
-    return Cookie => LoginMethod()."=session;".LoginSession()."=$session_cookie"
+    return LoginMethod()."=session;".LoginSession()."=$session_cookie"
 }
 
 
