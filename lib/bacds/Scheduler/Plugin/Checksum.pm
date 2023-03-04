@@ -49,9 +49,9 @@ plugin_keywords requires_checksum => sub {
         my ($self) = @_;
         my $checksum = $self->app->cookie('Checksum');
         if (!$checksum) {
-            $self->app->response->status(400);
+            $self->app->response->status(426);
             my $results = $Results_Class->new;
-            $results->add_error(400, 
+            $results->add_error(426, 
                 "You have sent a JSON request without a checksum cookie. This "
                 . "shouldn't be possible. Please reload the page and try again."
             );

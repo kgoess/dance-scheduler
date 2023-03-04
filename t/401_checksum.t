@@ -27,7 +27,7 @@ my $dbh = get_dbh();
 my ($res, $decoded, $got, $expected);
 $res = $test->request( GET '/style/1' );
 ok(!$res->is_success, 'no checksum returned failure');
-is ($res->code, 400, 'Missing checksum returns 400 error');
+is ($res->code, 426, 'Missing checksum returns 426 error');
 
 $decoded = decode_json($res->content);
 $expected = {
