@@ -78,15 +78,19 @@ sub MY::postamble {
 APPDIR=/var/www/bacds.org/dance-scheduler
 
 app-install:
-	install -d $(APPDIR) --mode 2755
+	install -d $(APPDIR) --mode 2775 --group dev
 	install bin/app.psgi $(APPDIR)
 	install config.yml   $(APPDIR)
 	install accordions-webui.yml   $(APPDIR)
 	install README.md    $(APPDIR)
-	install -d $(APPDIR)/environments --mode 2755
-	install -d $(APPDIR)/views        --mode 2755
-	install -d $(APPDIR)/public       --mode 2755
-	install -d $(APPDIR)/private      --mode 2750
+	install -d $(APPDIR)/environments  --mode 2775 --group dev
+	install -d $(APPDIR)/views         --mode 2775 --group dev
+	install -d $(APPDIR)/views/layouts --mode 2775 --group dev
+	install -d $(APPDIR)/public        --mode 2775 --group dev
+	install -d $(APPDIR)/public/images --mode 2775 --group dev
+	install -d $(APPDIR)/public/js     --mode 2775 --group dev
+	install -d $(APPDIR)/public/css    --mode 2775 --group dev
+	install -d $(APPDIR)/private       --mode 2770 --group apache
 	cp -r environments   $(APPDIR)
 	cp -r views          $(APPDIR)
 	cp -r public         $(APPDIR)
