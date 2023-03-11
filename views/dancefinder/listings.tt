@@ -34,7 +34,11 @@ page.
 <% FOREACH event IN events %>
     <div <% special_class(event) %>>
     <p class="listing<% IF event.is_canceled %> canceled-event<% END %>">
-    <% event.start_date.strftime("%A, %e %B, %Y") %>: 
+    <% IF event.end_date %>
+        <%- event.start_date.strftime("%A, %e %B - ") _ event.end_date.strftime("%A, %e %B, %Y") %>
+    <%- ELSE %>
+        <% event.start_date.strftime("%A, %e %B, %Y") %>
+    <%- END %>:
     <% IF event.styles.grep('^SPECIAL$') && event.name %>
         <% emphasize_name_over_style = 1 %>
     <% END %>
