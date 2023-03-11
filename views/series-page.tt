@@ -331,6 +331,7 @@
     }
     p.comment {
       margin: 0 1em 3em 1em;
+      padding-left: 15px;
       text-align: left;
       color: var(--seasoned-text);
     }
