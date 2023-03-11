@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width" />
 
   <title>
-    BACDS <% series.name %> Dance Series
+    <% page_title %>
   </title>
   <link rel="stylesheet" href="https://bacds.org/css/cd-carousel.css" />
   <style>
@@ -293,6 +293,13 @@
       font-size: 1.5em;
       font-weight: bold;
       text-align: center;
+    }
+    .series-description .series-name a {
+      color: #993300;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
     }
     .series-description .series-name-sub {
       font-size: 1.2em;
@@ -762,7 +769,7 @@
         <!-- ***************************** -->
         <section class="series-description">
           <div class="series-name">
-              <% series.name %>
+              <a href="<% series.series_url %>"><% series.name %></a>
           </div>
           <div class="series-name-sub">
               <% series.short_desc %>

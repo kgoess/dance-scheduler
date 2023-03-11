@@ -1,6 +1,6 @@
 =head1 NAME
 
-bacds::Scheduler - web controller for the BACDS Dance Scheduler single page app
+bacds::Scheduler - web controller for the BACDS website
 
 =head1 SYNOPSIS
 
@@ -1121,9 +1121,7 @@ get '/serieslister' => with_types [
 This is the replacement for the old series-pages with their virtual includes
 that called series-lister. It displays the entire page.
 
-
 =cut
-
 
 get '/series-page' => with_types [
     'optional' => ['query', 'series_id', 'SchedulerId'],
@@ -1174,7 +1172,7 @@ sub _details_for_series {
             { label => $+{style},       href => "https://bacds.org/series/$+{style}" },
             { label => $+{series_path}, href => $series->series_url  },
             $event_id
-                ? { label => $data->{events}[0]->start_date->strftime("%b. %e"),
+                ? { label => $data->{events}[0]->start_date->strftime("%b %e"),
                     href => $series->series_url."?event_id=$event_id" }
                 : (),
         ];
@@ -1190,6 +1188,10 @@ sub _details_for_series {
     $data->{event_content_title} = $event_id
         ? 'This Dance'
         : 'Upcoming Events';
+
+    $data->{page_title} = $event_id
+        ? $data->{events}[0]->start_date->strftime("%b %e"). ' ' .$series->name
+        : $series->name." Dance Series";
 
     $data->{season} = get_season();
 
