@@ -36,12 +36,12 @@ $expected = {
         msg => 
             "You have sent a JSON request without a checksum cookie. This "
             . "shouldn't be possible. Please reload the page and try again.",
-        num => 400,
+        num => 426,
     }]
 };
 eq_or_diff $decoded, $expected, 'missing checksum error msg matches';
 
-$test = get_tester(auth => 1, checksum => "bogus checksum");
+$test = get_tester(auth => 1, checksum => "99999");
 
 $res = $test->request( GET '/style/1' );
 ok(!$res->is_success, 'bad checksum returned failure');
