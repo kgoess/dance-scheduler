@@ -278,8 +278,11 @@
       padding: 5px;
     }
     nav .navsubsection {
-      padding: 5px;
-      margin: 5px;
+      padding: 0px 5px 5px 5px;
+      margin: 2px 5px 5px 5px;
+    }
+    nav .current-navsection {
+      background-color: #ffffff;
     }
     nav .navitem {
       font-style: italic;
@@ -637,7 +640,7 @@
           </div>
           <div class="navsection">
             <div class="navitem">
-              <a href="/membership/">Join Us!</a>
+              <a href="/membership/">Become a Member!</a>
             </div>
           </div>
           <div class="navsection">
@@ -646,8 +649,8 @@
             </div>
           </div>
           <div class="navsection">
-              Dance Series
-            <div class="navsubsection">
+              Dance Series:
+            <div class="navsubsection current-navsection">
               <div class="navitem">
                 <a href="/series/contra">Contra and Square Dances</a>
               </div>
@@ -675,42 +678,57 @@
             <div class="navitem">
               <a href="/teams/">Performance Teams</a>
             </div>
-            <div class="navitem">
-              <a href="/organization/">Organization</a>
-            </div>
           </div> <!-- end navsection -->
+          <div class="navsection">
+            All Upcoming Dances:
+            <div class="navsubsection">
+              <div class="navitem">
+                <a href="/scripts/dancefinder.pl?style=CONTRA">Contra Dances </a><br />
+              </div>
+              <div class="navitem">
+                <a href="/scripts/dancefinder.pl?style=ENGLISH">English Dances </a><br />
+              </div>
+              <div class="navitem">
+                <a href="/scripts/dancefinder.pl?style=BARN">Barn Dances </a><br />
+              </div>
+              <div class="navitem">
+                <a href="/scripts/dancefinder.pl">Eveything</a><br />
+              </div>
+            </div>
+          </div>
           <div class="navsection">
             <div class="navitem">
               <a href="/links/">Dance/Music Links</a>
             </div>
             <div class="navitem">
-              <a href="/dancefinder/">Dancefinder</a>
-            </div>
-            <div class="navitem">
-              <a href="/scripts/dancefinder.pl?style=CONTRA">Contra Dance Events</a><br />
-            </div>
-            <div class="navitem">
-              <a href="/scripts/dancefinder.pl?style=ENGLISH">English Dance Events</a><br />
-            </div>
-            <div class="navitem">
-              <a href="/scripts/dancefinder.pl?style=BARN">Barn Dance Events</a><br />
-            </div>
-            <div class="navitem">
-              <a href="/scripts/dancefinder.pl">All dance Events</a><br />
-            </div>
-          </div>
-          <div class="navsection">
-            <div class="navitem">
               <a href="/email/">E-mail discussion and announcement lists</a><br />
+            </div>
+            <div class="navitem">
+              <a href="/organization/">Board/Committees</a>
             </div>
           </div> <!-- end navsection -->
           <div class="navsection">
             <div class="navitem">
-              <a href="/calendars/">Online Calendars</a>
+              <a href="/dancefinder/">Dancefinder - search</a>
             </div>
-            <div class="navitem">
-              <a href="/pdfs/">Printable Calendars</a>
+          </div>
+
+          <div class="navsection">
+            Calendars:
+            <div class="navsubsection">
+              <div class="navitem">
+                <a href="livecalendar.html">Interactive</a>
+              </div>
+              <div class="navitem">
+                <a href="/calendars/">Monthly</a>
+              </div>
+              <div class="navitem">
+                <a href="/pdfs/">Printable</a>
+              </div>
             </div>
+          </div>
+
+          <div class="navsection">
             <div class="navitem">
               <a href="/transit/">Take Public Transit to Dances!</a>
             </div>
