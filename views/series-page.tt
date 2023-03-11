@@ -163,6 +163,10 @@
         }
     }
     @media (min-width: 600px) {
+        .collapsible-title {
+            /* no need to show the text "Navigation Links" in the nav bar */
+            display: none;
+        }
         /* in the desktop view the collapsibles aren't collapsible so they're
          * never closed */
         .collapsible-body-hidden {
@@ -249,7 +253,6 @@
         width: 100%;
       }
     }
-
     @media (min-width: 600px) {
       .collapsible-section.nav {
         max-width: 16em;
@@ -264,6 +267,11 @@
       display: flex;
       flex-direction: column;
       padding: 10px;
+    }
+    @media (min-width: 600px) {
+      nav {
+        padding: 0px;
+      }
     }
     nav .navsection {
       margin: 5px;
