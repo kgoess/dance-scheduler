@@ -786,32 +786,6 @@
           </div>
           <div class="series-display-text">
               <% display_text %>
-<!--
-            <p>
-            Are you comfortable dancing <b>heys for three</b> and <b>double figures of eight</b>? Do you
-            find it satisfying to move in time to the music and to match your fellow dancers surging in a line?
-            <p>
-            Welcome to the Fourth Saturday Experienced English Dance!
-            <p>
-            We spend some time each evening paying attention to styling, to
-            make the dances go more smoothly and look nicer. Each program
-            includes a few <b>challenging dances</b>, as well as many
-            familiar and favorite dances that we can do with <b>quick
-            walk-through calling</b>. Come enjoy the camaraderie, physical
-            and mental stimuli, and the glorious music.
-
-            <p>
-            (If you have friends to whom you would like to introduce the
-            joys of English Country Dancing, please bring them on the second
-            and fourth Thursdays to the dances in
-            <a href="/series/english/berkeley_wed/">Berkeley</a>, or to the
-            <a href="/series/english/san_francisco/">San Francisco<a>,
-            <a href="/series/english/palo_alto">Palo Alto</a>,
-            <a href="/series/english/peninsula/">Peninsula</a> or
-            <a href="/series/english/san_jose/">South Bay</a> dances. Check
-            the listings on the quarterly BACDS calendar flyer or on the
-            calendar at www.bacds.org)
--->
           </div> <!-- end series-display-text -->
         </section> <!-- end series-description -->
 
@@ -829,6 +803,8 @@
               <% event_content_title %>:
             </div>
 
+            <!-- *** here's the meat of the page *** -->
+            <!-- *** all the events are displayed from this include *** -->
             <% INCLUDE "serieslister/events-for-series.tt" %>
 
           </div> <!-- end event-content-container -->
