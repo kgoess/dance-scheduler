@@ -1183,8 +1183,6 @@ sub _details_for_series {
         ? 'serieslister/upcoming-events'
         : 'series-page';
 
-    $data->{mark_as_beta} = request->path() eq '/series-page';
-
     $data->{event_content_title} = $event_id
         ? 'This Dance'
         : 'Upcoming Events';

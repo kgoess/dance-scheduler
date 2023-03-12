@@ -1,6 +1,6 @@
 <% MACRO maybe_linkit(string, url) BLOCK %>
     <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
-<% END %>
+<% END -%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -532,12 +532,6 @@
     /* ************************ */
     /* end from base.css */
     /* ************************ */
-
-<% IF mark_as_beta %>
-    body {
-        border: 20px double red;
-    }
-<% END %>
 
     .hidden {
         display: none;
