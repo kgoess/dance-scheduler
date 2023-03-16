@@ -179,7 +179,7 @@
           <div class="col-lg-5 ml-auto p-lg-5 mt-4 mt-lg-0" data-aos="fade-left" data-aos-delay="">
 <h3 class="mb-3" text-red">NOTE: these past events are  only examples to show off photos!</h3>
             <!--<p><b>During the Coronavirus pandemic, all our in-person events are canceled. Join us for today&rsquo;s <i>online</i> events:</b></p>-->
-            <p class="listing"> <span class="eventdate">Saturday, July 11, 2020 <b>[PAST EVENT! Just showing off photos in listings]</b>: </span> 
+            <p class="listing"> <span class="event-date">Saturday, July 11, 2020 <b>[PAST EVENT! Just showing off photos in listings]</b>: </span> 
               <!-- loc="ONLINE" ->
 
 <!-- band="Rodney Miller in a special <b>NBCDS Online Tunebook Kickoff Party</b>, 7pm&ndash;8pm PDT " --> 
@@ -199,7 +199,7 @@
             <div class="col-12 col-lg-6 block__73422 order-lg-2" style="background-image: url('images/unearth/syncopaths_fence_colour.jpg');" data-aos="fade-left" data-aos-delay=""> </div>
             <div class="col-lg-5 mr-auto p-lg-5 mt-4 mt-lg-0 order-lg-1" data-aos="fade-right" data-aos-delay="">
               <!--<p><b>During the Coronavirus pandemic, all our in-person events are canceled. Join us for these upcoming <i>online</i> events:</b></p>-->
-              <p class="listing"> <span class="eventdate">Sunday, July 12, 2020 <b>[PAST EVENT! Just showing off photos in listings]</b>:</span> 
+              <p class="listing"> <span class="event-date">Sunday, July 12, 2020 <b>[PAST EVENT! Just showing off photos in listings]</b>:</span> 
                 <!-- loc="ONLINE" ->
 
 <!-- band="Syncopaths (Ryan McKasson, Ashley Broder, Jeff Spero, Christa Burch) in a special <b>SCDS Online Concert</b>, 4pm&ndash;5pm PDT " --> 
@@ -214,25 +214,6 @@
         <div class="row d-flex no-gutters">
           <div class="col-lg-8 mr-auto p-lg-5 mt-4 mt-lg-0 order-lg-1" data-aos="fade-right" data-aos-delay="">
           <% include unearth/listings.tt events => eighteen_days %>
-          <!--
-            <p class="listing"> <span class="eventdate">Monday, February 20, 2023:</span> 
-
-		<b><i>Jubilee Dance Open Rehearsal</i></b> ( SPECIAL ) at <a href="https://www.facebook.com/jubileedance/posts/pfbid0EnBNbnpXgF3cMRvfqRPqbcwbby5hqyCa6bWypuiZHx3nEKW2P4HjXbLcoHxXG49il">Ashkenaz in Berkeley</a>. Jubilee American Dance Theater is having an open rehearsal. Based in Berkeley, Jubilee is the Bay Area&rsquo;s preeminent US historic dance ensemble, bringing to the stage the dance and music of the various traditions that make up America. This includes clogging, square dance, running sets, polkas, waltzes, Cajun, swing, hornpipes, and other historical social dances. We perform locally and internationally.
-		<i><a href="https://www.facebook.com/jubileedance/posts/pfbid0EnBNbnpXgF3cMRvfqRPqbcwbby5hqyCa6bWypuiZHx3nEKW2P4HjXbLcoHxXG49il">More Info</a></i> </p>
-
-            <p class="listing"> <span class="eventdate">Tuesday, February 21, 2023:</span> 
-
-	        ( ENGLISH ) at <a href="https://bacds.org/series/english/peninsula/">All Saints Episcopal Church in Palo Alto</a>. Alan Winston with Bill Jensen, Robin Lockner, Noel Cragg - 7:30-9:30, please arrive early for COVID check-in. <a href="https://bacds.org/series/english/peninsula/https://bacds.org/series/english/peninsula/"><em>More Info</em></a> </p>
-
-            <p class="listing"> <span class="eventdate">Tuesday, February 21, 2023:</span> 
-
-	        ( ENGLISH ) at <a href="https://bacds.org/series/english/berkeley_wed/">Christ Church Berkeley in Berkeley</a>. Ric Goldman with Anne Goess, Craig Johnson, Judy Linsenberg &mdash; Open Band Night - dance 7:45-10:00, beginner lesson 7:15. <a href="https://bacds.org/series/english/berkeley_wed/"><em>More Info</em></a>
-
-            <p class="listing"> <span class="eventdate">Tuesday, February 21, 2023:</span> 
-
-	        ( CONTRA ) at <a href="https://bacds.org/series/contra/palo_alto/">First United Methodist Church of Palo Alto in Palo Alto</a> Tanya Merchant with The Corn Likkers: Eleanor Chen, Elijah Chen, Lael Sigal, Lauren Graves, Ray Chen - newcomers welcome/lesson 6:30 / dance 7:00-10:00. <a href="https://bacds.org/series/contra/palo_alto/"><em>More Info</em></a>
-
--->
           </div>
         </div>
       </div>

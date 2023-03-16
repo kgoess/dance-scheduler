@@ -1,4 +1,33 @@
-.eventdate {
-	font-weight:bolder;
-	font-style:italic;
+.special-event-name {
+    font-size: 120%;
+    font-weight: bolder;
+    font-style: italic;
+    font-variant: small-caps;
+}
+
+.event-types:not(.special-event-name + .event-types){
+    font-style: italic;
+    font-weight: bolder;
+}
+
+.event-date {
+    color: #2c1919;
+}
+
+.event-short-desc {
+    margin-left: 2.5em;
+}
+
+.event-listing {
+    margin-block-end: 1.5em;
+}
+
+.canceled-event, .canceled-event *:not(a){
+    text-decoration: line-through;
+    color: #990707;
+    font-style: italic;
+}
+
+.event-listing .more-info-link {
+    font-style: italic;
 }

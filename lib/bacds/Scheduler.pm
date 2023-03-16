@@ -1448,10 +1448,35 @@ get '/test' => sub {
     #   db         => $db,
     #   dbuser     => $dbuser
     );
-    my @events = $rs->all;
+    my @eighteen_days = $rs->all;
+    $end_date = get_today()->ymd;
+    $rs = bacds::Scheduler::Model::DanceFinder->search_events(
+       end_date   => $end_date,
+    #   style      => \@style_ids,
+    #   dbix_debug => $verbose,
+    #   db         => $db,
+    #   dbuser     => $dbuser
+    );
+    my @today = $rs->all;
+    my $dbh = get_dbh;
+    my @style_ids = map $_->style_id, $dbh->resultset('Style')->search({
+        is_deleted => 0,
+        name => ['SPECIAL', 'CAMP'],
+    })->all;
+    $rs = bacds::Scheduler::Model::DanceFinder->search_events(
+    #   end_date   => $end_date,
+        style      => \@style_ids,
+    #   dbix_debug => $verbose,
+    #   db         => $db,
+    #   dbuser     => $dbuser
+    );
+    my @special = $rs->all;
+        
 
     template 'unearth/index' => {
-        eighteen_days => \@events,
+        eighteen_days => \@eighteen_days,
+        today => \@today,
+        special => \@special,
     },
     {layout => undef},
 };

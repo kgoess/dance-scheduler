@@ -8,86 +8,87 @@ page.
     <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
 <% END %>
 
-<% MACRO special_class(event) BLOCK %>
-    <% IF highlight_special_types %>
-        <%-
-         # from the old dancefinder.pl:
-         #     my $class = "special";
-         #     $class = "workshop" if ( $type =~ /WORKSHOP/ );
-         #     $class = "woodshed" if ( $type =~ /WOODSHED/ );
-         #     $class = "camp"     if ( $type =~ /CAMP/ );
-         found_styles = [];
-         special_styles = { special => 1, workshop => 1, woodshed => 1, camp => 1 };
-         FOREACH style IN event.styles;
-            style_name = style.name.lower;
-            IF special_styles.$style_name;
-                 found_styles.push(style_name);
-            END;
-         END;
-         IF found_styles.size() -%>
-            class="<% found_styles.join(' ') %>"
-         <%- END -%>
-    <% END %>
-<% END %>
+<% MACRO classes_for_event(event) BLOCK;
+  #This macro whitelists event.styles for insertion into a css class list
+  # It also adds the canceled-event class if event.is_canceled is truthy
+    found_styles = [];
+    IF highlight_special_types;
+        special_styles = { special => 1, workshop => 1, woodshed => 1, camp => 1 };
+        FOREACH style IN event.styles;
+           style_name = style.name.lower;
+           IF special_styles.$style_name;
+                found_styles.push(style_name);
+           END;
+        END;
+    END;
+    IF event.is_canceled;
+        found_styles.push('canceled-event');
+    END;
+    IF found_styles.size();
+       ' ' _ found_styles.join(' '); #this is the return value
+    END;
+END %>
+
+<% MACRO date_format(event) BLOCK;
+    IF event.end_date;
+        event.start_date.strftime("%A, %B %e - ") _ event.end_date.strftime("%A, %e %B, %Y");
+    ELSE;
+        event.start_date.strftime("%A, %B %e, %Y");
+    END;
+END %>
 
 
 <% FOREACH event IN events %>
-    <div <% special_class(event) %>>
-    <p class="listing<% IF event.is_canceled %> canceled-event<% END %>">
-    <% IF event.end_date %>
-        <%- event.start_date.strftime("%A, %e %B - ") _ event.end_date.strftime("%A, %e %B, %Y") %>
-    <%- ELSE %>
-        <% event.start_date.strftime("%A, %e %B, %Y") %>
-    <%- END %>:
-    <% IF event.styles.grep('^SPECIAL$') && event.name %>
-        <% emphasize_name_over_style = 1 %>
-    <% END %>
-    <% IF emphasize_name_over_style %>
-        <span class="special-event-name"><% event.name %></span> (
-    <% ELSE %>
-        <strong>
-    <% END %>
-    <%- FOREACH style IN event.styles %>
-        <%- style.name %><% IF !loop.last() %>/<% END %>
-    <%- END %>
-    <% IF emphasize_name_over_style %>
-        )
-    <% ELSE %>
-        </strong>
-    <% END %>
-    <%- IF event.venues %> at <% END %>
-    <%- FOREACH venue IN event.venues %>
-        <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
-    <%- END %>
-    <% IF event.is_canceled %>
-        <strong>&mdash; CANCELED</strong>
-    <% END %>
-    <%- IF event.callers %>
-        <%- FOREACH caller IN event.callers %>
-            <% caller.name %><% IF !loop.last() %>, <% END %>
-        <%- END %>
-        <%- IF event.bands || event.talent %> with <% END %>
-    <%- ELSE %>
-        <%- IF event.bands || event.talent %>
-            Music by
+    <div class="event-listing<% classes_for_event(event) %>">
+        <% IF event.is_canceled %>
+            <strong>CANCELED</strong>
         <% END %>
-    <%- END %>
-    <%- FOREACH band IN event.bands %>
-        <%- maybe_linkit(band.name, band.url) -%><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
-    <%- END %>
-    <%- IF event.talent %>
-        <%- FOREACH talent IN event.talent %>
-            <%- talent.name %><% IF !loop.last() %>, <% END %>
+        <span class="event-date"><% date_format(event) %>:</span>
+        <% IF event.styles.grep('^SPECIAL$') && event.name;
+            emphasize_name_over_style = 1;
+        ELSE;
+            emphasize_name_over_style = 0;
+        END %>
+        <% IF emphasize_name_over_style %>
+            <span class="special-event-name"><% event.name %></span> (
+        <% END %>
+        <span class="event-types">
+        <%- FOREACH style IN event.styles %>
+            <%- style.name %><% IF !loop.last() %>/<% END %>
         <%- END %>
-    <%- END %>
-        <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
-    <% IF !emphasize_name_over_style && event.name %>
-        <%# if it's a special event, print out the title.'%>
-        <span class="special-event-name"><% event.name %></span>
-    <%- END %>
-    <% IF event.short_desc %> - <% END %><% event.short_desc %>
-    <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
-
-    </p>
+        </span>
+        <% IF emphasize_name_over_style %>
+            )
+        <% END %>
+        <%- IF event.venues %> at <% END %>
+        <%- FOREACH venue IN event.venues %>
+            <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
+        <%- END %>
+        <%- IF event.callers %>
+            <%- FOREACH caller IN event.callers %>
+                <% caller.name %><% IF !loop.last() %>, <% END %>
+            <%- END %>
+            <%- IF event.bands || event.talent %> with <% END %>
+        <%- ELSE %>
+            <%- IF event.bands || event.talent %>
+                Music by
+            <% END %>
+        <%- END %>
+        <%- FOREACH band IN event.bands %>
+            <%- maybe_linkit(band.name, band.url) -%><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
+        <%- END %>
+        <%- IF event.talent %>
+            <%- FOREACH talent IN event.talent %>
+                <%- talent.name %><% IF !loop.last() %>, <% END %>
+            <%- END %>
+        <%- END %>
+            <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
+        <%- IF !emphasize_name_over_style && event.name %>
+            <%# if it's a special event, print out the title.'%>
+            <span class="special-event-name"><% event.name %></span>
+        <%- END %>
+        <%- IF event.short_desc %><div class="event-short-desc"><% event.short_desc %><% END %>
+        <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>
+        <% IF event.short_desc %></div><% END %>
     </div>
 <% END %>
