@@ -201,7 +201,7 @@ sub search_events {
             'me.event_id' => { -in => $subquery->as_query },
         },
         {
-            order_by => 'start_date',
+            order_by => ['start_date', 'start_time'],
             prefetch => \@prefetches,
         },
     );
