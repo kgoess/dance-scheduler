@@ -229,7 +229,13 @@ sub post_row {
         my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
 
         $auditor->target_id($row->$pkey);
-        my $audit_name = $retrieved_row->can('name') ? ' "'.$retrieved_row->name.'"' : '';
+        my $audit_name = $retrieved_row->can('synthetic_name')
+            ? $retrieved_row->synthetic_name
+            : '';
+        $audit_name ||= $retrieved_row->can('name')
+             ? ' "'.$retrieved_row->name.'"'
+             : '';
+
         $auditor->message(qq{created $model_name$audit_name});
 
         my $other_tables = $class->_update_relationships($retrieved_row, \%incoming_data, $dbh);
