@@ -30,7 +30,7 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 package OldEvent {
     use Class::Accessor::Lite (
         new => 1,
-        rw => [ qw/startday endday type loc leader band comments is_canceled/ ]
+        rw => [ qw/startday endday type loc leader band musos comments is_canceled/ ]
     );
 }
 
@@ -52,6 +52,7 @@ sub load_events_for_month {
             loc      => join('/', map $_->vkey, $event->venues->all),
             leader   => join(', ', map $_->name, $event->callers->all),
             band     => join(', ', map $_->name, $event->bands->all),
+            musos    => join(', ', map $_->name, $event->talent->all),
             comments => $event->short_desc, # maybe?
             is_canceled => $event->is_canceled,
         });
