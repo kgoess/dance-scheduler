@@ -41,7 +41,7 @@ sub test_fetch_google_oauth_keys {
 
     is ref $keys, 'ARRAY', 'the "keys" part is an arrayref';
 
-    is @$keys, 2, 'with two things in it';
+    ok @$keys >= 2, 'with at leasts two things in it (sometimes three)' or dump $keys;
 
 }
 
