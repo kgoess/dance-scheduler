@@ -114,7 +114,7 @@ sub _load_events {
         start_date => { '<=', $through_date },
         is_deleted => 0,
     },{
-        order_by => 'start_date',
+        order_by => ['start_date', 'start_time'],
     });
 
     return @events;
