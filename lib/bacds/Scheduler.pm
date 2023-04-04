@@ -73,6 +73,9 @@ register_type_check 'Timestamp' => sub {
 register_type_check 'XID' => sub {
     return $_[0] =~ /^[A-Z0-9._-]{3,32}$/;
 };
+register_type_check 'StyleName' => sub {
+    return $_[0] =~ /^[A-Z]{3,16}$/;
+};
 
 preload_accordion_config;
 
@@ -847,14 +850,30 @@ get '/dancefinder-results' => with_types [
     'optional' => ['query', 'band',   'SchedulerId'],
     'optional' => ['query', 'muso',   'SchedulerId'],
     'optional' => ['query', 'style',  'SchedulerId'],
+    'optional' => ['query', 'style-name',  'StyleName'],
 ] => sub {
+
+    my $dbh = get_dbh(debug => 0);
+
+    # alternate calling convention for links in the sidebar
+    # e.g. dancefilter-results?style-name=ENGLISH
+    my @style_ids_from_names;
+    if (my @style_names = query_parameters->get_all('style-name')) {
+        my @rs = $dbh->resultset('Style')->search({
+            is_deleted => 0,
+            name => \@style_names,
+        })->all;
+        @style_ids_from_names = map $_->style_id, @rs;
+    }
+
 
     my %params = (
         caller => [grep $_, query_parameters->get_all('caller')],
         venue  => [grep $_, query_parameters->get_all('venue')],
         band   => [grep $_, query_parameters->get_all('band')],
         muso   => [grep $_, query_parameters->get_all('muso')],
-        style  => [grep $_, query_parameters->get_all('style')],
+        style  => [@style_ids_from_names,
+                   grep $_, query_parameters->get_all('style')],
     );
 
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
@@ -870,8 +889,6 @@ get '/dancefinder-results' => with_types [
 
     # individually look up the query parameters so we can fill them out on the
     # results page
-    my $dbh = get_dbh(debug => 0);
-
     my @fetchers = (
         [qw/caller Caller caller_id/],
         [qw/style Style style_id/],

@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 61;
+use Test::More tests => 63;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -455,6 +455,23 @@ sub test_dancefinder_results_endpoint {
             <span.class="search_arg">test.band.2</span> \s+
         </div>
     }x, 'query with bunch of args looks ok';
+
+    #
+    # new param: style-name=CONTRA
+    #
+    $q = 'style-name=ENGLISH&style-name=CONTRA';
+
+    $Test->get_ok("/dancefinder-results?$q", "GET /dancefinder-results?$q ok");
+
+    ($body) = $Test->content =~ m{(<body.+?>.+</body>)}ms;
+
+    like $body, qr{
+        <div.class="search_args"> \s+
+            <span.class="search_arg">English</span> \s+ or \s+
+            <span.class="search_arg">Contra</span> \s+
+            Dances \s+
+        </div>
+    }x, 'query with style-name arg looks ok';
 }
 
 
