@@ -41,6 +41,8 @@ page.
     <%- END %>:
     <% IF event.styles.grep('^SPECIAL$') && event.name %>
         <% emphasize_name_over_style = 1 %>
+    <% ELSE %>
+        <% emphasize_name_over_style = 0 %>
     <% END %>
     <% IF emphasize_name_over_style %>
         <span class="special-event-name"><% event.name %></span> (
