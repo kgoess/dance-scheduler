@@ -15,7 +15,7 @@ $( document ).ready(function() {
         buttons: {
             Yes: function() {
                 const found = {};
-                $( 'select[name="talent_id"]' ).each(function() {
+                $( '[fold_model="event"] select[name="talent_id"]' ).each(function() {
                     found[$(this).val()] = 1;
                 });
                 const emptyTalentSelectboxes = $.makeArray($( '#event-display-form [model-name="talent"] select' ))
@@ -74,7 +74,7 @@ $( document ).ready(function() {
             .fail( (err) => {
                 handleError(err);
             });
-        }
+        },
     });
     $( 'select[name="band_id"]' ).change(function() {
         bandDialog.bandId = $(this).val();
