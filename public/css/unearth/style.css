@@ -1154,12 +1154,12 @@ h1, h2, h3, h4, h5,
 .border-w-2 {
   border-width: 2px !important; }
 
-.block__73694 .block__73422 {
-  background-size: cover;
+.event-section .event-image {
+  background-size: contain;
   background-position: center center;
   background-repeat: no-repeat; }
   @media (max-width: 991.98px) {
-    .block__73694 .block__73422 {
+    .event-section .event-image {
       height: 400px; } }
 
 @media (max-width: 991.98px) {
