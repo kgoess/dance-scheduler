@@ -24,6 +24,15 @@ page.
     IF event.is_canceled;
         found_styles.push('canceled-event');
     END;
+    band_photo_size = 0;
+    FOREACH band IN event.bands;
+        IF band.photo_url;
+            band_photo_size = 1;
+        END;
+    END;
+    IF band_photo_size > 0;
+        found_styles.push('has-photo');
+    END;
     IF found_styles.size();
        ' ' _ found_styles.join(' '); #this is the return value
     END;
@@ -39,7 +48,8 @@ END %>
 
 
 <% FOREACH event IN events %>
-    <div class="event-listing<% classes_for_event(event) %>">
+    <div class="d-flex flex-row event-listing<% classes_for_event(event) %>">
+        <div>
         <% IF event.is_canceled %>
             <strong>CANCELED</strong>
         <% END %>
@@ -90,5 +100,9 @@ END %>
         <%- IF event.short_desc %><div class="event-short-desc"><% event.short_desc %><% END %>
         <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>
         <% IF event.short_desc %></div><% END %>
+        </div>
+        <% IF event.bands.size() AND event.bands.0.photo_url %>
+        <div class="event-image" style="background-image: url('<% event.bands.0.photo_url %>');"> </div>
+        <% END %>
     </div>
 <% END %>

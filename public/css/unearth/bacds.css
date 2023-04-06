@@ -31,3 +31,15 @@
 .event-listing .more-info-link {
     font-style: italic;
 }
+
+.event-image {
+    min-height: 14em;
+}
+
+.event-listing:not(.has-photo) {
+    max-width: 80%;
+}
+
+.event-listing .event-image {
+    flex: 0 0 50%;
+}
