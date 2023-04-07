@@ -72,6 +72,8 @@ my $tt = Template->new(
     END_TAG   => '%>',
 );
 
+binmode( STDOUT, ":utf8" );
+
 $tt->process('dancefinder/listings.tt' => {
     events => \@events,
     highlight_special_types => $highlight_specials,
