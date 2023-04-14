@@ -100,6 +100,7 @@ phase I:
  - check out the short_desc in the template for https://bacds.org/series/english/berkeley_sat/, is that right?
  - what about the <style> tags in upcoming-events.tt? good enough or what?
  - I suspect we want a long_desc in the events table
+ - fix removing the last style/band from an event
 
 
 phase II:
