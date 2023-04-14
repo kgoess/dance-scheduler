@@ -1,12 +1,12 @@
 use utf8;
-package bacds::Scheduler::Schema::Result::Style;
+package bacds::Scheduler::Schema::Result::Team;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-bacds::Scheduler::Schema::Result::Style
+bacds::Scheduler::Schema::Result::Team
 
 =cut
 
@@ -27,15 +27,15 @@ use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime");
 
-=head1 TABLE: C<styles>
+=head1 TABLE: C<teams>
 
 =cut
 
-__PACKAGE__->table("styles");
+__PACKAGE__->table("teams");
 
 =head1 ACCESSORS
 
-=head2 style_id
+=head2 team_id
 
   data_type: 'integer'
   is_auto_increment: 1
@@ -45,6 +45,40 @@ __PACKAGE__->table("styles");
 
   data_type: 'varchar'
   is_nullable: 0
+  size: 255
+
+=head2 team_xid
+
+  data_type: 'char'
+  is_nullable: 0
+  size: 24
+
+=head2 contact
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 2048
+
+=head2 description
+
+  data_type: 'mediumtext'
+  is_nullable: 1
+
+=head2 sidebar
+
+  data_type: 'mediumtext'
+  is_nullable: 1
+
+=head2 team_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
+=head2 photo_url
+
+  data_type: 'varchar'
+  is_nullable: 1
   size: 255
 
 =head2 is_deleted
@@ -69,10 +103,22 @@ __PACKAGE__->table("styles");
 =cut
 
 __PACKAGE__->add_columns(
-  "style_id",
+  "team_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
   { data_type => "varchar", is_nullable => 0, size => 255 },
+  "team_xid",
+  { data_type => "char", is_nullable => 0, size => 24 },
+  "contact",
+  { data_type => "varchar", is_nullable => 1, size => 2048 },
+  "description",
+  { data_type => "mediumtext", is_nullable => 1 },
+  "sidebar",
+  { data_type => "mediumtext", is_nullable => 1 },
+  "team_url",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "photo_url",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
   "is_deleted",
   { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
@@ -94,17 +140,17 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</style_id>
+=item * L</team_id>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("style_id");
+__PACKAGE__->set_primary_key("team_id");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<styles_id_idx>
+=head2 C<team_name_idx>
 
 =over 4
 
@@ -114,22 +160,34 @@ __PACKAGE__->set_primary_key("style_id");
 
 =cut
 
-__PACKAGE__->add_unique_constraint("styles_id_idx", ["name"]);
+__PACKAGE__->add_unique_constraint("team_name_idx", ["name"]);
+
+=head2 C<team_xid_idx>
+
+=over 4
+
+=item * L</team_xid>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("team_xid_idx", ["team_xid"]);
 
 =head1 RELATIONS
 
-=head2 event_styles_maps
+=head2 event_team_maps
 
 Type: has_many
 
-Related object: L<bacds::Scheduler::Schema::Result::EventStylesMap>
+Related object: L<bacds::Scheduler::Schema::Result::EventTeamMap>
 
 =cut
 
 __PACKAGE__->has_many(
-  "event_styles_maps",
-  "bacds::Scheduler::Schema::Result::EventStylesMap",
-  { "foreign.style_id" => "self.style_id" },
+  "event_team_maps",
+  "bacds::Scheduler::Schema::Result::EventTeamMap",
+  { "foreign.team_id" => "self.team_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
@@ -144,31 +202,22 @@ Related object: L<bacds::Scheduler::Schema::Result::TeamStylesMap>
 __PACKAGE__->has_many(
   "team_styles_maps",
   "bacds::Scheduler::Schema::Result::TeamStylesMap",
-  { "foreign.style_id" => "self.style_id" },
+  { "foreign.team_id" => "self.team_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-04-13 20:14:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:n7C6inTYBhKTqv3piV+EAg
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PAlbqJiwJl7VeribGfOk9w
 
-
-
-__PACKAGE__->many_to_many(events=> 'event_styles_maps', 'event');
+__PACKAGE__->many_to_many(styles => 'team_styles_maps', 'style');
+__PACKAGE__->many_to_many(events=> 'event_team_maps', 'event');
 
 sub get_fields_for_event_row {
     my ($self) = @_;
     return {
         name => $self->name,
-        id   => $self->style_id,
-    };
-}
-
-sub get_fields_for_team_row {
-    my ($self) = @_;
-    return {
-        name => $self->name,
-        id   => $self->style_id,
+        id   => $self->team_id,
     };
 }
 

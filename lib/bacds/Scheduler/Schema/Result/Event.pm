@@ -278,6 +278,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 event_team_maps
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::EventTeamMap>
+
+=cut
+
+__PACKAGE__->has_many(
+  "event_team_maps",
+  "bacds::Scheduler::Schema::Result::EventTeamMap",
+  { "foreign.event_id" => "self.event_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 event_venues_maps
 
 Type: has_many
@@ -329,10 +344,11 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-02-04 11:32:52
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0lQQPFcT+HbqF5ALFFIu5Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-04-13 20:14:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zkFKv2Q6KYLhJOUrN4JCoQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
+__PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');
 __PACKAGE__->many_to_many(parent_orgs => 'event_parent_orgs_maps', 'parent_org');
 __PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
