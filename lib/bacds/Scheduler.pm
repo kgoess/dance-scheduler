@@ -48,6 +48,7 @@ use bacds::Scheduler::Model::Programmer;
 use bacds::Scheduler::Model::Series;
 use bacds::Scheduler::Model::SeriesLister;
 use bacds::Scheduler::Model::Talent;
+use bacds::Scheduler::Model::Team;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
@@ -607,6 +608,9 @@ my $routes_yaml = <<EOL;
   write_perm: requires_superuser
 
 - model: series
+  write_perm: requires_superuser
+
+- model: team
   write_perm: requires_superuser
 
 - model: band

@@ -47,6 +47,12 @@
           section and it will make more sense.</p>
           <p>If there's anything filled in for the Event then changing the
              Series won't apply the "default" to the Event.</p>
+    - label: Team
+      name: team_id
+      type: dropdown
+      model_name: team
+      table_name: teams
+      allow_multi_select: 1
     - label: Style
       name: style_id
       required: 1
@@ -56,7 +62,6 @@
       table_name: styles
     - label: Venue
       name: venue_id
-      required: 1
       type: dropdown
       model_name: venue
       table_name: venues
@@ -250,10 +255,10 @@
       name: name
       required: 1
       type: text
-    - label: Caller URL (Unused)
+    - label: Caller URL
       name: url
       type: text
-    - label: Photo URL (Unused)
+    - label: Photo URL
       name: photo_url
       type: text
     - name: caller_id
@@ -270,7 +275,7 @@
     - label: Band URL
       name: url
       type: text
-    - label: Photo URL (Unused)
+    - label: Photo URL
       name: photo_url
       type: text
     - label: Talent
@@ -290,10 +295,10 @@
       name: name
       required: 1
       type: text
-    - label: Talent URL (Unused)
+    - label: Talent URL
       name: url
       type: text
-    - label: Photo URL (Unused)
+    - label: Photo URL
       name: photo_url
       type: text
     - name: talent_id
@@ -347,3 +352,41 @@
     - name: programmer_id
       type: hidden
 
+- label: Teams
+  fold_model: team
+  fold_vars:
+    columns:
+    - label: Name
+      name: name
+      required: 1
+      type: text
+    - label: External ID
+      name: team_xid
+      help: >
+          "External ID" is a short, permanent ID for the team, general enough to survive
+          name changes, used for example in links in HTML files on the filesystem.
+      required: 1
+      type: text
+    - label: Team contact info
+      name: contact
+      type: text
+    - label: Description
+      name: description
+      type: text
+    - label: Sidebar
+      name: sidebar
+      type: text
+    - label: Team URL
+      name: team_url
+      type: text
+    - label: Photo URL
+      name: photo_url
+      type: text
+    - label: Styles
+      name: style_id
+      type: dropdown
+      model_name: style
+      table_name: styles
+      allow_multi_select: 1
+    - name: team_id
+      type: hidden

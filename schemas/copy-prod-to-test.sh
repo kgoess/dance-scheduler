@@ -6,10 +6,13 @@ tables="
     event_styles_map
     event_talent_map
     event_venues_map
+    event_teams_map
     programmer_series_map
     programmer_events_map
     band_membership
+    team_styles_map
     events
+    teams
     series
     styles
     talent

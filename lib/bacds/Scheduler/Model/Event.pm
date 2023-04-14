@@ -54,6 +54,7 @@ sub get_many_to_manys {
     [qw/ParentOrg parent_orgs parent_org_id/],
     [qw/Style styles style_id/],
     [qw/Talent talent talent_id/],
+    [qw/Team teams team_id/],
     [qw/Venue venues venue_id/],
 }
 sub get_one_to_manys { [qw/Series series series_id/] }
