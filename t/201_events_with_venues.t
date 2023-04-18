@@ -68,6 +68,7 @@ subtest 'POST /event' => sub {
         venues      => [],
         bands       => [],
         talent      => [],
+        teams       => [],
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_deleted  => 0,

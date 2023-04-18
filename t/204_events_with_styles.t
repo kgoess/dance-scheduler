@@ -60,6 +60,7 @@ subtest 'POST /event' => sub {
         long_desc   => $new_event->{long_desc},
         name        => $new_event->{name},
         talent      => [],
+        teams       => [],
         series      => [],
         styles      => [],
         venues      => [],
