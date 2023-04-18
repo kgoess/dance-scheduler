@@ -20,8 +20,8 @@ setup_test_db;
 my $test = get_tester(auth => 1);
 my $dbh = get_dbh();
 
-my ($Event, $Callered_Event);
-my ($Event_Id, $Callered_Event_Id);
+my ($Event, $ParentOrged_Event);
+my ($Event_Id, $ParentOrged_Event_Id);
 my ($Parent_Org_Id);
 
 
@@ -137,7 +137,7 @@ subtest 'POST /event/# with parent_org' => sub {
     $decoded = decode_json($test->content);
     $got = $decoded->{data};
 
-    $Callered_Event_Id = $got->{event_id},
+    $ParentOrged_Event_Id = $got->{event_id},
 
     my $expected = {
         parent_orgs => [
@@ -150,7 +150,7 @@ subtest 'POST /event/# with parent_org' => sub {
 
     eq_or_diff $got->{parent_orgs}, $expected->{parent_orgs}, 'return matches';
 
-    $Callered_Event = $dbh->resultset('Event')->find($Callered_Event_Id);
+    $ParentOrged_Event = $dbh->resultset('Event')->find($ParentOrged_Event_Id);
 };
 
 
@@ -159,7 +159,7 @@ subtest "GET /event/# with parent_org" => sub {
 
     my ($expected, $res, $decoded, $got);
 
-    $test->get_ok("/event/$Callered_Event_Id" );
+    $test->get_ok("/event/$ParentOrged_Event_Id" );
     ok( $test->success, 'returned success' );
     $decoded = decode_json($test->content);
     $got = $decoded->{data};
@@ -204,7 +204,7 @@ subtest "PUT /event/# with parent_org" => sub {
     };
     $ENV{TEST_NOW} += 100;
     $modified_time = get_now();
-    $test->put_ok("/event/$Callered_Event_Id", { content => $edit_event });
+    $test->put_ok("/event/$ParentOrged_Event_Id", { content => $edit_event });
     ok( $test->success, 'returned success' ) or die $test->content;
     $decoded = decode_json($test->content);
     $got = $decoded->{data};
@@ -218,7 +218,7 @@ subtest "PUT /event/# with parent_org" => sub {
     };
     eq_or_diff $got->{parent_orgs}, $expected->{parent_orgs}, 'return matches';
 
-    $test->get_ok("/event/$Callered_Event_Id" );
+    $test->get_ok("/event/$ParentOrged_Event_Id" );
     $decoded = decode_json($test->content);
     $got = $decoded->{data};
 
