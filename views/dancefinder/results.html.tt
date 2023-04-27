@@ -32,7 +32,9 @@ Dances
 <% FOREACH caller IN caller_arg %>
     <% IF loop.first() %>Led By <% END %><span class="search_arg"><% caller.name %></span><% IF !loop.last() %> or <% END %>
 <% END %>
-
+<% FOREACH team IN teams_arg %>
+    <% IF loop.first() %>Featuring <% END %><span class="search_arg"><% team.name %></span><% IF !loop.last() %> or <% END %>
+<% END %>
 <% IF bands_and_musos_arg.size() %>
     Featuring
     <% FOREACH bands_and_musos IN bands_and_musos_arg %>

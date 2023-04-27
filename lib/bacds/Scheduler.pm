@@ -855,6 +855,7 @@ get '/dancefinder-results' => with_types [
     'optional' => ['query', 'muso',   'SchedulerId'],
     'optional' => ['query', 'style',  'SchedulerId'],
     'optional' => ['query', 'style-name',  'StyleName'],
+    'optional' => ['query', 'team',   'SchedulerId'],
 ] => sub {
 
     my $dbh = get_dbh(debug => 0);
@@ -878,6 +879,7 @@ get '/dancefinder-results' => with_types [
         muso   => [grep $_, query_parameters->get_all('muso')],
         style  => [@style_ids_from_names,
                    grep $_, query_parameters->get_all('style')],
+        team   => [grep $_, query_parameters->get_all('team')],
     );
 
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
@@ -899,6 +901,7 @@ get '/dancefinder-results' => with_types [
         [qw/venue Venue venue_id/],
         [qw/band Band band_id/],
         [qw/muso Talent talent_id /],
+        [qw/team Team team_id /],
     );
     my %results;
     foreach my $fetcher (@fetchers) {
@@ -920,6 +923,7 @@ get '/dancefinder-results' => with_types [
         caller_arg => $results{caller},
         venue_arg  => $results{venue},
         bands_and_musos_arg  => [ @{$results{band}}, @{$results{muso}} ],
+        teams_arg  => $results{team},
         style_arg  => $results{style},
 
         events => \@events,

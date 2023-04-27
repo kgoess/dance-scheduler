@@ -145,6 +145,7 @@ sub search_events {
     my $band_arg       = delete $args{band}       || [];
     my $muso_arg       = delete $args{muso}       || [];
     my $style_arg      = delete $args{style}      || [];
+    my $team_arg       = delete $args{team}       || [];
     my $dbix_debug     = delete $args{dbix_debug};
     # db and dbuser are for dancefinder.pl
     my $db_arg         = delete $args{db};
@@ -163,6 +164,7 @@ sub search_events {
         {event_styles_maps => 'style'},
         {event_talent_maps => 'talent'},
         {event_venues_maps => 'venue'},
+        {event_team_maps => 'team'},
         {event_band_maps => {band => { band_memberships => 'talent'}}},
     );
 
@@ -172,6 +174,7 @@ sub search_events {
         @$style_arg ? 'event_styles_maps' : (),
         @$muso_arg ? 'event_talent_maps' : (),
         @$band_arg ? 'event_band_maps' : (),
+        @$team_arg ? 'event_team_maps' : (),
     );
 
     my $start_date = $start_date_arg || get_today()->ymd;
@@ -185,6 +188,7 @@ sub search_events {
             @$style_arg  ? ('event_styles_maps.style_id'   => $style_arg)  : (),
             @$muso_arg   ? ('event_talent_maps.talent_id'  => $muso_arg)   : (),
             @$band_arg   ? ('event_band_maps.band_id'      => $band_arg)   : (),
+            @$team_arg   ? ('event_team_maps.team_id'     => $team_arg)   : (),
             start_date =>
                 $end_date_arg
                 ? { '-between' => [$start_date, $end_date_arg] }
