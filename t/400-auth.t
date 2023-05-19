@@ -11,7 +11,7 @@ use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 62;
+use Test::More tests => 69;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -29,6 +29,7 @@ test_password_matches();
 test_bacds_login();
 test_requires_login();
 test_can_edit();
+test_can_edit_team();
 
 
 sub test_fetch_google_oauth_keys {
@@ -422,3 +423,104 @@ sub test_can_edit {
 
 }
 
+sub test_can_edit_team {
+    # POST and PUT to /event/ require can_edit_event
+    my $test_noauth = get_tester();
+    my $test_authed = get_tester(
+        auth => 1,
+    );
+    my $test_team_programmer = get_tester(
+        auth => 1,
+        user_email => 'caneditteam@example.com',
+    );
+    my $test_programmer = get_tester(
+        auth => 1,
+        user_email => 'cannoteditteam@example.com',
+    );
+    my $dbh = get_dbh();
+
+    my $team_programmer = $dbh->resultset('Programmer')->new({
+        name => 'Team Programmer',
+        is_superuser => 0,
+        email => 'caneditteam@example.com',
+        is_deleted => 0,
+    });
+    $team_programmer->insert;
+    my $team = $dbh->resultset('Team')->new({
+        name => 'a team',
+        team_xid => 'ATEAM',
+        is_deleted => 0,
+    });
+    $team->insert;
+    $team_programmer->add_to_teams($team, {ordering => 1});
+
+    my $programmer = $dbh->resultset('Programmer')->new({
+        name => 'Unevented Programmer',
+        is_superuser => 0,
+        email => 'cannoteditteam@example.com',
+        is_deleted => 0,
+    });
+    $programmer->insert;
+
+    my $new_event = {
+        team_id        => $team->team_id,
+        start_date     => "2022-05-01",
+        start_time     => "20:00",
+        end_date       => "2022-05-01",
+        end_time       => "22:00",
+        short_desc     => "itsa shortdesc",
+        custom_url     => 'https://event.url',
+        custom_pricing => '¥4,000',
+        name           => "saturday night test event £ ウ",
+        is_canceled    => 0,
+        and_friends    => 0,
+        is_series_defaults    => 0,
+        synthetic_name => 'Saturday Night Test',
+    };
+    my ($content, $res, $res_data);
+
+    #
+    # any logged-in user can create an event
+    #
+    $test_authed->post_ok('/event/', $new_event, 'authed can create event');
+    $content = $test_authed->res->content;
+    $res_data = decode_json $content;
+    ok $res_data->{data}{event_id},
+        "POST created event # $res_data->{data}{event_id}";
+    my $new_event_id = $res_data->{data}{event_id};
+    is $res_data->{data}{name}, "saturday night test event £ ウ",
+        '...with good json';
+    is_deeply $res_data->{errors}, [],
+        '...and with no errors';
+
+    my $event_edit = {
+        team_id        => $team->team_id,
+        start_date     => "2022-05-01",
+        start_time     => "20:00",
+        end_date       => "2022-05-01",
+        end_time       => "22:00",
+        short_desc     => "change 無為",
+        custom_url     => 'https://event.url',
+        custom_pricing => '¥4,000',
+        name           => "saturday night test event £ ウ",
+        is_canceled    => 0,
+        synthetic_name => 'Saturday Night Test',
+    };
+
+    #
+    # the team programmer can edit the event
+    #
+    $test_team_programmer->put_ok("/event/$new_event_id", {content => $event_edit},
+         'team programmer can edit the event');
+    $content = $test_team_programmer->res->content;
+    $res_data = decode_json $content;
+    is $res_data->{data}{short_desc}, "change 無為",
+        'the desc was changed to a UTF8 char';
+
+    #
+    # some unaffiliated programmer can NOT edit the event
+    #
+    $test_programmer->put("/event/$new_event_id", content => $event_edit);
+    is $test_programmer->res->code, '403',
+        'unaffiliated programmer gets a 403';
+}

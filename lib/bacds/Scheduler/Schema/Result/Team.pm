@@ -191,6 +191,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 programmer_teams_maps
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::ProgrammerTeamsMap>
+
+=cut
+
+__PACKAGE__->has_many(
+  "programmer_teams_maps",
+  "bacds::Scheduler::Schema::Result::ProgrammerTeamsMap",
+  { "foreign.team_id" => "self.team_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 team_styles_maps
 
 Type: has_many
@@ -207,13 +222,21 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-04-13 20:14:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:PAlbqJiwJl7VeribGfOk9w
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-18 19:25:41
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:hsrsuJij/FfCnyrDQIOrzQ
 
 __PACKAGE__->many_to_many(styles => 'team_styles_maps', 'style');
 __PACKAGE__->many_to_many(events=> 'event_team_maps', 'event');
 
 sub get_fields_for_event_row {
+    my ($self) = @_;
+    return {
+        name => $self->name,
+        id   => $self->team_id,
+    };
+}
+
+sub get_fields_for_programmer_row {
     my ($self) = @_;
     return {
         name => $self->name,

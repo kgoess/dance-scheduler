@@ -150,7 +150,11 @@ plugin_keywords can_edit_event => sub {
         my @event_rs = $programmer->events(
              {  'event.event_id' => $event_id }
         );
-        if (@series_rs or @event_rs) {
+        my @event_teams_rs = $event->teams();
+        my @teams_rs = $programmer->teams(
+             {'team.team_id' => [map $_->team_id, @event_teams_rs]}
+        );
+        if (@series_rs or @event_rs or @teams_rs) {
             $route_sub->($self, @args); # this is success
         } else {
             my $results = bacds::Scheduler::Util::Results->new;

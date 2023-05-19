@@ -76,7 +76,7 @@ $( document ).ready(function() {
             });
         },
     });
-    $( 'select[name="team_id"]' ).change(function() {
+    $( '[fold_model="event"] select[name="team_id"]' ).change(function() {
         teamDialog.teamId = $(this).val();
         teamDialog.dialog( 'open' );
     });

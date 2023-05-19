@@ -344,6 +344,12 @@
       table_name: series
       type: dropdown
     - allow_multi_select: 1
+      label: Can Edit Team
+      model_name: team
+      name: team_id
+      table_name: teams
+      type: dropdown
+    - allow_multi_select: 1
       label: Can Edit Event
       model_name: event
       name: event_id

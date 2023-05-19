@@ -187,9 +187,24 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 programmer_teams_maps
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-01-08 07:29:30
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:A8jBhmF21Y2fH9h8iliUqg
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::ProgrammerTeamsMap>
+
+=cut
+
+__PACKAGE__->has_many(
+  "programmer_teams_maps",
+  "bacds::Scheduler::Schema::Result::ProgrammerTeamsMap",
+  { "foreign.programmer_id" => "self.programmer_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-18 19:25:41
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LUmzftbr6zJ4fgTFBiOecQ
 
 
 use Role::Tiny::With;
@@ -197,5 +212,6 @@ with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 
 __PACKAGE__->many_to_many(series => 'programmer_series_maps', 'series');
 __PACKAGE__->many_to_many(events => 'programmer_events_maps', 'event');
+__PACKAGE__->many_to_many(teams => 'programmer_teams_maps', 'team');
 
 1;

@@ -9,7 +9,7 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -30,10 +30,14 @@ my $Programmer_With_Event;
 my $Programmer_With_Event_Id;
 my $Programmer_With_Series;
 my $Programmer_With_Series_Id;
+my $Programmer_With_Teams;
+my $Programmer_With_Teams_Id;
 my $Created_Time;
 my $Modified_Time;
 my $Modified_Time_With_Series;
 my $Modified_Time_With_Event;
+my $Modified_Time_With_Teams;
+
 
 
 my $Event1 = $dbh->resultset('Event')->new({
@@ -65,7 +69,7 @@ my $Series1 = $dbh->resultset('Series')->new({
 });
 $Series1->insert;
 my $Series2 = $dbh->resultset('Series')->new({
-    name => 'test series 1',
+    name => 'test series 2',
     series_xid => 'TS2',
 });
 $Series2->insert;
@@ -75,6 +79,21 @@ my $Series3 = $dbh->resultset('Series')->new({
 });
 $Series3->insert;
 
+my $Team1 = $dbh->resultset('Team')->new({
+    name => 'test team 1',
+    team_xid => 'MX1',
+});
+$Team1->insert;
+my $Team2 = $dbh->resultset('Team')->new({
+    name => 'test team 2',
+    team_xid => 'MX2',
+});
+$Team2->insert;
+my $Team3 = $dbh->resultset('Team')->new({
+    name => 'test team 3',
+    team_xid => 'MX3',
+});
+$Team3->insert;
 
 # note that setup_test_db adds a programmer to seed the table
 subtest 'Invalid GET /programmer/2' => sub {
@@ -123,7 +142,7 @@ subtest 'POST /programmer' => sub {
         modified_ts  => $Created_Time,
         events       => [],
         series       => [],
-        events       => [],
+        teams       => [],
         is_deleted   => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
@@ -200,7 +219,7 @@ subtest 'POST /programmer with series' => sub {
                 name => $Series2->name,
             },
         ],
-        events       => [],
+        teams       => [],
         is_deleted   => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
@@ -247,13 +266,63 @@ subtest 'POST /programmer with events' => sub{
                 name => $Event2->synthetic_name,
             },
         ],
-        is_deleted   => 0,
+        teams         => [],
+        is_deleted    => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
 
     # now save it for the subsequent tests
     $Programmer_With_Event = $dbh->resultset('Programmer')->find($decoded->{data}{programmer_id});
     $Programmer_With_Event_Id = $Programmer_With_Event->programmer_id;
+};
+
+subtest 'POST /programmer with teams' => sub {
+    plan tests => 2;
+
+    my $atest = get_tester(auth => 1);
+
+    my ($expected, $res, $decoded, $got);
+    my $new_programmer = {
+        name          => 'dave morrisman',
+        email         => 'dave@test.com',
+        password_hash => 'thisisthepasswordhash',
+        is_superuser  => 1,
+        programmer_id => '', # the webapp sends name=test+programmer&programmer_id=
+        team_id => [ $Team1->team_id, $Team2->team_id ],
+    };
+    $ENV{TEST_NOW} = 1651112285;
+    $Created_Time = get_now()->iso8601;
+    $res = $test->request(POST '/programmer/', $new_programmer );
+    ok($res->is_success, 'returned success');
+
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    $expected = {
+        programmer_id => 5,
+        name          => $new_programmer->{name},
+        email         => $new_programmer->{email},
+        is_superuser  => $new_programmer->{is_superuser},
+        created_ts    => $Created_Time,
+        modified_ts   => $Created_Time,
+        events        => [],
+        series        => [],
+        teams => [
+            {
+                id   => $Team1->team_id,
+                name => $Team1->name,
+            },
+            {
+                id   => $Team2->team_id,
+                name => $Team2->name,
+            },
+        ],
+        is_deleted   => 0,
+    };
+    eq_or_diff $got, $expected, 'return matches';
+
+    # now save it for the subsequent tests
+    $Programmer_With_Teams = $dbh->resultset('Programmer')->find($decoded->{data}{programmer_id});
+    $Programmer_With_Teams_Id = $Programmer_With_Teams->programmer_id;
 };
 
 subtest 'GET /programmer/2' => sub {
@@ -276,7 +345,7 @@ subtest 'GET /programmer/2' => sub {
         is_deleted     => 0,
         events         => [],
         series         => [],
-        events         => [],
+        teams          => [],
     };
     eq_or_diff $got, $expected, 'return matches';
 };
@@ -310,7 +379,7 @@ subtest 'GET /programmer/2 (with series)' => sub {
                 name => $Series2->name,
             },
         ],
-        events => [],
+        teams          => [],
     };
     eq_or_diff $got, $expected, 'return matches';
 };
@@ -333,6 +402,7 @@ subtest 'GET /programmer/3 (with events)' => sub{
         modified_ts    => $Created_Time,
         is_deleted     => 0,
         series         => [],
+        teams          => [],
         events => [
             {
                 id   => $Event1->event_id,
@@ -370,6 +440,7 @@ subtest 'PUT /programmer/#' => sub {
         is_superuser  => 1,
         events        => [],
         series        => [],
+        teams         => [],
         created_ts  => $Created_Time,
         modified_ts => $Modified_Time,
         is_deleted  => 0,
@@ -422,7 +493,7 @@ subtest 'PUT /programmer/# 2 (with series)' => sub {
                 name => $Series3->name,
             },
         ],
-        events      => [],
+        teams       => [],
         created_ts  => $Created_Time,
         modified_ts => $Modified_Time_With_Series,
         is_deleted  => 0,
@@ -438,6 +509,50 @@ subtest 'PUT /programmer/# 2 (with series)' => sub {
     $Programmer = $dbh->resultset('Programmer')->find($Programmer_Id);
 };
 
+subtest 'PUT /programmer/# 5 (with teams)' => sub {
+    plan tests => 3;
+
+    my ($res, $decoded, $got, $expected);
+    my $edit_programmer = {
+        name           => $Programmer_With_Teams->name,
+        email          => $Programmer_With_Teams->email,
+        is_superuser   => $Programmer_With_Teams->is_superuser,
+        team_id      => [ $Team3->team_id],
+    };
+    $ENV{TEST_NOW} += 100;
+    $Modified_Time_With_Teams = get_now()->iso8601;
+    $res = $test->request( PUT "/programmer/$Programmer_With_Teams_Id" , content => $edit_programmer);
+    ok( $res->is_success, 'returned success' );
+
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    $expected = {
+        programmer_id  => $Programmer_With_Teams_Id,
+        name           => $Programmer_With_Teams->name,
+        email          => $Programmer_With_Teams->email,
+        is_superuser   => $Programmer_With_Teams->is_superuser,
+        events         => [],
+        series         => [],
+        teams => [
+            {
+                id => $Team3->team_id,
+                name => $Team3->name,
+            },
+        ],
+        created_ts  => $Created_Time,
+        modified_ts => $Modified_Time_With_Teams,
+        is_deleted  => 0,
+    };
+    eq_or_diff $got, $expected, 'return matches';
+
+    $res  = $test->request( GET "/programmer/$Programmer_With_Teams_Id" );
+    $decoded = decode_json($res->content);
+    $got = $decoded->{data};
+    eq_or_diff $got, $expected, 'GET changed after PUT';
+
+    # update our global programmer object
+    $Programmer = $dbh->resultset('Programmer')->find($Programmer_Id);
+};
 
 subtest 'PUT /programmer/# 3 (with events)' => sub {
     plan tests => 3;
@@ -462,6 +577,7 @@ subtest 'PUT /programmer/# 3 (with events)' => sub {
         email          => $Programmer_With_Event->email,
         is_superuser   => $Programmer_With_Event->is_superuser,
         series         => [],
+        teams          => [],
         events => [
             {
                 id => $Event3->event_id,
@@ -510,6 +626,15 @@ subtest 'GET /programmerAll' => sub {
         is_superuser  => $Programmer_With_Event->is_superuser,
         created_ts    => $Created_Time,
         modified_ts   => $Modified_Time_With_Event,
+        is_deleted    => 0,
+      },
+      {
+        programmer_id => $Programmer_With_Teams_Id,
+        name          => $Programmer_With_Teams->name,
+        email         => $Programmer_With_Teams->email,
+        is_superuser  => $Programmer_With_Teams->is_superuser,
+        created_ts    => $Created_Time,
+        modified_ts   => $Modified_Time_With_Teams,
         is_deleted    => 0,
       },
       {
