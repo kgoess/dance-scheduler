@@ -373,6 +373,11 @@
           name changes, used for example in links in HTML files on the filesystem.
       required: 1
       type: text
+    - label: Parent Org
+      name: parent_org_id
+      type: dropdown
+      model_name: parent_org
+      table_name: parent_orgs
     - label: Team contact info
       name: contact
       type: text

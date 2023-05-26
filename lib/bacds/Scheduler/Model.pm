@@ -53,10 +53,11 @@ the database, and the third being the primary key.
 
 =item * get_one_to_manys()
 
-This must return a nested list of lists of other tables with
-one-to-many relationships like C<[qw/Style styles style_id/],> With the first
-item being the model name (/Models/Style.pm), the second being the tablename in
-the database, and the third being the primary key.
+This must return a nested list of lists of other tables with one-to-many
+relationships like C<[qw/Style styles style_id style/],> With the first item
+being the model name (/Models/Style.pm), the second being the tablename in the
+database, the third being the primary key, and the fourth being the singular
+form of the tablename (which dbix needs for the way it handles one-to-manys).
 
 =item * get_default_sorting()
 
@@ -146,24 +147,26 @@ with the error bits filled in.
 
 sub get_row {
     my ($class, $row_id) = @_;
-    my @other_table_names = ();
     my $model_name = $class->get_model_name;
     my $dbh = get_dbh();
-
-    my @relationships = $class->get_many_to_manys;
-    push @relationships, $class->get_one_to_manys;
-    foreach my $relationship (@relationships){
-        my ($other_model, $other_table_name, $primary_key) = @$relationship;
-        push @other_table_names, $other_table_name;
-        }
 
     my $row = $dbh->resultset($model_name)->find($row_id)
         or return $class->not_found_error($row_id);
 
     my $other_tables = {};
-    foreach my $other_table_name (@other_table_names){
+
+    my @mtms = $class->get_many_to_manys;
+    foreach my $mtm (@mtms){
+        my ($other_model, $other_table_name, $primary_key) = @$mtm;
         my @others = $row->$other_table_name;
         $other_tables->{$other_table_name} = \@others;
+    }
+
+    my @otms = $class->get_one_to_manys;
+    foreach my $otm (@otms){
+        my ($other_model, $other_table_name, $primary_key, $singular_table_name) = @$otm;
+        my @other = $row->$singular_table_name;
+        $other_tables->{$other_table_name} = \@other;
     }
 
     return $class->_row_to_result($row, $other_tables);

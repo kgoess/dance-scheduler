@@ -153,9 +153,24 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 teams
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-01-12 22:02:37
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Tfyf31s9E4Hhd/qNUT2kkQ
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::Team>
+
+=cut
+
+__PACKAGE__->has_many(
+  "teams",
+  "bacds::Scheduler::Schema::Result::Team",
+  { "foreign.parent_org_id" => "self.parent_org_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-25 19:32:49
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:j9o7aW1ExashfsCwhN1nlA
 
 
 use Role::Tiny::With;
@@ -171,5 +186,12 @@ sub get_fields_for_event_row {
     };
 }
 
+sub get_fields_for_team_row {
+    my ($self) = @_;
+    return {
+        name => $self->full_name,
+        id   => $self->parent_org_id,
+    };
+}
 
 1;

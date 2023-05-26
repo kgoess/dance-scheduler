@@ -100,6 +100,12 @@ __PACKAGE__->table("teams");
   default_value: current_timestamp
   is_nullable: 0
 
+=head2 parent_org_id
+
+  data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -134,6 +140,8 @@ __PACKAGE__->add_columns(
     default_value => \"current_timestamp",
     is_nullable => 0,
   },
+  "parent_org_id",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -191,6 +199,26 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 parent_org
+
+Type: belongs_to
+
+Related object: L<bacds::Scheduler::Schema::Result::ParentOrg>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "parent_org",
+  "bacds::Scheduler::Schema::Result::ParentOrg",
+  { parent_org_id => "parent_org_id" },
+  {
+    is_deferrable => 1,
+    join_type     => "LEFT",
+    on_delete     => "RESTRICT",
+    on_update     => "RESTRICT",
+  },
+);
+
 =head2 programmer_teams_maps
 
 Type: has_many
@@ -222,8 +250,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-18 19:25:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:hsrsuJij/FfCnyrDQIOrzQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-25 19:32:49
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:o9y4ToqPaeBcjhcCZzTR8g
 
 __PACKAGE__->many_to_many(styles => 'team_styles_maps', 'style');
 __PACKAGE__->many_to_many(events=> 'event_team_maps', 'event');

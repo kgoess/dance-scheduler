@@ -39,6 +39,7 @@ sub get_fields_for_input {
     qw/
         name
         team_xid
+        parent_org_id
         contact
         description
         sidebar
@@ -47,11 +48,13 @@ sub get_fields_for_input {
         is_deleted
     /
 }
-sub get_fkey_fields { }
+sub get_fkey_fields { qw/parent_org_id/ }
 sub get_many_to_manys { 
     [qw/Style styles style_id/],
 }
-sub get_one_to_manys { }
+sub get_one_to_manys {
+    [qw/ParentOrg parent_orgs parent_org_id parent_org/],
+}
 sub get_default_sorting { {-asc=>'name'} }
 
 1;

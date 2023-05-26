@@ -57,7 +57,7 @@ sub get_many_to_manys {
     [qw/Team teams team_id/],
     [qw/Venue venues venue_id/],
 }
-sub get_one_to_manys { [qw/Series series series_id/] }
+sub get_one_to_manys { [qw/Series series series_id series/] }
 sub get_default_sorting { {-asc => [qw/start_date start_time/]} }
 
 sub filter_input {

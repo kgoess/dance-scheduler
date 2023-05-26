@@ -103,6 +103,7 @@ subtest 'POST /team' => sub {
         photo_url => undef,
         sidebar => undef,
         styles => [],
+        parent_orgs => [],
         team_url => undef,
         team_id => $Team_Id,
         name => 'Bree Morris',
