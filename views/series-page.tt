@@ -700,16 +700,13 @@
             All Upcoming Dances:
             <div class="navsubsection">
               <div class="navitem">
-                <a href="/scripts/dancefinder.pl?style=CONTRA">Contra Dances </a><br />
+                <a href="/dance-scheduler/dancefinder-results?style-name=CONTRA">Contra Dances </a><br />
               </div>
               <div class="navitem">
-                <a href="/scripts/dancefinder.pl?style=ENGLISH">English Dances </a><br />
+                <a href="/dance-scheduler/dancefinder-results?style-name=ENGLISH">English Dances </a><br />
               </div>
               <div class="navitem">
-                <a href="/scripts/dancefinder.pl?style=BARN">Barn Dances </a><br />
-              </div>
-              <div class="navitem">
-                <a href="/scripts/dancefinder.pl">Eveything</a><br />
+                <a href="/dance-scheduler/dancefinder-results">Everything</a><br />
               </div>
             </div>
           </div>
