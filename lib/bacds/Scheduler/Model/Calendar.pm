@@ -74,7 +74,8 @@ sub load_venue_list_for_month {
 
     my (%seen, @venue_list);
     foreach my $event (@events) {
-        my $venue = $event->venues->first;
+        my $venue = $event->venues->first
+            or next;
         next if $seen{$venue->vkey}++;
         # making a data structure from a | string is silly, but I'm
         # maintaining the old behavior
