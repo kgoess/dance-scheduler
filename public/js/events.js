@@ -1,7 +1,13 @@
-import {
+/* import {
     multiSelectOptionAdd,
     unpackResults
 } from "./helper-functions.js";
+*/
+
+let {
+    multiSelectOptionAdd,
+    unpackResults
+} = await import(`./helper-functions.js?checksum=${jsChecksum}`);
 
 $( document ).ready(function() {
 
@@ -191,7 +197,11 @@ $( document ).ready(function() {
 
     /* This helper function will be run by saveAction() before submitting
      */
-    $('#event-display-form')[0].saveHelper.push(activeForm => {
+    const eventDisplayForm = $('#event-display-form')[0];
+    if (!eventDisplayForm.saveHelper) {
+        eventDisplayForm.saveHelper = [];
+    }
+    eventDisplayForm.saveHelper.push(activeForm => {
         let nameStr = $(activeForm.find('input[name="name"]')).val();
         if (!nameStr){
             const styles = [];

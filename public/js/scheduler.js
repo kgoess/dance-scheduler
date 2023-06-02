@@ -1,5 +1,5 @@
-import * as h from "./event-handlers.js";
-import {
+let h = await import(`./event-handlers.js?checksum=${jsChecksum}`);
+let {
     displayItem,
     escapeHtml,
     getParentAndModelName,
@@ -9,15 +9,20 @@ import {
     saveAction,
     toastInit, 
     unpackResults,
-} from "./helper-functions.js";
+} = await import(`./helper-functions.js?checksum=${jsChecksum}`);
 
 $( document ).ready(function() {
+
     $('.remove-multi-select-button' ).click(function() {
         $(this).closest('.multi-select-wrapper').remove();
     });
 
     // Create empty lists for adding helper functions
-    $('.display-form').each(function() {this.saveHelper = []});
+    $('.display-form').each(function() {
+        if (!this.saveHelper) {
+            this.saveHelper = [];
+        }
+    });
 
     // Load up an item from the list when it's been clicked on
     $( '.clickable-list' ).change( h.clickableListOnchange );

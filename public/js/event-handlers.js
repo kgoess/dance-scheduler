@@ -1,4 +1,4 @@
-import {
+let {
     deleteAction,
     displayItem,
     getLabelForDisplayInItemListbox,
@@ -8,7 +8,7 @@ import {
     loadListForModel,
     saveAction,
     unpackResults,
-} from "./helper-functions.js";
+} = await import(`./helper-functions.js?checksum=${jsChecksum}`);
 
 
 /* listFilterOnchange

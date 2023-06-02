@@ -24,10 +24,9 @@
 
 <script>
 var appUriBase = "<% request.uri_base %>";
+var jsChecksum = "<% checksum %>";
 </script>
 <script type="module" src="<% request.uri_base %>/js/scheduler.js?checksum=<% checksum %>"></script>
-<script type="module" src="<% request.uri_base %>/js/event-handlers.js?checksum=<% checksum %>"></script>
-<script type="module" src="<% request.uri_base %>/js/helper-functions.js?checksum=<% checksum %>"></script>
 
 </head>
 <body>
