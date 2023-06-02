@@ -15,6 +15,7 @@ $( document ).ready(function() {
         buttons: {
             Yes: function() {
                 const found = {};
+                /* copy the styles in */
                 $( '[fold_model="event"] select[name="style_id"]' ).each(function() {
                     found[$(this).val()] = 1;
                 });
@@ -32,6 +33,27 @@ $( document ).ready(function() {
                         const lastStyleSelectbox = $( '#event-display-form [model-name="style"] select' ).last();
                         const clone = multiSelectOptionAdd.call(lastStyleSelectbox);
                         clone.val(incomingStyleId);
+                    }
+                });
+
+                /* copy the parent_org in */
+                $( '[fold_model="event"] select[name="parent_org_id"]' ).each(function() {
+                    found[$(this).val()] = 1;
+                });
+                const emptyParentOrgSelectboxes = $.makeArray($( '#event-display-form [model-name="parent_org"] select' ))
+                    .filter(item => !$(item).val()) ;
+
+                teamDialog.parentOrgIds.forEach((incomingParentOrgId, i) => {
+                    if (found[incomingParentOrgId]) {
+                        return;
+                    }
+                    let firstEmptyParentOrgSelectbox;
+                    if (firstEmptyParentOrgSelectbox = emptyParentOrgSelectboxes.shift()) {
+                        $(firstEmptyParentOrgSelectbox).val(incomingParentOrgId);
+                    } else {
+                        const lastParentOrgSelectbox = $( '#event-display-form [model-name="parent_org"] select' ).last();
+                        const clone = multiSelectOptionAdd.call(lastParentOrgSelectbox);
+                        clone.val(incomingParentOrgId);
                     }
                 });
 
@@ -56,16 +78,27 @@ $( document ).ready(function() {
                     msg,
                     (msg) => {
                         $('#team-name-in-popup').text(msg.data.name);
-                        const spanForNames = $('#add-team-dialog .style-names');
-                        spanForNames.text('');
-                        const olEl = $(document.createElement('ol'));
-                        spanForNames.append(olEl);
+                        const spanForStyles = $('#add-team-dialog .style-names');
+                        spanForStyles.text('');
+                        const styleOl = $(document.createElement('ol'));
+                        spanForStyles.append(styleOl);
                         teamDialog.styleIds = [];
                         msg.data.styles.forEach((style, i) => {
                             const itemEl = document.createElement('li');
                             itemEl.textContent = style.name;
-                            olEl.append(itemEl);
+                            styleOl.append(itemEl);
                             teamDialog.styleIds.push(style.id);
+                        });
+                        const spanForParentOrgs = $('#add-team-dialog .parent-org-names');
+                        spanForParentOrgs.text('');
+                        const parentOrgUl = $(document.createElement('ul'));
+                        spanForParentOrgs.append(parentOrgUl);
+                        teamDialog.parentOrgIds = [];
+                        msg.data.parent_orgs.forEach((parentOrg, i) => {
+                            const itemEl = document.createElement('li');
+                            itemEl.textContent = parentOrg.name;
+                            parentOrgUl.append(itemEl);
+                            teamDialog.parentOrgIds.push(parentOrg.id);
                         });
                     },
                     [msg]
