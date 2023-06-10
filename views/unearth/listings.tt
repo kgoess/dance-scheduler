@@ -4,6 +4,9 @@ the tonight.html, 18-day.html, and specialevents.html bits of the main
 page.
 %>
 
+<% USE Math %>
+<% USE POSIX %>
+
 <% MACRO maybe_linkit(string, url) BLOCK %>
     <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
 <% END %>
@@ -24,13 +27,27 @@ page.
     IF event.is_canceled;
         found_styles.push('canceled-event');
     END;
-    band_photo_size = 0;
-    FOREACH band IN event.bands;
-        IF band.photo_url;
-            band_photo_size = 1;
+    event_has_photos = 0;
+    # FIXME NO NOT LIKE THIS
+    FOREACH entity IN event.bands;
+        IF entity.photo_url;
+            event_has_photos = 1;
+            LAST;
         END;
     END;
-    IF band_photo_size > 0;
+    FOREACH entity IN event.callers;
+        IF entity.photo_url;
+            event_has_photos = 1;
+            LAST;
+        END;
+    END;
+    FOREACH entity IN event.talent;
+        IF entity.photo_url;
+            event_has_photos = 1;
+            LAST;
+        END;
+    END;
+    IF event_has_photos;
         found_styles.push('has-photo');
     END;
     IF found_styles.size();
@@ -101,8 +118,40 @@ END %>
         <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>
         <% IF event.short_desc %></div><% END %>
         </div>
-        <% IF event.bands.size() AND event.bands.0.photo_url %>
-        <div class="event-image" style="background-image: url('<% event.bands.0.photo_url %>');"> </div>
+        <% photo_count = 0 %>
+        <% FOREACH entity IN event.bands;
+            IF entity.photo_url;
+                photo_count = photo_count + 1;
+            END;
+        END;
+        FOREACH entity IN event.callers;
+            IF entity.photo_url;
+                photo_count = photo_count + 1;
+            END;
+        END;
+        FOREACH entity IN event.talent;
+            IF entity.photo_url;
+                photo_count = photo_count + 1;
+            END;
+        END; %>
+        <% IF photo_count %>
+            <div class="event-photos-collage" style="--data-collage-width: <% POSIX.ceil(Math.sqrt(photo_count)) %>">
+                <% FOREACH entity IN event.bands;
+                    IF entity.photo_url; %>
+                        <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
+                    <% END;
+                END;
+                FOREACH entity IN event.callers;
+                    IF entity.photo_url; %>
+                        <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
+                    <% END;
+                END;
+                FOREACH entity IN event.talent;
+                    IF entity.photo_url; %>
+                        <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
+                    <% END;
+                END; %>
+            </div>
         <% END %>
     </div>
 <% END %>

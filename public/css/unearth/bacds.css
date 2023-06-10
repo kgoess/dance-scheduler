@@ -32,8 +32,15 @@
     font-style: italic;
 }
 
+.event-photos-collage {
+    display: grid;
+    grid-template-columns: repeat(var(--data-collage-width), 1fr);
+    grid-template-rows: repeat(var(--data-collage-width), 1fr);
+}
+
 .event-image {
-    min-height: 14em;
+    height: 5em;
+    width: 5em;
 }
 
 .event-listing:not(.has-photo) {
