@@ -9,6 +9,7 @@ tables="
     event_team_map
     programmer_series_map
     programmer_events_map
+    programmer_teams_map
     band_membership
     team_styles_map
     events
