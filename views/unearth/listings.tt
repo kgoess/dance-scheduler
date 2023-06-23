@@ -48,7 +48,10 @@ page.
         END;
     END;
     IF event_has_photos;
-        found_styles.push('has-photo');
+        FOREACH class IN [ 'has-photo', 'col-lg-6', 'mr-auto', 'p-lg-5',
+                            'mt-4', 'mt-lg-0' ];
+            found_styles.push(class);
+        END;
     END;
     IF found_styles.size();
        ' ' _ found_styles.join(' '); #this is the return value
@@ -65,7 +68,43 @@ END %>
 
 
 <% FOREACH event IN events %>
-    <div class="d-flex flex-row event-listing<% classes_for_event(event) %>">
+    <% photo_count = 0 %>
+    <% FOREACH entity IN event.bands;
+        IF entity.photo_url;
+            photo_count = photo_count + 1;
+        END;
+    END;
+    FOREACH entity IN event.callers;
+        IF entity.photo_url;
+            photo_count = photo_count + 1;
+        END;
+    END;
+    FOREACH entity IN event.talent;
+        IF entity.photo_url;
+            photo_count = photo_count + 1;
+        END;
+    END; %>
+    <div class="row d-flex no-gutters <% IF photo_count %>has-photo<% END %>">
+    <% IF photo_count %>
+        <div class="<% IF photo_count > 1 %>event-photos-collage<% ELSE %>event-photo<% END %> col-12 col-lg-4 aos-init aos-animate" style="--data-collage-width: <% POSIX.ceil(Math.sqrt(photo_count)) %>">
+            <% FOREACH entity IN event.bands;
+                IF entity.photo_url; %>
+                    <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
+                <% END;
+            END;
+            FOREACH entity IN event.callers;
+                IF entity.photo_url; %>
+                    <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
+                <% END;
+            END;
+            FOREACH entity IN event.talent;
+                IF entity.photo_url; %>
+                    <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
+                <% END;
+            END; %>
+        </div>
+    <% END %>
+    <div class="event-listing col-12 aos-init aos-animate <% classes_for_event(event) %>">
         <div>
         <% IF event.is_canceled %>
             <strong>CANCELED</strong>
@@ -118,40 +157,6 @@ END %>
         <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>
         <% IF event.short_desc %></div><% END %>
         </div>
-        <% photo_count = 0 %>
-        <% FOREACH entity IN event.bands;
-            IF entity.photo_url;
-                photo_count = photo_count + 1;
-            END;
-        END;
-        FOREACH entity IN event.callers;
-            IF entity.photo_url;
-                photo_count = photo_count + 1;
-            END;
-        END;
-        FOREACH entity IN event.talent;
-            IF entity.photo_url;
-                photo_count = photo_count + 1;
-            END;
-        END; %>
-        <% IF photo_count %>
-            <div class="event-photos-collage" style="--data-collage-width: <% POSIX.ceil(Math.sqrt(photo_count)) %>">
-                <% FOREACH entity IN event.bands;
-                    IF entity.photo_url; %>
-                        <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
-                    <% END;
-                END;
-                FOREACH entity IN event.callers;
-                    IF entity.photo_url; %>
-                        <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
-                    <% END;
-                END;
-                FOREACH entity IN event.talent;
-                    IF entity.photo_url; %>
-                        <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
-                    <% END;
-                END; %>
-            </div>
-        <% END %>
     </div>
+    </div> <!-- end row -->
 <% END %>

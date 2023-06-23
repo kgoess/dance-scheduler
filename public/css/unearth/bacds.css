@@ -32,15 +32,26 @@
     font-style: italic;
 }
 
+/* if there's multiple photos */
 .event-photos-collage {
     display: grid;
     grid-template-columns: repeat(var(--data-collage-width), 1fr);
     grid-template-rows: repeat(var(--data-collage-width), 1fr);
+    aspect-ratio: 1;
+    padding: 2rem;
 }
 
-.event-image {
-    height: 5em;
-    width: 5em;
+/* give them a little overlap */
+.event-photos-collage .event-image {
+    margin: -2rem;
+}
+
+/* if there's only a single photo */
+.event-photo {
+    display: grid;
+    grid-template-columns: repeat(var(--data-collage-width), 1fr);
+    grid-template-rows: repeat(var(--data-collage-width), 1fr);
+    aspect-ratio: 1;
 }
 
 .event-listing:not(.has-photo) {
@@ -50,3 +61,28 @@
 .event-listing .event-image {
     flex: 0 0 50%;
 }
+
+.event-photos-collage .event-image {
+    border: 1px solid gray;
+    background-color: aliceblue;
+    border-radius: 10px;
+}
+
+@media (min-width: 992px) {
+    /* reverse the natural ordering for every other row that has a
+     * photo so that the photos alternate left-and-right going
+     * down the page, but only on the wide view--on mobile they just
+     * display vertically */
+    .row:nth-child(even of .has-photo) .event-listing.has-photo {
+        -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+        order: 1;
+    }
+    .row:nth-child(even of .has-photo) :is(.event-photos-collage, .event-photo) {
+        -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+        order: 2;
+    }
+}
+
+@media (min-width: 992px)
