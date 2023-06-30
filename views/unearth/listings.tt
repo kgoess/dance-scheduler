@@ -66,6 +66,21 @@ END %>
     END;
 END %>
 
+<% MACRO collage_images(entities_list) BLOCK %>
+    <% FOREACH entity IN entities_list;
+        IF entity.photo_url; %>
+            <% collage_image(entity) %>
+        <% END;
+    END %>
+<% END %>
+<% MACRO collage_image(entitiy) BLOCK %>
+    <div class="event-pic">
+        <div class="polaroid-frame">
+            <img class="event-inner-image" src="<% entity.photo_url %>">
+            <div class="event-pic-caption"><% entity.name %></div>
+        </div>
+    </div>
+<% END %>
 
 <% FOREACH event IN events %>
     <% photo_count = 0 %>
@@ -87,21 +102,9 @@ END %>
     <div class="row d-flex no-gutters <% IF photo_count %>has-photo<% END %>">
     <% IF photo_count %>
         <div class="<% IF photo_count > 1 %>event-photos-collage<% ELSE %>event-photo<% END %> col-12 col-lg-4 aos-init aos-animate" style="--data-collage-width: <% POSIX.ceil(Math.sqrt(photo_count)) %>">
-            <% FOREACH entity IN event.bands;
-                IF entity.photo_url; %>
-                    <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
-                <% END;
-            END;
-            FOREACH entity IN event.callers;
-                IF entity.photo_url; %>
-                    <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
-                <% END;
-            END;
-            FOREACH entity IN event.talent;
-                IF entity.photo_url; %>
-                    <div class="event-image" style="background-image: url('<% entity.photo_url %>');"> </div>
-                <% END;
-            END; %>
+            <% collage_images(event.bands) %>
+            <% collage_images(event.callers) %>
+            <% collage_images(event.talent) %>
         </div>
     <% END %>
     <div class="event-listing col-12 aos-init aos-animate <% classes_for_event(event) %>">

@@ -13,6 +13,10 @@
 <link rel="stylesheet" href="fonts/unearth/flaticon/font/flaticon.css">
 <link rel="stylesheet" href="css/unearth/aos.css">
 
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Just+Another+Hand:wght@400&display=swap" rel="stylesheet">
+
 <!-- MAIN CSS -->
 <link rel="stylesheet" href="css/unearth/style.css">
 <link rel="stylesheet" href="css/unearth/bacds.css">
