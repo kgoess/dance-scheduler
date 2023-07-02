@@ -101,12 +101,15 @@
       name: short_desc
       required: 0
       type: textarea
+      help: >
+        Short Desc. is the main description that gets shown everywhere.
     - label: Long Desc.
       name: long_desc
       required: 0
       type: textarea
       help: >
-        This might be useful for one-off special events so we can host the entire page here in the app.
+        This might be useful for one-off special events so we can host the
+        entire page here in the app, but is currently unused.
     - label: Custom URL
       name: custom_url
       type: text
