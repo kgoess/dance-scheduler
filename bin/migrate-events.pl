@@ -15,6 +15,9 @@ my %Series_Lookup = (
     'CCB-CONTRA' => 'Berkeley Contra',
     'CCB-CONTRA/WORKSHOP' => 'Berkeley Contra',
     'CCB-WORKSHOP/HAMBO' => 'Berkeley Contra',
+    'CCB-CONTRAWORKSHOP/WALTZ' => 'Berkeley Contra',
+    'CCB-ECDWORKSHOP/WALTZ' => 'Berkeley Contra',
+    'CCB-ENGLISH/JAM' => 'Berkeley Contra',
     'SF-CONTRA' => 'San Francisco Contra',
     'SF-CONTRA/SPECIAL' => 'San Francisco Contra',
     'SF-CONTRAWORKSHOP' => 'San Francisco Contra',
@@ -33,6 +36,7 @@ my %Series_Lookup = (
     'FSJ-CONTRA' => 'South Bay Contra Dance Series',
     'FSJ-SPECIAL' => 'South Bay Contra Dance Series',
     'FSJ-CONTRA/SPECIAL' => 'South Bay Contra Dance Series',
+    'FSJ-CONTRA/JAM' => 'South Bay Contra Dance Series',
     'FSJ-CONTRA/SPECIAL/WORKSHOP' => 'South Bay Contra Dance Series',
     'FSJ-FAMILY' => 'South Bay Contra Dance Series',
     'GSP-FAMILY' => 'South Bay Contra Dance Series',
@@ -45,6 +49,8 @@ my %Series_Lookup = (
     'CCB-WALTZ/WORKSHOP' => 'Berkeley English',
     'SMM-ENGLISH' => 'Berkeley English',
     'FBH-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
+    'FBH-ENGLISH/WORKSHOP' => 'Berkeley Fourth Saturday Experienced Dance',
+    'FUO-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
     'CCB-WALTZ' => 'Berkeley English',
     'CCB-SINGING' => 'Berkeley English',
     'CCB-SINGING/ENGLISH' => 'Berkeley English',
@@ -58,11 +64,13 @@ my %Series_Lookup = (
     'SME-ENGLISH/WORKSHOP' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH/REGENCY/SPECIAL' => 'Palo Alto Friday English Dance',
     'FBC-ENGLISH' => 'Palo Alto Friday English Dance',
+    'FBC-CONTRA' => 'Palo Alto Contra',
     # ???
     #'CCB-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
     'SJP-ENGLISH' => 'San Francisco Saturday English Dance',
     'SPC-ENGLISH' => 'San Francisco Saturday English Dance',
     'DGK-ENGLISH' => 'San Francisco Saturday English Dance',
+    'DGK-ENGLISH/CEILIDH' => 'San Francisco Saturday English Dance',
     'FSJ-ENGLISH' => 'San Jose English',
     'COY-ENGLISH' => 'San Jose English', # just guessing?
     'HPP-WOODSHED' => 'Los Altos Second-Monday Woodshed',
@@ -90,12 +98,16 @@ my %Series_Lookup = (
     'BR-ENGLISH/CAMP' => 'Fall Frolick',
     'ONLINE-ENGLISH/CAMP' => 'Fall Frolick',
     'MON-ENGLISH/CAMP/SPECIAL' => 'Fall Frolick',
+    'MON-ENGLISH/CAMP' => 'Fall Frolick',
     'FBH-ENGLISH/SPECIAL' => 'Fall Ball',
     'FBH-ENGLISH/SPECIAL/WORKSHOP' => 'Fall Ball',
+    'SMT-ENGLISH/SPECIAL' => 'Fall Ball',
+    'SMT-ENGLISH/SPECIAL/WORKSHOP' => 'Fall Ball',
     'MON-FAMILY/CAMP' => 'Family Week',
     'MON-ENGLISH/CAMP/SPECIAL/WEEKEND' => 'Family Week',
     'MON-CONTRA/ENGLISH/DISPLAY/CRAFTS/CAMP/SPECIAL' => 'Family Week',
     'MON-CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS' => 'Family Week',
+    'FHS-CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS' => 'Family Week',
     'ONLINE-ONLINE Family Week Gathering' => 'Family Week',
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
     'JPC-CONTRA/SPECIAL' => 'Balance the Bay',
@@ -133,6 +145,7 @@ my %Series_Lookup = (
     'AMH-ENGLISH' => 'SKIP SERIES',
     'VAR-MORRIS/SPECIAL' => 'SKIP SERIES',
     'CCB-MORRIS/WORKSHOP/SPECIAL' => 'SKIP SERIES',
+    'FUM-ENGLISH/CONTRA/SPECIAL' => 'SKIP SERIES',
 );
 
 my $dbh = $ENV{YES_DO_PROD}
@@ -150,7 +163,8 @@ sub create_events {
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2019');
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2018');
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2017');
-    my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2016');
+    #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2016');
+    my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2015');
 
     foreach my $old (@old_events) {
 
@@ -195,6 +209,8 @@ dump $old;
         $new->name('Phoenix In Concert');
     } elsif ($old->type eq 'CONTRA/SPECIAL/CONCERT' && $old->startday eq "2017-08-16") {
         $new->name('Mason & Weed In Concert');
+    } elsif ($old->type eq 'ENGLISH/CONTRA/SPECIAL' && $old->startday eq "2015-09-10") {
+        $new->name('Jody Dill Memorial');
     }
     my $synthetic_name = join ' ', map { $old->$_ } qw/type loc leader/ ;
     $new->synthetic_name($new->name or $synthetic_name);
@@ -298,6 +314,10 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'WORKSHOP';
     } elsif ($old_style eq 'ENGLISH/WORKSHOP') {
         push @old_styles, 'ENGLISH', 'WORKSHOP';
+    } elsif ($old_style eq 'ENGLISH/JAM') {
+        push @old_styles, 'ENGLISH', 'JAM';
+    } elsif ($old_style eq 'CONTRA/JAM') {
+        push @old_styles, 'CONTRA', 'JAM';
     } elsif ($old_style eq 'ENGLISH CAMP FALL FROLICK') {
         push @old_styles, 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'ENGLISH CAMP HEY DAYS') {
@@ -350,6 +370,10 @@ sub attach_styles {
         push @old_styles, 'ENGLISH','MORRIS','SWORD','SPECIAL';
     } elsif ($old_style eq 'WORKSHOP/HAMBO') {
         push @old_styles, 'WORKSHOP','HAMBO';
+    } elsif ($old_style eq 'CONTRAWORKSHOP/WALTZ') {
+        push @old_styles, 'WORKSHOP','WALTZ';
+    } elsif ($old_style eq 'ECDWORKSHOP/WALTZ') {
+        push @old_styles, 'WORKSHOP','WALTZ';
     } elsif ($old_style eq 'ENGLISH/CONCERT') {
         push @old_styles, 'ENGLISH','CONCERT';
     } elsif ($old_style eq 'CONTRA/SPECIAL/CONCERT') {
@@ -358,6 +382,8 @@ sub attach_styles {
         push @old_styles, 'CONTRA','SPECIAL';
     } elsif ($old_style eq 'ENGLISH/CONTRA/SPECIAL/CAMP') {
         push @old_styles, 'ENGLISH', 'CONTRA','SPECIAL', 'CAMP';
+    } elsif ($old_style eq 'ENGLISH/CONTRA/SPECIAL') {
+        push @old_styles, 'ENGLISH', 'CONTRA','SPECIAL';
     } elsif ($old_style eq 'SINGING/ENGLISH') {
         push @old_styles, 'SINGING', 'ENGLISH';
     } elsif ($old_style eq 'CONTRA/SPECIAL/WORKSHOP') {
@@ -366,6 +392,8 @@ sub attach_styles {
         push @old_styles, 'MORRIS', 'SPECIAL';
     } elsif ($old_style eq 'MORRIS/WORKSHOP/SPECIAL') {
         push @old_styles, 'MORRIS', 'WORKSHOP', 'SPECIAL';
+    } elsif ($old_style eq 'ENGLISH/CEILIDH') {
+        push @old_styles, 'ENGLISH', 'CEILIDH';
     } else {
         push @old_styles, $old_style;
     }
