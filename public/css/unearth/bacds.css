@@ -50,7 +50,7 @@
     transform: rotate(-5deg);
 }
 
-.row:nth-child(even of .has-photo) .polaroid-container {
+.row:nth-child(even) .polaroid-container {
     transform: rotate(5deg);
 }
 
@@ -65,10 +65,6 @@
     grid-template-columns: repeat(var(--data-collage-width), 1fr);
     grid-template-rows: repeat(var(--data-collage-width), 1fr);
     aspect-ratio: 1;
-}
-
-.event-listing:not(.has-photo) {
-    max-width: 80%;
 }
 
 .event-listing .polaroid-container {
@@ -111,12 +107,12 @@
      * photo so that the photos alternate left-and-right going
      * down the page, but only on the wide view--on mobile they just
      * display vertically */
-    .row:nth-child(even of .has-photo) .event-listing.has-photo {
+    .row:nth-child(even) .event-listing {
         -webkit-box-ordinal-group: 2;
         -ms-flex-order: 1;
         order: 1;
     }
-    .row:nth-child(even of .has-photo) :is(.event-photos-collage, .event-photo) {
+    .row:nth-child(even) :is(.event-photos-collage, .event-photo) {
         -webkit-box-ordinal-group: 3;
         -ms-flex-order: 2;
         order: 2;
