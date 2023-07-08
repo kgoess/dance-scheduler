@@ -381,7 +381,7 @@ sub test_dancefinder_results_endpoint {
         'vanilla results header with no params';
 
     like $body, qr{
-        Thursday,.28.April,.2022:\s+<strong>\s*</strong>\s+at\s+
+        Thursday,.April.28:\s+<strong>\s*</strong>\s+at\s+
         <a.href="http://custom-url/test-event-1">Mr\..Hooper's.Store.in.Sunny.Day</a>\.\s+
             Music.by \s+
             test.band.1,.test.band.2:.muso.3 \s+
@@ -389,7 +389,7 @@ sub test_dancefinder_results_endpoint {
     }x, "event1's title looks right";
 
     like $body, qr{
-        Thursday,.28.April,.2022:\s+<strong>\s*CONTRA\s*</strong>\s+at\s+
+        Thursday,.April.28:\s+<strong>\s*CONTRA\s*</strong>\s+at\s+
         <a.href="https://bacds.org/dance-a-week/">Mr\..Hooper's.Store.in.Sunny.Day</a>\. \s+
         <a.href="https://bacds.org/dance-a-week/">More.Info</a> \s+
         </p>

@@ -10,6 +10,8 @@ sub get_fields_for_output {
     qw/
         parent_org_id
         full_name
+        url
+        photo_url
         abbreviation
         created_ts
         modified_ts
@@ -19,6 +21,8 @@ sub get_fields_for_output {
 sub get_fields_for_input {
     qw/
         full_name
+        url
+        photo_url
         abbreviation
         is_deleted
     /

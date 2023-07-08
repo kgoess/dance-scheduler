@@ -54,8 +54,10 @@ subtest 'POST /parent_org' => sub {
     my ($expected, $res, $decoded, $got);
     my $new_parent_org = {
         full_name        => "test parent_org",
-        abbreviation        => "TPO",
-        parent_org_id   => '', # the webapp sends full_name=test+parent_org&parent_org_id=
+        url              => "https://parentorg.com",
+        photo_url        => "https://parentorg.com/thelogo.png",
+        abbreviation     => "TPO",
+        parent_org_id    => '', # the webapp sends full_name=test+parent_org&parent_org_id=
     };
     $ENV{TEST_NOW} = 1651112285;
     $Created_Time = get_now()->iso8601;
@@ -67,6 +69,8 @@ subtest 'POST /parent_org' => sub {
     $expected = {
         parent_org_id    => 1,
         full_name        => $new_parent_org->{full_name},
+        url              => $new_parent_org->{url},
+        photo_url        => $new_parent_org->{photo_url},
         abbreviation     => $new_parent_org->{abbreviation},
         created_ts  => $Created_Time,
         modified_ts => $Created_Time,
@@ -119,6 +123,8 @@ subtest 'GET /parent_org/#' => sub {
     $expected = {
         parent_org_id    => $ParentOrg_Id,
         full_name        => $ParentOrg->full_name,
+        url              => $ParentOrg->url,
+        photo_url        => $ParentOrg->photo_url,
         abbreviation     => $ParentOrg->abbreviation,
         created_ts  => $Created_Time,
         modified_ts => $Created_Time,
@@ -147,6 +153,8 @@ subtest 'PUT /parent_org/#' => sub {
         parent_org_id    => $ParentOrg_Id,
         full_name        => $edit_parent_org->{full_name},
         abbreviation     => $edit_parent_org->{abbreviation},
+        url              => $ParentOrg->url,
+        photo_url        => $ParentOrg->photo_url,
         created_ts  => $Created_Time,
         modified_ts => $Modified_Time,
         is_deleted  => 0,
@@ -184,6 +192,8 @@ subtest 'GET /parent_orgAll' => sub{
       {
         parent_org_id    => $ParentOrg_Id,
         full_name        => $ParentOrg->full_name,
+        url              => $ParentOrg->url,
+        photo_url        => $ParentOrg->photo_url,
         abbreviation     => $ParentOrg->abbreviation,
         created_ts  => $Created_Time,
         modified_ts => $Modified_Time,

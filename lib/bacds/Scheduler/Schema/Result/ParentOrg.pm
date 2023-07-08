@@ -72,6 +72,18 @@ __PACKAGE__->table("parent_orgs");
   default_value: current_timestamp
   is_nullable: 0
 
+=head2 url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
+=head2 photo_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -96,6 +108,10 @@ __PACKAGE__->add_columns(
     default_value => \"current_timestamp",
     is_nullable => 0,
   },
+  "url",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "photo_url",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
 );
 
 =head1 PRIMARY KEY
@@ -169,8 +185,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-25 19:32:49
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:j9o7aW1ExashfsCwhN1nlA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-07-07 20:22:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:c1APNw+pbtWWYLqhq0vbYA
 
 
 use Role::Tiny::With;

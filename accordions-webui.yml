@@ -315,6 +315,12 @@
       name: full_name
       required: 1
       type: text
+    - label: Url
+      name: url
+      type: text
+    - label: Photo Url (logo)
+      name: photo_url
+      type: text
     - label: Abbreviation
       name: abbreviation
       required: 1
