@@ -13,6 +13,7 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 # to the new series table, by name
 my %Series_Lookup = (
     'CCB-CONTRA' => 'Berkeley Contra',
+    'STC-CONTRA' => 'Berkeley Contra',
     'CCB-CONTRA/WORKSHOP' => 'Berkeley Contra',
     'CCB-WORKSHOP/HAMBO' => 'Berkeley Contra',
     'CCB-CONTRAWORKSHOP/WALTZ' => 'Berkeley Contra',
@@ -44,6 +45,8 @@ my %Series_Lookup = (
     'CCB-ENGLISH' => 'Berkeley English',
     'CCB-ENGLISH WORKSHOP' => 'Berkeley English',
     'CCB-ENGLISH/WORKSHOP' => 'Berkeley English',
+    'STC-ENGLISH' => 'Berkeley English',
+    'STC-ENGLISH/WORKSHOP' => 'Berkeley English',
     'CCB-ENGLISH/CONTRA' => 'Berkeley English',
     'CCB-ENGLISH/WALTZ' => 'Berkeley English',
     'CCB-WALTZ/WORKSHOP' => 'Berkeley English',
@@ -62,6 +65,7 @@ my %Series_Lookup = (
     'SME-ENGLISH' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH WORKSHOP' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH/WORKSHOP' => 'Palo Alto Friday English Dance',
+    'SME-ENGLISH/SPECIAL' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH/REGENCY/SPECIAL' => 'Palo Alto Friday English Dance',
     'FBC-ENGLISH' => 'Palo Alto Friday English Dance',
     'FBC-CONTRA' => 'Palo Alto Contra',
@@ -106,6 +110,7 @@ my %Series_Lookup = (
     'MON-FAMILY/CAMP' => 'Family Week',
     'MON-ENGLISH/CAMP/SPECIAL/WEEKEND' => 'Family Week',
     'MON-CONTRA/ENGLISH/DISPLAY/CRAFTS/CAMP/SPECIAL' => 'Family Week',
+    'FHS-CAMP/CONTRA/ENGLISH/FAMILY/CRAFTS' => 'Family Week',
     'MON-CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS' => 'Family Week',
     'FHS-CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS' => 'Family Week',
     'ONLINE-ONLINE Family Week Gathering' => 'Family Week',
@@ -125,6 +130,8 @@ my %Series_Lookup = (
     'HVC-CONTRA/FAMILY' => 'Family Contra',
     'RHM-CONTRA/SPECIAL' => 'Contra College',
     'RHM-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
+    'FUM-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
+    'FUM-WALTZ/CONTRA/WORKSHOP' => 'Contra College',
     'SJW-ENGLISH/SPECIAL' => 'Playford Ball',
     'HVC-ENGLISH/SPECIAL' => 'Playford Ball',
     'HVC-ENGLISH' => 'Playford Ball',
@@ -135,6 +142,7 @@ my %Series_Lookup = (
     'LSC-CONTRA/SPECIAL' => 'American Week',
     'LMDC-CONTRA/SPECIAL' => 'No Snow Ball',
     'OVMB-CONTRA/SPECIAL' => 'No Snow Ball',
+    'ALM-CONTRA/SPECIAL' => 'No Snow Ball',
     'MON-ENGLISH/CONTRA/SPECIAL/CAMP' => 'Spring Fever',
     'ALB-ENGLISH/MORRIS/SWORD/SPECIAL' => 'SKIP SERIES',
     'HC-ENGLISH/SPECIAL' => 'SKIP SERIES',
@@ -146,6 +154,9 @@ my %Series_Lookup = (
     'VAR-MORRIS/SPECIAL' => 'SKIP SERIES',
     'CCB-MORRIS/WORKSHOP/SPECIAL' => 'SKIP SERIES',
     'FUM-ENGLISH/CONTRA/SPECIAL' => 'SKIP SERIES',
+    'FBH-ENGLISH/MUSIC/WORKSHOP' => 'SKIP SERIES',
+    'GIC-SQUARE/SPECIAL' => 'SKIP SERIES',
+    'ACC-ENGLISH/SPECIAL' => 'SKIP SERIES',
 );
 
 my $dbh = $ENV{YES_DO_PROD}
@@ -164,7 +175,8 @@ sub create_events {
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2018');
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2017');
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2016');
-    my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2015');
+    #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2015');
+    my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2014');
 
     foreach my $old (@old_events) {
 
@@ -324,11 +336,15 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'CAMP/ENGLISH/MUSIC') {
         push @old_styles, 'ENGLISH', 'CAMP';
+    } elsif ($old_style eq 'ENGLISH/MUSIC/WORKSHOP') {
+        push @old_styles, 'ENGLISH', 'WORKSHOP';
     } elsif ($old_style eq 'ENGLISH/CAMP/SPECIAL') {
         push @old_styles, 'ENGLISH', 'CAMP', 'SPECIAL';
     } elsif ($old_style eq 'FAMILY/CAMP') {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS') {
+        push @old_styles, 'FAMILY', 'CAMP';
+    } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/FAMILY/CRAFTS') {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CONTRA/CAMP') {
         push @old_styles, 'CONTRA', 'CAMP';
@@ -346,6 +362,8 @@ sub attach_styles {
         push @old_styles, 'CONTRA', 'SPECIAL';
     } elsif ($old_style eq 'CONTRA/WALTZ/SPECIAL') {
         push @old_styles, 'CONTRA', 'WALTZ', 'SPECIAL';
+    } elsif ($old_style eq 'WALTZ/CONTRA/WORKSHOP') {
+        push @old_styles, 'WALTZ', 'CONTRA', 'WORKSHOP' ;
     } elsif ($old_style eq 'CONTRA/WALTZ') {
         push @old_styles, 'CONTRA', 'WALTZ';
     } elsif ($old_style eq 'CONTRA/ENGLISH') {
@@ -394,6 +412,8 @@ sub attach_styles {
         push @old_styles, 'MORRIS', 'WORKSHOP', 'SPECIAL';
     } elsif ($old_style eq 'ENGLISH/CEILIDH') {
         push @old_styles, 'ENGLISH', 'CEILIDH';
+    } elsif ($old_style eq 'SQUARE/SPECIAL') {
+        push @old_styles, 'SQUARE', 'SPECIAL';
     } else {
         push @old_styles, $old_style;
     }
