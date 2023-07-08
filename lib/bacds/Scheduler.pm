@@ -40,6 +40,7 @@ use bacds::Scheduler::Plugin::AccordionConfig;
 use bacds::Scheduler::Plugin::Auth;
 use bacds::Scheduler::Plugin::Checksum;
 use bacds::Scheduler::Model::Band;
+use bacds::Scheduler::Model::Calendar;
 use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::Event;
@@ -76,6 +77,14 @@ register_type_check 'XID' => sub {
 };
 register_type_check 'StyleName' => sub {
     return $_[0] =~ /^[A-Z]{3,16}$/;
+};
+register_type_check 'OKYear' => sub {
+    return unless $_[0] =~ /^ [0-9]{4} $/x;
+    return $_[0] >= 1997 && $_[0] <= DateTime->now->year;
+};
+register_type_check 'OKMonth' => sub {
+    return unless $_[0] =~ /^ [0-9]{1,2} $/x;
+    return $_[0] >= 1 && $_[0] <= 12;
 };
 
 preload_accordion_config;
@@ -1221,6 +1230,73 @@ sub _details_for_series {
     template($template, $data,
         {layout => undef},
     );
+};
+
+=head2 GET /archive-calendars
+
+Lists all the archive-calendar years/months available
+
+=cut
+
+get '/archive-calendars' => sub {
+
+    my $now = DateTime->now;
+    my $this_year = $now->year;
+    my $last_year = $now->clone->subtract(years => 1)->year;
+    my $this_month = $now->month;
+    my @years = (2003..$last_year);
+    my @available = ( [2002, [ 10, 11, 12]] );
+    foreach my $year (2003..$last_year) {
+        push @available, [$year, [1..12]];
+    }
+    push @available , [$this_year, [1..$this_month]];
+
+    template 'archive-calendars/index'=> {
+        available_months => \@available,
+        uri_for => \&uri_for,
+        sprintf => sub { sprintf "%0.2d", shift },
+    },
+    { layout => 'dancefinder' },
+};
+
+=head2 GET /archive-calendars/:year/:month
+
+Handles links like https://bacds.org/dance-scheduler/archive-calendars/2016/08/
+
+Used to be the old cgi-bin/calendar2.pl see
+https://github.com/kgoess/bacds.org-scripts/blob/master/cgi-bin/calendar2.pl
+
+Uses bacds::Scheduler::Model::Calendar to access the database.
+
+=cut
+
+get '/archive-calendars/:year/:month/' => with_types [
+    # required
+    ['route', 'year', 'OKYear'],
+    ['route', 'month', 'OKMonth'],
+] => sub {
+    my $year = route_parameters->{year};
+    my $month = route_parameters->{month};
+
+    my @events = bacds::Scheduler::Model::Calendar->load_events_for_month($year, $month);
+
+    template 'archive-calendars/month'=> {
+        events => dump \@events,
+    },
+    { layout => 'dancefinder' },
+
+
+
+#2002/10 is the first one
+    #return "hi there year $year month $month";
+#    my $event_id = params->{event_id};
+#    my ($event, $err) = $event_model->get_row($event_id);
+#
+#    return $err->format if $err;
+#
+#    my $results = $Results_Class->new;
+#    $results->data($event);
+#    return $results->format;
 };
 
 sub get_season {

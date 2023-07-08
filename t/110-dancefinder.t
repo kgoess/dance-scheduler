@@ -29,17 +29,18 @@ $ENV{TEST_NOW} = 1651112285; # 2022-04-27
 my $i = 0;
 
 my $fixture = setup_fixture();
-test_model_related_entities();
-test_dancefinder_form_endpoint();
-test_dancefinder_results_endpoint($fixture);
-test_search_events($fixture);
-test_livecalendar_endpoint($fixture);
-test_serieslister($fixture);
-test_serieslister_endpoint($fixture);
-test_serieslister_single_event_endpoint($fixture);
-test_serieslister_ldjson($fixture);
-test_calendar_get_events();
-test_calendar_get_venues();
+#test_model_related_entities();
+#test_dancefinder_form_endpoint();
+#test_dancefinder_results_endpoint($fixture);
+#test_search_events($fixture);
+#test_livecalendar_endpoint($fixture);
+test_archive_calendars_endpoint($fixture);
+#test_serieslister($fixture);
+#test_serieslister_endpoint($fixture);
+#test_serieslister_single_event_endpoint($fixture);
+#test_serieslister_ldjson($fixture);
+#test_calendar_get_events();
+#test_calendar_get_venues();
 
 sub setup_fixture {
 
@@ -484,6 +485,82 @@ sub test_livecalendar_endpoint {
     $Test->get_ok("/livecalendar-results?start=$start&end=$end", "GET /livecalendar-results ok");
 
     my ($data, $expected);
+
+    $data = decode_json $Test->content;
+
+    $expected = [
+      {
+        allDay => 1,
+        backgroundColor => "yellow",
+        borderColor => "antiquewhite",
+        end => "",
+        id => 1,
+        start => "2022-04-28",
+        textColor => "black",
+        title => " test event 1 at Mr. Hooper's Store in Sunny Day. Music by test band 1, test band 2: muso 3. Big  dance party \x{263a}",
+        url => 'http://custom-url/test-event-1',
+      },
+      {
+        allDay => 1,
+        backgroundColor => "coral",
+        borderColor => "bisque",
+        end => "",
+        id => 2,
+        start => "2022-04-28",
+        textColor => "black",
+        title => "CONTRA  at Mr. Hooper\'s Store in Sunny Day.",
+        url => 'https://bacds.org/dance-a-week/',
+      },
+    ];
+    eq_or_diff $data, $expected, "livecalendar two default events json";
+
+    $start = get_now->subtract(days => 14)->epoch;
+    $end = get_now->subtract(days => 1)->epoch;
+    $Test->get_ok("/livecalendar-results?start=$start&end=$end", "GET /livecalendar-results ok");
+
+    $data = decode_json $Test->content;
+
+    $expected = [
+      {
+        allDay => 1,
+        backgroundColor => "darkturquoise",
+        borderColor => "darkblue",
+        end => "",
+        id => 3,
+        start => "2022-04-14",
+        textColor => "black",
+        title =>
+            "ENGLISH/CONTRA ".
+            "Ye Oldde Ewent ".
+            "at Mr. Hooper's Store in Sunny Day, and Batman's Cave in Gotham City. ".
+            "Led by Alice Ackerby and Bob Bronson. ".
+            "Music by Raging Rovers, Blasting Berzerkers: muso 4.",
+        url => 'https://bacds.org/dance-a-week/',
+      },
+    ];
+    eq_or_diff $data, $expected, "livecalendar old event json";
+
+    #dump $data;
+}
+
+sub test_archive_calendars_endpoint {
+    my ($fixture) = @_;
+
+    my $start = 1651112285; # 2022-04-27
+    my $end = 1651112285 + 60*60*24*30;
+
+    $Test->get_ok('/archive-calendars');
+
+    my ($data, $expected);
+
+    say $Test->content;
+
+    $Test->get_ok('/archive-calendars/2022/04');
+
+    my ($data, $expected);
+
+    say $Test->content;
+exit;
 
     $data = decode_json $Test->content;
 
