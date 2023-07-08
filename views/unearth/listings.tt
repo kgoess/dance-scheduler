@@ -74,10 +74,10 @@ END %>
     END %>
 <% END %>
 <% MACRO collage_image(entitiy) BLOCK %>
-    <div class="event-pic">
+    <div class="polaroid-container">
         <div class="polaroid-frame">
             <img class="event-inner-image" src="<% entity.photo_url %>">
-            <div class="event-pic-caption"><% entity.name %></div>
+            <div class="polaroid-caption"><% entity.name %></div>
         </div>
     </div>
 <% END %>

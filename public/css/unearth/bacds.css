@@ -42,9 +42,21 @@
 }
 
 /* give them a little overlap */
-.event-photos-collage .event-pic {
+.event-photos-collage .polaroid-container {
     margin: -5px;
+}
+
+.polaroid-container {
     transform: rotate(-5deg);
+}
+
+.row:nth-child(even of .has-photo) .polaroid-container {
+    transform: rotate(5deg);
+}
+
+.event-photo .polaroid-container {
+    margin: 25px; /* shrink the singleton non-collage ones a little */
+
 }
 
 /* if there's only a single photo */
@@ -59,14 +71,14 @@
     max-width: 80%;
 }
 
-.event-listing .event-pic {
+.event-listing .polaroid-container {
     flex: 0 0 50%;
 }
 
 /* when there's multiple pix we do the collage */
 
 /* each picture in the collage */
-.event-photos-collage .event-pic {
+.polaroid-container {
     border: 2px outset #ffebcc;
     background-color: #fffbf5;
     border-radius: 3px;
@@ -85,7 +97,7 @@
     padding: 15px 15px 3px 15px;
 }
 
-.event-pic-caption {
+.polaroid-caption {
     font-family: "Just Another Hand";
     text-align: center;
     color: gray;
