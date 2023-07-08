@@ -86,7 +86,11 @@ END %>
             </div>
         <% ELSE %>
             <div class="event-photo col-12 col-lg-4 aos-init aos-animate">
-                <img src="https://bacds.org/graphics/bacdslogo.gif">
+
+                <% FOREACH parent IN event.parent_orgs %>
+                    <img src="<% parent.photo_url %>">
+                    <% LAST # just the first one for now because TT vs. DBIx is being weird  %>
+                <% END %>
                 <!-- <img src="https://bacds.org/graphics/BACDS-Logo-reverse.png"> -->
             </div>
         <% END %>
