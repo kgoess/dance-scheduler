@@ -61,6 +61,16 @@ END %>
 <% END %>
 
 <% FOREACH event IN events %>
+    <% aos_attrs1 = "data-aos-delay=\"\" ";
+    aos_attrs2 = "data-aos-delay=\"\" ";
+    IF loop.odd;
+        aos_attrs1 = aos_attrs1 _ "data-aos=\"fade-right\"";
+        aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-left\"";
+    ELSE;
+        aos_attrs1 = aos_attrs1 _ "data-aos=\"fade-left\"";
+        aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-right\"";
+    END;
+    %>
     <% photo_count = 0 %>
     <% FOREACH entity IN event.bands;
         IF entity.photo_url;
@@ -79,13 +89,19 @@ END %>
     END; %>
     <div class="row d-flex no-gutters">
         <% IF photo_count %>
-            <div class="<% IF photo_count > 1 %>event-photos-collage<% ELSE %>event-photo<% END %> col-12 col-lg-4 aos-init aos-animate" style="--data-collage-width: <% POSIX.ceil(Math.sqrt(photo_count)) %>">
+            <div
+                class="<% IF photo_count > 1 %>event-photos-collage<% ELSE %>event-photo<% END %> col-12 col-lg-4"
+                style="--data-collage-width: <% POSIX.ceil(Math.sqrt(photo_count)) %>"
+                <% aos_attrs1 %>
+            >
                 <% collage_images(event.bands) %>
                 <% collage_images(event.callers) %>
                 <% collage_images(event.talent) %>
             </div>
         <% ELSE %>
-            <div class="event-photo col-12 col-lg-4 aos-init aos-animate">
+            <div class="event-photo col-12 col-lg-4"
+                <% aos_attrs1 %>
+            >
 
                 <% FOREACH parent IN event.parent_orgs %>
                     <img src="<% parent.photo_url %>">
@@ -94,7 +110,9 @@ END %>
                 <!-- <img src="https://bacds.org/graphics/BACDS-Logo-reverse.png"> -->
             </div>
         <% END %>
-        <div class="event-listing col-12 aos-init aos-animate <% classes_for_event(event) %>">
+        <div class="event-listing col-12 <% classes_for_event(event) %>"
+            <% aos_attrs2 %>
+        >
             <div>
             <% IF event.is_canceled %>
                 <strong>CANCELED</strong>
