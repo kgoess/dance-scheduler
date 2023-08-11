@@ -34,6 +34,7 @@
 
 /* if there's multiple photos */
 .event-photos-collage {
+    height: 500px;
     display: grid;
     grid-template-columns: repeat(var(--data-collage-width), 1fr);
     grid-template-rows: repeat(var(--data-collage-width), 1fr);
