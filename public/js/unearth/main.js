@@ -1,7 +1,8 @@
  AOS.init({
  	duration: 800,
  	easing: 'slide',
- 	once: false
+ 	once: false,
+    disable: 'phone'
  });
 
 jQuery(document).ready(function($) {

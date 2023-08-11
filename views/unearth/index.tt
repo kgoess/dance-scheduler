@@ -200,21 +200,6 @@
         <div class="container">
               <h2 class="mb-3 text-black">Upcoming Dances &amp; Events</h2>
 	      <br>
-          <div class="row d-flex no-gutters">
-            <div class="col-12 col-lg-6 event-image order-lg-2" style="background-image: url('images/unearth/syncopaths_fence_colour.jpg');" data-aos="fade-left" data-aos-delay=""> </div>
-            <div class="col-lg-5 mr-auto p-lg-5 mt-4 mt-lg-0 order-lg-1" data-aos="fade-right" data-aos-delay="">
-              <!--<p><b>During the Coronavirus pandemic, all our in-person events are canceled. Join us for these upcoming <i>online</i> events:</b></p>-->
-              <p class="listing"> <span class="event-date">Sunday, July 12, 2020 <b>[PAST EVENT! Just showing off photos in listings]</b>:</span> 
-                <!-- loc="ONLINE" ->
-
-<!-- band="Syncopaths (Ryan McKasson, Ashley Broder, Jeff Spero, Christa Burch) in a special <b>SCDS Online Concert</b>, 4pm&ndash;5pm PDT " --> 
-                <strong>ONLINE&nbsp;Concert</strong> in the cloud. 
-                <!-- band="Syncopaths (Ryan McKasson, Ashley Broder, Jeff Spero, Christa Burch) in a special <b>SCDS Online Concert</b>, 4pm&ndash;5pm PDT " --> 
-                Music by Syncopaths (Ryan McKasson, Ashley Broder, Jeff Spero, Christa Burch) in a special <b>SCDS Online Concert</b>, 4pm&ndash;5pm PDT <em><b>Not a BACDS event</b> &mdash; this event is sponsored by our sister organization the Sacramento Country Dance Society; More info and link to the meeting are at <a href=https://sactocds.wordpress.com>https://scds.org</a></em>. </p>
-            </div>
-          </div>
-        </div>
-      <div class="container">
           <% include unearth/listings.tt events => eighteen_days %>
       </div>
     </div>
