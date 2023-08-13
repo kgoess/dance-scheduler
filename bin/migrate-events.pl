@@ -18,14 +18,16 @@ my %Series_Lookup = (
     'CCB-WORKSHOP/HAMBO' => 'Berkeley Contra',
     'CCB-CONTRAWORKSHOP/WALTZ' => 'Berkeley Contra',
     'CCB-ECDWORKSHOP/WALTZ' => 'Berkeley Contra',
-    'CCB-ENGLISH/JAM' => 'Berkeley Contra',
+    'CCB-CONTRA/JAM' => 'Berkeley Contra',
     'SF-CONTRA' => 'San Francisco Contra',
     'SF-CONTRA/SPECIAL' => 'San Francisco Contra',
     'SF-CONTRAWORKSHOP' => 'San Francisco Contra',
+    'SF-BARN DANCE' => 'San Francisco Contra',
     'FUM-CONTRA' => 'Palo Alto Contra', # ?
     'FUM-CONTRA/SPECIAL' => 'Palo Alto Contra',
     'FUM-CONTRA/WALTZ' => 'Palo Alto Contra',
     'MT-CONTRA' => 'Palo Alto Contra',
+    'MT-CONTRA/SPECIAL' => 'Palo Alto Contra',
     'FUM-CONTRA/WALTZ/SPECIAL' => 'Palo Alto Contra',
     'FUM-CONTRA/WORKSHOP/SPECIAL' => 'Palo Alto Contra',
     'FUM-CONTRA/WORKSHOP' => 'Palo Alto Contra',
@@ -41,10 +43,10 @@ my %Series_Lookup = (
     'FSJ-CONTRA/SPECIAL/WORKSHOP' => 'South Bay Contra Dance Series',
     'FSJ-FAMILY' => 'South Bay Contra Dance Series',
     'GSP-FAMILY' => 'South Bay Contra Dance Series',
-    'ASE-ENGLISH' => 'Peninsula English (Palo Alto)',
     'CCB-ENGLISH' => 'Berkeley English',
-    'CCB-ENGLISH WORKSHOP' => 'Berkeley English',
+    'CCB-ENGLISH/JAM' => 'Berkeley English',
     'CCB-ENGLISH/WORKSHOP' => 'Berkeley English',
+    'CCB-ENGLISH/COUPLE' => 'Berkeley English',
     'STC-ENGLISH' => 'Berkeley English',
     'STC-ENGLISH/WORKSHOP' => 'Berkeley English',
     'CCB-ENGLISH/CONTRA' => 'Berkeley English',
@@ -58,10 +60,16 @@ my %Series_Lookup = (
     'CCB-SINGING' => 'Berkeley English',
     'CCB-SINGING/ENGLISH' => 'Berkeley English',
     # ASE,FBC,MT,FHL,SME,STM are all Peninsula English if Tue/Wed/Thu
+    'ASE-ENGLISH' => 'Peninsula English (Palo Alto)',
+    'ASE-ENGLISH/SPECIAL' => 'Peninsula English (Palo Alto)',
     'STM-ENGLISH' => 'Peninsula English (Palo Alto)',
     'MT-ENGLISH' => 'Peninsula English (Palo Alto)',
+    'MT-ENGLISH' => 'Peninsula English (Palo Alto)',
     'MT-ENGLISH/WORKSHOP' => 'Peninsula English (Palo Alto)',
+    'MT-ENGLISH/SPECIAL/WORKSHOP' => 'Peninsula English (Palo Alto)',
+    'MT-ENGLISH/SPECIAL' => 'Peninsula English (Palo Alto)',
     'MT-ENGLISH/WALTZ/WORKSHOP/SPECIAL' => 'Peninsula English (Palo Alto)',
+    'FHL-ENGLISH' => 'Peninsula English (Palo Alto)',
     'SME-ENGLISH' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH WORKSHOP' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH/WORKSHOP' => 'Palo Alto Friday English Dance',
@@ -76,6 +84,7 @@ my %Series_Lookup = (
     'DGK-ENGLISH' => 'San Francisco Saturday English Dance',
     'DGK-ENGLISH/CEILIDH' => 'San Francisco Saturday English Dance',
     'FSJ-ENGLISH' => 'San Jose English',
+    'FSJ-ENGLISH/CONTRA' => 'San Jose English',
     'COY-ENGLISH' => 'San Jose English', # just guessing?
     'HPP-WOODSHED' => 'Los Altos Second-Monday Woodshed',
     'STM-WOODSHED' => 'Los Altos Second-Monday Woodshed',
@@ -107,6 +116,8 @@ my %Series_Lookup = (
     'FBH-ENGLISH/SPECIAL/WORKSHOP' => 'Fall Ball',
     'SMT-ENGLISH/SPECIAL' => 'Fall Ball',
     'SMT-ENGLISH/SPECIAL/WORKSHOP' => 'Fall Ball',
+    'SMT-ENGLISH/WORKSHOP/SPECIAL' => 'Fall Ball',
+    'SMT-ENGLISH/WORKSHOP' => 'Fall Ball',
     'MON-FAMILY/CAMP' => 'Family Week',
     'MON-ENGLISH/CAMP/SPECIAL/WEEKEND' => 'Family Week',
     'MON-CONTRA/ENGLISH/DISPLAY/CRAFTS/CAMP/SPECIAL' => 'Family Week',
@@ -131,6 +142,10 @@ my %Series_Lookup = (
     'RHM-CONTRA/SPECIAL' => 'Contra College',
     'RHM-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
     'FUM-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
+    'WCP-CONTRA' => 'Contra College',
+    'WCP-CONTRA/WORKSHOP' => 'Contra College',
+    'WCP-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
+    'WCP-WORKSHOP/HAMBO' => 'Contra College',
     'FUM-WALTZ/CONTRA/WORKSHOP' => 'Contra College',
     'SJW-ENGLISH/SPECIAL' => 'Playford Ball',
     'HVC-ENGLISH/SPECIAL' => 'Playford Ball',
@@ -143,6 +158,7 @@ my %Series_Lookup = (
     'LMDC-CONTRA/SPECIAL' => 'No Snow Ball',
     'OVMB-CONTRA/SPECIAL' => 'No Snow Ball',
     'ALM-CONTRA/SPECIAL' => 'No Snow Ball',
+    'GOC-CONTRA/SPECIAL' => 'No Snow Ball',
     'MON-ENGLISH/CONTRA/SPECIAL/CAMP' => 'Spring Fever',
     'ALB-ENGLISH/MORRIS/SWORD/SPECIAL' => 'SKIP SERIES',
     'HC-ENGLISH/SPECIAL' => 'SKIP SERIES',
@@ -157,6 +173,7 @@ my %Series_Lookup = (
     'FBH-ENGLISH/MUSIC/WORKSHOP' => 'SKIP SERIES',
     'GIC-SQUARE/SPECIAL' => 'SKIP SERIES',
     'ACC-ENGLISH/SPECIAL' => 'SKIP SERIES',
+    'FUM-SPECIAL/ENGLISH/MOLLY/CONTRA' => 'SKIP SERIES',
 );
 
 my $dbh = $ENV{YES_DO_PROD}
@@ -176,7 +193,15 @@ sub create_events {
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2017');
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2016');
     #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2015');
-    my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2014');
+    #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2014');
+
+    # need to be re-run on fried:
+    my @old_events;
+    push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2013');
+    # need to run this on fried: 
+    # update events set name = 'Fall Ball' where event_id in (select event_id from events where series_id = (select series_id from series where name = 'Fall Ball'));
+    # insert into styles (name, created_ts) values ('COUPLE', current_timestamp());
+    push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2012');
 
     foreach my $old (@old_events) {
 
@@ -209,7 +234,7 @@ dump $old;
         $new->name('Hey Days English Week');
     } elsif ($old->type eq 'FAMILY/CAMP') {
         $new->name('Family Camp');
-    } elsif ($old->type eq 'ENGLISH/SPECIAL' && $old->url eq "/events/1718") {
+    } elsif ($old->type eq 'ENGLISH/SPECIAL' && ($old->url//'') eq "/events/1718") {
         $new->name('1718 Ball');
     } elsif ($old->type eq 'ENGLISH/MORRIS/SWORD/SPECIAL') {
         $new->name('Michael Siemen Memorial');
@@ -223,6 +248,8 @@ dump $old;
         $new->name('Mason & Weed In Concert');
     } elsif ($old->type eq 'ENGLISH/CONTRA/SPECIAL' && $old->startday eq "2015-09-10") {
         $new->name('Jody Dill Memorial');
+    } elsif ($old->type eq 'SPECIAL/ENGLISH/MOLLY/CONTRA' && $old->startday eq "2013-03-09") {
+        $new->name('Vanessa Schnatmeier Memorial');
     }
     my $synthetic_name = join ' ', map { $old->$_ } qw/type loc leader/ ;
     $new->synthetic_name($new->name or $synthetic_name);
@@ -232,6 +259,15 @@ dump $old;
     $new->end_date( $old->endday )
         if $old->endday;
     my $short_desc = $old->leader ? $old->leader.' with '.$old->band : $old->band;
+
+    # We don't have a "comments" field in the new schema, but we're jamming
+    # everything into the short_desc so just put it in there, with a marker
+    # so we can find it later if we want. This was retrofitted onto the
+    # migration halfway through after I noticed it wasn't handled.
+    if ($old->comments) {
+        $short_desc .= ' <span style="calcomments>'.$old->comments.'</span>';
+    }
+    
     $short_desc =~ s/^ +//; #leading spaces in the data
     $new->short_desc( $short_desc );
     $new->is_series_defaults(0);
@@ -261,6 +297,7 @@ dump $old;
         'Balance the Bay' => 1,
         'Family Week' => 1,
         'Fall Frolick' => 1,
+        'Fall Ball' => 1,
         'Hey Days English Week' => 1,
         'Spring Fever' => 1,
     };
@@ -328,6 +365,8 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'WORKSHOP';
     } elsif ($old_style eq 'ENGLISH/JAM') {
         push @old_styles, 'ENGLISH', 'JAM';
+    } elsif ($old_style eq 'ENGLISH/COUPLE') {
+        push @old_styles, 'ENGLISH', 'COUPLE';
     } elsif ($old_style eq 'CONTRA/JAM') {
         push @old_styles, 'CONTRA', 'JAM';
     } elsif ($old_style eq 'ENGLISH CAMP FALL FROLICK') {
@@ -352,6 +391,8 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'REGENCY';
     } elsif ($old_style eq 'ENGLISH/SPECIAL/WORKSHOP') {
         push @old_styles, 'ENGLISH', 'SPECIAL', 'WORKSHOP';
+    } elsif ($old_style eq 'ENGLISH/WORKSHOP/SPECIAL') {
+        push @old_styles, 'ENGLISH', 'WORKSHOP', 'SPECIAL';
     } elsif ($old_style eq 'ENGLISH/REGENCY/SPECIAL') {
         push @old_styles, 'ENGLISH', 'REGENCY', 'SPECIAL';
     } elsif ($old_style eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
@@ -414,6 +455,10 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'CEILIDH';
     } elsif ($old_style eq 'SQUARE/SPECIAL') {
         push @old_styles, 'SQUARE', 'SPECIAL';
+    } elsif ($old_style eq 'BARN DANCE') {
+        push @old_styles, 'BARN';
+    } elsif ($old_style eq 'SPECIAL/ENGLISH/MOLLY/CONTRA') {
+        push @old_styles, 'SPECIAL', 'ENGLISH', 'MOLLY', 'CONTRA';
     } else {
         push @old_styles, $old_style;
     }
