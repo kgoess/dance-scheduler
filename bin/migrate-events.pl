@@ -265,7 +265,10 @@ dump $old;
     # so we can find it later if we want. This was retrofitted onto the
     # migration halfway through after I noticed it wasn't handled.
     if ($old->comments) {
-        $short_desc .= ' <span style="calcomments>'.$old->comments.'</span>';
+        # in cgi-bin/calendar.cgi the old data was printed in an <em> like this:
+        # print td({-class => 'calcomment', -colspan => 4},em($cmts));
+
+        $short_desc .= ' <div style="calendar-event-comments>'.$old->comments.'</div>';
     }
     
     $short_desc =~ s/^ +//; #leading spaces in the data
