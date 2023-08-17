@@ -1,8 +1,24 @@
 
+# This is a scratch script. I'd migrated the old data from 2021-2014 from the
+# .csv database to mysql but had neglected to include the "comments" field.
+#
+# This goes back and collects the comments and adds them to short_desc, which
+# up to now was the contents of "band", which might or might not be information
+# about the band and musicians.
+#
+# Run like this, set the load_all_from_old_schema that you want and test with:
+#
+# YES_DO_PROD=0 perl -Ilib bin/fix-migrate-comments.pl  --dry-run 1
+#
+# and then really do the updates by reversing those two arguments, or whatever
+# to suit.
+
+
 use 5.16.0;
 use warnings;
 
 use Data::Dump qw/dump/;
+use Getopt::Long;
 
 use bacds::Model::Event;# the old CSV schema
 
@@ -12,8 +28,11 @@ my $dbh = $ENV{YES_DO_PROD}
     ? get_dbh(db => 'schedule', user => 'scheduler')
     : get_dbh(db => 'schedule_test', user => 'scheduler_test');
 
-    #my @old_events = bacds::Model::Event->load_all_from_old_schema(table => 'schedule2021_clean_for_migration');
-my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2020');
+my $dry_run = 1;
+GetOptions('dry-run=i', => \$dry_run);
+
+#my @old_events = bacds::Model::Event->load_all_from_old_schema(table => 'schedule2021_clean_for_migration');
+#my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2020');
 #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2019');
 #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2018');
 #my @old_events = bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2017');
@@ -70,9 +89,18 @@ foreach my $old_event (@old_events) {
     $for_update or die "didn't find update for ".
         join "\n", map { "$_: ".$old_event->$_ } qw/startday type loc leader band comments /;
 
+    next if $for_update->event_id == 543;
+
     $update{$for_update->event_id} = $old_event->comments;
+
+    if (!$dry_run) {
+        $for_update->short_desc(join '', $for_update->short_desc ,' ', '<em>', $old_event->comments, '</em>');
+        $for_update->update();
+    }
 }
 
-say dump %update;
+if ($dry_run) {
+    say dump %update;
+}
  
 say "done";
