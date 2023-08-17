@@ -197,7 +197,7 @@ sub create_events {
 
     # need to be re-run on fried:
     my @old_events;
-    push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2013');
+    #push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2013');
     # need to run this on fried: 
     # update events set name = 'Fall Ball' where event_id in (select event_id from events where series_id = (select series_id from series where name = 'Fall Ball'));
     # insert into styles (name, created_ts) values ('COUPLE', current_timestamp());
@@ -267,8 +267,10 @@ dump $old;
     if ($old->comments) {
         # in cgi-bin/calendar.cgi the old data was printed in an <em> like this:
         # print td({-class => 'calcomment', -colspan => 4},em($cmts));
-
-        $short_desc .= ' <div style="calendar-event-comments>'.$old->comments.'</div>';
+        #$short_desc .= ' <div style="calendar-event-comments>'.$old->comments.'</div>';
+        # Oh, darn, in the fix-migrate-comments.pl I just ran for 2021-2014 I just stuck them in an <em>
+        # OK I'll just continue with that.
+        $short_desc .= ' <em>'.$old->comments.'</em>';
     }
     
     $short_desc =~ s/^ +//; #leading spaces in the data
