@@ -26,6 +26,7 @@ my %Series_Lookup = (
     'FUM-CONTRA' => 'Palo Alto Contra', # ?
     'FUM-CONTRA/SPECIAL' => 'Palo Alto Contra',
     'FUM-CONTRA/WALTZ' => 'Palo Alto Contra',
+    'MT-WORKSHOP/HAMBO' => 'Palo Alto Contra',
     'MT-CONTRA' => 'Palo Alto Contra',
     'MT-CONTRA/SPECIAL' => 'Palo Alto Contra',
     'FUM-CONTRA/WALTZ/SPECIAL' => 'Palo Alto Contra',
@@ -49,8 +50,11 @@ my %Series_Lookup = (
     'CCB-ENGLISH/COUPLE' => 'Berkeley English',
     'STC-ENGLISH' => 'Berkeley English',
     'STC-ENGLISH/WORKSHOP' => 'Berkeley English',
+    'STC-ENGLISH/WORKSHOP/SPECIAL' => 'Berkeley English',
     'CCB-ENGLISH/CONTRA' => 'Berkeley English',
     'CCB-ENGLISH/WALTZ' => 'Berkeley English',
+    'CCB-ENGLISH/SPECIAL' => 'Berkeley English',
+    'CCB-ENGLISH/WORKSHOP/SPECIAL' => 'Berkeley English',
     'CCB-WALTZ/WORKSHOP' => 'Berkeley English',
     'SMM-ENGLISH' => 'Berkeley English',
     'FBH-ENGLISH' => 'Berkeley Fourth Saturday Experienced Dance',
@@ -59,6 +63,7 @@ my %Series_Lookup = (
     'CCB-WALTZ' => 'Berkeley English',
     'CCB-SINGING' => 'Berkeley English',
     'CCB-SINGING/ENGLISH' => 'Berkeley English',
+    'CCB-SINGING/ENGLISH/WORKSHOP' => 'Berkeley English',
     # ASE,FBC,MT,FHL,SME,STM are all Peninsula English if Tue/Wed/Thu
     'ASE-ENGLISH' => 'Peninsula English (Palo Alto)',
     'ASE-ENGLISH/SPECIAL' => 'Peninsula English (Palo Alto)',
@@ -84,6 +89,7 @@ my %Series_Lookup = (
     'DGK-ENGLISH' => 'San Francisco Saturday English Dance',
     'DGK-ENGLISH/CEILIDH' => 'San Francisco Saturday English Dance',
     'FSJ-ENGLISH' => 'San Jose English',
+    'FSJ-ENGLISH/SPECIAL' => 'San Jose English',
     'FSJ-ENGLISH/CONTRA' => 'San Jose English',
     'COY-ENGLISH' => 'San Jose English', # just guessing?
     'HPP-WOODSHED' => 'Los Altos Second-Monday Woodshed',
@@ -123,6 +129,7 @@ my %Series_Lookup = (
     'MON-CONTRA/ENGLISH/DISPLAY/CRAFTS/CAMP/SPECIAL' => 'Family Week',
     'FHS-CAMP/CONTRA/ENGLISH/FAMILY/CRAFTS' => 'Family Week',
     'MON-CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS' => 'Family Week',
+    'MON-CAMP/ENGLISH/CONTRA/SINGING/MUSIC' => 'Family Week',
     'FHS-CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS' => 'Family Week',
     'ONLINE-ONLINE Family Week Gathering' => 'Family Week',
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
@@ -142,6 +149,8 @@ my %Series_Lookup = (
     'RHM-CONTRA/SPECIAL' => 'Contra College',
     'RHM-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
     'FUM-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
+    'WCP-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
+    'WCP-CONTRA/SPECIAL' => 'Contra College',
     'WCP-CONTRA' => 'Contra College',
     'WCP-CONTRA/WORKSHOP' => 'Contra College',
     'WCP-CONTRA/WORKSHOP/SPECIAL' => 'Contra College',
@@ -174,6 +183,9 @@ my %Series_Lookup = (
     'GIC-SQUARE/SPECIAL' => 'SKIP SERIES',
     'ACC-ENGLISH/SPECIAL' => 'SKIP SERIES',
     'FUM-SPECIAL/ENGLISH/MOLLY/CONTRA' => 'SKIP SERIES',
+    'BTW-CONTRA/SPECIAL/WORKSHOP' => 'SKIP SERIES',
+    'TGH-CONTRA/SPECIAL/WORKSHOP' => 'SKIP SERIES',
+    'LSC-ENGLISH/SPECIAL' => 'SKIP SERIES', # patsy bolt memorial 2011
 );
 
 my $dbh = $ENV{YES_DO_PROD}
@@ -200,8 +212,12 @@ sub create_events {
     #push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2013');
     # need to run this on fried: 
     # update events set name = 'Fall Ball' where event_id in (select event_id from events where series_id = (select series_id from series where name = 'Fall Ball'));
+    # got ERROR 1093 (HY000): You can't specify target table 'events' for update in FROM clause
+    # so ran this instead:
+    # MariaDB [schedule]> update events set name = 'Fall Ball' where event_id in (1820, 1821, 2106, 2107, 2450, 2479, 2480, 2779, 2780);
     # insert into styles (name, created_ts) values ('COUPLE', current_timestamp());
-    push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2012');
+    #push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2012');
+    push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2011');
 
     foreach my $old (@old_events) {
 
@@ -250,6 +266,10 @@ dump $old;
         $new->name('Jody Dill Memorial');
     } elsif ($old->type eq 'SPECIAL/ENGLISH/MOLLY/CONTRA' && $old->startday eq "2013-03-09") {
         $new->name('Vanessa Schnatmeier Memorial');
+    } elsif ($old->type eq 'ENGLISH/WORKSHOP/SPECIAL' && $old->startday eq "2011-06-08") {
+        $new->name(q{Mary Luckhardt's 60th Birthday Celebration Dance & Potluck});
+    } elsif ($old->type eq 'ENGLISH/SPECIAL' && $old->startday eq "2011-07-24") {
+        $new->name(q{Patsy Bolt Memorial Celebration});
     }
     my $synthetic_name = join ' ', map { $old->$_ } qw/type loc leader/ ;
     $new->synthetic_name($new->name or $synthetic_name);
@@ -360,6 +380,8 @@ sub attach_styles {
         push @old_styles, 'CONTRA', 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'ENGLISH/SINGING/DISPLAY/CAMP') {
         push @old_styles, 'ENGLISH', 'CAMP';
+    } elsif ($old_style eq 'SINGING/ENGLISH/WORKSHOP') {
+        push @old_styles, 'SINGING', 'ENGLISH', 'WORKSHOP';
     } elsif ($old_style eq 'ENGLISH/WALTZ/WORKSHOP/SPECIAL') {
         push @old_styles, 'ENGLISH', 'WALTZ', 'WORKSHOP', 'SPECIAL';
     } elsif ($old_style eq 'WALTZ/WORKSHOP') {
@@ -387,6 +409,8 @@ sub attach_styles {
     } elsif ($old_style eq 'FAMILY/CAMP') {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS') {
+        push @old_styles, 'FAMILY', 'CAMP';
+    } elsif ($old_style eq 'CAMP/ENGLISH/CONTRA/SINGING/MUSIC') {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/FAMILY/CRAFTS') {
         push @old_styles, 'FAMILY', 'CAMP';
