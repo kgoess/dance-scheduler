@@ -27,7 +27,7 @@ page.
     IF event.is_canceled;
         found_styles.push('canceled-event');
     END;
-    FOREACH class IN [ 'col-lg-6', 'mr-auto', 'p-lg-5',
+    FOREACH class IN [ 'col-12', 'col-lg-6', 'p-lg-5',
                         'mt-4', 'mt-lg-0' ];
         found_styles.push(class);
     END;
@@ -44,10 +44,15 @@ END %>
     END;
 END %>
 
-<% MACRO collage_images(entities_list) BLOCK %>
+<% MACRO collage_images(entities_list, aos_attrs, width) BLOCK %>
     <% FOREACH entity IN entities_list;
         IF entity.photo_url; %>
+            <div
+                class="col-<% width %>"
+                <% aos_attrs %>
+            >
             <% collage_image(entity) %>
+            </div>
         <% END;
     END %>
 <% END %>
@@ -87,30 +92,27 @@ END %>
             photo_count = photo_count + 1;
         END;
     END; %>
-    <div class="row d-flex no-gutters">
-        <% IF photo_count %>
-            <div
-                class="<% IF photo_count > 1 %>event-photos-collage<% ELSE %>event-photo<% END %> col-12 col-lg-4"
-                style="--data-collage-width: <% POSIX.ceil(Math.sqrt(photo_count)) %>"
-                <% aos_attrs1 %>
-            >
-                <% collage_images(event.bands) %>
-                <% collage_images(event.callers) %>
-                <% collage_images(event.talent) %>
-            </div>
-        <% ELSE %>
-            <div class="event-photo col-12 col-lg-4"
-                <% aos_attrs1 %>
-            >
-
-                <% FOREACH parent IN event.parent_orgs %>
-                    <img src="<% parent.photo_url %>">
-                    <% LAST # just the first one for now because TT vs. DBIx is being weird  %>
+    <div class="row">
+        <div class="col-12 col-lg-4">
+            <div class="row">
+                <% IF photo_count;
+                    num_columns_per_picture =  12 / POSIX.ceil(Math.sqrt(photo_count)) 
+                        # bootstrap uses a 12-column layout, so a picture that
+                        # is 4 columns wide occupies 1/3 of the space.
+                        # This will break if they have more than 16 images.
+                        %>
+                        <% collage_images(event.bands, aos_attrs1, num_columns_per_picture) %>
+                        <% collage_images(event.callers, aos_attrs1, num_columns_per_picture) %>
+                        <% collage_images(event.talent, aos_attrs1, num_columns_per_picture) %>
+                <% ELSE %>
+                    <% collage_images(event.parent_orgs, aos_attrs1, num_columns_per_picture) %>
                 <% END %>
-                <!-- <img src="https://bacds.org/graphics/BACDS-Logo-reverse.png"> -->
-            </div>
-        <% END %>
-        <div class="event-listing col-12 <% classes_for_event(event) %>"
+            </div><% #end photo nested row %>
+        </div><% #end photo outer col %>
+        <div class="<% classes_for_event(event);
+            IF loop.even;
+                ' order-lg-first';
+            END %>"
             <% aos_attrs2 %>
         >
             <div>
