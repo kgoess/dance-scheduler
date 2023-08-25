@@ -15,6 +15,7 @@ my %Series_Lookup = (
     'CCB-CONTRA' => 'Berkeley Contra',
     'GNC-CONTRA' => 'Berkeley Contra',
     'STC-CONTRA' => 'Berkeley Contra',
+    'OV2-CONTRA/SPECIAL' => 'Berkeley Contra',
     'CCB-CONTRA/WORKSHOP' => 'Berkeley Contra',
     'STALB-CONTRA/WORKSHOP' => 'Berkeley Contra',
     'STALB-CONTRA' => 'Berkeley Contra',
@@ -25,6 +26,7 @@ my %Series_Lookup = (
     'CCB-CONTRA/JAM' => 'Berkeley Contra',
     'SF-CONTRA' => 'San Francisco Contra',
     'SF-CONTRA/SPECIAL' => 'San Francisco Contra',
+    'SF-SPECIAL/CONTRA' => 'San Francisco Contra',
     'SF-CONTRAWORKSHOP' => 'San Francisco Contra',
     'SF-BARN DANCE' => 'San Francisco Contra',
     'FUM-CONTRA' => 'Palo Alto Contra', # ?
@@ -93,6 +95,8 @@ my %Series_Lookup = (
     'MT-ENGLISH/WALTZ/WORKSHOP/SPECIAL' => 'Peninsula English (Palo Alto)',
     'FHL-ENGLISH' => 'Peninsula English (Palo Alto)',
     'SME-ENGLISH' => 'Palo Alto Friday English Dance',
+    'SBE-ENGLISH' => 'Palo Alto Friday English Dance',
+    'SBE-ENGLISH/SPECIAL' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH WORKSHOP' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH/WORKSHOP' => 'Palo Alto Friday English Dance',
     'SME-ENGLISH/SPECIAL' => 'Palo Alto Friday English Dance',
@@ -137,6 +141,7 @@ my %Series_Lookup = (
     'MON-ENGLISH/CAMP/SPECIAL' => 'Fall Frolick',
     'MON-ENGLISH/CAMP' => 'Fall Frolick',
     'MON-CAMP/ENGLISH/MUSIC/DISPLAY' => 'Fall Frolick',
+    'MON-CAMP/SPECIAL/ENGLISH/MUSIC/DISPLAY' => 'Fall Frolick',
     'FBH-ENGLISH/SPECIAL' => 'Fall Ball',
     'FBH-ENGLISH/SPECIAL/WORKSHOP' => 'Fall Ball',
     'SMT-ENGLISH/SPECIAL' => 'Fall Ball',
@@ -152,6 +157,7 @@ my %Series_Lookup = (
     'MON-CAMP/ENGLISH/CONTRA/SINGING/MUSIC' => 'Family Week',
     'FHS-CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS' => 'Family Week',
     'ONLINE-ONLINE Family Week Gathering' => 'Family Week',
+    'FHS-CAMP/CONTRA/ENGLISH/RITUAL/MUSIC/CRAFTS/WEEK' => 'Family Week',
     'JPC-CONTRA/CAMP' => 'Balance the Bay',
     'JPC-CONTRA/SPECIAL' => 'Balance the Bay',
     'PRC-CONTRA/CAMP/SPECIAL' => 'Balance the Bay',
@@ -160,6 +166,7 @@ my %Series_Lookup = (
     'JPC-BALANCE THE BAY SPECIAL CONTRA WEEKEND' => 'Balance the Bay',
     'JPC-CONTRA/CAMP/SPECIAL' => 'Balance the Bay',
     'JPC-CAMP/CONTRA/SPECIAL' => 'Balance the Bay',
+    'JPC-CAMP/CONTRA/COUPLES' => 'Balance the Bay',
     'SME-ENGLISH/REGENCY' => 'English Regency',
     'STM-ENGLISH/REGENCY' => 'English Regency',
     'ACC-ENGLISH' => 'Arlington Community Church English',
@@ -181,18 +188,22 @@ my %Series_Lookup = (
     'SJW-ENGLISH/SPECIAL' => 'Playford Ball',
     'HVC-ENGLISH/SPECIAL' => 'Playford Ball',
     'HVC-ENGLISH' => 'Playford Ball',
+    'HUM-ENGLISH/SPECIAL' => 'Playford Ball',
+    'GOC-ENGLISH/SPECIAL' => 'Playford Ball',
     'ONLINE-ONLINE Meetup' => 'Online Meetup',
     'ONLINE-ONLINE Sound Workshop' => 'Online Workshop',
     'JG-CONTRA/CAMP/SPECIAL' => 'American Week',
     'JG-CAMP/CONTRA/COUPLE/MUSIC' => 'American Week',
     'LSC-CONTRA/SPECIAL' => 'American Week',
     'MEN-CAMP/CONTRA/COUPLE/MUSIC' => 'American Week',
+    'MEN-CAMP/CONTRA/SQUARES/MUSIC' => 'American Week',
     'LMDC-CONTRA/SPECIAL' => 'No Snow Ball',
     'OVMB-CONTRA/SPECIAL' => 'No Snow Ball',
     'ALM-CONTRA/SPECIAL' => 'No Snow Ball',
     'GOC-CONTRA/SPECIAL' => 'No Snow Ball',
     'MON-ENGLISH/CONTRA/SPECIAL/CAMP' => 'Spring Fever',
     'MON-CAMP/CONTRA/ENGLISH/MUSIC/SONG' => 'Spring Fling',
+    'MON-SPECIAL/CAMP/CONTRA/ENGLISH/COUPLES/MUSIC' => 'Spring Fling',
     'ALB-ENGLISH/MORRIS/SWORD/SPECIAL' => 'SKIP SERIES',
     'HC-ENGLISH/SPECIAL' => 'SKIP SERIES',
     'HVC-CONTRA/SPECIAL' => 'SKIP SERIES',
@@ -202,6 +213,7 @@ my %Series_Lookup = (
     'AMH-ENGLISH' => 'SKIP SERIES',
     'VAR-MORRIS/SPECIAL' => 'SKIP SERIES',
     'CCB-MORRIS/WORKSHOP/SPECIAL' => 'SKIP SERIES',
+    'GNC-SPECIAL/MORRIS/WORKSHOP' => 'SKIP SERIES',
     'FUM-ENGLISH/CONTRA/SPECIAL' => 'SKIP SERIES',
     'FBH-ENGLISH/MUSIC/WORKSHOP' => 'SKIP SERIES',
     'GIC-SQUARE/SPECIAL' => 'SKIP SERIES',
@@ -210,7 +222,12 @@ my %Series_Lookup = (
     'BTW-CONTRA/SPECIAL/WORKSHOP' => 'SKIP SERIES',
     'TGH-CONTRA/SPECIAL/WORKSHOP' => 'SKIP SERIES',
     'LSC-ENGLISH/SPECIAL' => 'SKIP SERIES', # patsy bolt memorial 2011
-    'ALB-ENGLISH/SPECIAL' => 'SKIP SERIES', # Chuck Warn lifetime achievement
+    'ALB-ENGLISH/SPECIAL' => 'SKIP SERIES', # Chuck Ward lifetime achievement
+    'HUM-CONTRA' => 'SKIP SERIES', # Humanist hall dances in 2009
+    'HUM-CEILIDH' => 'SKIP SERIES', # Humanist hall dances in 2009
+    'ODF-CONTRA/SPECIAL' => 'SKIP SERIES', # Oakland Free Dance Festival 2009
+    'ODF-ENGLISH/SPECIAL' => 'SKIP SERIES', # Oakland Free Dance Festival 2009
+    'BOA-BOARD/SPECIAL' => 'SKIP SERIES', # Oakland Free Dance Festival 2009
 );
 
 my $dbh = $ENV{YES_DO_PROD}
@@ -243,7 +260,8 @@ sub create_events {
     # insert into styles (name, created_ts) values ('COUPLE', current_timestamp());
     #push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2012');
     #push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2011');
-    push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2010');
+    #push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2010');
+    push @old_events, bacds::Model::Event->load_all_from_really_old_schema(table => 'schedule2009');
 
     foreach my $old (@old_events) {
 
@@ -409,6 +427,8 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'CAMP/ENGLISH/MUSIC/DISPLAY') {
         push @old_styles, 'ENGLISH', 'CAMP';
+    } elsif ($old_style eq 'CAMP/SPECIAL/ENGLISH/MUSIC/DISPLAY') {
+        push @old_styles, 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'CONTRA/ENGLISH/DISPLAY/CRAFTS/CAMP/SPECIAL') {
         push @old_styles, 'CONTRA', 'ENGLISH', 'CAMP';
     } elsif ($old_style eq 'ENGLISH/SINGING/DISPLAY/CAMP') {
@@ -443,6 +463,8 @@ sub attach_styles {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/IRISH/INTERNATIONAL/FAMILY/CRAFTS') {
         push @old_styles, 'FAMILY', 'CAMP';
+    } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/RITUAL/MUSIC/CRAFTS/WEEK') {
+        push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CAMP/ENGLISH/CONTRA/SINGING/MUSIC') {
         push @old_styles, 'FAMILY', 'CAMP';
     } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/FAMILY/CRAFTS') {
@@ -463,6 +485,8 @@ sub attach_styles {
         push @old_styles, 'ENGLISH', 'SPECIAL';
     } elsif ($old_style eq 'CONTRA/SPECIAL') {
         push @old_styles, 'CONTRA', 'SPECIAL';
+    } elsif ($old_style eq 'SPECIAL/CONTRA') {
+        push @old_styles, 'CONTRA', 'SPECIAL';
     } elsif ($old_style eq 'CONTRA/WALTZ/SPECIAL') {
         push @old_styles, 'CONTRA', 'WALTZ', 'SPECIAL';
     } elsif ($old_style eq 'WALTZ/CONTRA/WORKSHOP') {
@@ -479,7 +503,11 @@ sub attach_styles {
         push @old_styles, 'CONTRA', 'CAMP', 'SPECIAL';
     } elsif ($old_style eq 'CAMP/CONTRA/SPECIAL') {
         push @old_styles, 'CONTRA', 'CAMP', 'SPECIAL';
+    } elsif ($old_style eq 'CAMP/CONTRA/COUPLES') {
+        push @old_styles, 'CONTRA', 'CAMP', 'SPECIAL';
     } elsif ($old_style eq 'CAMP/CONTRA/COUPLE/MUSIC') {
+        push @old_styles, 'CONTRA', 'CAMP';
+    } elsif ($old_style eq 'CAMP/CONTRA/SQUARES/MUSIC') {
         push @old_styles, 'CONTRA', 'CAMP';
     } elsif ($old_style eq 'FAMILY/CONTRA') {
         push @old_styles, 'FAMILY CONTRA';
@@ -491,6 +519,8 @@ sub attach_styles {
         push @old_styles, 'CONTRA', 'WORKSHOP';
     } elsif ($old_style eq 'ENGLISH/MORRIS/SWORD/SPECIAL') {
         push @old_styles, 'ENGLISH','MORRIS','SWORD','SPECIAL';
+    } elsif ($old_style eq 'SPECIAL/MORRIS/WORKSHOP') {
+        push @old_styles, 'SPECIAL','MORRIS','WORKSHOP';
     } elsif ($old_style eq 'WORKSHOP/HAMBO') {
         push @old_styles, 'WORKSHOP','HAMBO';
     } elsif ($old_style eq 'CONTRAWORKSHOP/WALTZ') {
@@ -525,6 +555,10 @@ sub attach_styles {
         push @old_styles, 'SPECIAL', 'ENGLISH', 'MOLLY', 'CONTRA';
     } elsif ($old_style eq 'CAMP/CONTRA/ENGLISH/MUSIC/SONG') {
         push @old_styles, 'SPECIAL', 'CAMP', 'ENGLISH', 'CONTRA';
+    } elsif ($old_style eq 'SPECIAL/CAMP/CONTRA/ENGLISH/COUPLES/MUSIC') {
+        push @old_styles, 'SPECIAL', 'CAMP', 'ENGLISH', 'CONTRA';
+    } elsif ($old_style eq 'BOARD/SPECIAL') {
+        push @old_styles, 'SPECIAL', 'BOARDMEETING';
     } else {
         push @old_styles, $old_style;
     }
