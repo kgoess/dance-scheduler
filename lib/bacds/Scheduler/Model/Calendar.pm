@@ -30,7 +30,24 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 package OldEvent {
     use Class::Accessor::Lite (
         new => 1,
-        rw => [ qw/startday endday name type loc leader band musos comments is_canceled/ ]
+        # I don't seem to be able to do styles.all in the templates maybe
+        # because of list context?
+        # https://metacpan.org/pod/Template::Plugin::Scalar
+        # So continue pre-processing them here.
+        rw => [ qw/
+            startday
+            startday_obj
+            endday
+            endday_obj
+            name
+            type
+            loc
+            leader
+            band
+            musos
+            comments
+            is_canceled
+        / ]
     );
 }
 
@@ -47,7 +64,9 @@ sub load_events_for_month {
     foreach my $event (@events) {
         my $old = OldEvent->new({
             startday => $event->start_date->ymd,
+            startday_obj => $event->start_date,
             endday   => ($event->end_date ? $event->end_date->ymd : ''),
+            endday_obj   => $event->end_date,
             name     => $event->name, # for special events, might be empty
             type     => join('/', map $_->name, $event->styles->all),
             loc      => join('/', map $_->vkey, $event->venues->all),
@@ -63,6 +82,8 @@ sub load_events_for_month {
 }
 
 =head2 load_venue_list_for_month
+
+Old behavior, returns list of pipe-separated strings.
 
 =cut
 
@@ -90,6 +111,30 @@ sub load_venue_list_for_month {
     }
     sort @venue_list
 
+}
+
+=head2 load_venue_list_for_month_new
+
+Returns venue objects
+
+=cut
+
+sub load_venue_list_for_month_new {
+    my ($class, $start_year, $start_month) = @_;
+
+    # silly doing this a second time on the page, will fix someday
+    my @events = _load_events($start_year, $start_month);
+
+    my (%seen, @venue_list);
+    foreach my $event (@events) {
+        my $venue = $event->venues->first
+            or next;
+        next if $seen{$venue->vkey}++;
+        # making a data structure from a | string is silly, but I'm
+        # maintaining the old behavior
+        push @venue_list, $venue;
+    }
+    return sort {$a->vkey cmp $b->vkey} @venue_list;
 }
 
 sub _load_events {

@@ -1,0 +1,130 @@
+<html>
+<head>
+<title>BACDS Calendar generator</title>
+<link rel="stylesheet" type="text/css" href="https://bacds.org/css/calendar.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="https://bacds.org/css/mod_layout_base.css" />
+
+<% virtual_include.mod_header %>
+<style>
+    .special-event-name {
+        font-size: 120%;
+        font-weight: bolder;
+        font-style: italic;
+        font-variant: small-caps;
+    }
+</style>
+
+</head>
+<body>
+<h1>BACDS Events Calendar</h1>
+
+<table>
+    <tr>
+        <th colspan="7" class="calendar_title"><% month_name %> <% year %>
+    </tr>
+    <tr>
+        <th class="calendar">Su</th>
+        <th class="calendar">M</th>
+        <th class="calendar">Tu</th>
+        <th class="calendar">W</th>
+        <th class="calendar">Th</th>
+        <th class="calendar">F</th>
+        <th class="calendar">Sa</th>
+    </tr>
+    <tr>
+        <% FOR calendar_day IN calendar_days %>
+            <td class="calendar<% IF calendar_day.is_today %> tonight<% END %>">
+                <% IF calendar_day.has_events %>
+                    <a href="#<% calendar_day.link_target %>">
+                <% END %>
+                <% calendar_day.day %>
+                <% IF calendar_day.has_events %>
+                    </a>
+                <% END %>
+            </td>
+            <% IF loop.count() % 7 == 0 %>
+                </tr><tr>
+            <% END %>
+        <% END %>
+    </tr>
+</table>
+
+<hr>
+<h1>Schedule of Events</h1>
+<table>
+    <tr>
+        <th class="caltitle">DATE(S)</th>
+        <th class="caltitle">STYLE</th>
+        <th class="caltitle">LOCATION</th>
+        <th class="caltitle">CALLER(S)<br>TEACHER(S)</th>
+        <th class="caltitle" align="center">MUSICIANS</th>
+    </tr>
+    <% FOR event IN events %>
+        <% listing_class = "callisting" %>
+        <% comment_class = "callisting" %>
+        <% IF event.is_canceled %>
+            <% listing_class = list_class    _ " calcanceled" %>
+            <% comment_class = comment_class _ " calcanceled" %>
+        <% END %>
+        <% talent = event.band %>
+        <% IF event.band && event.musos %>
+            <% talent = talent _ ", " %>
+        <% END %>
+        <% talent = talent _ event.musos %>
+        <tr>
+            <td class="<% listing_class %>">
+                <a name="<% event.startday_obj.ymd %>">
+                    <% event.startday_obj.month_name %>&nbsp;<% event.startday_obj.day %>
+                    <% IF event.end_date %>
+                        &nbsp;to&nbsp;<% event.end_date.month_name %>&nbsp;<% event.end_date.day %>
+                    <% END %>
+                </a>
+            </td>
+            <td class="<% listing_class %>">
+                <% IF event.name %>
+                    <span class="special-event-name"><% event.name %></span>(<% event.type %>)
+                <% ELSE %>
+                    <% event.type %>
+                <% END %>
+            </td>
+            <td class="<% listing_class %>">
+                <% event.loc %>
+            </td>
+            <td class="<% listing_class %>">
+                <% event.leader %>
+            </td>
+            <td class="<% listing_class %>">
+                <% talent %>
+            </td>
+        </tr>
+        <% IF event.comments %>
+            <tr class="<% comment_class %>">
+                <td class="<% comment_class %>"></td>
+                <td class="<% comment_class %>" colspan="4">
+                    <em><% event.comments %></em>
+                </td>
+            </tr>
+        <% END %>
+    <% END %> 
+
+</table>
+
+<hr>
+<h1>Dance Venues</h1>
+<table>
+    <tr>
+        <th class="callisting">VENUE</th>
+        <th class="callisting">NAME</th>
+        <th class="callisting">ADDRESS</th>
+        <th class="callisting">CITY</th>
+    </tr>
+    <% FOR venue IN venues %>
+        <tr>
+            <td class="callisting"><% venue.vkey %></td>
+            <td class="callisting"><% venue.hall_name %></td>
+            <td class="callisting"><% venue.address %></td>
+            <td class="callisting"><% venue.city %></td>
+        </tr>
+
+    <% END %>
+</table>

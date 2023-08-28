@@ -25,6 +25,7 @@ use Dancer2;
 use Dancer2::Core::Cookie;
 use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Dancer2::Plugin::ParamTypes;
+use Date::Calc qw(Today Days_in_Month Day_of_Week Month_to_Text);
 use Data::Dump qw/dump/;
 use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
@@ -41,6 +42,7 @@ use bacds::Scheduler::Plugin::Auth;
 use bacds::Scheduler::Plugin::Checksum;
 use bacds::Scheduler::Model::Band;
 use bacds::Scheduler::Model::Caller;
+use bacds::Scheduler::Model::Calendar;
 use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
@@ -76,6 +78,14 @@ register_type_check 'XID' => sub {
 };
 register_type_check 'StyleName' => sub {
     return $_[0] =~ /^[A-Z]{3,16}$/;
+};
+register_type_check 'PathYear' => sub {
+    return $_[0] =~ /^20[0-9]{2}$/;
+};
+register_type_check 'PathMonth' => sub {
+    my $m = $_[0];
+    return unless $m =~ /^[01][0-9]$/;
+    return $m >= 1 && $m <= 12;
 };
 
 preload_accordion_config;
@@ -1245,7 +1255,77 @@ sub get_season {
 
     # see Time::Piece for this localtime() usage
     return $season->{localtime->fullmonth};
-}    
+}
+
+
+=head2 GET /calendars
+
+This is the replacement for
+
+https://bacds.org/calendars/2007/01/
+
+=cut
+
+get '/calendars/:year/:month/' => with_types [
+    'optional' => ['route', 'year', 'PathYear'],
+    'optional' => ['route', 'month', 'PathMonth'],
+] => \&archive_calendars;
+
+sub archive_calendars {
+    my $year  = route_parameters->get('year');
+    my $month = route_parameters->get('month');
+    $month += 0; # remove leading zero
+
+    # @events are OldEvent defined in bacds::Scheduler::Model::Calendar
+    my @events = bacds::Scheduler::Model::Calendar->load_events_for_month($year, $month);
+    my @venues = bacds::Scheduler::Model::Calendar->load_venue_list_for_month_new($year, $month);
+
+    my $today_day_of_month = DateTime->now->day;
+
+    my $days_in_month = Days_in_Month($year, $month);
+    my $cur_day_of_mon = 1;
+    # and the first day of the week
+    my $cur_day_of_wk = Day_of_Week(
+        $year,
+        $month,
+        $cur_day_of_mon
+    );
+    my %day_has_event;
+    foreach my $event (@events) {
+        my $event_day = $event->startday_obj->day; # 1-31
+        $day_has_event{$event_day} = 1;
+    }
+
+    my @calendar_days;
+    my $dow = DateTime->new(year => $year, month => $month, day => 1);
+    if ((my $day_of_week = $dow->day_of_week) != 7) {
+        while ($day_of_week--) {
+            unshift @calendar_days, { empty => 1 };
+        }
+    }
+    foreach (my $i = 1; $i <= $days_in_month; $i++) {
+        push @calendar_days, {
+            day         => $i, # 1-31
+            has_events  => $day_has_event{$i},
+            is_today    => $i == $today_day_of_month,
+            link_target => sprintf("%d-%02d-%02d", $year, $month, $i),
+        };
+    }
+
+    template 'archive-calendars/month.html' => {
+        events        => \@events,
+        venues        => \@venues,
+        month_name    => Month_to_Text($month),
+        year          => $year,
+        calendar_days => \@calendar_days,
+        virtual_include => {
+            mod_header => _virtual_include('shared/mod_header.html'),
+        }
+    },
+    # no wrapper
+    { layout => undef },
+}
+
 
 
 =head2 Helper Methods
