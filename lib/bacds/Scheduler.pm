@@ -1262,7 +1262,14 @@ sub get_season {
 
 This is the replacement for
 
-https://bacds.org/calendars/2007/01/
+    https://bacds.org/calendars/2007/01/
+
+for 2023 and onward. The rest of the files for prior years are static HTML
+created by the old cgi-bin/calendar2.pl and dumped to disk.
+
+The routing is handled by this rule in calendars/.htaccess
+
+    RewriteRule "^(202[3456789]/.*/)" /dance-scheduler/calendars/$1
 
 =cut
 
@@ -1319,7 +1326,8 @@ sub archive_calendars {
         year          => $year,
         calendar_days => \@calendar_days,
         virtual_include => {
-            mod_header => _virtual_include('shared/mod_header.html'),
+            mod_header => _virtual_include('common/mod_header.html'),
+            mod_footer => _virtual_include('common/mod_footer.html'),
         }
     },
     # no wrapper
