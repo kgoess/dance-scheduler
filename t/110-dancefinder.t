@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 63;
+use Test::More tests => 68;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -40,6 +40,7 @@ test_serieslister_single_event_endpoint($fixture);
 test_serieslister_ldjson($fixture);
 test_calendar_get_events();
 test_calendar_get_venues();
+test_new_calendar();
 
 sub setup_fixture {
 
@@ -781,6 +782,7 @@ sub test_calendar_get_events {
     is $events[0]->startday, '2022-04-14';
     is $events[1]->startday, '2022-04-28';
     is $events[2]->startday, '2022-04-28';
+    is $events[2]->startday_obj->ymd, '2022-04-28';
 }
 
 sub test_calendar_get_venues {
@@ -790,4 +792,25 @@ sub test_calendar_get_venues {
     is @venues, 1, 'just one venue';
     is $venues[0], q{hop|Mr. Hooper's Store|123 Sesame St.|Sunny Day};
 
+}
+
+# The dance-scheduler is now handling /calendars/2023/ and onward.
+# We'll test it with the dates/events we've got.
+sub test_new_calendar {
+    my $series_id = $fixture->{series1};
+    $Test->get_ok("/calendars/2022/04/", "GET /calendars/2022/04/ ok");
+    like $Test->content, qr{<td class="calendar">    <a href="#2022-04-14">  14  </a>   </td>},
+         'calendar part has a date linked';
+    like $Test->content, qr{<td class="callisting">Mr. Hooper's Store</td>},
+        'venue part has Mr. Hooper';
+
+    like $Test->content, qr{
+            <td.class="callisting"> \s+
+                <a.name="2022-04-28">April&nbsp;28 \s+
+                </a> \s+
+            </td> \s+
+            <td.class="callisting"> \s+
+                    <span.class="special-event-name">test.event.1</span>\(\) \s+
+            </td>
+    }x, 'listings part has a listing';
 }

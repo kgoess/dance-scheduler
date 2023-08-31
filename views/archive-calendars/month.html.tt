@@ -34,25 +34,25 @@
     <tr>
         <% FOR calendar_day IN calendar_days %>
             <td class="calendar">
-                <%# the existing css wants this div for div.tonight. ok w/ever %>
-                <% IF calendar_day.is_today %>
+                <%= # the existing css wants this div for div.tonight. ok w/ever =%>
+                <%= IF calendar_day.is_today =%>
                     <div class="tonight">
-                <% END %>
-                <% IF calendar_day.has_events %>
+                <%= END =%>
+                <%= IF calendar_day.has_events =%>
                     <a href="#<% calendar_day.link_target %>">
-                <% END %>
-                <% calendar_day.day %>
-                <% IF calendar_day.has_events %>
+                <%= END =%>
+                <%= calendar_day.day =%>
+                <%= IF calendar_day.has_events =%>
                     </a>
-                <% END %>
-                <% IF calendar_day.is_today %>
+                <%= END =%>
+                <%= IF calendar_day.is_today =%>
                     </div>
-                <% END %>
+                <%= END =%>
             </td>
-            <% IF loop.count() % 7 == 0 %>
+            <%- IF loop.count() % 7 == 0 %>
                 </tr><tr>
-            <% END %>
-        <% END %>
+            <%- END %>
+        <%- END %>
     </tr>
 </table>
 
@@ -67,32 +67,32 @@
         <th class="caltitle" align="center">MUSICIANS</th>
     </tr>
     <% FOR event IN events %>
-        <% listing_class = "callisting" %>
-        <% comment_class = "callisting" %>
-        <% IF event.is_canceled %>
+        <%- listing_class = "callisting" %>
+        <%- comment_class = "callisting" %>
+        <%- IF event.is_canceled %>
             <% listing_class = list_class    _ " calcanceled" %>
             <% comment_class = comment_class _ " calcanceled" %>
-        <% END %>
-        <% talent = event.band %>
-        <% IF event.band && event.musos %>
+        <%- END %>
+        <%- talent = event.band %>
+        <%- IF event.band && event.musos %>
             <% talent = talent _ ", " %>
-        <% END %>
-        <% talent = talent _ event.musos %>
+        <%- END %>
+        <%- talent = talent _ event.musos %>
         <tr>
             <td class="<% listing_class %>">
                 <a name="<% event.startday_obj.ymd %>">
-                    <% event.startday_obj.month_name %>&nbsp;<% event.startday_obj.day %>
-                    <% IF event.end_date %>
+                    <%- event.startday_obj.month_name %>&nbsp;<% event.startday_obj.day %>
+                    <%- IF event.end_date %>
                         &nbsp;to&nbsp;<% event.end_date.month_name %>&nbsp;<% event.end_date.day %>
-                    <% END %>
+                    <%- END %>
                 </a>
             </td>
             <td class="<% listing_class %>">
-                <% IF event.name %>
+                <%- IF event.name %>
                     <span class="special-event-name"><% event.name %></span>(<% event.type %>)
-                <% ELSE %>
+                <%- ELSE %>
                     <% event.type %>
-                <% END %>
+                <%- END %>
             </td>
             <td class="<% listing_class %>">
                 <% event.loc %>
@@ -104,14 +104,14 @@
                 <% talent %>
             </td>
         </tr>
-        <% IF event.comments %>
+        <%- IF event.comments %>
             <tr class="<% comment_class %>">
                 <td class="<% comment_class %>"></td>
                 <td class="<% comment_class %>" colspan="4">
                     <em><% event.comments %></em>
                 </td>
             </tr>
-        <% END %>
+        <%- END %>
     <% END %> 
 
 </table>
