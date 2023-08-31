@@ -33,13 +33,20 @@
     </tr>
     <tr>
         <% FOR calendar_day IN calendar_days %>
-            <td class="calendar<% IF calendar_day.is_today %> tonight<% END %>">
+            <td class="calendar">
+                <%# the existing css wants this div for div.tonight. ok w/ever %>
+                <% IF calendar_day.is_today %>
+                    <div class="tonight">
+                <% END %>
                 <% IF calendar_day.has_events %>
                     <a href="#<% calendar_day.link_target %>">
                 <% END %>
                 <% calendar_day.day %>
                 <% IF calendar_day.has_events %>
                     </a>
+                <% END %>
+                <% IF calendar_day.is_today %>
+                    </div>
                 <% END %>
             </td>
             <% IF loop.count() % 7 == 0 %>

@@ -56,6 +56,7 @@ use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Results;
+use bacds::Scheduler::Util::Time qw/get_today/;
 my $Results_Class = "bacds::Scheduler::Util::Results";
 
 our $VERSION = '0.1';
@@ -1287,7 +1288,11 @@ sub archive_calendars {
     my @events = bacds::Scheduler::Model::Calendar->load_events_for_month($year, $month);
     my @venues = bacds::Scheduler::Model::Calendar->load_venue_list_for_month_new($year, $month);
 
-    my $today_day_of_month = DateTime->now->day;
+    my $today = get_today();
+    my $today_day_of_month = 0; # so it will never match
+    if ($today->month == $month && $today->year == $year) {
+        $today_day_of_month = $today->day;
+    }
 
     my $days_in_month = Days_in_Month($year, $month);
     my $cur_day_of_mon = 1;
@@ -1304,8 +1309,10 @@ sub archive_calendars {
     }
 
     my @calendar_days;
-    my $dow = DateTime->new(year => $year, month => $month, day => 1);
-    if ((my $day_of_week = $dow->day_of_week) != 7) {
+    my $first_of_month = DateTime->new(
+        year => $year, month => $month, day => 1, time_zone => 'local'
+    );
+    if ((my $day_of_week = $first_of_month->day_of_week) != 7) {
         while ($day_of_week--) {
             unshift @calendar_days, { empty => 1 };
         }
