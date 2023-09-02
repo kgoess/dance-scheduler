@@ -214,6 +214,11 @@ font-size: 10px;
     flex-direction: row;
     align-items: stretch;
 }
+.display-row-support { /* e.g. image-preview */
+    border-bottom: 1px solid #9bc;
+    background-color: #bde;
+    padding: 3px;
+}
 .display-form .button-container {
     background-color: #bde;
 }
@@ -379,6 +384,18 @@ form:invalid button.disableable {
 }
 
 .help-content {display: none;}
+
+.image-preview {
+    display: none;
+    padding-left: 40px;
+}
+.image-preview img {
+    border: 2px solid #5cbeef;
+}
+.fullsize-image {
+    display: none;
+    align: left;
+}
 
 /* 
  * accordion nav menu!

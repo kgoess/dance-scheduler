@@ -115,6 +115,9 @@
                     model-name="<% column.model_name %>"
                     table-name="<% column.table_name %>"
                 <% END %>
+                <% IF column.preview_image %>
+                    preview-image="1"
+                <% END %>
             >
                 <label
                     for="<% column.name %>"
@@ -131,11 +134,19 @@
                         </div>
                     <% END %>
                 </label>
-                <% if column.type != 'dropdown' %><span class="row-contents"></span><% END %>
+                <% IF column.type != 'dropdown' %><span class="row-contents"></span><% END %>
                 <%  macro_name = 'handle_input_' _ column.type;
                     $macro_name(column)
                 %>
             </div>
+            <% IF column.preview_image %>
+                <% # this is filled out by displayItemRow and the popupLightbox %>
+                <div class="image-preview display-row-support" >
+                    <span class="image-thumbnail">
+                        <img height="100px">
+                    </span>
+                </div>
+            <% END %>
         <% END %>
         <span class="button-container">
             <button class="button save-button disableable">Save</button>

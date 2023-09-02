@@ -264,6 +264,7 @@
     - label: Photo URL
       name: photo_url
       type: text
+      preview_image: 1
     - name: caller_id
       type: hidden
 
@@ -281,6 +282,7 @@
     - label: Photo URL
       name: photo_url
       type: text
+      preview_image: 1
     - label: Talent
       name: talent_id
       type: dropdown
@@ -304,6 +306,7 @@
     - label: Photo URL
       name: photo_url
       type: text
+      preview_image: 1
     - name: talent_id
       type: hidden
 
@@ -321,6 +324,7 @@
     - label: Photo Url (logo)
       name: photo_url
       type: text
+      preview_image: 1
     - label: Abbreviation
       name: abbreviation
       required: 1
@@ -402,6 +406,7 @@
     - label: Photo URL
       name: photo_url
       type: text
+      preview_image: 1
     - label: Styles
       name: style_id
       type: dropdown

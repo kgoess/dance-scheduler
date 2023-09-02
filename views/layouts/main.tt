@@ -26,6 +26,11 @@
 var appUriBase = "<% request.uri_base %>";
 var jsChecksum = "<% checksum %>";
 </script>
+
+<!--Popup Lightbox for photo_url previews https://codehimblog.github.io/jquery-popup-lightbox/-->
+<script src="<% request.uri_base %>/js/jquery.popup.lightbox.js"></script>
+<link href="<% request.uri_base %>/css/popup-lightbox.css" rel="stylesheet" />
+
 <script type="module" src="<% request.uri_base %>/js/scheduler.js?checksum=<% checksum %>"></script>
 
 </head>

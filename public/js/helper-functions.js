@@ -99,6 +99,21 @@ export function displayItemRow(currentRow, targetObj) {
             displayText = displayText.replace(/\n/g, '<br/>');
             currentRow.children('.row-contents').html(displayText);
             currentRow.children('.row-edit').val(singleValue);
+            /* handle the thumbnail, which is in the div immediately following us */
+            if (currentRow.attr('preview-image') && singleValue) {
+                currentRow.next('.image-preview').each((i, row) => {
+                    $(row).find('img').attr('src', singleValue);
+                    // for the caption at the top. this "name||full_name" is
+                    // admittedly inelegant
+                    $(row).find('img').attr('alt', targetObj.name || targetObj.full_name);
+                    $(row).show();
+                });
+                currentRow.next('.image-fullsize').each((i, row) => {
+                    $(row).find('img').attr('src', singleValue);
+                });
+            } else {
+                currentRow.next('.image-preview').hide();
+            }
             break;
         case 'bool-item':
             currentRow.find('.row-edit input').val(singleValue);
@@ -464,5 +479,5 @@ export function toastInit(window, $){
 
     return this;
   }
-  
 }
+

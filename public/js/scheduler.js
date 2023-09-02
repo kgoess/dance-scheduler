@@ -51,6 +51,10 @@ $( document ).ready(function() {
 
     $( '.add-multi-select-button' ).click( multiSelectOptionAdd );
 
+    /* pop up full-size image for image thumbnail */
+    $(".image-preview").popupLightbox();
+
+
     /*
      * This sets values for this new event to the default values from the series'
      * defaults event
