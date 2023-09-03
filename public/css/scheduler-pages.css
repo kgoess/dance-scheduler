@@ -1,0 +1,508 @@
+/* scheduler-pages.css is for display pages output by the dance-scheduler app,
+ * for starters the series pages and the /calendar/ pages.
+
+  Colors in here are driven by a bunch of CSS --vars established in the
+  template that look like this:
+
+  :root {
+      <% IF season == "winter" %>
+          --header-color: #bbbbbb;
+          --header-background-color: #0000ff;
+          --nav-background: #bbddff;
+          --seasoned-text: #0000ff;
+          --special-event-border: #0000ff;
+  ...etc..
+
+
+  This is the desktop layout. For the mobile layout,
+  everything is top-to-bottom or flex-direction:column.
+  + -----------------------------------------------------------+
+  | header                                                     |
+  +------------------------------------------------------------+
+  | div.navbar-and-body                                        |
+  | +-------------+----------------------------------------+   |
+  | | nav         | div.body-and-sidebar                   |   |
+  | |             |   +--------------------------------+   |   |
+  | |             |   | div.body-top                   |   |   |
+  | |             |   |                                |   |   |
+  | |             |   +--------------------------------+   |   |
+  | |             |   | div.body-bottom                |   |   |
+  | |             |   | +--------------------------+   |   |   |
+  | |             |   | | main     | aside.sidebar |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | |          |               |   |   |   |
+  | |             |   | +----------+---------------+   |   |   |
+  | |             |   |                                |   |   |
+  | |             |   |                                |   |   |
+  | |             |   +--------------------------------+   |   |
+  | |             |                                        |   |
+  | +-------------+----------------------------------------+   |
+  +------------------------------------------------------------+
+  | footer                                                     |
+  +------------------------------------------------------------+
+
+
+*/
+/* start flexbox layout, see diagram above */
+.navbar-and-body {
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 600px) {
+  .navbar-and-body {
+    flex-direction: row;
+  }
+}
+.body-and-sidebar {
+  /* needs border to match up with the navbar boarder otherwise you see the
+   * step */
+  border-top: 2px solid var(--header-background-color);
+  display: flex;
+  flex-direction: column;
+}
+.body-bottom {
+  display: flex;
+  flex-direction: column;
+  padding: 1px; /* separates the special event box from the nav column */
+}
+@media (min-width: 600px) {
+  .body-bottom {
+    flex-direction: row;
+  }
+}
+main {
+  flex-basis: auto;
+  flex-grow: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* forces the mission-statement to the bottom */
+}
+aside.sidebar {
+  flex-basis: 25%;
+  flex-grow: 1;
+}
+/* end flexbox layout */
+
+body {
+  width: fit-content;
+}
+
+aside.sidebar {
+  margin: 20px;
+  min-width: 15em;
+}
+@media (min-width: 600px) {
+  .sidebar-sep {
+    display: none;
+  }
+}
+
+.desktop-only {
+  display: none;
+}
+@media (min-width: 600px) {
+  span.desktop-only {
+    display: inline;
+  }
+  div.desktop-only {
+    display: block;
+  }
+}
+
+/* emulate details/summary tags */
+@media (max-width: 599px) {
+    .collapsible-title { /* like <summary */
+      padding: 5px;
+    }
+    .collapsible-title.collapsible-closed::before {
+      content: '►';
+      margin-right: 5px;
+      font-size: 80%;
+    }
+    .collapsible-title.collapsible-open::before {
+      content: '▼';
+      margin-right: 5px;
+      font-size: 80%;
+    }
+    /* in the mobile view the collapsibles start closed */
+    .collapsible-body-hidden {
+        display: none;
+    }
+}
+@media (min-width: 600px) {
+    .collapsible-title {
+        /* no need to show the text "Navigation Links" in the nav bar */
+        display: none;
+    }
+    /* in the desktop view the collapsibles aren't collapsible so they're
+     * never closed */
+    .collapsible-body-hidden {
+        /* display: none; */
+    }
+}
+/* end details/summary emulation */
+
+a {
+  color: var(--seasoned-text);
+}
+
+body {
+  font-family: Verdana, sans-serif;
+}
+header {
+  color: var(--header-color);
+  background-color: var(--header-background-color);
+  min-width: 100%;
+}
+/* carousel stuff just for local dev */
+header .cd-carousel-bg {
+  color: #ffffff;
+}
+header .cd-carousel-bg a {
+  color: #ffffff;
+}
+header .masthead {
+  display: flex;
+  flex-direction: row;
+}
+header .masthead a:any-link {
+  text-decoration: none;
+}
+header .breadcrumbs a:any-link {
+  color: #ffffff;
+  font-style: italic;
+  font-weight: bold;
+}
+header .masthead-title { font-size: 1.5em;
+  font-weight: bold;
+  margin: 2px;
+  margin-left: 10px;
+}
+header .masthead-title a:any-link {
+  color: var(--header-color);
+}
+
+header .masthead-logo {
+  margin: 2px;
+  align-self: top;
+}
+header .breadcrumbs {
+  margin: 2px;
+  margin-left: 10px;
+  font-size: 70%;
+}
+@media (min-width: 600px) {
+  header .breadcrumbs {
+    font-size: 1em;
+  }
+}
+header ul {
+  margin: 0px; /* ul defaults to 16px top and bottom */
+}
+
+.body-top {
+  margin: 10px;
+}
+
+main .event-content-title {
+  color: #993300;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.collapsible-section.nav {
+  width: auto;
+  border: 2px solid var(--header-background-color);
+}
+@media (min-width: 600px) {
+  .collapsible-section.nav {
+    width: 100%;
+  }
+}
+@media (min-width: 600px) {
+  .collapsible-section.nav {
+    max-width: 16em;
+  }
+}
+.collapsible-title.nav {
+  background-color: var(--nav-background);
+  padding: 5px;
+}
+nav {
+  background-color: var(--nav-background);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  font-size: .9em;
+}
+@media (min-width: 600px) {
+  nav {
+    padding: 0px;
+  }
+}
+nav .navsection {
+  margin: 5px;
+  padding: 5px;
+}
+nav .navsubsection {
+  padding: 0px 5px 5px 5px;
+  margin: 2px 5px 5px 5px;
+}
+nav .current-navsection {
+  background-color: #ffffff;
+}
+nav .navitem {
+  font-style: italic;
+}
+
+.series-description .series-name {
+  color: #993300;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+.series-description .series-name a {
+  color: #993300;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+}
+.series-description .series-name-sub {
+  font-size: 1.2em;
+  font-weight: bold;
+  padding-left: 5px;
+  text-align: center;
+}
+.series-description .series-display-text {
+  padding: 10px;
+}
+
+/* importing from base.css */
+p.dance {
+  margin: 1.5em 0 0 0;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  /* font-size: 12pt; */
+  color: #000000;
+  text-align: left;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+/* the new date links on each entry, they're just there for google to crawl,
+ * so take off the italics we added, and take off the standard underline for links  */
+p.dance b.date a {
+  text-decoration:           none;
+}
+p.dance b.date a:link {
+  font-style:                normal;
+}
+p.comment {
+  margin: 0 1em 3em 1em;
+  padding-left: 15px;
+  text-align: left;
+  color: var(--seasoned-text);
+}
+p.canceled-event-comment {
+  color: IndianRed;
+}
+.canceled-event {
+  text-decoration: line-through;
+  color: purple;
+  font-style: italic;
+}
+.special-event-name {
+  font-size: 120%;
+  font-weight: bolder;
+  font-style: italic;
+  font-variant: small-caps;
+  font: italic small-caps bold;
+}
+
+div.tonight, div.workshop, div.special, div.camp {
+  border: solid;
+  border-color: var(--special-event-border);
+  border-width: 3px;
+}
+
+aside.mission-statement {
+  text-align: center;
+  font-weight: bold;
+}
+aside.mission-statement.mobile-only {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+  size: auto;
+}
+aside.mission-statement.desktop-only {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: .5em;
+  padding-bottom: .5em;
+  margin-bottom: 0px;
+  width: 36em;
+  display: none;
+}
+@media (min-width: 600px) {
+  aside.mission-statement.mobile-only {
+    display: none;
+  }
+  aside.mission-statement.desktop-only {
+    display: flex;
+    justify-content: center;
+  }
+}
+/* the mission statement colors could be seasonalized? */
+aside.mission-statement .mission-container {
+  background-color: var(--header-background-color);
+  padding: 10px 40px 10px 40px;
+}
+aside.mission-statement .mission-title {
+  color: #fffb00;
+  font-size: 150%;
+}
+aside.mission-statement .mission-text {
+  color: #ffffff;
+  font-size: 50%;
+  text-align: center;
+}
+aside.mission-statement a:any-link {
+  text-decoration: none;
+}
+aside.mission-statement a:any-link {
+  color: #ffffff;
+}
+
+
+footer {
+  background-color: var(--header-background-color);
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: .3em;
+  padding-bottom: .3em;
+  margin-bottom: 3em;
+  color: var(--header-color);
+  font-style: italic;
+  font-size: 0.8em;
+}
+footer a {
+  color: var(--header-color);
+}
+.old {
+    display: none;
+}
+
+/* the promo buttons are the "Buy Our CDs", "Donate!", "Search"...etc */
+#promo-buttons {
+    display: flex;
+    flex-direction: row;
+    background-color: var(--header-background-color);
+}
+.promo-button {
+    color: #000000;
+    background-color: var(--nav-background);
+    font-size: 90%;
+    padding: 8px 16px;;
+    padding: 0px 5px 5px 2px;
+    text-align: center;
+    box-shadow:
+        inset 0 0 2px 0 rgba(255,255,255,.4),
+        inset 0 0 3px 0 rgba(0,0,0,.4),
+        inset 0 0 3px 5px rgba(0,0,0,.05),
+        2px 2px 4px 0 rgba(0,0,0,.25);
+    border-radius: 5px;
+    vertical-align: center;
+    margin: 1px;
+}
+.promo-button a:link {
+    text-decoration: none;
+    color: #000000;
+}
+.promo-button:before, .promo-button:after {
+    content: '';
+    display: block;
+    left: 2px;
+    right: 2px;
+    height: 3px;
+}
+.promo-button:before {
+    top: 0;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background: rgba(255,255,255,.6);
+    box-shadow: 0 1px 2px 0 rgba(255,255,255,.6);
+}
+/* it would be nice to get this bottom border working, but it's hugging the
+ * bottom of the text instead of the bottom of the button
+    .promo-button:after {
+        bottom: 0;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        background: rgba(0,0,0,.15);
+        box-shadow: 0 -1px 2px 0 rgba(0,0,0,.15);
+    }
+*/
+
+header .cd-carousel-bg {
+    margin-top: 10px;
+    padding-bottom: 20px;
+    /* need to override the bottom margin from our cd-carousel.css or we
+       get a blank chunk between the carousel and the rest of the page */
+    margin-bottom: 0px;
+
+}
+@media (max-width: 599px) {
+    /* overriding cd-carousel.css for mobile */
+    header ul#cd-carousel li {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+.google-searchbox-container {
+  margin: auto;
+  width: 100%;
+  min-width: 100%;
+  background-color: var(--header-background-color);
+}
+.google-searchbox {
+    max-width: 500px;
+}
+/* this is for covidStatus.html */
+#covid-status-announcement {
+    /* these are from main.p in base.css */
+    /* but we're using a div here, not a p */
+    padding-left: 15px;
+    padding-right: 15px;
+}
+#covid-current {
+    border-radius: 30px;
+    color: white;
+    padding: 2px 4px 2px 4px;
+    margin: 2px;
+}
+
+
+/* ************************ */
+/* from base.css to handle html in like the Display Text form */
+/* ************************ */
+.center {
+    text-align: center;
+}
+h1.dance {
+    text-align: center;
+    color: #993300;
+    /* this font-size not in base.css, but let's drop it down a notch anyway */
+    font-size: 1.2em;
+}
+/* ************************ */
+/* end from base.css */
+/* ************************ */
+
+.hidden {
+    display: none;
+}
