@@ -62,10 +62,10 @@
           </div>
           <div class="breadcrumbs">
             <%- IF breadcrumbs %>
-                <span class="desktop-only">This page is <a href="/">www.bacds.org</a> > </span>
+                <span class="desktop-only">This page is <a href="/">www.bacds.org</a> &gt; </span>
                 <%- FOREACH crumb IN breadcrumbs %>
                     <a href="<% crumb.href %><% IF loop.last %>#top<% END %>"><% crumb.label %></a>
-                    <%- IF ! loop.last %>&gt;<% END %>
+                    <%- IF ! loop.last %> &gt;<% END %>
                 <% END %>
             <% END %>
           </div>
