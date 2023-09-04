@@ -78,6 +78,7 @@ sub MY::postamble {
 APPDIR=/var/www/bacds.org/dance-scheduler
 
 app-install:
+	@if [ -n "$$(find * -name '*.sw?')" ] ; then echo -e "\n*****************\n*** Please exit vim and make sure there aren't any *.sw? files in the installation tree. ***\n*******************\n" ; false; fi
 	install -d $(APPDIR) --mode 2775 --group dev
 	install bin/app.psgi $(APPDIR)
 	install config.yml   $(APPDIR)
@@ -104,7 +105,7 @@ app-install:
 
 # the httpd.conf requires sudo, so keeping it separate (it won't change often)
 httpd-conf-install:
-	@if [ ! $$(id -u) = 0 ]; then  echo -e "\n*****************\n*** You need to run this with sudo: 'sudo make httpd-conf-install'***\n*******************\n" ; false; fi
+	@if [ ! $$(id -u) = 0 ]; then echo -e "\n*****************\n*** You need to run this with sudo: 'sudo make httpd-conf-install'***\n*******************\n" ; false; fi
 	install apache/dance-scheduler.conf /etc/httpd/conf.d/dance-scheduler.conf
 	@echo -e "\n*****************\n*** Done! Now do 'sudo service httpd restart'***\n*******************\n"
 
