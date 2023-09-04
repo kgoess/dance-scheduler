@@ -47,7 +47,7 @@
        <% END %>
   }
   </style>
-  <link rel="stylesheet" title="base" type="text/css" href="<% request.uri_base %>/css/scheduler-pages.css" />
+  <link rel="stylesheet" title="base" type="text/css" href="/css/scheduler-pages.css" />
 </head>
 <body>
   <!-- ***************************** -->
@@ -242,7 +242,7 @@
             Calendars:
             <div class="navsubsection">
               <div class="navitem">
-                <a href="livecalendar.html">Interactive</a>
+                <a href="/livecalendar.html">Interactive</a>
               </div>
               <div class="navitem">
                 <a href="/calendars/">Monthly</a>

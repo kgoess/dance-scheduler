@@ -91,9 +91,11 @@ aside.sidebar {
 }
 /* end flexbox layout */
 
-/* body {
-  width: fit-content;
-} */
+@media (max-width: 599px) {
+    body {
+      width: fit-content;
+    } 
+}
 
 aside.sidebar {
   margin: 20px;
