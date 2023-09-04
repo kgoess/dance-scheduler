@@ -1,0 +1,134 @@
+<html>
+<head>
+</head>
+<body>
+<%-
+month_name = {
+    '1' => 'Jan',
+    '2' => 'Feb',
+    '3' => 'Mar',
+    '4' => 'Apr',
+    '5' => 'May',
+    '6' => 'Jun',
+    '7' => 'Jul',
+    '8' => 'Aug',
+    '9' => 'Sep',
+    '10' => 'Oct',
+    '11' => 'Nov',
+    '12' => 'Dec',
+};
+years = [2003 .. 2023]
+%>
+<table class="main" width="100%" cellspacing="7" cellpadding="3" border="0">
+<%- FOR year IN years.reverse %>
+   <tr>
+      <td valign="top" align="left">
+         <a name="<% year %>"></a><% year %>:
+            <%- FOR month IN [1 .. 12] %>
+                <a href="<% year %>/<% month | format('%02d') %> "><% month_name.$month %></a>&nbsp;/&nbsp;
+            <% END %>
+      </td>
+   </tr>
+<% END %>
+
+<tr>
+<td valign="top" align="left">
+<a name="2002"></a>2002:
+<a href="jan02.html">Jan</a>&nbsp;/&nbsp;
+<a href="feb02.html">Feb</a>&nbsp;/&nbsp;
+<a href="mar02.html">Mar</a>&nbsp;/&nbsp;
+<a href="apr02.html">Apr</a>&nbsp;/&nbsp;
+<a href="may02.html">May</a>&nbsp;/&nbsp;
+<a href="jun02.html">Jun</a>&nbsp;/&nbsp;
+<a href="jul02.html">Jul</a>&nbsp;/&nbsp;
+<a href="aug02.html">Aug</a>&nbsp;/&nbsp;
+<a href="sep02.html">Sep</a>&nbsp;/&nbsp;
+<a href="2002/10">Oct</a>&nbsp;/&nbsp;
+<a href="2002/11">Nov</a>&nbsp;/&nbsp;
+<a href="2002/12">Dec</a>
+</td>
+</tr>
+
+<tr>
+<td valign="top" align="left">
+<a name="2001"></a>2001:
+<a href="jan01.html">Jan</a>&nbsp;/&nbsp;
+<a href="feb01.html">Feb</a>&nbsp;/&nbsp;
+<a href="mar01.html">Mar</a>&nbsp;/&nbsp;
+<a href="apr01.html">Apr</a>&nbsp;/&nbsp;
+<a href="may01.html">May</a>&nbsp;/&nbsp;
+<a href="jun01.html">Jun</a>&nbsp;/&nbsp;
+<a href="jul01.html">Jul</a>&nbsp;/&nbsp;
+<a href="aug01.html">Aug</a>&nbsp;/&nbsp;
+<a href="sep01.html">Sep</a>&nbsp;/&nbsp;
+<a href="oct01.html">Oct</a>&nbsp;/&nbsp;
+<a href="nov01.html">Nov</a>&nbsp;/&nbsp;
+<a href="dec01.html">Dec</a>
+</td>
+</tr>
+
+<tr>
+<td valign="top" align="left">
+<a name="2000"></a>2000:
+<a href="jan00.html">Jan</a>&nbsp;/&nbsp;
+<a href="feb00.html">Feb</a>&nbsp;/&nbsp;
+<a href="mar00.html">Mar</a>&nbsp;/&nbsp;
+<a href="apr00.html">Apr</a>&nbsp;/&nbsp;
+<a href="may00.html">May</a>&nbsp;/&nbsp;
+<a href="jun00.html">Jun</a>&nbsp;/&nbsp;
+<a href="july00.html">Jul</a>&nbsp;/&nbsp;
+<a href="aug00.html">Aug</a>&nbsp;/&nbsp;
+<a href="sept00.html">Sep</a>&nbsp;/&nbsp;
+<a href="oct00.html">Oct</a>&nbsp;/&nbsp;
+<a href="nov00.html">Nov</a>&nbsp;/&nbsp;
+<a href="dec00.html">Dec</a>
+</td>
+</tr>
+
+<tr>
+<td valign="top" align="left">
+<a name="1999"></a>1999:
+<a href="jan99.html">Jan</a>&nbsp;/&nbsp;
+<a href="feb99.html">Feb</a>&nbsp;/&nbsp;
+<a href="mar99.html">Mar</a>&nbsp;/&nbsp;
+<a href="apr99.html">Apr</a>&nbsp;/&nbsp;
+<a href="may99.html">May</a>&nbsp;/&nbsp;
+<a href="june99.html">Jun</a>&nbsp;/&nbsp;
+<a href="july99.html">Jul</a>&nbsp;/&nbsp;
+<a href="aug99.html">Aug</a>&nbsp;/&nbsp;
+<a href="sept99.html">Sep</a>&nbsp;/&nbsp;
+<a href="oct99.html">Oct</a>&nbsp;/&nbsp;
+<a href="nov99.html">Nov</a>&nbsp;/&nbsp;
+<a href="dec99.html">Dec</a>
+</td>
+</tr>
+
+<tr>
+<td valign="top" align="left">
+<a name="1998"></a>1998:
+<a href="jan98.html">Jan</a>&nbsp;/&nbsp;
+<a href="feb98.html">Feb</a>&nbsp;/&nbsp;
+<a href="mar98.html">Mar</a>&nbsp;/&nbsp;
+<a href="apr98.html">Apr</a>&nbsp;/&nbsp;
+<a href="may98.html">May</a>&nbsp;/&nbsp;
+<a href="june98.html">Jun</a>&nbsp;/&nbsp;
+<a href="july98.html">Jul</a>&nbsp;/&nbsp;
+<a href="aug98.html">Aug</a>&nbsp;/&nbsp;
+<a href="sept98.html">Sep</a>&nbsp;/&nbsp;
+<a href="oct98.html">Oct</a>&nbsp;/&nbsp;
+<a href="nov98.html">Nov</a>&nbsp;/&nbsp;
+<a href="dec98.html">Dec</a>
+</td>
+</tr>
+
+<tr>
+<td valign="top" align="left">
+<a name="1997"></a>1997:
+<a href="JulSep97.txt">July-September</a>
+<a href="OctDec97.txt">October-December</a>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
