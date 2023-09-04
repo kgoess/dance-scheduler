@@ -1,0 +1,106 @@
+/*
+** CSS for calendars
+*/
+.calendar, .calendar_title {
+	font-size:					36px;
+	font-family:					monospace;
+}
+
+table {
+	margin-left:					auto;
+	margin-right:					auto;
+}
+
+table tr th.calendar {
+	font-size:					36px;
+	text-align:					center;
+	padding:					0.5em;
+	cell-padding:					0.5em;
+}
+
+table tr th.calendar_title {
+	font-size:					48px;
+	text-align:					left;
+	padding:					0.5em;
+}
+
+table tr td.calendar {
+	font-size:					36px;
+	text-align:					right;
+	padding:					0.5em;
+}
+
+/*
+** CSS for form pull-downs
+*/
+
+.calform {
+	font-size:					18px;
+	font-family:					monospace;
+}
+
+table tr th.calform {
+	font-size:					18px;
+}
+
+table tr td.calform {
+	font-size:					18px;
+}
+
+/*
+** CSS for calendar listings
+*/
+
+.callisting {
+	font-size:					15px;
+	font-family:					sans-serif;
+}
+
+table tr th.callisting {
+	font-size:					15px;
+	vertical-align:					top;
+	padding-left:					6px;
+	padding-right:					6px;
+}
+
+table tr td.callisting {
+	font-size:					15px;
+	vertical-align:					top;
+	padding-left:					6px;
+	padding-right:					6px;
+	padding-top:					6px;
+	padding-bottom:					0px;
+}
+
+table tr td.calcomment {
+	font-size:					15px;
+	vertical-align:					top;
+	padding-left:					6px;
+	padding-right:					6px;
+	padding-bottom:					22px;
+	padding-top:					0px;
+}
+table tr td.calcanceled {
+	text-decoration: line-through;
+	color: IndianRed;
+}
+
+table tr th.caltitle {
+	font-size:					15px;
+	text-align:					left;
+	vertical-align:					top;
+	padding-left:					6px;
+	padding-right:					6px;
+}
+
+.special-event-name {
+    font-size: 120%;
+    font-weight: bolder;
+    font-style: italic;
+    font-variant: small-caps;
+}
+
+.body-and-sidebar {
+    margin-left: 10px;
+    margin-bottom: 40px;
+}

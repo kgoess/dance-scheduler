@@ -1329,19 +1329,32 @@ sub archive_calendars {
         };
     }
 
+    my @breadcrumbs = (
+        # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
+        # to uri_for if we break "/series/" into a separate app
+        { label => 'calendars', href => 'https://bacds.org/calendars/' },
+        { label => $year,       href => "https://bacds.org/calendars/$year/" },
+        { label => Month_to_Text($month),
+          href => sprintf "https://bacds.org/calendars/$year/%02d/", $month,
+        },
+    );
+
     template 'archive-calendars/month.html' => {
         events        => \@events,
         venues        => \@venues,
         month_name    => Month_to_Text($month),
         year          => $year,
         calendar_days => \@calendar_days,
+        page_title    => "Calendar for $month/$year",
+        season        => get_season(),
+        breadcrumbs   => \@breadcrumbs,
         virtual_include => {
             mod_header => _virtual_include('common/mod_header.html'),
             mod_footer => _virtual_include('common/mod_footer.html'),
         }
     },
-    # no wrapper
-    { layout => undef },
+    # gets the wrapper from views/layouts/<whatever>
+    { layout => 'scheduler-page' },
 }
 
 

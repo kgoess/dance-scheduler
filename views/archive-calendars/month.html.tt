@@ -1,21 +1,7 @@
-<html>
-<head>
-<title>BACDS Calendar generator</title>
-<link rel="stylesheet" type="text/css" href="https://bacds.org/css/calendar.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="https://bacds.org/css/mod_layout_base.css" />
+<%# This template is wrapped by views/layouts/scheduler-page.tt %>
+<link rel="stylesheet" type="text/css" href="<% request.uri_base %>/css/calendar.css" />
 
-<% virtual_include.mod_header %>
-<style>
-    .special-event-name {
-        font-size: 120%;
-        font-weight: bolder;
-        font-style: italic;
-        font-variant: small-caps;
-    }
-</style>
-
-</head>
-<body>
+<div class="body-and-sidebar">
 <h1>BACDS Events Calendar</h1>
 
 <table>
@@ -135,4 +121,4 @@
 
     <% END %>
 </table>
-<% virtual_include.mod_footer %>
+</div>
