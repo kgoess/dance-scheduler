@@ -1296,15 +1296,6 @@ sub archive_calendars {
     if ($today->month == $month && $today->year == $year) {
         $today_day_of_month = $today->day;
     }
-
-    my $days_in_month = Days_in_Month($year, $month);
-    my $cur_day_of_mon = 1;
-    # and the first day of the week
-    my $cur_day_of_wk = Day_of_Week(
-        $year,
-        $month,
-        $cur_day_of_mon
-    );
     my %day_has_event;
     foreach my $event (@events) {
         my $event_day = $event->startday_obj->day; # 1-31
@@ -1320,6 +1311,7 @@ sub archive_calendars {
             unshift @calendar_days, { empty => 1 };
         }
     }
+    my $days_in_month = Days_in_Month($year, $month);
     foreach (my $i = 1; $i <= $days_in_month; $i++) {
         push @calendar_days, {
             day         => $i, # 1-31
@@ -1329,25 +1321,30 @@ sub archive_calendars {
         };
     }
 
+    my $prev_ym = $first_of_month->clone->subtract(months => 1)->strftime('%Y/%m');
+    my $next_ym = $first_of_month->clone->add(     months => 1)->strftime('%Y/%m');
+
     my @breadcrumbs = (
         # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
         # to uri_for if we break "/series/" into a separate app
         { label => 'calendars', href => 'https://bacds.org/calendars/' },
         { label => $year,       href => "https://bacds.org/calendars/$year/" },
         { label => Month_to_Text($month),
-          href => sprintf "https://bacds.org/calendars/$year/%02d/", $month,
+          href => sprintf "https://bacds.org/calendars/$year/%02d", $month,
         },
     );
 
     template 'archive-calendars/month.html' => {
-        events        => \@events,
-        venues        => \@venues,
-        month_name    => Month_to_Text($month),
-        year          => $year,
+        breadcrumbs   => \@breadcrumbs,
         calendar_days => \@calendar_days,
+        events        => \@events,
+        month_name    => Month_to_Text($month),
         page_title    => "Calendar for $month/$year",
         season        => get_season(),
-        breadcrumbs   => \@breadcrumbs,
+        venues        => \@venues,
+        year          => $year,
+        prev_ym       => $prev_ym,
+        next_ym       => $next_ym,
     },
     # gets the wrapper from views/layouts/<whatever>
     { layout => 'scheduler-page' },

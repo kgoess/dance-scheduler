@@ -112,3 +112,9 @@ table tr th.caltitle {
 .monthly-calendar-list div {
     padding-top: 10px;
 }
+
+.prev-next-month-links {
+    display: flex;
+    justify-content: space-between;
+}
+

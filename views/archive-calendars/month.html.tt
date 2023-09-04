@@ -6,9 +6,8 @@
 
 <table>
     <tr>
-        <th colspan="7" class="calendar_title"><% month_name %> <% year %>
+        <th colspan="7" class="calendar_title"><% month_name %> <% year %></th>
     </tr>
-    <tr>
         <th class="calendar">Su</th>
         <th class="calendar">M</th>
         <th class="calendar">Tu</th>
@@ -40,8 +39,15 @@
             <%- END %>
         <%- END %>
     </tr>
+    <tr>
+        <td colspan="7">
+            <div class="prev-next-month-links">
+                <a href="/calendars/<% prev_ym %>/">&lt;&lt;&lt; previous</a>
+                <a href="/calendars/<% next_ym %>/">next &gt;&gt;&gt;</a>
+            </div>
+        </td>
+    <tr>
 </table>
-
 <hr>
 <h1>Schedule of Events</h1>
 <table>
