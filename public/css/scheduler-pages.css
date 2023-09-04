@@ -57,11 +57,14 @@
   }
 }
 .body-and-sidebar {
-  /* needs border to match up with the navbar boarder otherwise you see the
+  /* needs border to match up with the navbar border otherwise you see the
    * step */
   border-top: 2px solid var(--header-background-color);
   display: flex;
   flex-direction: column;
+}
+.body-and-sidebar p {
+  max-width: 50em;
 }
 .body-bottom {
   display: flex;
@@ -69,6 +72,9 @@
   padding: 1px; /* separates the special event box from the nav column */
 }
 @media (min-width: 600px) {
+  .dancefinder.body-and-sidebar {
+    padding-left: 20px;
+  }
   .body-bottom {
     flex-direction: row;
   }

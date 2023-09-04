@@ -1,5 +1,5 @@
 <%# This template is wrapped by views/layouts/scheduler-page.tt %>
-<div class="body-and-sidebar">
+<div class="body-and-sidebar dancefinder">
 <a name="top"></a><h1>Find a dance near you!</h1>
 <p>
 This convenient form will help you prepare a customized dance calendar.
