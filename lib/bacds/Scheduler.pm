@@ -1230,6 +1230,7 @@ sub _details_for_series {
     $data->{season} = get_season();
 
     template($template, $data,
+        # gets the wrapper from views/layouts/<whatever>
         { layout => 'scheduler-page' },
     );
 };
@@ -1358,15 +1359,18 @@ See also "GET /calendars/yyyy/mm/" => archive_calendars above.
 get '/calendars/' => \&archive_calendars_index;
 
 sub archive_calendars_index {
+    my @breadcrumbs = (
+        # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
+        # to uri_for if we break "/series/" into a separate app
+        { label => 'Archive Calendars', href => 'https://bacds.org/calendars/' },
+    );
     template 'archive-calendars/index.html' => {
+        page_title => 'Archive Calendars',
         current_year => get_today()->year,
-        virtual_include => {
-            mod_header => _virtual_include('common/mod_header.html'),
-            mod_footer => _virtual_include('common/mod_footer.html'),
-        }
+        season => get_season(),
     },
-    # no wrapper
-    { layout => undef },
+    # gets the wrapper from views/layouts/<whatever>
+    { layout => 'scheduler-page' },
 }
 
 

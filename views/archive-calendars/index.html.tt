@@ -1,7 +1,5 @@
-<html>
-<head>
-</head>
-<body>
+<%# This template is wrapped by views/layouts/scheduler-page.tt %>
+<div class="body-and-sidebar">
 <%-
 month_name = {
     '1' => 'Jan',
@@ -19,6 +17,11 @@ month_name = {
 };
 years = [2003 .. 2023]
 %>
+<h1>Online Calendars</h1>
+
+<p>
+You'll find links to historical and future BACDS event and series schedules here.
+</p>
 <table class="main" width="100%" cellspacing="7" cellpadding="3" border="0">
 <%- FOR year IN years.reverse %>
    <tr>
@@ -29,6 +32,9 @@ years = [2003 .. 2023]
             <% END %>
       </td>
    </tr>
+  <% IF (year - 1) % 5 == 0 %>
+      <tr><td>&nbsp;</td></tr>
+  <% END %>
 <% END %>
 
 <tr>
@@ -66,6 +72,8 @@ years = [2003 .. 2023]
 <a href="dec01.html">Dec</a>
 </td>
 </tr>
+
+<tr><td>&nbsp;</td></tr>
 
 <tr>
 <td valign="top" align="left">
@@ -130,5 +138,6 @@ years = [2003 .. 2023]
 </tr>
 </table>
 
-</body>
-</html>
+<p>&nbsp;</p>
+
+</div>
