@@ -1213,7 +1213,7 @@ sub _details_for_series {
                 : (),
         ];
     }
-    
+
 
     my $template = request->path() eq '/serieslister'
         ? 'serieslister/upcoming-events'
@@ -1259,7 +1259,7 @@ sub get_season {
 }
 
 
-=head2 GET /calendars
+=head2 GET /calendars/yyyy/mm/
 
 This is the replacement for
 
@@ -1271,6 +1271,8 @@ created by the old cgi-bin/calendar2.pl and dumped to disk.
 The routing is handled by this rule in calendars/.htaccess
 
     RewriteRule "^(202[3456789]/.*/)" /dance-scheduler/calendars/$1
+
+See also "GET /calendars" => archive_calendars_index below.
 
 =cut
 
@@ -1332,6 +1334,32 @@ sub archive_calendars {
         month_name    => Month_to_Text($month),
         year          => $year,
         calendar_days => \@calendar_days,
+        virtual_include => {
+            mod_header => _virtual_include('common/mod_header.html'),
+            mod_footer => _virtual_include('common/mod_footer.html'),
+        }
+    },
+    # no wrapper
+    { layout => undef },
+}
+
+
+=head2 GET /calendars
+
+This is the replacement for the index page that shows the list of historical
+calendars available:
+
+    https://bacds.org/calendars
+
+See also "GET /calendars/yyyy/mm/" => archive_calendars above.
+
+=cut
+
+get '/calendars/' => \&archive_calendars_index;
+
+sub archive_calendars_index {
+    template 'archive-calendars/index.html' => {
+        current_year => get_today()->year,
         virtual_include => {
             mod_header => _virtual_include('common/mod_header.html'),
             mod_footer => _virtual_include('common/mod_footer.html'),
