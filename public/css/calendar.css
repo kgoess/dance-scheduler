@@ -104,3 +104,11 @@ table tr th.caltitle {
     margin-left: 10px;
     margin-bottom: 40px;
 }
+
+.monthly-calendar-list {
+    margin-left: 50px;
+}
+
+.monthly-calendar-list div {
+    padding-top: 10px;
+}

@@ -1348,15 +1348,41 @@ sub archive_calendars {
         page_title    => "Calendar for $month/$year",
         season        => get_season(),
         breadcrumbs   => \@breadcrumbs,
-        virtual_include => {
-            mod_header => _virtual_include('common/mod_header.html'),
-            mod_footer => _virtual_include('common/mod_footer.html'),
-        }
     },
     # gets the wrapper from views/layouts/<whatever>
     { layout => 'scheduler-page' },
 }
 
+=head2 GET /calendars/yyyy
+
+For years 2023 onward, we want to replicate the old on-disk behavior of having
+/calendars/yyyy/ being a useable link.
+
+=cut
+
+get '/calendars/:year/' => with_types [
+    'optional' => ['route', 'year', 'PathYear'],
+] => \&archive_calendars_year;
+
+sub archive_calendars_year {
+    my $year  = route_parameters->get('year');
+
+    my @breadcrumbs = (
+        # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
+        # to uri_for if we break "/series/" into a separate app
+        { label => 'calendars', href => 'https://bacds.org/calendars/' },
+        { label => $year,       href => "https://bacds.org/calendars/$year/" },
+    );
+
+    template 'archive-calendars/year.html' => {
+        year          => $year,
+        page_title    => "Calendars for $year",
+        season        => get_season(),
+        breadcrumbs   => \@breadcrumbs,
+    },
+    # gets the wrapper from views/layouts/<whatever>
+    { layout => 'scheduler-page' },
+}
 
 =head2 GET /calendars
 
