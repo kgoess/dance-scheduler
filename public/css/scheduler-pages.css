@@ -86,7 +86,7 @@ aside.sidebar {
 /* end flexbox layout */
 
 body {
-  width: fit-content;
+  width: auto;
 }
 
 aside.sidebar {
