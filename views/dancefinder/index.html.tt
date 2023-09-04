@@ -1,4 +1,5 @@
-<%# the wrapper for this file is views/layouts/dancefinder.tt %>
+<%# This template is wrapped by views/layouts/scheduler-page.tt %>
+<div class="body-and-sidebar">
 <a name="top"></a><h1>Find a dance near you!</h1>
 <p>
 This convenient form will help you prepare a customized dance calendar.
@@ -119,3 +120,4 @@ Which styles:
   </p>
 </form>
 
+</div>

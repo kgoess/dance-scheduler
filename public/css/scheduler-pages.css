@@ -78,7 +78,6 @@ main {
   flex-grow: 3;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* forces the mission-statement to the bottom */
 }
 aside.sidebar {
   flex-basis: 25%;
@@ -221,6 +220,10 @@ main .event-content-title {
 @media (min-width: 600px) {
   .collapsible-section.nav {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--nav-background);
   }
 }
 @media (min-width: 600px) {
@@ -339,13 +342,8 @@ aside.mission-statement.mobile-only {
   size: auto;
 }
 aside.mission-statement.desktop-only {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-top: .5em;
-  padding-bottom: .5em;
-  margin-bottom: 0px;
-  width: 36em;
   display: none;
+  border-bottom: 1px solid white;
 }
 @media (min-width: 600px) {
   aside.mission-statement.mobile-only {
@@ -388,6 +386,7 @@ footer {
   color: var(--header-color);
   font-style: italic;
   font-size: 0.8em;
+  text-align: center;
 }
 footer a {
   color: var(--header-color);

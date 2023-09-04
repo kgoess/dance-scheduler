@@ -831,25 +831,25 @@ get '/dancefinder' => sub {
     }
     @styles = sort { $a->[1] cmp $b->[1] } @styles;
 
+    my @breadcrumbs = (
+        # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
+        # to uri_for if we break "/series/" into a separate app
+        { label => 'Dance Finder', href => 'https://bacds.org/dancefinder/' },
+    );
+
     template 'dancefinder/index.html' => {
         bacds_uri_base => 'https://www.bacds.org/',
-        title => 'Find A Dance Near You!',
+        page_title => 'Find A Dance Near You!',
         callers => \@callers,
         venues  => \@venues,
         bands   => \@bands,
         musos   => \@musos,
         styles  => \@styles,
-        virtual_include => {
-            copyright => _virtual_include('/shared/copyright.html'),
-            carousel  => _virtual_include('/shared/cd-carousel.html'),
-            menu      => _virtual_include('/shared/menu.html'),
-            meta_tags => _virtual_include('/shared/meta-tags.html'),
-            navbar    => _virtual_include('/shared/navbar.html'),
-        },
-
+        season  => get_season(),
+        breadcrumbs => \@breadcrumbs,
     },
-    # get the wrapper from views/layouts/<whatever>
-    { layout => 'dancefinder' },
+    # gets the wrapper from views/layouts/<whatever>
+    { layout => 'scheduler-page' },
 
 };
 
@@ -1230,7 +1230,7 @@ sub _details_for_series {
     $data->{season} = get_season();
 
     template($template, $data,
-        {layout => undef},
+        { layout => 'scheduler-page' },
     );
 };
 
