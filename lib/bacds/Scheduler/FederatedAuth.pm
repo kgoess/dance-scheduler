@@ -248,7 +248,7 @@ sub check_facebook_auth {
         my $fb = Facebook::OpenGraph->new({
             app_id => '430760472446636',
             secret => $secret,
-            version => 'v14.0',
+            version => 'v18.0',
             ua => $ua,
             access_token => $access_token,
             #namespace =>
