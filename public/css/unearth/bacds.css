@@ -32,27 +32,9 @@
     font-style: italic;
 }
 
-/* if there's multiple photos */
-.event-photos-collage {
-    height: 500px;
-    display: grid;
-    grid-template-columns: repeat(var(--data-collage-width), 1fr);
-    grid-template-rows: repeat(var(--data-collage-width), 1fr);
-    aspect-ratio: 1;
-    padding: 2rem;
-}
-
-/* give them a little overlap */
-.event-photos-collage .polaroid-container {
-    margin: -5px;
-}
-
 .polaroid-container {
-    transform: rotate(-5deg);
-}
-
-.row:nth-child(even) .polaroid-container {
-    transform: rotate(5deg);
+    transform: rotate(var(--data-polaroid-rotate));
+    margin: -5px;
 }
 
 .event-photo .polaroid-container {
@@ -98,8 +80,9 @@
     font-family: "Just Another Hand";
     text-align: center;
     color: gray;
-    font-size: 140%;
-    
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
+    overflow: hidden;
 }
     
 
