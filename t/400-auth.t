@@ -145,7 +145,7 @@ sub test_bacds_login {
     };
     warning_is {
         $res = $test->request(POST '/bacds-signin', $bad_params);
-    } qq{login failure for nobody\@evil.ru: No programmer found for 'nobody\@evil.ru'\n};
+    } qq{bacds-signin login failure for nobody\@evil.ru: No programmer found for 'nobody\@evil.ru'\n};
     is $res->code, 401, 'got 401';
     like $res->content, qr{Unauthorized!}, 'bad request';
 
@@ -175,7 +175,7 @@ sub test_bacds_login {
     };
     warning_is {
         $res = $test->request(POST '/bacds-signin', $wrong_pw_params);
-    } qq{login failure for bacds\@loginner.com: Incorrect password\n};
+    } qq{bacds-signin login failure for bacds\@loginner.com: Incorrect password\n};
     is $res->code, 401, 'wrong pw gets a 401';
     like $res->content, qr{Unauthorized!}, 'bad request gets "Unauthorized"';
 

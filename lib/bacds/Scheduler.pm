@@ -178,6 +178,7 @@ post '/google-signin' => sub {
 
     if ($err) {
         my ($code, $msg) = @$err;
+        warn "google-signin->check_google_auth returned error $code $msg\n";
         send_error $msg => $code;
     }
 
@@ -212,6 +213,7 @@ post '/facebook-signin' => sub {
 
     if ($err) {
         my ($code, $msg) = @$err;
+        warn "facebook-signin->check_facebook_auth returned error $code $msg\n";
         send_error $msg => $code;
     }
 
@@ -246,7 +248,7 @@ post '/bacds-signin' => sub {
 
     if ($err) {
         my ($code, $msg) = @$err;
-        warn "login failure for $programmer_email: $msg\n";
+        warn "bacds-signin login failure for $programmer_email: $msg\n";
         send_error $msg => $code;
     }
 
