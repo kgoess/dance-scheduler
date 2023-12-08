@@ -175,34 +175,21 @@
   </div>
   <div class="site-section">
     <div class="event-section mb-2" id="tonight-section">
-        <div class="container">
-            <h2 class="mb-3 text-black">Today&rsquo;s Dances &amp; Events</h2>
-	     <br>
-         <div class="row d-flex no-gutters align-items-stretch" id="tonight-section">
-           <div class="col-12 col-lg-6 event-image" style="background-image: url('images/unearth/rodney miller.jpg');" data-aos="fade-right" data-aos-delay=""> </div>
-           <div class="col-lg-5 ml-auto p-lg-5 mt-4 mt-lg-0" data-aos="fade-left" data-aos-delay="">
-<h3 class="mb-3" text-red">NOTE: these past events are  only examples to show off photos!</h3>
-            <!--<p><b>During the Coronavirus pandemic, all our in-person events are canceled. Join us for today&rsquo;s <i>online</i> events:</b></p>-->
-            <p class="listing"> <span class="event-date">Saturday, July 11, 2020 <b>[PAST EVENT! Just showing off photos in listings]</b>: </span> 
-              <!-- loc="ONLINE" ->
-
-<!-- band="Rodney Miller in a special <b>NBCDS Online Tunebook Kickoff Party</b>, 7pm&ndash;8pm PDT " --> 
-              <strong>ONLINE Waltz</strong> in the cloud. 
-              <!-- band="Rodney Miller in a special <b>NBCDS Online Tunebook Kickoff Party</b>, 7pm&ndash;8pm PDT " --> 
-              Music by Rodney Miller in a special <b>NBCDS Online Tunebook Kickoff Party</b>, 7pm&ndash;8pm PDT <em><b>Not a BACDS event</b> &mdash; this event is sponsored by our sister organization the North Bay Country Dance Society; More info and link to the meeting are at <a href=https://nbcds.org/event/saturday-evening-party-rodney-miller-tunebook-kickoff-party/>https://nbcds.org</a> or <a href=https://www.facebook.com/events/338518500507309/>FaceBook</a></em>. </p>
-            <!--<p> See <a href="https://www.cdss.org/community/covid19/online-events">CDSS.org</a> for more online music &amp; dance events. </p>-->
-           </div>
-         </div>
+      <div class="container">
+        <h2 class="mb-3 text-black">Today's Dances &amp; Events</h2>
+        <br>
+        <% include unearth/listings.tt events => today, left_right_flipper => 1 %>
       </div>
     </div>
-      <hr />
-      <div class="event-section" id="upcoming-section">
-        <div class="container">
-              <h2 class="mb-3 text-black">Upcoming Dances &amp; Events</h2>
-	      <br>
-          <% include unearth/listings.tt events => eighteen_days %>
+    <hr />
+    <div class="event-section" id="upcoming-section">
+      <div class="container">
+        <h2 class="mb-3 text-black">Upcoming Dances &amp; Events</h2>
+        <br>
+        <% include unearth/listings.tt events => eighteen_days, left_right_flipper => 0 %>
       </div>
     </div>
+  </div>
     <div class="site-section" id="calendar-section">
       <div class="container">
         <div class="row mb-5 justify-content-center">

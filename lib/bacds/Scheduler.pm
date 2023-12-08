@@ -1441,8 +1441,10 @@ sub archive_calendars_index {
 get '/test' => sub {
 
     my $end_date = get_today()->add(days=>18)->ymd;
+    my $start_date = get_today()->add(days=>1)->ymd;
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
        end_date   => $end_date,
+       start_date => $start_date,
     #   style      => \@style_ids,
     #   dbix_debug => $verbose,
     #   db         => $db,

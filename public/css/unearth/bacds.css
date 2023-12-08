@@ -1,3 +1,14 @@
+.event-section {
+    padding-bottom: 1em;
+}
+
+#tonight-section {
+    background-color: #f5ca94;
+    box-shadow: 0 0 15px 0px #875920;
+    font-size: 130%;
+}
+
+
 .special-event-name {
     font-size: 120%;
     font-weight: bolder;

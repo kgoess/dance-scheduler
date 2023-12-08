@@ -73,7 +73,7 @@ END %>
 <% FOREACH event IN events %>
     <% aos_attrs1 = "data-aos-delay=\"\" ";
     aos_attrs2 = "data-aos-delay=\"\" ";
-    IF loop.odd;
+    IF left_right_flipper;
         aos_attrs1 = aos_attrs1 _ "data-aos=\"fade-right\"";
         aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-left\"";
     ELSE;
@@ -126,7 +126,7 @@ END %>
             </div><% #end photo nested row %>
         </div><% #end photo outer col %>
         <div class="<% classes_for_event(event);
-            IF loop.even;
+            IF !left_right_flipper;
                 ' order-lg-first';
             END %>"
             <% aos_attrs2 %>
@@ -185,4 +185,9 @@ END %>
             </div>
         </div>
     </div> <!-- end row -->
+    <% IF left_right_flipper;
+    left_right_flipper = 0;
+    ELSE;
+    left_right_flipper = 1;
+    END; %>
 <% END %>
