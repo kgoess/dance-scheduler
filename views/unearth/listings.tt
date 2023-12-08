@@ -62,8 +62,10 @@ END %>
         style="--data-polaroid-rotate: <% 10-Math.rand(20) %>deg"
     >
         <div class="polaroid-frame">
-            <img class="event-inner-image" src="<% entity.photo_url %>">
-            <div class="polaroid-caption"><% entity.name %></div>
+            <div class="event-inner-image-container">
+                <img class="event-inner-image" src="<% entity.photo_url %>">
+            </div>
+            <div class="polaroid-caption"><% entity.name || entity.full_name %></div>
         </div>
     </div>
 <% END %>
