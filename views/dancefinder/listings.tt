@@ -94,39 +94,47 @@ page.
 
 
 <%- FOREACH event IN events %>
-    <div <% special_class(event) %>>
     <p class="listing<% IF event.is_canceled %> canceled-event<% END %>">
     <%- event_date(event) -%>:
-    <% IF event.teams -%>
+    <%- IF event.long_desc -%>
         <%- IF event.name -%>
             <%- event_name(event) %>
-            with 
+            (<%- event_styles(event) -%>)
+            <%- event_venues(event) -%>
         <%- END -%>
-        <% event_teams(event) %>
-        (<%- event_styles(event) -%>)
-        <%- event_callers_and_bands(event) -%>
-        <%- event_talent(event) -%>
-        <%- event_venues(event) -%>
-    <% ELSIF event.styles.grep('^SPECIAL$') && event.name %>
-        <%- event_name(event) %>
-        (&nbsp;<%- event_styles(event) -%>&nbsp;)
-        <%- event_venues(event) -%>
-        <%- event_callers_and_bands(event) -%>
-        <%- event_talent(event) -%>
-    <% ELSE %>
-        <strong><%- event_styles(event) -%></strong>
-        <%- event_venues(event) -%>
-        <%- event_callers_and_bands(event) -%>
-        <%- event_talent(event) -%>
-        <%- IF event.name -%>
-            <%- event_name(event) -%>
+        <br />
+        <%- event.long_desc -%>
+    <%- ELSE -%>
+        <% IF event.teams -%>
+            <%- IF event.name -%>
+                <%- event_name(event) %>
+                with 
+            <%- END -%>
+            <% event_teams(event) %>
+            (<%- event_styles(event) -%>)
+            <%- event_callers_and_bands(event) -%>
+            <%- event_talent(event) -%>
+            <%- event_venues(event) -%>
+        <% ELSIF event.styles.grep('^SPECIAL$') && event.name %>
+            <%- event_name(event) %>
+            (&nbsp;<%- event_styles(event) -%>&nbsp;)
+            <%- event_venues(event) -%>
+            <%- event_callers_and_bands(event) -%>
+            <%- event_talent(event) -%>
+        <% ELSE %>
+            <strong><%- event_styles(event) -%></strong>
+            <%- event_venues(event) -%>
+            <%- event_callers_and_bands(event) -%>
+            <%- event_talent(event) -%>
+            <%- IF event.name -%>
+                <%- event_name(event) -%>
+            <%- END -%>
+        <% END %>
+        <% IF event.short_desc %> - <% END %><% event.short_desc %>
+        <%- IF event.custom_url || event.series.series_url -%>
+            <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
         <%- END -%>
-    <% END %>
-    <% IF event.short_desc %> - <% END %><% event.short_desc %>
-    <%- IF event.custom_url || event.series.series_url -%>
-        <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
     <%- END -%>
-
     </p>
     </div>
 <% END %>
