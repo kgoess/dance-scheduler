@@ -110,8 +110,8 @@
       help: >
         This is for things like special events where there are too many bands
         and talent for the regular display logic to make sense. If you put anything in
-        this field it will replace the default "at <location>. <caller1, caller2> with
-        <band1, band2> music by <muso1, muso2>" on the main listing on the front page.
+        this field it will replace the default "at &lt;location&gt;. &lt;caller1, caller2&gt; with
+        &lt;band1, band2&gt; music by &lt;muso1, muso2&gt;" on the main listing on the front page.
     - label: Custom URL
       name: custom_url
       type: text
