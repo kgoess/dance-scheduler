@@ -108,8 +108,10 @@
       required: 0
       type: textarea
       help: >
-        This might be useful for one-off special events so we can host the
-        entire page here in the app, but is currently unused.
+        This is for things like special events where there are too many bands
+        and talent for the regular display logic to make sense. If you put anything in
+        this field it will replace the default "at <location>. <caller1, caller2> with
+        <band1, band2> music by <muso1, muso2>" on the main listing on the front page.
     - label: Custom URL
       name: custom_url
       type: text
