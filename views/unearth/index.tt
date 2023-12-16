@@ -189,6 +189,14 @@
         <% include unearth/listings.tt events => eighteen_days, left_right_flipper => 0 %>
       </div>
     </div>
+    <hr />
+    <div class="event-section" id="special-section">
+      <div class="container">
+        <h2 class="mb-3 text-black">Special Events</h2>
+        <br>
+        <% include unearth/listings.tt events => special, left_right_flipper => 0 %>
+      </div>
+    </div>
   </div>
     <div class="site-section" id="calendar-section">
       <div class="container">
