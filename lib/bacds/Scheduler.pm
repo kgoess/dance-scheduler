@@ -1404,7 +1404,7 @@ sub archive_calendars_index {
     );
     template 'archive-calendars/index.html' => {
         page_title => 'Archive Calendars',
-        current_year => get_today()->year,
+        end_year => get_today()->add(months => 8)->year,
         season => get_season(),
     },
     # gets the wrapper from views/layouts/<whatever>

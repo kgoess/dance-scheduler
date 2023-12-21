@@ -15,7 +15,7 @@ month_name = {
     '11' => 'Nov',
     '12' => 'Dec',
 };
-years = [2003 .. 2023]
+years = [2003 .. end_year]
 %>
 <h1>Online Calendars</h1>
 
