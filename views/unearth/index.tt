@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="css/unearth/owl.theme.default.min.css">
 <link rel="stylesheet" href="fonts/unearth/flaticon/font/flaticon.css">
 <link rel="stylesheet" href="css/unearth/aos.css">
-
+<link rel="stylesheet" href="/javascript/fullcalendar-1.6.4/fullcalendar/fullcalendar.css">
+<link rel="stylesheet" media="print" href="/javascript/fullcalendar-1.6.4/fullcalendar/fullcalendar.print.css">
 
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Just+Another+Hand:wght@400&display=swap" rel="stylesheet">
@@ -20,6 +21,10 @@
 <!-- MAIN CSS -->
 <link rel="stylesheet" href="css/unearth/style.css">
 <link rel="stylesheet" href="css/unearth/bacds.css">
+<script>
+var bacds = {};
+bacds.baseUri = '<% request.uri_base %>';
+</script>
 </head>
 <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
 <div id="overlayer"></div>
@@ -176,51 +181,48 @@
   <div class="site-section">
     <div class="event-section mb-2" id="tonight-section">
       <div class="container">
-        <h2 class="mb-3 text-black">Today's Dances &amp; Events</h2>
-        <br>
+        <div class="mb-5 text-center block-heading-1" data-aos="fade-up" data-aos-delay=""><h2>Today's Dances &amp; Events</h2></div>
         <% include unearth/listings.tt events => today, left_right_flipper => 1 %>
       </div>
     </div>
-    <hr />
     <div class="event-section" id="upcoming-section">
       <div class="container">
-        <h2 class="mb-3 text-black">Upcoming Dances &amp; Events</h2>
-        <br>
+        <div class="mb-5 text-center block-heading-1" data-aos="fade-up" data-aos-delay=""><h2>Upcoming Dances &amp; Events</h2></div>
         <% include unearth/listings.tt events => eighteen_days, left_right_flipper => 0 %>
       </div>
     </div>
-    <hr />
-    <div class="event-section" id="special-section">
+    <div class="event-section bg-light" id="special-section">
       <div class="container">
-        <h2 class="mb-3 text-black">Special Events</h2>
-        <br>
+        <div class="mb-5 text-center block-heading-1" data-aos="fade-up" data-aos-delay=""><h2>Special Events</h2></div>
         <% include unearth/listings.tt events => special, left_right_flipper => 0 %>
       </div>
     </div>
   </div>
     <div class="site-section" id="calendar-section">
       <div class="container">
-        <div class="row mb-5 justify-content-center">
-          <div class="col-md-7 text-center">
-            <div class="block-heading-1" data-aos="fade-up" data-aos-delay="">
-              <a href="https://bacds.org/livecalendar.html"><h2>Calendar</h2></a>
+        <div class="row mb-5 justify-content-center" data-aos="fade" data-aos-delay="">
+          <div class="col-md-12 text-center">
+            <div class="block-heading-1">
+              <h2>Calendar</h2>
             </div>
+            <div id="calendar"></div>
           </div>
         </div>
       </div>
     </div>
-    <div class="site-section" id="dancefinder-section">
+    <div class="site-section bg-light" id="dancefinder-section">
       <div class="container">
         <div class="row mb-5 justify-content-center">
           <div class="col-md-7 text-center">
             <div class="block-heading-1" data-aos="fade-up" data-aos-delay="">
-              <a href="https://bacds.org/dance-scheduler/dancefinder"><h2>Dance Finder</h2></a>
+              <h2>Dance Finder</h2>
+<% include dancefinder/index.html.tt %>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="site-section bg-light block-13" id="testimonials-section" data-aos="fade">
+    <div class="site-section block-13" id="testimonials-section" data-aos="fade">
       <div class="container">
         <div class="text-center mb-5">
           <div class="block-heading-1">
@@ -312,5 +314,7 @@
 <script src="js/unearth/jquery.easing.1.3.js"></script> 
 <script src="js/unearth/aos.js"></script> 
 <script src="js/unearth/main.js"></script>
+<script src="js/unearth/bacds.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 </body>
 </html>

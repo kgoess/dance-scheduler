@@ -27,6 +27,7 @@ use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Dancer2::Plugin::ParamTypes;
 use Date::Calc qw(Today Days_in_Month Day_of_Week Month_to_Text);
 use Data::Dump qw/dump/;
+use DateTime::Format::ISO8601;
 use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
@@ -69,9 +70,13 @@ register_type_check 'SchedulerId' => sub {
     return 1;
 };
 register_type_check 'Timestamp' => sub {
-    return unless looks_like_number( $_[0] );
-    return unless $_[0] >= 0;
-    return 1;
+    if( looks_like_number( $_[0] )){
+      return unless $_[0] >= 0;
+      return 1;
+    } elsif ( $_[0] =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/){
+      return 1;
+    }
+    return;
 };
 # usable for series.series_xid or venue.vkey
 register_type_check 'XID' => sub {
@@ -791,7 +796,29 @@ Replacing the old dancefinder cgi, display the form
 =cut
 
 get '/dancefinder' => sub {
+    my ($callers, $venues, $bands, $musos, $styles) = _dancefinder_data();
+    my @breadcrumbs = (
+        # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
+        # to uri_for if we break "/series/" into a separate app
+        { label => 'Dance Finder', href => 'https://bacds.org/dancefinder/' },
+    );
+    template 'dancefinder/index.html' => {
+        bacds_uri_base => 'https://www.bacds.org/',
+        page_title => 'Find A Dance Near You!',
+        callers => $callers,
+        venues  => $venues,
+        bands   => $bands,
+        musos   => $musos,
+        styles  => $styles,
+        season  => get_season(),
+        breadcrumbs => \@breadcrumbs,
+    },
+    # gets the wrapper from views/layouts/<whatever>
+    { layout => 'scheduler-page' },
 
+};
+
+sub _dancefinder_data {
     my $data = bacds::Scheduler::Model::DanceFinder
         ->related_entities_for_upcoming_events();
 
@@ -833,25 +860,12 @@ get '/dancefinder' => sub {
     }
     @styles = sort { $a->[1] cmp $b->[1] } @styles;
 
-    my @breadcrumbs = (
-        # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
-        # to uri_for if we break "/series/" into a separate app
-        { label => 'Dance Finder', href => 'https://bacds.org/dancefinder/' },
-    );
-
-    template 'dancefinder/index.html' => {
-        bacds_uri_base => 'https://www.bacds.org/',
-        page_title => 'Find A Dance Near You!',
-        callers => \@callers,
-        venues  => \@venues,
-        bands   => \@bands,
-        musos   => \@musos,
-        styles  => \@styles,
-        season  => get_season(),
-        breadcrumbs => \@breadcrumbs,
-    },
-    # gets the wrapper from views/layouts/<whatever>
-    { layout => 'scheduler-page' },
+    return 
+       \@callers,
+       \@venues,
+       \@bands,
+       \@musos,
+       \@styles;
 
 };
 
@@ -986,8 +1000,14 @@ get '/livecalendar-results' => with_types [
 ] => sub {
     my $start = query_parameters->{start};
     my $end   = query_parameters->{end};
-    my $start_date = DateTime->from_epoch(epoch => $start)->ymd;
-    my $end_date   = DateTime->from_epoch(epoch => $end  )->ymd;
+    my ($start_date, $end_date);
+    if ($start =~ /^[0-9]+$/){
+      $start_date = DateTime->from_epoch(epoch => $start)->ymd;
+      $end_date   = DateTime->from_epoch(epoch => $end  )->ymd;
+    } else {
+      $start_date = DateTime::Format::ISO8601->parse_datetime($start);
+      $end_date = DateTime::Format::ISO8601->parse_datetime($end);
+    }
 
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
         start_date => $start_date,
@@ -1051,10 +1071,11 @@ get '/livecalendar-results' => with_types [
         push $ret, {
             id => $event->event_id, # in dancefinder.pl this is just $i++
             url => $url,
-            start => $event->start_date ? $event->start_date->ymd : '',
-            end => $event->end_date ? $event->end_date->ymd : '',
+            start => $event->start_date ? $event->start_date->ymd . 'T' . $event->start_time : '',
+            end => ($event->end_date ? $event->end_date->ymd : $event->start_date->ymd) . 'T' . ($event->end_time || '00:00:00'),
             title => $titlestring,
-            allDay => true,
+            #allDay => true,
+            eventColor => $colors->{bgcolor},
             backgroundColor => $colors->{bgcolor},
             borderColor => $colors->{bordercolor},
             textColor => $colors->{textcolor},
@@ -1473,12 +1494,19 @@ get '/test' => sub {
     #   dbuser     => $dbuser
     );
     my @special = $rs->all;
-        
+
+    my ($callers, $venues, $bands, $musos, $styles) = _dancefinder_data();
+#    template 'dancefinder/index.html' => {
 
     template 'unearth/index' => {
         eighteen_days => \@eighteen_days,
         today => \@today,
         special => \@special,
+        callers => $callers,
+        venues  => $venues,
+        bands   => $bands,
+        musos   => $musos,
+        styles  => $styles,
     },
     {layout => undef},
 };
