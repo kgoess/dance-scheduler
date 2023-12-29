@@ -1067,14 +1067,26 @@ get '/livecalendar-results' => with_types [
         } elsif (my $series = $event->series) {
             $url = $series->series_url;
         }
+        my $start_date = $event->start_date->ymd;
+        my $end_date = ($event->end_date ? $event->end_date : $event->start_date);
+        my $allDay = $start_date ne $end_date->ymd;
+        if ($allDay) {
+            $end_date->add(days=>1);
+        } elsif ($event->end_time eq '00:00:00'){
+            $end_date = '';
+        } else {
+            $end_date = $end_date->ymd;
+        }
+        
 
         push $ret, {
             id => $event->event_id, # in dancefinder.pl this is just $i++
             url => $url,
-            start => $event->start_date ? $event->start_date->ymd . 'T' . $event->start_time : '',
-            end => ($event->end_date ? $event->end_date->ymd : $event->start_date->ymd) . 'T' . ($event->end_time || '00:00:00'),
+            start => $start_date . 'T' . $event->start_time,
+            ($end_date ? (end => $end_date . ($event->end_time ne '00:00:00' ? 'T' . $event->end_time : '')):()),
+            #TODO: check for NULL
             title => $titlestring,
-            #allDay => true,
+            ($allDay ? (allDay => $allDay) : ()),
             eventColor => $colors->{bgcolor},
             backgroundColor => $colors->{bgcolor},
             borderColor => $colors->{bordercolor},

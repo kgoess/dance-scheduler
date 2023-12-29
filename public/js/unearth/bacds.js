@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     headerToolbar: { center: 'dayGridMonth,timeGridWeek' }, // buttons for switching between views
 
+      defaultTimedEventDuration: '02:30',
     events: {   
       url: bacds.baseUri+'/livecalendar-results',
       failure: function() {
