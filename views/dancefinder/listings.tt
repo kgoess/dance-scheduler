@@ -39,13 +39,13 @@ page.
 <%- END -%>
 
 <%- MACRO event_styles(event) BLOCK -%>
-    <%- FOREACH style IN event.styles %>
+    <%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) %>
         <%- style.name %><% IF !loop.last() %>/<% END %>
     <%- END %>
 <%- END -%>
 
 <%- MACRO event_teams(event) BLOCK -%>
-    <%- FOREACH team IN event.teams %>
+    <%- FOREACH team IN event.teams({}, { order_by => 'me.ordering' }) %>
         <%- IF loop.last() && !loop.first() %>and <% END %><% maybe_linkit(team.name, team.team_url) %>
         <%- IF !loop.last() %>, <% END %>
     <%- END %>
@@ -59,14 +59,14 @@ page.
 
 <%- MACRO event_callers_and_bands(event) BLOCK -%>
     <%- IF event.callers %>
-        <%- FOREACH caller IN event.callers %>
+        <%- FOREACH caller IN event.callers({}, { order_by => 'me.ordering' }) %>
             <% caller.name %><% IF !loop.last() %>, <% END %>
         <%- END %>
         <%- IF event.bands || event.talent %> with <% END %>
     <%- ELSE %>
         <%- IF event.bands || event.talent %> Music by <% END -%>
     <%- END -%>
-    <%- FOREACH band IN event.bands -%>
+    <%- FOREACH band IN event.bands({}, { order_by => 'me.ordering' }) -%>
         <%- maybe_linkit(band.name, band.url) -%>
         <%- IF loop.last() && event.talent %>: 
         <%- ELSIF !loop.last %>, 
@@ -75,7 +75,7 @@ page.
 <%- END -%>
 
 <%- MACRO event_talent(event) BLOCK -%>
-    <%- FOREACH talent IN event.talent -%>
+    <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
         <%- talent.name %><% IF !loop.last() %>, <% END -%>
     <%- END -%>
     <%- IF (event.bands || event.talent) && event.and_friends -%>&#8230;and friends<% END -%>
@@ -83,7 +83,7 @@ page.
 
 <%- MACRO event_venues(event) BLOCK -%>
     <%- IF event.venues %> at <% END %>
-    <%- FOREACH venue IN event.venues %>
+    <%- FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) %>
         <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
     <%- END %>
 <%- END -%>

@@ -158,7 +158,7 @@ sub get_row {
     my @mtms = $class->get_many_to_manys;
     foreach my $mtm (@mtms){
         my ($other_model, $other_table_name, $primary_key) = @$mtm;
-        my @others = $row->$other_table_name;
+        my @others = $row->$other_table_name({}, { order_by => 'me.ordering' });
         $other_tables->{$other_table_name} = \@others;
     }
 
@@ -430,6 +430,11 @@ sub _update_relationships {
         if ($incoming_data->{$primary_key}){
             # look up all the objects on the other end of the mappings
             my $i = 1;
+            my %ordering;
+            if (ref $incoming_data->{$primary_key} eq 'ARRAY') {
+                %ordering = map { $_ => $i++ } @{ $incoming_data->{$primary_key} };
+            }
+
             my @rs = $dbh->resultset($other_model)->search({
                 $primary_key => { '-in' => $incoming_data->{$primary_key} }
             });
@@ -437,9 +442,11 @@ sub _update_relationships {
             # add them in one at a time
             my $add = "add_to_$other_table_name";
             $row->$add($_, {
-                 ordering => $i++,
+                 ordering => $ordering{ $_->$primary_key } // 1,
              }) for @rs;
-            $other_tables->{$other_table_name} = \@rs;
+            $other_tables->{$other_table_name} = [
+                sort { $ordering{$a->$primary_key} <=> $ordering{$b->$primary_key} } @rs
+            ];
             @after = @rs;
         }
         else{

@@ -8,7 +8,7 @@ use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
 use Ref::Util qw/is_coderef/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use bacds::Scheduler;
 use bacds::Scheduler::Schema;
@@ -22,7 +22,7 @@ my $dbh = get_dbh();
 
 my ($Event, $Callered_Event);
 my ($Event_Id, $Callered_Event_Id);
-my ($Caller_Id);
+my ($Caller_Id, $Other_Caller_Id);
 
 
 # this could just use DBIx::Class to insert it directly
@@ -88,7 +88,6 @@ subtest 'POST /caller' => sub {
 
     my $new_caller = {
         name       => 'Rose Gamgee',
-        frequency  => 'fourth Trewsday',
         
     };
     $test->post_ok('/caller/', $new_caller );
@@ -180,7 +179,6 @@ subtest "PUT /event/# with caller" => sub {
 
     my $other_caller = {
         name        => 'Daffodil Brandybuck',
-        frequency   => 'monthly',
     };
     $test->post_ok('/caller/', $other_caller );
     ok($test->success, 'created caller');
@@ -212,6 +210,69 @@ subtest "PUT /event/# with caller" => sub {
             id => 2,
             name => 'Daffodil Brandybuck',
           }
+        ],
+    };
+    eq_or_diff $got->{callers}, $expected->{callers}, 'return matches';
+
+    $test->get_ok("/event/$Callered_Event_Id" );
+    $decoded = decode_json($test->content);
+    $got = $decoded->{data};
+
+    eq_or_diff $got->{callers}, $expected->{callers}, 'GET changed after PUT';
+
+    $Other_Caller_Id = $other_caller_id;
+};
+
+# I think this is the only test in the whole t/*.t test suite that submit
+# multiple entities, note that we're testing that we preserve ordering
+subtest "PUT /event/# with THREE callers" => sub {
+    plan tests => 7;
+
+    my ($expected, $modified_time, $decoded, $got);
+
+    my $third_caller = {
+        name        => 'Lilac Brandywine',
+    };
+    $test->post_ok('/caller/', $third_caller );
+    ok($test->success, 'created caller');
+
+    $decoded = decode_json($test->content);
+    my $third_caller_id = $decoded->{data}{caller_id};
+
+    my $edit_event = {
+        start_date  => "2022-05-03",
+        start_time  => "21:00",
+        end_date    => "2022-05-03",
+        end_time    => "23:00",
+        name        => "new name",
+        short_desc  => "new shortdef",
+        #venue_id    => [],
+        style_id   => [],
+        caller_id   => [$third_caller_id, $Caller_Id, $Other_Caller_Id],
+        is_canceled => 0,
+    };
+    $ENV{TEST_NOW} += 100;
+    $modified_time = get_now();
+    $test->put_ok("/event/$Callered_Event_Id" , { content => $edit_event });
+    ok( $test->success, 'returned success' );
+    $decoded = decode_json($test->content);
+    $got = $decoded->{data};
+    $expected = {
+        callers => [
+        # we're testing that we preserve the ordering from "caller_id" in the
+        # $edit_event above
+          {
+            id => 3,
+            name => 'Lilac Brandywine',
+          },
+          {
+            id => 1,
+            name => 'Rose Gamgee',
+          },
+          {
+            id => 2,
+            name => 'Daffodil Brandybuck',
+          },
         ],
     };
     eq_or_diff $got->{callers}, $expected->{callers}, 'return matches';

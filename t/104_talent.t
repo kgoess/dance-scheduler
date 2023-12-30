@@ -81,7 +81,7 @@ subtest 'POST /talent' => sub {
     $Talent_Id = $Talent->talent_id;
 };
 
-subtest 'POST /style duplicate' => sub {
+subtest 'POST /talent duplicate' => sub {
     plan tests => 3;
 
     my ($expected, $res, $decoded, $got);
