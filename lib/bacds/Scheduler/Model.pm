@@ -428,13 +428,14 @@ sub _update_relationships {
         my @after;
 
         if ($incoming_data->{$primary_key}){
-            # look up all the objects on the other end of the mappings
+            # set the ordering based on the incoming request
             my $i = 1;
             my %ordering;
             if (ref $incoming_data->{$primary_key} eq 'ARRAY') {
                 %ordering = map { $_ => $i++ } @{ $incoming_data->{$primary_key} };
             }
 
+            # look up all the objects on the other end of the mappings
             my @rs = $dbh->resultset($other_model)->search({
                 $primary_key => { '-in' => $incoming_data->{$primary_key} }
             });

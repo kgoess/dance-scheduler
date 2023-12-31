@@ -118,3 +118,8 @@ table tr th.caltitle {
     justify-content: space-between;
 }
 
+.non-bacds-event {
+    filter: opacity(0.6);
+    font-size: 95%;
+}
+

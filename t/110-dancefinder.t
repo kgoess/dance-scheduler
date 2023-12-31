@@ -44,6 +44,18 @@ test_new_calendar();
 
 sub setup_fixture {
 
+    my $bacds_parent_org = $dbh->resultset('ParentOrg')->new({
+        full_name => 'Bay Area Country Dance Society',
+        abbreviation => 'BACDS',
+    });
+    $bacds_parent_org->insert;
+
+    my $nbcds_parent_org = $dbh->resultset('ParentOrg')->new({
+        full_name => 'North Bay',
+        abbreviation => 'NBCDS',
+    });
+    $nbcds_parent_org->insert;
+
     my $event1 = $dbh->resultset('Event')->new({
         name => 'test event 1',
         synthetic_name => 'test event 1 synthname',
@@ -53,12 +65,15 @@ sub setup_fixture {
         start_time => '20:00',
     });
     $event1->insert;
+    $event1->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
+
     my $event2 = $dbh->resultset('Event')->new({
         synthetic_name => 'test event 2 synthname',
         start_date => get_now->ymd('-'),
         start_time => '20:00',
     });
     $event2->insert;
+    $event2->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
 
     # this one is before today so won't show up
     my $oldevent = $dbh->resultset('Event')->new({
@@ -68,6 +83,7 @@ sub setup_fixture {
         start_time => '20:00',
     });
     $oldevent->insert;
+    $oldevent->add_to_parent_orgs($nbcds_parent_org, { ordering => 1 });
 
     # is_deleted shouldn't show up
     my $deleted_event = $dbh->resultset('Event')->new({
@@ -523,18 +539,18 @@ sub test_livecalendar_endpoint {
     $expected = [
       {
         allDay => 1,
-        backgroundColor => "darkturquoise",
-        borderColor => "darkblue",
+        backgroundColor => "beige",
+        borderColor => "dimgrey",
         end => "",
         id => 3,
         start => "2022-04-14",
-        textColor => "black",
+        textColor => "darkgrey",
         title =>
             "ENGLISH/CONTRA ".
             "Ye Oldde Ewent ".
             "at Mr. Hooper's Store in Sunny Day, and Batman's Cave in Gotham City. ".
             "Led by Alice Ackerby and Bob Bronson. ".
-            "Music by Raging Rovers, Blasting Berzerkers: muso 4.",
+            "Music by Raging Rovers, Blasting Berzerkers: muso 4. (NBCDS)",
         url => 'https://bacds.org/dance-a-week/',
       },
     ];

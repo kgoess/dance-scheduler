@@ -92,9 +92,29 @@ page.
     <span class="special-event-name"><% event.name %></span>
 <%- END -%>
 
+<%- MACRO class_for_is_non_bacds(event) BLOCK -%>
+    <%- is_bacds_event = 0 -%>
+    <%- FOREACH parent_org IN event.parent_orgs- %>
+        <%- IF parent_org.abbreviation == 'BACDS';
+            is_bacds_event = 1;
+            LAST;
+            END;
+        -%>
+    <%- END -%>
+    <%- IF !is_bacds_event -%> non-bacds-event<%- END -%>
+<%- END -%>
+
+
+<%- MACRO includes_non_bacds_org(event) BLOCK -%>
+    <%- FOREACH parent_org IN event.parent_orgs- %>
+        <%- IF parent_org.abbreviation != 'BACDS' -%>
+            <br><em>Presented by the <a href="<% parent_org.url %>"><% parent_org.full_name %></a>.</em>
+        <%- END -%>
+    <%- END -%>
+<%- END -%>
 
 <%- FOREACH event IN events %>
-    <p class="listing<% IF event.is_canceled %> canceled-event<% END %>">
+    <p class="listing<% IF event.is_canceled %> canceled-event<% END %><% class_for_is_non_bacds(event) %>">
     <%- event_date(event) -%>:
     <%- IF event.long_desc -%>
         <%- IF event.name -%>
@@ -134,6 +154,7 @@ page.
         <%- IF event.custom_url || event.series.series_url -%>
             <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
         <%- END -%>
+        <%- includes_non_bacds_org(event) -%>
     <%- END -%>
     </p>
     </div>

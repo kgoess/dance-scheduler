@@ -1029,8 +1029,13 @@ get '/livecalendar-results' => with_types [
         $titlestring =~ s/<[^>]*>//g;
         $titlestring = decode_entities($titlestring);
 
+        if (_has_non_bacds($event)) {
+            $titlestring .= ' ('.(join ', ', map $_->abbreviation, $event->parent_orgs).')';
+        }
         my $colors;
-        if (my @styles = $event->styles->all) {
+        if (_is_non_bacds($event)) {
+            $colors = _colors_for_livecalendar('NONBACDS');
+        } elsif (my @styles = $event->styles->all) {
             $colors = _colors_for_livecalendar(map $_->name, @styles);
         } else {
             $colors = _colors_for_livecalendar('DEFAULT');
@@ -1061,7 +1066,25 @@ get '/livecalendar-results' => with_types [
         { content_type => 'application/json; charset=UTF-8' };
 };
 
+sub _is_non_bacds {
+    my ($event) = @_;
+    foreach my $parent_org ($event->parent_orgs) {
+        return 0 if $parent_org->abbreviation eq 'BACDS';
+    }
+    return 1;
+}
+
+sub _has_non_bacds {
+    my ($event) = @_;
+    return List::Util::any { $_->abbreviation ne 'BACDS' } $event->parent_orgs;
+}
+
 state $livecalendar_colors = {
+    NONBACDS => {
+        bgcolor => 'beige',
+        bordercolor => 'dimgrey',
+        textcolor => 'darkgrey',
+    },
     SPECIAL => { # and CAMP and WORKSHOP, see below
         bgcolor => 'plum',
         bordercolor => 'dimgrey',

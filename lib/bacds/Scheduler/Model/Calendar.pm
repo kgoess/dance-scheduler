@@ -73,6 +73,7 @@ sub load_events_for_month {
             leader   => join(', ', map $_->name, $event->callers->all),
             band     => join(', ', map $_->name, $event->bands->all),
             musos    => join(', ', map $_->name, $event->talent->all),
+            parent_orgs => join(', ', map $_->abbreviation, $event->parent_orgs->all),
             comments => $event->short_desc, # maybe?
             is_canceled => $event->is_canceled,
         });

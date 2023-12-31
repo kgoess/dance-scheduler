@@ -1,4 +1,16 @@
 <%# This template is wrapped by views/layouts/scheduler-page.tt %>
+
+<%#- note these are "OldEvent"s, not a DBIx event, see bacds/Scheduler/Model/Calendar.pm -%>
+<%- MACRO class_for_non_bacds(event) BLOCK -%>
+    <%- IF NOT event.parent_orgs.match('BACDS') -%>non-bacds-event<%- END -%>
+<%- END -%>
+
+<%- MACRO includes_non_bacds_org(event) BLOCK -%>
+    <%- IF event.parent_orgs != 'BACDS' -%>
+        (<% event.parent_orgs %>)
+    <%- END -%>
+<%- END -%>
+
 <link rel="stylesheet" type="text/css" href="<% request.uri_base %>/css/calendar.css" />
 
 <div class="body-and-sidebar">
@@ -70,7 +82,7 @@
             <% talent = talent _ ", " %>
         <%- END %>
         <%- talent = talent _ event.musos %>
-        <tr>
+        <tr class="<% class_for_non_bacds(event) %>">
             <td class="<% listing_class %>">
                 <a name="<% event.startday_obj.ymd %>">
                     <%- event.startday_obj.month_name %>&nbsp;<% event.startday_obj.day %>
@@ -85,6 +97,7 @@
                 <%- ELSE %>
                     <% event.type %>
                 <%- END %>
+                <%- includes_non_bacds_org(event) -%>
             </td>
             <td class="<% listing_class %>">
                 <% event.loc %>

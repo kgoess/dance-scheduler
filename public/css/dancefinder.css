@@ -1,0 +1,12 @@
+/* This is for styles particular to templates under views/dancefinder/, for
+ * starters the main page of the site, i.e. views/dancefinder/listings.tt
+ *
+ * Note that on the main page it requires a symlink:
+ * cd /var/www/bacds.org/public_html/css \
+ *     && ln -s ../../dance-scheduler/public/css/dancefinder.css
+ */
+
+.non-bacds-event {
+    filter: opacity(0.6);
+    font-size: 95%;
+}

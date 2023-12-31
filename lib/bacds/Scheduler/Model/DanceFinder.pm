@@ -205,6 +205,8 @@ sub search_events {
             'me.event_id' => { -in => $subquery->as_query },
         },
         {
+            # this might be the place to add sorting for events on the same day
+            # with different parent_orgs so that BACDS comes first
             order_by => ['start_date', 'start_time'],
             prefetch => \@prefetches,
         },
