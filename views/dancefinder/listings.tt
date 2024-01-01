@@ -106,9 +106,21 @@ page.
 
 
 <%- MACRO includes_non_bacds_org(event) BLOCK -%>
-    <%- FOREACH parent_org IN event.parent_orgs- %>
-        <%- IF parent_org.abbreviation != 'BACDS' -%>
-            <br><em>Presented by the <a href="<% parent_org.url %>"><% parent_org.full_name %></a>.</em>
+    <%- has_non_bacds_org = 0;
+        FOREACH parent_org IN event.parent_orgs;
+            IF parent_org.abbreviation != 'BACDS';
+                has_non_bacds_org = 1;
+            END;
+        END;a -%>
+    <%- IF has_non_bacds_org; -%>
+        <br><em>Presented by
+        <%- FOREACH parent_org IN event.parent_orgs -%>
+            <%- IF parent_org.abbreviation == 'BACDS' -%>
+                the <a href="<% parent_org.url %>">BACDS</a>
+            <%- ELSE  %>
+                the <a href="<% parent_org.url %>"><% parent_org.full_name %></a></em>
+            <%- END %>
+        <%- IF loop.last() %>.<% ELSE %> and <% END %>
         <%- END -%>
     <%- END -%>
 <%- END -%>
