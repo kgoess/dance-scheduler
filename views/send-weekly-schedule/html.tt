@@ -1,0 +1,13 @@
+
+<p>
+<b>The BACDS dances this for the week of <% today_str %>:</b>
+</p>
+
+<div>
+<% INCLUDE dancefinder/listings.tt %>
+</div>
+
+<p><i>(You are receiving this email because you are a member of the
+bacds-announce@bacds.org mailing list. To unsubscribe, click on the
+link at the bottom of this message.)</i>
+</p>

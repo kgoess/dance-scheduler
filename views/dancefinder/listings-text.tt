@@ -1,0 +1,123 @@
+<%#-
+This is used by the send-weekly-schedule cron job
+-%>
+<%- MACRO event_date(event) BLOCK -%>
+    <%- IF event.end_date %>
+        <%- "\n" %><%- event.start_date.strftime("%A, %b. %e - ") _ event.end_date.strftime("%A, %b. %e") %>
+    <%- ELSE -%>
+        <%- "\n" %><% event.start_date.strftime("%A, %B %e") %>
+    <%- END -%>
+<%- END -%>
+
+<%- MACRO event_styles(event) BLOCK -%>
+    <%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) %>
+        <%- style.name %><% IF !loop.last() %>/<% END %>
+    <%- END %>
+<%- END -%>
+
+<%- MACRO event_teams(event) BLOCK -%>
+    <%- FOREACH team IN event.teams({}, { order_by => 'me.ordering' }) -%>
+        <%- IF loop.last() && !loop.first() %>and <% END %><% team.name- %>
+        <%- IF !loop.last() %>, <% END -%>
+    <%- END -%>
+<%- END -%>
+
+<%- MACRO event_callers_and_bands(event) BLOCK -%>
+    <%- IF event.callers %>
+        <%- FOREACH caller IN event.callers({}, { order_by => 'me.ordering' }) %>
+            <%- caller.name %><% IF !loop.last() %>, <% END %>
+        <%- END %>
+        <%- IF event.bands || event.talent %> with <% END %>
+    <%- ELSE %>
+        <%- IF event.bands || event.talent %> Music by <% END -%>
+    <%- END -%>
+    <%- FOREACH band IN event.bands({}, { order_by => 'me.ordering' }) -%>
+        <%- band.name -%>
+        <%- IF loop.last() && event.talent %>: 
+        <%- ELSIF !loop.last %>, 
+        <%- END -%>
+    <%- END -%>
+<%- END -%>
+
+<%- MACRO event_talent(event) BLOCK -%>
+    <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
+        <%- talent.name %><% IF !loop.last() %>, <% END -%>
+    <%- END -%>
+    <%- IF (event.bands || event.talent) && event.and_friends -%> and friends<% END -%>
+<%- END -%>
+
+<%- MACRO event_venues(event) BLOCK -%>
+    <%- IF event.venues %> at <% END %>
+    <%- FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) %>
+<%- venue.hall_name _ ' in ' _ venue.city %>.
+    <%- END %>
+<%- END -%>
+
+<%- MACRO includes_non_bacds_org(event) BLOCK -%>
+    <%- has_non_bacds_org = 0;
+        FOREACH parent_org IN event.parent_orgs;
+            IF parent_org.abbreviation != 'BACDS';
+                has_non_bacds_org = 1;
+            END;
+        END;a -%>
+    <%- IF has_non_bacds_org; -%>
+        <%- "\nPresented by " -%>
+        <%- FOREACH parent_org IN event.parent_orgs -%>
+            <%- IF parent_org.abbreviation == 'BACDS' -%>
+                <%- 'the BACDS' -%>
+            <%- ELSE  -%>
+                <%- 'the ' _ parent_org.full_name -%>
+            <%- END -%>
+        <%- IF loop.last() %>.<% ELSE %> and <% END %>
+        <%- END -%>
+    <%- END -%>
+<%- END -%>
+
+<%- MACRO event_is_cancelled(event) BLOCK -%>
+    <%- IF event.is_canceled -%> *** CANCELED ***<%- END -%>
+<%- END -%>
+
+<%- FOREACH event IN events; -%>
+    <%- event_date(event) %>:
+    <%- event_is_cancelled(event) -%>
+    <%- IF event.long_desc -%>
+        <%- IF event.name -%>
+            <%- event_name(event) %>
+        (<%- event_styles(event) -%>)
+            <%- event_venues(event) -%>
+        <%- END -%>
+        <br />
+        <%- event.long_desc -%>
+    <%- ELSE -%>
+        <%- IF event.teams -%>
+            <%- IF event.name -%>
+                <%- event_name(event) -%>
+                <%- " with " -%>
+            <%- END -%>
+            <%- event_teams(event) -%>
+            <%- ' (' -%><%- event_styles(event) -%><%- ')' -%>
+            <%- "\n" %><%- event_callers_and_bands(event) -%>
+            <%- event_talent(event) -%>
+            <%- event_venues(event) -%>
+        <%- ELSIF event.styles.grep('^SPECIAL$') && event.name %>
+            <%- event_name(event) %>
+            <%- '( ' _ event_styles(event) _ ' )' -%>
+            <%- event_venues(event) -%>
+            <%- "\n" %><%- event_callers_and_bands(event) -%>
+            <%- event_talent(event) -%>
+        <%- ELSE %>
+            <%- " " %><%- event_styles(event) -%>
+            <%- event_venues(event) -%>
+            <%- "\n" %><%- event_callers_and_bands(event) -%>
+            <%- event_talent(event) -%>
+            <%- IF event.name -%>
+                <%- event_name(event) -%>
+            <%- END -%>
+        <%- END %>
+        <%- IF event.short_desc %><%- "\n" %><% END %><% event.short_desc %>
+        <%- "\n" _ (event.custom_url || event.series.series_url) -%>
+        <%- includes_non_bacds_org(event) -%>
+    <%- END -%>
+    <%- "\n\n" %>
+<%- END -%>
+

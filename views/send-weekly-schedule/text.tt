@@ -1,0 +1,7 @@
+These are the BACDS dances this for the week of <% today_str %>:
+
+<% INCLUDE "dancefinder/listings-text.tt" %>
+
+You are receiving this email because you are a member of the
+bacds-announce@bacds.org mailing list. To unsubscribe 
+click here: https://www.bacds.org/mailman/listinfo/bacds-president
