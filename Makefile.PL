@@ -48,6 +48,7 @@ WriteMakefile(
         'Data::Entropy::Algorithms' => 0,
         'DateTime' => 0,
         'Digest::Bcrypt' => 0,
+        'Email::Stuffer' => 0,
         'Facebook::OpenGraph' => 0,
         'HTML::Entities' => 0,
         'HTTP::Date' => 0,
