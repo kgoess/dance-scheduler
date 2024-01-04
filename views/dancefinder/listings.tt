@@ -133,6 +133,7 @@ page.
             <%- event_name(event) %>
             (<%- event_styles(event) -%>)
             <%- event_venues(event) -%>
+            <%- event_is_cancelled(event) -%>
         <%- END -%>
         <br />
         <%- event.long_desc -%>
@@ -147,15 +148,18 @@ page.
             <%- event_callers_and_bands(event) -%>
             <%- event_talent(event) -%>
             <%- event_venues(event) -%>
+            <%- event_is_cancelled(event) -%>
         <% ELSIF event.styles.grep('^SPECIAL$') && event.name %>
             <%- event_name(event) %>
             (&nbsp;<%- event_styles(event) -%>&nbsp;)
             <%- event_venues(event) -%>
+            <%- event_is_cancelled(event) -%>
             <%- event_callers_and_bands(event) -%>
             <%- event_talent(event) -%>
         <% ELSE %>
             <strong><%- event_styles(event) -%></strong>
             <%- event_venues(event) -%>
+            <%- event_is_cancelled(event) -%>
             <%- event_callers_and_bands(event) -%>
             <%- event_talent(event) -%>
             <%- IF event.name -%>
