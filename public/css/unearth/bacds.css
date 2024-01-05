@@ -126,4 +126,9 @@
     }
 }
 
-@media (min-width: 992px)
+.fc-daygrid-event { /* overriding the default styling for 
+    fullcalendar so we can show more info per event. */
+    overflow: hidden;
+    max-height: 8em;
+    white-space: unset;
+}
