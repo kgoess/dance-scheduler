@@ -1,197 +1,191 @@
-<%#
+[%#
 This is used for the dancefinder results page as well as to generate
 the tonight.html, 18-day.html, and specialevents.html bits of the main
 page.
-%>
+%]
 
-<% USE Math %>
-<% USE POSIX %>
+[% USE Math %]
+[% USE POSIX %]
 
-<% MACRO maybe_linkit(string, url) BLOCK %>
-    <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
-<% END %>
+[% MACRO maybe_linkit(string, url) BLOCK %]
+  [%- IF url %]<a href="[% url %]">[% string %]</a>[% ELSE %][% string %][% END -%]
+[% END %]
 
-<% MACRO classes_for_event(event) BLOCK;
+[% MACRO classes_for_event(event) BLOCK;
   #This macro whitelists event.styles for insertion into a css class list
   # It also adds the canceled-event class if event.is_canceled is truthy
-    found_styles = [];
-    IF highlight_special_types;
-        special_styles = { special => 1, workshop => 1, woodshed => 1, camp => 1 };
-        FOREACH style IN event.styles;
-           style_name = style.name.lower;
-           IF special_styles.$style_name;
-                found_styles.push(style_name);
-           END;
-        END;
+  found_styles = [];
+  IF highlight_special_types;
+    special_styles = { special => 1, workshop => 1, woodshed => 1, camp => 1 };
+    FOREACH style IN event.styles;
+      style_name = style.name.lower;
+      IF special_styles.$style_name;
+        found_styles.push(style_name);
+      END;
     END;
-    IF event.is_canceled;
-        found_styles.push('canceled-event');
-    END;
-    FOREACH class IN [ 'col-12', 'col-lg-6', 'p-lg-5',
-                        'mt-4', 'mt-lg-0' ];
-        found_styles.push(class);
-    END;
-    IF found_styles.size();
-       ' ' _ found_styles.join(' '); #this is the return value
-    END;
-END %>
+  END;
+  IF event.is_canceled;
+    found_styles.push('canceled-event');
+  END;
+  found_styles.push('col-12 col-lg-6 p-lg-5 mt-4 mt-lg-0');
+  ' ' _ found_styles.join(' '); #this is the return value
+END %]
 
-<% MACRO date_format(event) BLOCK;
-    IF event.end_date;
-        event.start_date.strftime("%A, %B %e - ") _ event.end_date.strftime("%A, %e %B, %Y");
-    ELSE;
-        event.start_date.strftime("%A, %B %e, %Y");
-    END;
-END %>
+[% MACRO date_format(event) BLOCK;
+  IF event.end_date;
+    event.start_date.strftime("%A, %B %e - ") _ event.end_date.strftime("%A, %e %B, %Y");
+  ELSE;
+    event.start_date.strftime("%A, %B %e, %Y");
+  END;
+END %]
 
-<% MACRO collage_images(entities_list, aos_attrs, width, font_size) BLOCK %>
-    <% FOREACH entity IN entities_list;
-        IF entity.photo_url; %>
-            <div
-                class="px-0 col-<% width %> fs-<% font_size %>"
-                <% aos_attrs %>
-            >
-            <% collage_image(entity) %>
-            </div>
-        <% END;
-    END %>
-<% END %>
-<% MACRO collage_image(entitiy) BLOCK %>
-    <div
-        class="polaroid-container"
-        style="--data-polaroid-rotate: <% 10-Math.rand(20) %>deg"
-    >
-        <div class="polaroid-frame">
-            <div class="event-inner-image-container">
-                <img class="event-inner-image" src="<% entity.photo_url %>">
-            </div>
-            <div class="polaroid-caption"><% entity.name || entity.full_name %></div>
-        </div>
+[% MACRO collage_images(entities_list, aos_attrs, width, font_size) BLOCK;
+  FOREACH entity IN entities_list;
+    IF entity.photo_url; %]
+      <div
+        class="px-0 col-[% width %] fs-[% font_size %]"
+        [% aos_attrs %]
+      >
+      [% collage_image(entity) %]
+      </div>
+    [% END;
+  END;
+END %]
+
+[% MACRO collage_image(entitiy) BLOCK %]
+  <div
+    class="polaroid-container"
+    style="--data-polaroid-rotate: [% 10-Math.rand(20) %]deg"
+  >
+    <div class="polaroid-frame">
+      <div class="event-inner-image-container">
+        <img class="event-inner-image" src="[% entity.photo_url %]">
+      </div>
+      <div class="polaroid-caption">[% entity.name || entity.full_name %]</div>
     </div>
-<% END %>
+  </div>
+[% END %]
 
-<% FOREACH event IN events %>
-    <% aos_attrs1 = "data-aos-delay=\"\" ";
-    aos_attrs2 = "data-aos-delay=\"\" ";
-    IF left_right_flipper;
-        aos_attrs1 = aos_attrs1 _ "data-aos=\"fade-right\"";
-        aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-left\"";
-    ELSE;
-        aos_attrs1 = aos_attrs1 _ "data-aos=\"fade-left\"";
-        aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-right\"";
+[% FOREACH event IN events;
+  aos_attrs1 = "data-aos-delay=\"\" ";
+  aos_attrs2 = "data-aos-delay=\"\" ";
+  IF left_right_flipper;
+    aos_attrs1 = aos_attrs1 _ "data-aos=\"fade-right\"";
+    aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-left\"";
+  ELSE;
+    aos_attrs1 = aos_attrs1 _ "data-aos=\"fade-left\"";
+    aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-right\"";
+  END;
+  photo_count = 0;
+  FOREACH entity IN event.bands;
+    IF entity.photo_url;
+      photo_count = photo_count + 1;
     END;
-    %>
-    <% photo_count = 0 %>
-    <% FOREACH entity IN event.bands;
-        IF entity.photo_url;
-            photo_count = photo_count + 1;
-        END;
+  END;
+  FOREACH entity IN event.callers;
+    IF entity.photo_url;
+      photo_count = photo_count + 1;
     END;
-    FOREACH entity IN event.callers;
-        IF entity.photo_url;
-            photo_count = photo_count + 1;
-        END;
+  END;
+  FOREACH entity IN event.talent;
+    IF entity.photo_url;
+      photo_count = photo_count + 1;
     END;
-    FOREACH entity IN event.talent;
-        IF entity.photo_url;
-            photo_count = photo_count + 1;
-        END;
-    END; %>
-    <div class="row mt-2">
-        <div class="col-12 col-lg-4">
-            <div class="row">
-                <% IF photo_count;
-                        # bootstrap uses a 12-column layout, so a picture that
-                        # is 4 columns wide occupies 1/3 of the space.
-                    IF photo_count >= 10;
-                        num_columns_per_picture = 2;    
-                        font_size = 6;
-                    ELSIF photo_count >= 5;
-                        num_columns_per_picture = 4;    
-                        font_size = 5;
-                    ELSIF photo_count >= 2;
-                        num_columns_per_picture = 6;    
-                        font_size = 3;
-                    ELSE; # == 1
-                        num_columns_per_picture = 12;    
-                        font_size = 1;
-                    END;
-                    %>
-                    <% collage_images(event.bands, aos_attrs1, num_columns_per_picture, font_size) %>
-                    <% collage_images(event.callers, aos_attrs1, num_columns_per_picture, font_size) %>
-                    <% collage_images(event.talent, aos_attrs1, num_columns_per_picture, font_size) %>
-                <% ELSE %>
-                    <% collage_images(event.parent_orgs, aos_attrs1, 12, 1) %>
-                <% END %>
-            </div><% #end photo nested row %>
-        </div><% #end photo outer col %>
-        <div class="<% classes_for_event(event);
-            IF !left_right_flipper;
-                ' order-lg-first';
-            END %>"
-            <% aos_attrs2 %>
-        >
-            <div>
-            <% IF event.is_canceled %>
-                <strong>CANCELED</strong>
-            <% END %>
-            <span class="event-date"><% date_format(event) %>:</span>
-            <% IF event.styles.grep('^SPECIAL$') && event.name;
-                emphasize_name_over_style = 1;
-            ELSE;
-                emphasize_name_over_style = 0;
-            END %>
-            <% IF emphasize_name_over_style %>
-                <span class="special-event-name"><% event.name %></span> (
-            <% END %>
-            <span class="event-types">
-            <%- FOREACH style IN event.styles %>
-                <%- style.name %><% IF !loop.last() %>/<% END %>
-            <%- END %>
-            </span>
-            <% IF emphasize_name_over_style %>
-                )
-            <% END %>
-            <%- IF event.venues %> at <% END %>
-            <%- FOREACH venue IN event.venues %>
-                <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
-            <%- END %>
-            <%- IF event.long_desc -%>
-                <div class="event-long-desc"><% event.long_desc %></div>
-            <%- ELSE -%>
-                <%- IF event.callers %>
-                    <%- FOREACH caller IN event.callers %>
-                        <% caller.name %><% IF !loop.last() %>, <% END %>
-                    <%- END %>
-                    <%- IF event.bands || event.talent %> with <% END %>
-                <%- ELSE %>
-                    <%- IF event.bands || event.talent %>
-                        Music by
-                    <% END %>
-                <%- END %>
-                <%- FOREACH band IN event.bands %>
-                    <%- maybe_linkit(band.name, band.url) -%><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
-                <%- END %>
-                <%- IF event.talent %>
-                    <%- FOREACH talent IN event.talent %>
-                        <%- talent.name %><% IF !loop.last() %>, <% END %>
-                    <%- END %>
-                <%- END %>
-                    <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
-                <%- IF !emphasize_name_over_style && event.name %>
-                    <%# if it's a special event, print out the title.'%>
-                    <span class="special-event-name"><% event.name %></span>
-                <%- END %>
-                <%- IF event.short_desc %><div class="event-short-desc"><% event.short_desc %><% END %>
-                <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>
-                <% IF event.short_desc %></div><% END %>
-            <%- END -%>
-            </div>
-        </div>
-    </div> <!-- end row -->
-    <% IF left_right_flipper;
+  END; %]
+  <div class="row mt-2">
+    <div class="col-12 col-lg-4">
+      <div class="row">
+        [% IF photo_count;
+          # bootstrap uses a 12-column layout, so a picture that
+          # is 4 columns wide occupies 1/3 of the space.
+          IF photo_count >= 10;
+            num_columns_per_picture = 2;    
+            font_size = 6;
+          ELSIF photo_count >= 5;
+            num_columns_per_picture = 4;    
+            font_size = 5;
+          ELSIF photo_count >= 2;
+            num_columns_per_picture = 6;    
+            font_size = 3;
+          ELSE; # == 1
+            num_columns_per_picture = 12;    
+            font_size = 1;
+          END; -%]
+          [%- collage_images(event.bands, aos_attrs1, num_columns_per_picture, font_size) %]
+          [% collage_images(event.callers, aos_attrs1, num_columns_per_picture, font_size) %]
+          [% collage_images(event.talent, aos_attrs1, num_columns_per_picture, font_size) %]
+            [%- ELSE -%]
+              [% collage_images(event.parent_orgs, aos_attrs1, 12, 1) %]
+            [%- END -%]
+      </div>[% #end photo nested row %]
+    </div>[% #end photo outer col %]
+    <div class="[% classes_for_event(event);
+      IF !left_right_flipper;
+        ' order-lg-first';
+      END %]"
+      [% aos_attrs2 %]
+    >
+    <div>
+      [% IF event.is_canceled -%]
+        <strong>CANCELED</strong>
+      [% END -%]
+      <span class="event-date">[% date_format(event) %]:</span>
+      [% IF event.styles.grep('^SPECIAL$') && event.name;
+        emphasize_name_over_style = 1;
+      ELSE;
+        emphasize_name_over_style = 0;
+      END 
+      IF emphasize_name_over_style -%]
+        <span class="special-event-name">[% event.name %]</span> (
+      [% END -%]
+      <span class="event-types">
+        [%- FOREACH style IN event.styles -%]
+          [%- style.name %][% IF !loop.last() %]/[% END -%]
+        [%- END -%]
+      </span>
+      [% IF emphasize_name_over_style -%]
+        )
+      [% END -%]
+      [% IF event.venues %] at [% END %]
+      [% FOREACH venue IN event.venues -%]
+        <a href="[% event.custom_url || event.series.series_url %]">[% venue.hall_name %] in [% venue.city %]</a>.
+      [% END -%]
+      [% IF event.long_desc -%]
+        <div class="event-long-desc">[% event.long_desc %]</div>
+      [%- ELSE -%]
+        [%- IF event.callers -%]
+          [%- FOREACH caller IN event.callers -%]
+            [% caller.name %][% IF !loop.last() %], [% END %]
+          [%- END -%]
+          [%- IF event.bands || event.talent %] with [% END %]
+        [%- ELSE %]
+          [%- IF event.bands || event.talent %]
+            Music by
+          [% END %]
+        [%- END %]
+        [%- FOREACH band IN event.bands %]
+          [%- maybe_linkit(band.name, band.url) -%][% IF loop.last() && event.talent %]: [% ELSIF !loop.last %], [% END %]
+        [%- END %]
+        [% IF event.talent %]
+          [%- FOREACH talent IN event.talent -%]
+            [% talent.name %][% IF !loop.last() %], [% END %]
+          [%- END -%]
+        [%- END %]
+          [%- IF (event.bands || event.talent) && event.and_friends %]&hellip;and friends[% END %]
+        [%- IF !emphasize_name_over_style && event.name %]
+          [%# if it's a special event, print out the title. %]
+          <span class="special-event-name">[% event.name %]</span>
+        [%- END %]
+        [%- IF event.short_desc %]<div class="event-short-desc">[% event.short_desc %][% END %]
+        <a class="more-info-link" href="[% event.custom_url || event.series.series_url %]">More Info</a>
+        [% IF event.short_desc %]</div>[% END %]
+      [%- END -%]
+      </div>
+    </div>
+  </div> <!-- end row -->
+  [% IF left_right_flipper;
     left_right_flipper = 0;
-    ELSE;
+  ELSE;
     left_right_flipper = 1;
-    END; %>
-<% END %>
+  END;
+END %]
