@@ -17,7 +17,7 @@ page.
   found_styles = [];
   IF highlight_special_types;
     special_styles = { special => 1, workshop => 1, woodshed => 1, camp => 1 };
-    FOREACH style IN event.styles;
+    FOREACH style IN event.styles({}, { order_by => 'me.ordering' });
       style_name = style.name.lower;
       IF special_styles.$style_name;
         found_styles.push(style_name);
@@ -77,17 +77,17 @@ END %>
     aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-right\"";
   END;
   photo_count = 0;
-  FOREACH entity IN event.bands;
+  FOREACH entity IN event.bands({}, { order_by => 'me.ordering' });
     IF entity.photo_url;
       photo_count = photo_count + 1;
     END;
   END;
-  FOREACH entity IN event.callers;
+  FOREACH entity IN event.callers({}, { order_by => 'me.ordering' });
     IF entity.photo_url;
       photo_count = photo_count + 1;
     END;
   END;
-  FOREACH entity IN event.talent;
+  FOREACH entity IN event.talent({}, { order_by => 'me.ordering' });
     IF entity.photo_url;
       photo_count = photo_count + 1;
     END;
@@ -139,7 +139,7 @@ END %>
         <span class="special-event-name"><% event.name %></span> (
       <% END -%>
       <span class="event-types">
-        <%- FOREACH style IN event.styles -%>
+        <%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) -%>
           <%- style.name %><% IF !loop.last() %>/<% END -%>
         <%- END -%>
       </span>
@@ -147,14 +147,14 @@ END %>
         )
       <% END -%>
       <% IF event.venues %> at <% END %>
-      <% FOREACH venue IN event.venues -%>
+      <% FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) -%>
         <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
       <% END -%>
       <% IF event.long_desc -%>
         <div class="event-long-desc"><% event.long_desc %></div>
       <%- ELSE -%>
         <%- IF event.callers -%>
-          <%- FOREACH caller IN event.callers -%>
+          <%- FOREACH caller IN event.callers({}, { order_by => 'me.ordering' }) -%>
             <% caller.name %><% IF !loop.last() %>, <% END %>
           <%- END -%>
           <%- IF event.bands || event.talent %> with <% END %>
@@ -163,11 +163,11 @@ END %>
             Music by
           <% END %>
         <%- END %>
-        <%- FOREACH band IN event.bands %>
+        <%- FOREACH band IN event.bands({}, { order_by => 'me.ordering' }) %>
           <%- maybe_linkit(band.name, band.url) -%><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
         <%- END %>
         <% IF event.talent %>
-          <%- FOREACH talent IN event.talent -%>
+          <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
             <% talent.name %><% IF !loop.last() %>, <% END %>
           <%- END -%>
         <%- END %>
