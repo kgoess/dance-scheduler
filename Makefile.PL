@@ -19,6 +19,7 @@ WriteMakefile(
         'bin/dance-scheduler-user-password.pl',
         'bin/dance-scheduler-add-programmer.pl',
         'bin/dancefinder.pl',
+        'bin/send-weekly-schedule.pl',
         'bin/tonightheader.pl',
     ],
     PL_FILES            => {},
