@@ -26,7 +26,7 @@ GetOptions (
     'b|basedir=s'      => \$basedir,
     'db=s'             => \$db,
     'dbuser=s'         => \$dbuser,
-    'approved'         => \$approved,
+    'approved=s'       => \$approved,
     'dry-run'          => \$dry_run,
     "h|help"           => \$help,
     "verbose|debug"    => \$verbose,
@@ -81,10 +81,6 @@ $tt->process('send-weekly-schedule/text.tt' => {
 }, \$text_part) || die $tt->error;
 
 
-my $temp_fh = File::Temp->new(
-    $dry_run ? ( UNLINK => 0 ) : (),
-);
-
 #   ->bcc      ('bunbun@sluggy.com')
 my $stuffer = Email::Stuffer
     ->from       ('BACDS noreply <noreply@bacds.org>')
@@ -96,11 +92,13 @@ my $stuffer = Email::Stuffer
 
 
 if ($dry_run) {
+    my $temp_fh = File::Temp->new(UNLINK => 0);
     $stuffer->transport  ('Print', fh => $temp_fh );
     say "dry-run, email written to $temp_fh";
-} else {
-    $stuffer->send or die "sending email failed but that's all I know";
 }
+
+
+$stuffer->send or die "sending email failed but that's all I know";
 
 say $stuffer->as_string if ($verbose);
 
