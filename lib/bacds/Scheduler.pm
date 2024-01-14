@@ -1202,6 +1202,9 @@ sub _details_for_series {
     my $c = 'bacds::Scheduler::Model::SeriesLister';
 
     if ($event_id) {
+        # is a page for a single event, like
+        # https://bacds.org/series/contra/berkeley/index.html?event_id=4198
+        # which are more for google's consumption than anything else
         $data = $c->get_event_details(event_id => $event_id);
     } else {
         $data = $c->get_upcoming_events_for_series(

@@ -143,7 +143,7 @@ sub get_event_details {
     return {
         series => $event->series,
         events => [$event],
-        ldjson => generate_ldjson($event),
+        ldjson => generate_ldjson($event), # might be empty
     }
 }
 
@@ -153,7 +153,8 @@ sub generate_ldjson {
     my ($event) = @_;
 
     my $date = $event->start_date->ymd;
-    my $venue = $event->venues->first;
+    my $venue = $event->venues->first
+        or return '';
     my $leaders = join ', ', map $_->name, $event->callers;
     my $bands = join ', ', map $_->name, $event->bands;
 
