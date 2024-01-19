@@ -59,7 +59,7 @@ bacds.baseUri = '<% request.uri_base %>';
           <nav class="site-navigation text-right ml-auto " role="navigation">
             <ul class="site-menu main-menu js-clone-nav ml-auto">
               <li><a href="#home-section" class="nav-link">Home</a></li>
-              <li class="has-children"> <a href="#listings-section" class="nav-link">Calendar</a>
+              <li class="has-children"> <a href="#calendar-section" class="nav-link">Calendar</a>
                 <ul class="dropdown arrow-top">
                   <li><a href="#tonight-section" class="nav-link">Tonight&rsquo;s Events</a></li>
                   <li><a href="#upcoming-section" class="nav-link">Upcoming Events</a></li>
