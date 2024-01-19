@@ -132,3 +132,8 @@
     max-height: 8em;
     white-space: unset;
 }
+
+.non-bacds-event {
+    filter: opacity(0.6);
+    font-size: 95%;
+}
