@@ -508,7 +508,6 @@ sub test_livecalendar_endpoint {
       {
         backgroundColor => "yellow",
         borderColor => "antiquewhite",
-        end => "2022-04-28T",
         id => 1,
         eventColor => 'yellow',
         start => "2022-04-28T20:00",
@@ -519,7 +518,6 @@ sub test_livecalendar_endpoint {
       {
         backgroundColor => "coral",
         borderColor => "bisque",
-        end => "2022-04-28T",
         eventColor => 'coral',
         id => 2,
         start => "2022-04-28T20:00",
@@ -540,7 +538,6 @@ sub test_livecalendar_endpoint {
       {
         backgroundColor => "beige",
         borderColor => "dimgrey",
-        end => "2022-04-14T",
         eventColor => 'beige',
         id => 3,
         start => "2022-04-14T20:00",
