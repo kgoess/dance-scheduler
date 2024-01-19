@@ -59,6 +59,7 @@ WriteMakefile(
         'String::Random' => 0,
         'SQL::Translator' => 0,
         'Template' => 0,
+        'Template::Plugin::POSIX' => 0,
         'Test::More' => 0,
         'Type::Library' => 0,
         'URL::Encode' => 0,

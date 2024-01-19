@@ -90,7 +90,7 @@ phase I:
  DONE(see unpackResults) function handleError(err) * TODO this should be added to all the requests
  DONE BUG venues display changing apostrophes to double-quotes?
 
- - Add a way to tell users to reload the app if there are server-side changes
+ DONE Add a way to tell users to reload the app if there are server-side changes
  - unify the sidebar
  - find docs on google/facebook to change them from redirects to something else
  - then change our js to pop up a modal and follow that new flow
@@ -143,3 +143,6 @@ series-page:
  - retire old series-url? or base routing on it?
  - problem in structured data: "Missing field "name" (in "performer")"
 
+Unearth:
+- fix the styling on the mobile hamburger button
+- fix the calculated navbar height situation
