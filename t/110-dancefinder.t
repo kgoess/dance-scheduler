@@ -506,23 +506,23 @@ sub test_livecalendar_endpoint {
 
     $expected = [
       {
-        allDay => 1,
         backgroundColor => "yellow",
         borderColor => "antiquewhite",
-        end => "",
+        end => "2022-04-28T",
         id => 1,
-        start => "2022-04-28",
+        eventColor => 'yellow',
+        start => "2022-04-28T20:00",
         textColor => "black",
         title => " test event 1 at Mr. Hooper's Store in Sunny Day. Music by test band 1, test band 2: muso 3. Big  dance party \x{263a}",
         url => 'http://custom-url/test-event-1',
       },
       {
-        allDay => 1,
         backgroundColor => "coral",
         borderColor => "bisque",
-        end => "",
+        end => "2022-04-28T",
+        eventColor => 'coral',
         id => 2,
-        start => "2022-04-28",
+        start => "2022-04-28T20:00",
         textColor => "black",
         title => "CONTRA  at Mr. Hooper\'s Store in Sunny Day.",
         url => 'https://bacds.org/dance-a-week/',
@@ -538,12 +538,12 @@ sub test_livecalendar_endpoint {
 
     $expected = [
       {
-        allDay => 1,
         backgroundColor => "beige",
         borderColor => "dimgrey",
-        end => "",
+        end => "2022-04-14T",
+        eventColor => 'beige',
         id => 3,
-        start => "2022-04-14",
+        start => "2022-04-14T20:00",
         textColor => "darkgrey",
         title =>
             "ENGLISH/CONTRA ".
