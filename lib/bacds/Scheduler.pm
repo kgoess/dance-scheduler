@@ -1072,6 +1072,7 @@ get '/livecalendar-results' => with_types [
         my $allDay = $start_date ne $end_date->ymd;
         if ($allDay) {
             $end_date->add(days=>1);
+            $end_date = $end_date->ymd;
         } elsif (!$event->end_time || $event->end_time eq '00:00:00'){
             $end_date = '';
         } else {
@@ -1083,7 +1084,7 @@ get '/livecalendar-results' => with_types [
             id => $event->event_id, # in dancefinder.pl this is just $i++
             url => $url,
             start => $start_date . 'T' . $event->start_time,
-            ($end_date ? (end => $end_date . ($event->end_time && $event->end_time ne '00:00:00' ? 'T' . $event->end_time : '')):()),
+            ($end_date ? (end => $end_date . (($event->end_time // '') ne '00:00:00' ? 'T' . $event->end_time : '')):()),
             #TODO: check for NULL
             title => $titlestring,
             ($allDay ? (allDay => $allDay) : ()),

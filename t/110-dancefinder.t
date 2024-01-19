@@ -96,6 +96,18 @@ sub setup_fixture {
     });
     $deleted_event->insert;
 
+    my $multidayevent = $dbh->resultset('Event')->new({
+        name => 'test multiday event 1',
+        synthetic_name => 'test multiday event 1 synthname',
+        short_desc => 'multiday event',
+        start_date => get_now->ymd('-'),
+        start_time => '20:00',
+        end_date => get_now->add(days=>1)->ymd('-'),
+        end_time => '00:15',
+    });
+    $multidayevent->insert;
+    $multidayevent->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
+
     my $band1 = $dbh->resultset('Band')->new({
         name => 'test band 1',
     });
@@ -252,13 +264,14 @@ sub setup_fixture {
     });
     $series1->insert;
 
-    foreach my $event ($oldevent, $event1, $event2, $deleted_event) {
+    foreach my $event ($oldevent, $event1, $multidayevent, $event2, $deleted_event) {
         $event->series_id($series1->series_id);
         $event->update;
     }
 
     return {
         event1 => $event1->event_id,
+        multiday=> $multidayevent->event_id,
         event2 => $event2->event_id,
         band1 => $band1->band_id,
         band2 => $band2->band_id,
@@ -318,7 +331,7 @@ sub test_search_events {
 
     @events = $rs->all;
 
-    is @events, 2, 'two events found with no args';
+    is @events, 3, 'three events found with no args';
 
     is $events[0]->synthetic_name, 'test event 1 synthname';
 
@@ -525,8 +538,20 @@ sub test_livecalendar_endpoint {
         title => "CONTRA  at Mr. Hooper\'s Store in Sunny Day.",
         url => 'https://bacds.org/dance-a-week/',
       },
+      {
+        allDay => 1, 
+        backgroundColor => "yellow",
+        borderColor => "antiquewhite",
+        end => '2022-04-30T00:15', 
+        eventColor => 'yellow',
+        id => 5,
+        start => "2022-04-28T20:00",
+        textColor => "black",
+        title => " test multiday event 1 at . Multiday event",
+        url => 'https://bacds.org/dance-a-week/',
+      },
     ];
-    eq_or_diff $data, $expected, "livecalendar two default events json";
+    eq_or_diff $data, $expected, "livecalendar three default events json";
 
     $start = get_now->subtract(days => 14)->epoch;
     $end = get_now->subtract(days => 1)->epoch;
@@ -571,7 +596,7 @@ sub test_serieslister {
     $series = $data->{series};
     is $series->name, 'The Dance-A-Week Series';
     is $series->series_xid, 'DAW';
-    is scalar  @{ $data->{events} }, 2, "two events coming up in this series";
+    is scalar  @{ $data->{events} }, 3, "two events coming up in this series by id";
     is $data->{events}[0]->synthetic_name, 'test event 1 synthname';
     is $data->{events}[1]->synthetic_name, 'test event 2 synthname';
 
@@ -582,7 +607,7 @@ sub test_serieslister {
 
     $series = $data->{series};
     is $series->name, 'The Dance-A-Week Series';
-    is scalar  @{ $data->{events} }, 2, "two events coming up in this series";
+    is scalar  @{ $data->{events} }, 3, "three events coming up in this series by path";
     is $data->{events}[0]->synthetic_name, 'test event 1 synthname';
     is $data->{events}[1]->synthetic_name, 'test event 2 synthname';
 }
@@ -787,7 +812,7 @@ sub test_calendar_get_events {
 
     my @events = bacds::Scheduler::Model::Calendar->load_events_for_month('2022', '04');
 
-    is scalar @events, 3, 'calendar gets all three undeleted events';
+    is scalar @events, 4, 'calendar gets all four undeleted events';
     is $events[0]->band, 'Raging Rovers, Blasting Berzerkers';
     is $events[0]->leader, 'Alice Ackerby, Bob Bronson';
     is $events[0]->type, 'ENGLISH/CONTRA';
