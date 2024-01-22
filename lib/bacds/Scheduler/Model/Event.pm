@@ -18,6 +18,7 @@ sub get_fields_for_output {
         short_desc
         long_desc
         custom_url
+        photo_url
         custom_pricing
         is_series_defaults
         created_ts
@@ -38,6 +39,7 @@ sub get_fields_for_input {
         short_desc
         long_desc
         custom_url
+        photo_url
         custom_pricing
         is_series_defaults
         and_friends

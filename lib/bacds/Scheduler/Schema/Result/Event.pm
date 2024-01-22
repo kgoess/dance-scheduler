@@ -139,6 +139,12 @@ __PACKAGE__->table("events");
   default_value: 0
   is_nullable: 0
 
+=head2 photo_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -187,6 +193,8 @@ __PACKAGE__->add_columns(
   { data_type => "mediumtext", is_nullable => 1 },
   "and_friends",
   { data_type => "tinyint", default_value => 0, is_nullable => 0 },
+  "photo_url",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
 );
 
 =head1 PRIMARY KEY
@@ -344,8 +352,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-04-13 20:14:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zkFKv2Q6KYLhJOUrN4JCoQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-01-21 16:57:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uVkALTM5650m9Be3ElpEwQ
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');

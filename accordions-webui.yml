@@ -115,6 +115,14 @@
     - label: Custom URL
       name: custom_url
       type: text
+    - label: Photo URL
+      name: photo_url
+      type: text
+      help: >
+        Generally the homepage sill display the event with photos of the
+        caller and musos. But for a special one-off event, maybe you want to use the
+        poster from the event rather than pictures of the talent.
+      preview_image: 1
     - label: Custom Pricing
       name: custom_pricing
       type: textarea

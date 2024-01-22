@@ -40,6 +40,12 @@ http://www.bacds.org:5000/signin.html run this:
 
     plackup -Ilib -p 5000 bin/app.psgi
 
+You'll probably want to run these so you can sign in to the test app:
+
+    bin/dance-scheduler-add-programmer.pl --name 'Your Name' --email your@email.com --db schedule_test --dbuser scheduler_test
+    bin/dance-scheduler-user-password.pl --email your@email.com --db schedule_test --dbuser scheduler_test
+    > enter password:
+
 Live and Test Databases
 ----
 
@@ -58,10 +64,14 @@ How To Make Schema Changes
    "Development" section above, that will generate new the perl code.
 4) Update the relevant files in the "schemas/" directory.
 5) Make the appropriate changes in accordions-webui.yml for your new field.
-6) Run "make test" (see the "Install" section below for details) to see any
+6) Add the field to the appropriate file in lib/bacds/Scheduler/Model/, see
+   get_fields_for_input and get_fields_for_output.
+7) Run "plackup -Ilib -p 5000 bin/app.psgi" and you can test your change at
+   http://bacds.org:5000 (note http not https).
+8) Run "make test" (see the "Install" section below for details) to see any
    changes needed in the unit tests and fix them up until they pass.
-7) Then see the "Install" section below.
-8) ...and coordinate that with repeating your schema changes in the live
+9) Then see the "Install" section below.
+10) ...and coordinate that with repeating your schema changes in the live
    "schedule" database.
 
 

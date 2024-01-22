@@ -109,6 +109,9 @@ END -%>
     aos_attrs2 = aos_attrs2 _ "data-aos=\"fade-right\"";
   END;
   photo_count = 0;
+  IF event.photo_url;
+    photo_count = photo_count +1;
+  END;
   FOREACH entity IN event.bands;
     IF entity.photo_url;
       photo_count = photo_count + 1;
@@ -142,13 +145,17 @@ END -%>
           ELSE; # == 1
             num_columns_per_picture = 12;    
             font_size = 1;
-          END -%>
-          <%- collage_images(event.bands, aos_attrs1, num_columns_per_picture, font_size) %>
-          <% collage_images(event.callers, aos_attrs1, num_columns_per_picture, font_size) %>
-          <% collage_images(event.talent, aos_attrs1, num_columns_per_picture, font_size) %>
-            <%- ELSE -%>
-              <% collage_images(event.parent_orgs, aos_attrs1, 12, 1) %>
-            <%- END -%>
+          END;
+          IF event.photo_url; -%>
+              <%- collage_images(event, aos_attrs1, num_columns_per_picture, font_size) %>
+          <%- ELSE -%>
+              <%- collage_images(event.bands, aos_attrs1, num_columns_per_picture, font_size) %>
+              <% collage_images(event.callers, aos_attrs1, num_columns_per_picture, font_size) %>
+              <% collage_images(event.talent, aos_attrs1, num_columns_per_picture, font_size) %>
+          <%- END -%>
+        <%- ELSE -%>
+          <% collage_images(event.parent_orgs, aos_attrs1, 12, 1) %>
+        <%- END -%>
       </div><% #end photo nested row %>
     </div><% #end photo outer col %>
     <div class="<% classes_for_event(event);

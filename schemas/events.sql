@@ -9,6 +9,7 @@ CREATE TABLE events (
     short_desc VARCHAR(2048),    
     long_desc MEDIUMTEXT,
     custom_url VARCHAR(255),
+    photo_url VARCHAR(255),
     custom_pricing TEXT(32866),
     is_series_defaults BOOLEAN NOT NULL DEFAULT 0,
     series_id INT,
