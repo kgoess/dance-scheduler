@@ -1,4 +1,4 @@
-These are the BACDS dances this for the week of <% today_str %>:
+These are the BACDS dances for the week of <% today_str %>:
 
 <% INCLUDE "dancefinder/listings-text.tt" %>
 

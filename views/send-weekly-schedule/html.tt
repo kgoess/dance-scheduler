@@ -1,6 +1,6 @@
 
 <p>
-<b>The BACDS dances this for the week of <% today_str %>:</b>
+<b>The BACDS dances for the week of <% today_str %>:</b>
 </p>
 
 <div>
