@@ -212,7 +212,8 @@ bacds.baseUri = '<% request.uri_base %>';
             <div class="block-heading-1">
               <h2>Calendar</h2>
             </div>
-            <div id="calendar"></div>
+            <div class="d-sm-block d-none" id="calendar" d></div>
+            <div class="d-sm-none">Please rotate your phone to view the calendar</div>
           </div>
         </div>
       </div>
