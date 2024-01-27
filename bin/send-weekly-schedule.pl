@@ -68,11 +68,11 @@ my $tt = Template->new(
 my $today_str = DateTime->now->strftime("%a., %b. %e");
 
 my ($html_part, $text_part);
-$tt->process('send-weekly-schedule/html.tt' => {
-    events => \@events,
-    highlight_special_types => 1,
-    today_str => $today_str,
-}, \$html_part) || die $tt->error;
+#$tt->process('send-weekly-schedule/html.tt' => {
+#    events => \@events,
+#    highlight_special_types => 1,
+#    today_str => $today_str,
+#}, \$html_part) || die $tt->error;
 
 $tt->process('send-weekly-schedule/text.tt' => {
     events => \@events,
@@ -88,7 +88,8 @@ my $stuffer = Email::Stuffer
     ->subject    ("Dances for the week of $today_str")
     ->header     (Approved => $moderator_pw)
     ->text_body  ($text_part)
-    ->html_body  ($html_part);
+#    ->html_body  ($html_part)
+;
 
 
 if ($dry_run) {
