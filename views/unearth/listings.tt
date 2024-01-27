@@ -38,7 +38,7 @@ page.
   IF !is_bacds_event;
     found_styles.push('non-bacds-event');
   END;
-  found_styles.push('col-12 col-lg-6 p-lg-5 mt-4 mt-lg-0');
+  found_styles.push('col-12 col-lg-9 p-lg-5 mt-4 mt-lg-0');
   ' ' _ found_styles.join(' '); #this is the return value
 END %>
 
@@ -128,7 +128,7 @@ END -%>
     END;
   END; %>
   <div class="row mt-2">
-    <div class="col-12 col-lg-4">
+    <div class="col-12 col-lg-3">
       <div class="row">
         <% IF photo_count;
           # bootstrap uses a 12-column layout, so a picture that
@@ -164,7 +164,7 @@ END -%>
       END %>"
       <% aos_attrs2 %>
     >
-    <div>
+    <div class="event-text">
       <% IF event.is_canceled -%>
         <strong>CANCELED</strong>
       <% END -%>

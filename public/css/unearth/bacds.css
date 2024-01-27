@@ -133,7 +133,12 @@
     white-space: unset;
 }
 
+.event-text {
+    font-size: 130%;
+}
 .non-bacds-event {
     filter: opacity(0.6);
-    font-size: 95%;
+}
+.non-bacds-event .event-text {
+    font-size: 100%;
 }
