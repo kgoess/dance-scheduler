@@ -173,5 +173,4 @@ page.
         <%- includes_non_bacds_org(event) -%>
     <%- END -%>
     </p>
-    </div>
 <% END %>
