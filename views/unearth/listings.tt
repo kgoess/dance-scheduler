@@ -126,6 +126,11 @@ END -%>
     IF entity.photo_url;
       photo_count = photo_count + 1;
     END;
+  END;
+  FOREACH entity IN event.teams;
+    IF entity.photo_url;
+      photo_count = photo_count + 1;
+    END;
   END; %>
   <div class="row mt-2">
     <div class="col-12 col-lg-3">
@@ -152,6 +157,7 @@ END -%>
               <%- collage_images(event.bands, aos_attrs1, num_columns_per_picture, font_size) %>
               <% collage_images(event.callers, aos_attrs1, num_columns_per_picture, font_size) %>
               <% collage_images(event.talent, aos_attrs1, num_columns_per_picture, font_size) %>
+              <% collage_images(event.teams, aos_attrs1, num_columns_per_picture, font_size) %>
           <%- END -%>
         <%- ELSE -%>
           <% collage_images(event.parent_orgs, aos_attrs1, 12, 1) %>
