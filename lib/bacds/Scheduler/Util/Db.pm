@@ -63,7 +63,7 @@ sub get_dbh {
                   "DBI:mysql:database=$database;host=$hostname;port=$port";
 
     my %dbi_params = (
-        mysql_enable_utf8 => 1,
+        # mysql_enable_utf8 => 1, not needed for mariadb
         AutoCommit => 1, # recommended by DBIx::Class::Schema
     );
 
