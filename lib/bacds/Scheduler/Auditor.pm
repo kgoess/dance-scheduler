@@ -40,6 +40,7 @@ use warnings;
 use Carp qw/croak/;
 use Data::Dump qw/dump/;
 use Moo;
+use Switch::Plain qw/sswitch/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
@@ -87,14 +88,14 @@ around BUILDARGS => sub {
         $args{programmer_id} = $programmer->programmer_id;
     }
     if (my $http_method = delete $args{http_method}) {
-        given ($http_method) {
-            when ('POST') {
+        sswitch ($http_method) {
+            case 'POST': {
                 $args{action} = 'create';
             }
-            when ('PUT') {
+            case 'PUT': {
                 $args{action} = 'update';
             }
-            default {
+            default: {
                 $args{action} = "http: $http_method";
             }
         }

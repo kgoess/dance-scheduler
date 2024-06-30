@@ -276,7 +276,10 @@ sub generate_ldjson {
     );
 
     # decode to logical characters, which is what the template expects
-    my $json_str = decode_utf8 Dancer2::Serializer::JSON::to_json(\%json_data, { pretty => 1 });
+    my $json_str = decode_utf8 Dancer2::Serializer::JSON::to_json(
+        \%json_data,
+        { pretty => 1, ,canonical => 1 }
+    );
     return <<EOL;
     <script type="application/ld+json">
     $json_str
