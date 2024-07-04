@@ -43,6 +43,7 @@ WriteMakefile(
         'DBI' => 0,
         'DBIx::Class' => 0,
         'DBIx::Class::Schema::Loader' => 0,
+        'DBIx::Class::Storage::DBI::MariaDB' => 0,
         'Dancer2' => 0.400000,
         'Dancer2::Plugin::HTTP::ContentNegotiation' => 0,
         'Dancer2::Plugin::ParamTypes' => 0,
