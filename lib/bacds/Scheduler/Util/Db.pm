@@ -57,10 +57,12 @@ sub get_dbh {
     state $user     = _get_name_for('user', %args);
 
     my $hostname = 'localhost';
-    my $port = 3306;
+    #my $port = 3306;
+    # MariaDB says: "port cannot be specified when host is localhost" ok, whatever
 
     my $dbi_dsn = $ENV{TEST_DSN} ||
-                  "DBI:mysql:database=$database;host=$hostname;port=$port";
+                  #"DBI:MariaDB:database=$database;host=$hostname;port=$port";
+                  "DBI:MariaDB:database=$database;host=$hostname";
 
     my %dbi_params = (
         # mysql_enable_utf8 => 1, not needed for mariadb
