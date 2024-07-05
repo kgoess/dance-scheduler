@@ -44,14 +44,14 @@ __PACKAGE__->table("programmers");
 =head2 name
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 255
+  is_nullable: 1
+  size: 191
 
 =head2 email
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 255
+  is_nullable: 1
+  size: 191
 
 =head2 password_hash
 
@@ -90,9 +90,9 @@ __PACKAGE__->add_columns(
   "programmer_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 0, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "email",
-  { data_type => "varchar", is_nullable => 0, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "password_hash",
   { data_type => "varchar", is_nullable => 1, size => 128 },
   "is_superuser",
@@ -203,8 +203,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-18 19:25:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LUmzftbr6zJ4fgTFBiOecQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:WjYCCyqfk4F6/X3UX2lUlQ
 
 
 use Role::Tiny::With;

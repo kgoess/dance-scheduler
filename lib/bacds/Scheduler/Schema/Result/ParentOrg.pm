@@ -44,14 +44,14 @@ __PACKAGE__->table("parent_orgs");
 =head2 full_name
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 255
+  is_nullable: 1
+  size: 191
 
 =head2 abbreviation
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 255
+  is_nullable: 1
+  size: 191
 
 =head2 is_deleted
 
@@ -90,9 +90,9 @@ __PACKAGE__->add_columns(
   "parent_org_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "full_name",
-  { data_type => "varchar", is_nullable => 0, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "abbreviation",
-  { data_type => "varchar", is_nullable => 0, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "is_deleted",
   { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
@@ -185,8 +185,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-07-07 20:22:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:c1APNw+pbtWWYLqhq0vbYA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AW4XDdwtpTruKNNIcDVvoQ
 
 
 use Role::Tiny::With;

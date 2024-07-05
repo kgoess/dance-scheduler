@@ -51,7 +51,7 @@ __PACKAGE__->table("series");
 
   data_type: 'varchar'
   is_nullable: 1
-  size: 255
+  size: 191
 
 =head2 frequency
 
@@ -67,12 +67,12 @@ __PACKAGE__->table("series");
 
 =head2 sidebar
 
-  data_type: 'mediumtext'
+  data_type: 'longtext'
   is_nullable: 1
 
 =head2 display_text
 
-  data_type: 'mediumtext'
+  data_type: 'longtext'
   is_nullable: 1
 
 =head2 series_url
@@ -89,7 +89,7 @@ __PACKAGE__->table("series");
 
 =head2 programmer_notes
 
-  data_type: 'mediumtext'
+  data_type: 'longtext'
   is_nullable: 1
 
 =head2 is_deleted
@@ -119,21 +119,21 @@ __PACKAGE__->add_columns(
   "series_xid",
   { data_type => "char", is_nullable => 0, size => 24 },
   "name",
-  { data_type => "varchar", is_nullable => 1, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "frequency",
   { data_type => "varchar", is_nullable => 1, size => 128 },
   "short_desc",
   { data_type => "varchar", is_nullable => 1, size => 2048 },
   "sidebar",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "longtext", is_nullable => 1 },
   "display_text",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "longtext", is_nullable => 1 },
   "series_url",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "manager",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "programmer_notes",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "longtext", is_nullable => 1 },
   "is_deleted",
   { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "created_ts",
@@ -210,8 +210,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-18 09:00:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vN+vx0OEW2SKVWk0XomVow
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YE/+IJQFFwLfsT+QpaXwlQ
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

@@ -44,8 +44,8 @@ __PACKAGE__->table("bands");
 =head2 name
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 255
+  is_nullable: 1
+  size: 191
 
 =head2 url
 
@@ -84,7 +84,7 @@ __PACKAGE__->add_columns(
   "band_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 0, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "url",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "photo_url",
@@ -165,8 +165,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:24
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1aGcrwQO03EvrPfbVC+WhA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8iDzkz/wX2QNbE4ThDzKRA
 
 __PACKAGE__->many_to_many(talents => 'band_memberships', 'talent');
 __PACKAGE__->many_to_many(events=> 'event_band_maps', 'event');

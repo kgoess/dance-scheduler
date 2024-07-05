@@ -44,8 +44,8 @@ __PACKAGE__->table("callers");
 =head2 name
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 255
+  is_nullable: 1
+  size: 191
 
 =head2 url
 
@@ -84,7 +84,7 @@ __PACKAGE__->add_columns(
   "caller_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 0, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "url",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "photo_url",
@@ -150,8 +150,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-12-10 09:35:24
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:esaETYxhjsFgt5IpbgHOVA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5zZLaOHaxpPIfsF1y0zOfg
 
 
 use Role::Tiny::With;
