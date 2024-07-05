@@ -44,8 +44,8 @@ __PACKAGE__->table("teams");
 =head2 name
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 255
+  is_nullable: 1
+  size: 191
 
 =head2 team_xid
 
@@ -61,12 +61,12 @@ __PACKAGE__->table("teams");
 
 =head2 description
 
-  data_type: 'mediumtext'
+  data_type: 'longtext'
   is_nullable: 1
 
 =head2 sidebar
 
-  data_type: 'mediumtext'
+  data_type: 'longtext'
   is_nullable: 1
 
 =head2 team_url
@@ -112,15 +112,15 @@ __PACKAGE__->add_columns(
   "team_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
-  { data_type => "varchar", is_nullable => 0, size => 255 },
+  { data_type => "varchar", is_nullable => 1, size => 191 },
   "team_xid",
   { data_type => "char", is_nullable => 0, size => 24 },
   "contact",
   { data_type => "varchar", is_nullable => 1, size => 2048 },
   "description",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "longtext", is_nullable => 1 },
   "sidebar",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "longtext", is_nullable => 1 },
   "team_url",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "photo_url",
@@ -250,8 +250,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-25 19:32:49
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:o9y4ToqPaeBcjhcCZzTR8g
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:tUdP9ODbF4daPFrMJ3uwTg
 
 __PACKAGE__->many_to_many(styles => 'team_styles_maps', 'style');
 __PACKAGE__->many_to_many(events=> 'event_team_maps', 'event');

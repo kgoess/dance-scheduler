@@ -46,6 +46,7 @@ You'll probably want to run these so you can sign in to the test app:
     bin/dance-scheduler-user-password.pl --email your@email.com --db schedule_test --dbuser scheduler_test
     > enter password:
 
+
 Live and Test Databases
 ----
 
@@ -54,6 +55,20 @@ The live database is "schedule" with the user "scheduler", password is in
 schemas/copy-prod-to-test.sh to dump that to a "schedule_test" database
 accessible with the user "scheduler_test". If you use plackup to run a local
 copy of the app on like port 5000, it'll be using "schedule_test".
+
+How to Access the Databases
+
+The test database:
+
+    mysql -uscheduler_test --password=`cat ~/.mysql-password` schedule_test \
+        --default-character-set=utf8mb4  \
+        --pager='less -SX'
+
+The real production database:
+
+    mysql -uscheduler --password=`cat /var/www/bacds.org/dance-scheduler/private/mysql-password` schedule \
+        --default-character-set=utf8mb4  \
+        --pager='less -SX'
 
 How To Make Schema Changes
 ----

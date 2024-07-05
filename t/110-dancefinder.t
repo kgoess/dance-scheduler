@@ -723,85 +723,85 @@ sub test_serieslister_ldjson {
     eq_or_diff $json, <<'EOL', 'ldjson generated ok';
     <script type="application/ld+json">
     {
-   "performer" : [
-      {
-         "name" : "test band 1, test band 2",
-         "@type" : "MusicGroup"
-      },
-      {
-         "name" : "",
-         "@type" : "Person"
-      }
+   "@context" : "http://schema.org",
+   "@type" : [
+      "Event",
+      "DanceEvent"
    ],
+   "description" : " Dancing at Mr. Hooper's Store in Sunny Day. Everyone welcome, beginners and experts! No partner necessary. big <b> dance party &#9786 (Prices may vary for special events or workshops. Check the calendar or website for specifics.)",
+   "endDate" : "2022-04-28T00:00:00",
    "eventAttendanceMode" : "https://schema.org/OfflineEventAttendanceMode",
+   "eventStatus" : "https://schema.org/EventScheduled",
+   "image" : "https://www.bacds.org/graphics/bacdsweblogomed.gif",
    "location" : {
       "@context" : "http://schema.org",
-      "name" : "Mr. Hooper's Store",
+      "@type" : "Place",
       "address" : {
-         "streetAddress" : "123 Sesame St.",
+         "@type" : "PostalAddress",
          "addressCountry" : "USA",
          "addressLocality" : "Sunny Day",
          "addressRegion" : "California",
          "postalCode" : null,
-         "@type" : "PostalAddress"
+         "streetAddress" : "123 Sesame St."
       },
-      "@type" : "Place"
+      "name" : "Mr. Hooper's Store"
    },
    "name" : " Dancing, calling by  to the music of test band 1, test band 2",
-   "description" : " Dancing at Mr. Hooper's Store in Sunny Day. Everyone welcome, beginners and experts! No partner necessary. big <b> dance party &#9786 (Prices may vary for special events or workshops. Check the calendar or website for specifics.)",
-   "eventStatus" : "https://schema.org/EventScheduled",
-   "image" : "https://www.bacds.org/graphics/bacdsweblogomed.gif",
-   "organizer" : {
-      "@context" : "http://schema.org",
-      "url" : "https://www.bacds.org/",
-      "name" : "Bay Area Country Dance Society",
-      "@type" : "Organization"
-   },
-   "@context" : "http://schema.org",
    "offers" : [
       {
+         "@type" : "Offer",
          "availability" : "http://schema.org/LimitedAvailability",
-         "priceCurrency" : "USD",
-         "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
          "name" : "supporters",
          "price" : "25.00",
-         "validFrom" : "2022-04-28",
-         "@type" : "Offer"
-      },
-      {
-         "availability" : "http://schema.org/LimitedAvailability",
          "priceCurrency" : "USD",
          "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "validFrom" : "2022-04-28"
+      },
+      {
+         "@type" : "Offer",
+         "availability" : "http://schema.org/LimitedAvailability",
          "name" : "non-members",
          "price" : "20.00",
-         "validFrom" : "2022-04-28",
-         "@type" : "Offer"
-      },
-      {
-         "availability" : "http://schema.org/LimitedAvailability",
          "priceCurrency" : "USD",
          "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "validFrom" : "2022-04-28"
+      },
+      {
+         "@type" : "Offer",
+         "availability" : "http://schema.org/LimitedAvailability",
          "name" : "members",
          "price" : "15.00",
-         "validFrom" : "2022-04-28",
-         "@type" : "Offer"
-      },
-      {
-         "availability" : "http://schema.org/LimitedAvailability",
          "priceCurrency" : "USD",
          "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "validFrom" : "2022-04-28"
+      },
+      {
+         "@type" : "Offer",
+         "availability" : "http://schema.org/LimitedAvailability",
          "name" : "students or low-income or pay what you can",
          "price" : "6.00",
-         "validFrom" : "2022-04-28",
-         "@type" : "Offer"
+         "priceCurrency" : "USD",
+         "url" : "http://www.bacds.org/dancefinder/serieslister?event_id=1",
+         "validFrom" : "2022-04-28"
       }
    ],
-   "endDate" : "2022-04-28T00:00:00",
-   "startDate" : "2022-04-28T20:00",
-   "@type" : [
-      "Event",
-      "DanceEvent"
-   ]
+   "organizer" : {
+      "@context" : "http://schema.org",
+      "@type" : "Organization",
+      "name" : "Bay Area Country Dance Society",
+      "url" : "https://www.bacds.org/"
+   },
+   "performer" : [
+      {
+         "@type" : "MusicGroup",
+         "name" : "test band 1, test band 2"
+      },
+      {
+         "@type" : "Person",
+         "name" : ""
+      }
+   ],
+   "startDate" : "2022-04-28T20:00"
 }
 
     </script>

@@ -4,7 +4,7 @@ use 5.16.0;
 use warnings;
 
 # local::lib is a no-op if already loaded
-use local::lib '/var/lib/dance-scheduler';
+#use local::lib '/var/lib/dance-scheduler';
 
 use Getopt::Long;
 use Pod::Usage qw/pod2usage/;

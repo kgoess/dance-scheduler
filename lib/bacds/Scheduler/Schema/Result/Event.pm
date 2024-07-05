@@ -89,7 +89,7 @@ __PACKAGE__->table("events");
 
 =head2 custom_pricing
 
-  data_type: 'mediumtext'
+  data_type: 'longtext'
   is_nullable: 1
 
 =head2 is_series_defaults
@@ -130,7 +130,7 @@ __PACKAGE__->table("events");
 
 =head2 long_desc
 
-  data_type: 'mediumtext'
+  data_type: 'longtext'
   is_nullable: 1
 
 =head2 and_friends
@@ -167,7 +167,7 @@ __PACKAGE__->add_columns(
   "custom_url",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "custom_pricing",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "longtext", is_nullable => 1 },
   "is_series_defaults",
   { data_type => "tinyint", is_nullable => 1 },
   "series_id",
@@ -190,7 +190,7 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "long_desc",
-  { data_type => "mediumtext", is_nullable => 1 },
+  { data_type => "longtext", is_nullable => 1 },
   "and_friends",
   { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "photo_url",
@@ -352,8 +352,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-01-21 16:57:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uVkALTM5650m9Be3ElpEwQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:WBsREvQkemK+rw8kowABHA
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');

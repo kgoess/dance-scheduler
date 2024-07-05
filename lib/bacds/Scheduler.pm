@@ -32,6 +32,7 @@ use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
 use Scalar::Util qw/looks_like_number/;
+use Switch::Plain qw/sswitch/;
 use Time::Piece;
 use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref/;
 use YAML qw/Load/;
@@ -118,8 +119,8 @@ hook before => sub {
 
     my $signed_in_as;
 
-    given ($login_method) {
-        when ('google') {
+    sswitch ($login_method) {
+        case 'google': {
             my $google_token = cookie GoogleToken
                 or return;
             my ($programmer, $err) = bacds::Scheduler::FederatedAuth
@@ -131,7 +132,7 @@ hook before => sub {
             }
             $signed_in_as = $programmer;
         }
-        when ('session') {
+        case 'session': {
             # this handles both facebook and bacds signins
             my $session_cookie = cookie LoginSession
                 or return;
@@ -825,14 +826,14 @@ sub _dancefinder_data {
     my (@callers, @venues, @bands, @musos, @styles);
 
     # set up the callers
-    foreach my $caller_id (keys $data->{callers}) {
+    foreach my $caller_id (keys %{$data->{callers}}) {
         my $caller = $data->{callers}{$caller_id};
         push @callers, [$caller_id, $caller->name];
     }
     @callers = sort { $a->[1] cmp $b->[1] } @callers;
 
     # set up the venues
-    foreach my $venue_id (keys $data->{venues}) {
+    foreach my $venue_id (keys %{$data->{venues}}) {
         my $venue = $data->{venues}{$venue_id};
         my $venue_str = $venue->city . ' -- ' .$venue->hall_name;
         push @venues, [$venue_id, $venue_str];
@@ -840,21 +841,21 @@ sub _dancefinder_data {
     @venues = sort { $a->[1] cmp $b->[1] } @venues;
 
     # set up the bands
-    foreach my $band_id (keys $data->{bands}) {
+    foreach my $band_id (keys %{$data->{bands}}) {
         my $band = $data->{bands}{$band_id};
         push @bands, [$band_id, $band->name];
     }
     @bands = sort { $a->[1] cmp $b->[1] } @bands;
 
     # set up the musos
-    foreach my $muso_id (keys $data->{musos}) {
+    foreach my $muso_id (keys %{$data->{musos}}) {
         my $muso = $data->{musos}{$muso_id};
         push @musos, [$muso_id, $muso->name];
     }
     @musos = sort { $a->[1] cmp $b->[1] } @musos;
 
     # set up the styles
-    foreach my $style_id (keys $data->{styles}) {
+    foreach my $style_id (keys %{$data->{styles}}) {
         my $style = $data->{styles}{$style_id};
         push @styles, [$style_id, $style->name];
     }
@@ -1080,7 +1081,7 @@ get '/livecalendar-results' => with_types [
         }
         
 
-        push $ret, {
+        push @$ret, {
             id => $event->event_id, # in dancefinder.pl this is just $i++
             url => $url,
             start => $start_date . 'T' . $event->start_time,
@@ -1110,7 +1111,7 @@ sub _is_non_bacds {
 
 sub _has_non_bacds {
     my ($event) = @_;
-    return List::Util::any { $_->abbreviation ne 'BACDS' } $event->parent_orgs;
+    return List::Util::any { $_->abbreviation ne 'BACDS' } ($event->parent_orgs);
 }
 
 state $livecalendar_colors = {
