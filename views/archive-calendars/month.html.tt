@@ -93,7 +93,7 @@
             </td>
             <td class="<% listing_class %>">
                 <%- IF event.name %>
-                    <span class="special-event-name"><% event.name %></span>(<% event.type %>)
+                    <span class="special-event-name"><% event.name %></span> (<% event.type %>)
                 <%- ELSE %>
                     <% event.type %>
                 <%- END %>
