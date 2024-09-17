@@ -73,6 +73,7 @@ bacds.baseUri = '<% request.uri_base %>';
                   <li><a href="#upcoming-section" class="nav-link">Upcoming Events</a></li>
                   <li><a href="#calendar-section" class="nav-link">Calendar</a></li>
                   <li><a href="#dancefinder-section" class="nav-link">Dance Finder (search)</a></li>
+                  <li><a href="https://bacds.org/calendars/" class="nav-link">Historical Calendars</a></li>
                 </ul>
               </li>
               <li class="has-children"> <a href="https://bacds.org/series/" class="nav-link">Dance Series</a>
