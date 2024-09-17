@@ -848,7 +848,7 @@ sub test_new_calendar {
                 </a> \s+
             </td> \s+
             <td.class="callisting"> \s+
-                    <span.class="special-event-name">test.event.1</span>\(\) \s+
+                    <span.class="special-event-name">test.event.1</span>.\(\) \s+
             </td>
     }x, 'listings part has a listing';
 }
