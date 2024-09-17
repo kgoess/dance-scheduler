@@ -1,144 +1,147 @@
 .event-section {
-    padding-bottom: 1em;
+  padding-bottom: 1em;
 }
 
 #tonight-section {
-    background-color: #ffdbc4;
-    box-shadow: 0 0 15px 0px #875920;
-    font-size: 130%;
+  background-color: #ffdbc4;
+  box-shadow: 0 0 15px 0px #875920;
+  font-size: 130%;
 }
-
 
 .special-event-name {
-    font-size: 120%;
-    font-weight: bolder;
-    font-style: italic;
-    font-variant: small-caps;
+  font-size: 120%;
+  font-weight: bolder;
+  font-style: italic;
+  font-variant: small-caps;
 }
 
-.event-types:not(.special-event-name + .event-types){
-    font-style: italic;
-    font-weight: bolder;
+.event-types:not(.special-event-name + .event-types) {
+  font-style: italic;
+  font-weight: bolder;
 }
 
 .event-date {
-    color: #2c1919;
+  color: #2c1919;
 }
 
 .event-short-desc {
-    margin-left: 2.5em;
+  margin-left: 2.5em;
 }
 .event-long-desc {
-    margin-left: 2.5em;
+  margin-left: 2.5em;
 }
 
 .event-listing {
-    margin-block-end: 1.5em;
+  margin-block-end: 1.5em;
 }
 
-.canceled-event, .canceled-event *:not(a){
-    text-decoration: line-through;
-    color: #990707;
-    font-style: italic;
+.canceled-event,
+.canceled-event *:not(a) {
+  text-decoration: line-through;
+  color: #990707;
+  font-style: italic;
 }
 
 .event-listing .more-info-link {
-    font-style: italic;
+  font-style: italic;
 }
 
 .polaroid-container {
-    transform: rotate(var(--data-polaroid-rotate));
-    margin: -5px;
+  transform: rotate(var(--data-polaroid-rotate));
+  margin: -5px;
 }
 
 .event-photo .polaroid-container {
-    margin: 25px; /* shrink the singleton non-collage ones a little */
-
+  margin: 25px; /* shrink the singleton non-collage ones a little */
 }
 
 /* if there's only a single photo */
 .event-photo {
-    display: grid;
-    grid-template-columns: repeat(var(--data-collage-width), 1fr);
-    grid-template-rows: repeat(var(--data-collage-width), 1fr);
-    aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--data-collage-width), 1fr);
+  grid-template-rows: repeat(var(--data-collage-width), 1fr);
+  aspect-ratio: 1;
 }
 
 .event-listing .polaroid-container {
-    flex: 0 0 50%;
+  flex: 0 0 50%;
 }
 
 /* when there's multiple pix we do the collage */
 
 /* each picture in the collage */
 .polaroid-container {
-    border: 2px outset #ffebcc;
-    background-color: #fffbf5;
-    border-radius: 3px;
-    filter: drop-shadow(2px 4px 4px grey);
+  border: 2px outset #ffebcc;
+  background-color: #fffbf5;
+  border-radius: 3px;
+  filter: drop-shadow(2px 4px 4px grey);
 }
 
 .event-inner-image-container {
-     
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 .event-inner-image {
-    min-width: 100%;
-    min-height: 100%;
-    max-width: 150%;
-    max-height: 150%;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: 150%;
+  max-height: 150%;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, 0);
 }
 
 .polaroid-frame {
-    max-width: 100%;
-    max-height: 100%;
-    aspect-ratio: 1;
-    padding: 15px 15px 3px 15px;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1;
+  padding: 15px 15px 3px 15px;
 }
 
 .polaroid-caption {
-    font-family: "Just Another Hand";
-    text-align: center;
-    color: gray;
-    text-overflow: ellipsis;
-    text-wrap: nowrap;
-    overflow: hidden;
+  font-family: "Just Another Hand";
+  text-align: center;
+  color: gray;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  overflow: hidden;
 }
-    
 
 @media (min-width: 992px) {
-    /* reverse the natural ordering for every other row that has a
+  /* reverse the natural ordering for every other row that has a
      * photo so that the photos alternate left-and-right going
      * down the page, but only on the wide view--on mobile they just
      * display vertically */
-    .row:nth-child(even) .event-listing {
-        -webkit-box-ordinal-group: 2;
-        -ms-flex-order: 1;
-        order: 1;
-    }
-    .row:nth-child(even) :is(.event-photos-collage, .event-photo) {
-        -webkit-box-ordinal-group: 3;
-        -ms-flex-order: 2;
-        order: 2;
-    }
+  .row:nth-child(even) .event-listing {
+    -webkit-box-ordinal-group: 2;
+    -ms-flex-order: 1;
+    order: 1;
+  }
+  .row:nth-child(even) :is(.event-photos-collage, .event-photo) {
+    -webkit-box-ordinal-group: 3;
+    -ms-flex-order: 2;
+    order: 2;
+  }
 }
 
-.fc-daygrid-event { /* overriding the default styling for 
+.fc-daygrid-event {
+  /* overriding the default styling for 
     fullcalendar so we can show more info per event. */
-    overflow: hidden;
-    max-height: 8em;
-    white-space: unset;
+  overflow: hidden;
+  max-height: 8em;
+  white-space: unset;
 }
 
 .event-text {
-    font-size: 130%;
+  font-size: 130%;
 }
 .non-bacds-event {
-    filter: opacity(0.6);
+  filter: opacity(0.6);
 }
 .non-bacds-event .event-text {
-    font-size: 100%;
+  font-size: 100%;
 }
