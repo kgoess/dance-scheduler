@@ -75,14 +75,14 @@ bacds.baseUri = '<% request.uri_base %>';
                   <li><a href="#dancefinder-section" class="nav-link">Dance Finder (search)</a></li>
                 </ul>
               </li>
-              <li class="has-children"> <a href="#services-section" class="nav-link">Dance Series</a>
+              <li class="has-children"> <a href="https://bacds.org/series/" class="nav-link">Dance Series</a>
                 <ul class="dropdown arrow-top">
                   <li><a href="https://bacds.org/series/contra" class="nav-link">Contra &amp; Square Dances</a></li>
                   <li><a href="https://bacds.org/series/english" class="nav-link">English Country Dances</a></li>
                   <li><a href="https://bacds.org/series/community" class="nav-link">Other Community Dances</a></li>
                 </ul>
               </li>
-              <li class="has-children"> <a href="#">Camps &amp; Weekends</a>
+              <li class="has-children"> <a href="https://bacds.org/camps/" class="nav-link">Camps &amp; Weekends</a>
                 <ul class="dropdown arrow-top">
                   <li><a href="https://bacds.org/camps/amweek2019/" class="nav-link">American Week</a></li>
                   <li><a href="https://bacds.org/eweek/" class="nav-link">Hey Days (English)</a></li>
@@ -91,7 +91,7 @@ bacds.baseUri = '<% request.uri_base %>';
                   <li><a href="https://bacds.org/camps/fallweekend/" class="nav-link">Fall Frolick</a></li>
                 </ul>
               </li>
-              <li class="has-children"> <a href="#specialevents-section" class="nav-link">Special Events &amp; Projects</a>
+              <li class="has-children"> <a href="https://bacds.org/events/" class="nav-link">Special Events &amp; Projects</a>
                 <ul class="dropdown arrow-top">
                   <li><a href="https://bacds.org/playford/" class="nav-link">Playford Ball</a></li>
                   <li><a href="https://bacds.org/camps/cc2020/" class="nav-link">Contra College</a></li>
@@ -104,7 +104,7 @@ bacds.baseUri = '<% request.uri_base %>';
                   <li><a href="https://bacds.org/events/#nyep" class="nav-link">New Year's Eve Contra</a></li>
                 </ul>
               </li>
-              <li class="has-children"> <a href="#about-section" class="nav-link">About Us</a>
+              <li class="has-children"> <a class="nav-link">About Us</a>
                 <ul class="dropdown arrow-top">
                   <li><a href="https://bacds.org/organization/" class="nav-link">Organization</a></li>
                   <!-- <li class="has-children"> <a href="#">Committees</a>
