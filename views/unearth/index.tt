@@ -107,24 +107,9 @@ bacds.baseUri = '<% request.uri_base %>';
               <li class="has-children"> <a class="nav-link">About Us</a>
                 <ul class="dropdown arrow-top">
                   <li><a href="https://bacds.org/newcomers/" class="nav-link">Newcomers</a></li>
+                  <li><a href="https://bacds.org/CodeOfConduct" class="nav-link">Code of Conduct</a></li>
                   <li><a href="https://bacds.org/email/?l=bacds-epub" class="nav-link">Email Signups</a></li>
                   <li><a href="https://bacds.org/organization/" class="nav-link">Organization</a></li>
-                  <!-- <li class="has-children"> <a href="#">Committees</a>
-                    <ul class="dropdown">
-                      <li><a href="https://bacds.org/">Finance</a></li>
-                      <li><a href="#">Hall Search</a></li>
-                      <li><a href="#">Mailing</a></li>
-                      <li><a href="#">Newsletter</a></li>
-                      <li><a href="#">Online Services</a></li>
-                      <li><a href="#">Outreach</a></li>
-                      <li><a href="#">Publicity</a></li>
-                      <li><a href="#">Programming</a></li>
-                      <li><a href="#">Scholarship</a></li>
-                      <li><a href="#">Sound</a></li>
-                      <li><a href="#">Squires</a></li>
-                      <li><a href="#">Volunteer Coordinator</a></li>
-                    </ul>
-                  </li>-->
                   <li><a href="https://bacds.org/memberform/" class="nav-link">Membership</a></li>
                   <li><a href="https://bacds.org/donate/" class="nav-link">Donate</a></li>
                   <li><a href="https://bacds.org/odd-sundays/" class="nav-link">Odd Sundays Garage Band Recordings</a></li>
