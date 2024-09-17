@@ -106,6 +106,8 @@ bacds.baseUri = '<% request.uri_base %>';
               </li>
               <li class="has-children"> <a class="nav-link">About Us</a>
                 <ul class="dropdown arrow-top">
+                  <li><a href="https://bacds.org/newcomers/" class="nav-link">Newcomers</a></li>
+                  <li><a href="https://bacds.org/email/?l=bacds-epub" class="nav-link">Email Signups</a></li>
                   <li><a href="https://bacds.org/organization/" class="nav-link">Organization</a></li>
                   <!-- <li class="has-children"> <a href="#">Committees</a>
                     <ul class="dropdown">
@@ -123,7 +125,6 @@ bacds.baseUri = '<% request.uri_base %>';
                       <li><a href="#">Volunteer Coordinator</a></li>
                     </ul>
                   </li>-->
-                  <li><a href="https://bacds.org/newcomers/" class="nav-link">Newcomers</a></li>
                   <li><a href="https://bacds.org/memberform/" class="nav-link">Membership</a></li>
                   <li><a href="https://bacds.org/donate/" class="nav-link">Donate</a></li>
                   <li><a href="https://bacds.org/odd-sundays/" class="nav-link">Odd Sundays Garage Band Recordings</a></li>
