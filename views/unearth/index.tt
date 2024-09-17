@@ -126,7 +126,14 @@ bacds.baseUri = '<% request.uri_base %>';
                   <li><a href="https://bacds.org/memberform/">Membership</a></li>
                   <li><a href="https://bacds.org/donate/" class="nav-link">Donate</a></li>
                   <li><a href="https://bacds.org/odd-sundays/" class="nav-link">Odd Sundays Garage Band Recordings</a></li>
-                  <li><a href="https://bacds.org/" class="nav-link">Music CDs</a></li>
+                  <li class="has-children"><a href="https://bacds.org/CDs/" class="nav-link">Music CDs</a>
+                    <ul class="dropdown arrow-right">
+                      <li><a href="https://bacds.org/events/SOTG" class="nav-link">Swinging on the Gate</a></li>
+                      <li><a href="https://bacds.org/events/WaltzCD" class="nav-link">Waltzes Before Breakfast</a></li>
+                      <li><a href="https://bacds.org/events/WBB2" class="nav-link">More Waltzes Before Breakfast</a></li>
+                      <li><a href="https://bacds.org/events/WBB3" class="nav-link">Chocolates Before Breakfast</a></li>
+                    </ul>
+                  </li>
                   <!-- <li><a href="#faq-section" class="nav-link">FAQ</a></li>-->
                   <li><a href="https://bacds.org/covid/" class="nav-link">COVID Saftey Info</a></li>
                 </ul>
