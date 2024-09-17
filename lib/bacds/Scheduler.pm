@@ -1473,7 +1473,7 @@ sub archive_calendars_index {
 }
 
 
-get '/test' => sub {
+get '/unearth' => sub {
 
     my $end_date = get_today()->add(days=>18)->ymd;
     my $start_date = get_today()->add(days=>1)->ymd;
