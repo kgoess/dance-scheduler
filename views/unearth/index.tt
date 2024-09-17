@@ -125,6 +125,7 @@ bacds.baseUri = '<% request.uri_base %>';
                   <li><a href="https://bacds.org/organization/payment-options" class="nav-link">Payment Options Policies</a></li>
                   <li><a href="https://bacds.org/staff_links/" class="nav-link">Support our Staff</a></li>
                   <li><a href="https://bacds.org/covid/" class="nav-link">COVID Saftey Info</a></li>
+                  <li><a href="https://bacds.org/transit/" class="nav-link">Transit Info</a></li>
                   <li><a href="https://bacds.org/links/" class="nav-link">External Resources</a></li>
                   <li><a href="https://bacds.org/contact/" class="nav-link">Contact Us</a></li>
                 </ul>
