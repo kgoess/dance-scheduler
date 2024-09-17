@@ -1473,6 +1473,10 @@ sub archive_calendars_index {
 }
 
 
+get '/unearth/' => sub { # allowing the trailing slash breaks all the relative links in the html
+    redirect '/unearth' => 303;
+};
+
 get '/unearth' => sub {
 
     my $end_date = get_today()->add(days=>18)->ymd;
