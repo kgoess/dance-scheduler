@@ -123,7 +123,8 @@ bacds.baseUri = '<% request.uri_base %>';
                       <li><a href="#">Volunteer Coordinator</a></li>
                     </ul>
                   </li>-->
-                  <li><a href="https://bacds.org/memberform/">Membership</a></li>
+                  <li><a href="https://bacds.org/newcomers/" class="nav-link">Newcomers</a></li>
+                  <li><a href="https://bacds.org/memberform/" class="nav-link">Membership</a></li>
                   <li><a href="https://bacds.org/donate/" class="nav-link">Donate</a></li>
                   <li><a href="https://bacds.org/odd-sundays/" class="nav-link">Odd Sundays Garage Band Recordings</a></li>
                   <li class="has-children"><a href="https://bacds.org/CDs/" class="nav-link">Music CDs</a>
