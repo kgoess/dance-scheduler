@@ -22,7 +22,7 @@
   integrity="sha512-GQz6nApkdT7cWN1Cnj/DOAkyfzNOoq+txIhSEK1G4HTCbSHVGpsrvirptbAP60Nu7qbw0+XlAAPGUmLU2L5l4g=="
   crossorigin="anonymous"
   referrerpolicy="no-referrer" />
-<link rel="stylesheet" href="css/unearth/aos.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Just+Another+Hand:wght@400&display=swap" rel="stylesheet">
 
@@ -321,7 +321,7 @@ bacds.baseUri = '<% request.uri_base %>';
 <script src="js/unearth/jquery.animateNumber.min.js"></script>
 <script src="js/unearth/jquery.fancybox.min.js"></script>
 <script src="js/unearth/jquery.easing.1.3.js"></script>
-<script src="js/unearth/aos.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="js/unearth/main.js"></script>
 <script src="js/unearth/bacds.js"></script>
 <script
