@@ -138,6 +138,7 @@ bacds.baseUri = '<% request.uri_base %>';
                   </li>
                   <!-- <li><a href="#faq-section" class="nav-link">FAQ</a></li>-->
                   <li><a href="https://bacds.org/covid/" class="nav-link">COVID Saftey Info</a></li>
+                  <li><a href="https://bacds.org/contact/" class="nav-link">Contact Us</a></li>
                 </ul>
               </li>
             </ul>
