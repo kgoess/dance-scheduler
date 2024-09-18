@@ -54,7 +54,11 @@ bacds.baseUri = '<% request.uri_base %>';
             <a href="#" class="text-white"><span class="mr-2 text-white icon-phone"></span> <span class="d-none d-md-inline-block"></span></a>
 -->
           
-          <div class="float-right"> <a href="#" class="text-white"><span class="mr-2 text-white icon-facebook"></span> <span class="d-none d-md-inline-block">FaceBook</span></a> <span class="mx-md-2 d-inline-block"></span> <a href="#" class="text-white"><span class="mr-2 text-white icon-twitter"></span> <span class="d-none d-md-inline-block">Twitter</span></a> </div>
+          <div class="float-right">
+            <!-- <a href="#" class="text-white"><span class="mr-2 text-white icon-facebook"></span> <span class="d-none d-md-inline-block">Facebook</span></a> -->
+            <span class="mx-md-2 d-inline-block"></span>
+            <!-- <a href="#" class="text-white"><span class="mr-2 text-white icon-twitter"></span> <span class="d-none d-md-inline-block">Twitter</span></a> -->
+         </div>
         </div>
       </div>
     </div>
