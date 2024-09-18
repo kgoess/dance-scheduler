@@ -31,7 +31,11 @@
 <link rel="stylesheet" href="css/unearth/bacds.css">
 <script>
 var bacds = {};
-bacds.baseUri = '<% request.uri_base %>';
+/* this baseUri is somewhat problematic now that we're pre-generating the page from cron using curl,
+   so the requested url may not be what the browser requested
+*/
+bacds.baseUri = window.location.protocol + '//' + window.location.hostname + '<% request.uri_base.path %>';
+
 </script>
 </head>
 <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
