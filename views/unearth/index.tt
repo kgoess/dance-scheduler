@@ -93,7 +93,7 @@ bacds.baseUri = window.location.protocol + '//' + window.location.hostname + '<%
               </li>
               <li class="has-children"> <a href="https://bacds.org/camps/" class="nav-link">Camps &amp; Weekends</a>
                 <ul class="dropdown arrow-top">
-                  <li><a href="https://bacds.org/camps/amweek2019/" class="nav-link">American Week</a></li>
+                  <li><a href="https://amweek.camp" class="nav-link">American Week</a></li>
                   <li><a href="https://bacds.org/eweek/" class="nav-link">Hey Days (English)</a></li>
                   <li><a href="https://bacds.org/familyweek/" class="nav-link">Family Week</a></li>
                   <li><a href="https://bacds.org/balancethebay/" class="nav-link">Balance the Bay</a></li>
