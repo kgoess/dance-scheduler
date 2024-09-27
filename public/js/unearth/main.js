@@ -234,12 +234,28 @@ jQuery(document).ready(function ($) {
 
         $("html, body").animate(
           {
-            scrollTop: $(hash).offset().top - $(".site-navbar").height(),
+            scrollTop:
+              $("#tonight-section").offset().top -
+              $(".site-navbar").height() -
+              5,
           },
-          600,
+          500,
           "easeInOutExpo",
           function () {
-            // window.location.hash = hash;
+            console.log(this.tagName, $(this).scrollTop());
+            $("html").animate(
+              {
+                scrollTop:
+                  $("#tonight-section").offset().top -
+                  $(".site-navbar").height() -
+                  5,
+              },
+              200,
+              "",
+              () => {
+                console.log(this.tagName, $(this).scrollTop());
+              }
+            );
           }
         );
       }
