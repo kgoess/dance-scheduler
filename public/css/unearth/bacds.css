@@ -47,7 +47,10 @@
 }
 
 .polaroid-container {
-  transform: rotate(var(--data-polaroid-rotate));
+  /* The scale is to correct for the overflow of the rotation 
+   chrome doesn't support abs yet, so sqrt(x^2) it is */
+  transform: rotate(var(--data-polaroid-rotate))
+    scale(calc(1 - sqrt(pow(sin(var(--data-polaroid-rotate)), 2))));
   margin: -5px;
 }
 
@@ -71,6 +74,7 @@
 
 /* each picture in the collage */
 .polaroid-container {
+  max-width: 100%;
   border: 2px outset #ffebcc;
   background-color: #fffbf5;
   border-radius: 3px;
