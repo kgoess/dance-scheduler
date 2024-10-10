@@ -2,7 +2,7 @@ AOS.init({
   duration: 800,
   easing: "slide",
   once: false,
-  disable: "phone",
+  disable: "mobile",
 });
 
 jQuery(document).ready(function ($) {
