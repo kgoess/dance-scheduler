@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     defaultTimedEventDuration: "02:30",
     events: {
-      url: "/livecalendar-results",
+      url: "/dance-scheduler/livecalendar-results",
       failure: function () {
         alert("there was an error while fetching events!");
       },
