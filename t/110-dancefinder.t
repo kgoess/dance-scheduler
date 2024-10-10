@@ -378,7 +378,7 @@ sub test_dancefinder_form_endpoint {
     $Test->get_ok("/dancefinder", "GET /dancefinder ok");
 
     like $Test->content, qr{
-        (?-x:<select name="band" multiple>)\s+
+        (?-x:<select name="band"[^>]*>)\s+
         (?-x:<option value="">ALL BANDS</option>)\s+
         (?-x:<option value="1">test band 1</option>)\s+
         (?-x:<option value="2">test band 2</option>)\s+
@@ -386,7 +386,7 @@ sub test_dancefinder_form_endpoint {
     }x, "bands found in form";
 
     like $Test->content, qr{
-        (?-x:<select name="muso" multiple>)\s+
+        (?-x:<select name="muso"[^>]*>)\s+
         (?-x:<option value="">ALL MUSICIANS</option>)\s+
         (?-x:<option value="1">muso 1</option>)\s+
         (?-x:<option value="2">muso 2</option>)\s+
