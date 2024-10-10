@@ -92,9 +92,9 @@ aside.sidebar {
 /* end flexbox layout */
 
 @media (max-width: 599px) {
-    body {
-      width: fit-content;
-    } 
+  body {
+    width: fit-content;
+  }
 }
 
 aside.sidebar {
@@ -121,43 +121,47 @@ aside.sidebar {
 
 /* emulate details/summary tags */
 @media (max-width: 599px) {
-    .collapsible-title { /* like <summary */
-      padding: 5px;
-    }
-    .collapsible-title.collapsible-closed::before {
-      content: '►';
-      margin-right: 5px;
-      font-size: 80%;
-    }
-    .collapsible-title.collapsible-open::before {
-      content: '▼';
-      margin-right: 5px;
-      font-size: 80%;
-    }
-    /* in the mobile view the collapsibles start closed */
-    .collapsible-body-hidden {
-        display: none;
-    }
+  .collapsible-title {
+    /* like <summary */
+    padding: 5px;
+  }
+  .collapsible-title.collapsible-closed::before {
+    content: "►";
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  .collapsible-title.collapsible-open::before {
+    content: "▼";
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  /* in the mobile view the collapsibles start closed */
+  .collapsible-body-hidden {
+    display: none;
+  }
 }
 @media (min-width: 600px) {
-    .collapsible-title {
-        /* no need to show the text "Navigation Links" in the nav bar */
-        display: none;
-    }
-    /* in the desktop view the collapsibles aren't collapsible so they're
+  .collapsible-title {
+    /* no need to show the text "Navigation Links" in the nav bar */
+    display: none;
+  }
+  /* in the desktop view the collapsibles aren't collapsible so they're
      * never closed */
-    .collapsible-body-hidden {
-        /* display: none; */
-    }
+  .collapsible-body-hidden {
+    /* display: none; */
+  }
 }
 /* end details/summary emulation */
 
 a {
   color: var(--seasoned-text);
+  text-decoration: revert;
 }
 
 body {
   font-family: Verdana, sans-serif;
+  line-height: revert;
+  margin: revert;
 }
 header {
   color: var(--header-color);
@@ -183,7 +187,8 @@ header .breadcrumbs a:any-link {
   font-style: italic;
   font-weight: bold;
 }
-header .masthead-title { font-size: 1.5em;
+header .masthead-title {
+  font-size: 1.5em;
   font-weight: bold;
   margin: 2px;
   margin-left: 10px;
@@ -248,7 +253,7 @@ nav {
   display: flex;
   flex-direction: column;
   padding: 10px;
-  font-size: .9em;
+  font-size: 0.9em;
 }
 @media (min-width: 600px) {
   nav {
@@ -306,10 +311,10 @@ p.dance {
 /* the new date links on each entry, they're just there for google to crawl,
  * so take off the italics we added, and take off the standard underline for links  */
 p.dance b.date a {
-  text-decoration:           none;
+  text-decoration: none;
 }
 p.dance b.date a:link {
-  font-style:                normal;
+  font-style: normal;
 }
 p.comment {
   margin: 0 1em 3em 1em;
@@ -333,7 +338,10 @@ p.canceled-event-comment {
   font: italic small-caps bold;
 }
 
-div.tonight, div.workshop, div.special, div.camp {
+div.tonight,
+div.workshop,
+div.special,
+div.camp {
   border: solid;
   border-color: var(--special-event-border);
   border-width: 3px;
@@ -383,13 +391,12 @@ aside.mission-statement a:any-link {
   color: #ffffff;
 }
 
-
 footer {
   background-color: var(--header-background-color);
   padding-left: 15px;
   padding-right: 15px;
-  padding-top: .3em;
-  padding-bottom: .3em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
   margin-bottom: 3em;
   color: var(--header-color);
   font-style: italic;
@@ -400,48 +407,47 @@ footer a {
   color: var(--header-color);
 }
 .old {
-    display: none;
+  display: none;
 }
 
 /* the promo buttons are the "Buy Our CDs", "Donate!", "Search"...etc */
 #promo-buttons {
-    display: flex;
-    flex-direction: row;
-    background-color: var(--header-background-color);
+  display: flex;
+  flex-direction: row;
+  background-color: var(--header-background-color);
 }
 .promo-button {
-    color: #000000;
-    background-color: var(--nav-background);
-    font-size: 90%;
-    padding: 8px 16px;;
-    padding: 0px 5px 5px 2px;
-    text-align: center;
-    box-shadow:
-        inset 0 0 2px 0 rgba(255,255,255,.4),
-        inset 0 0 3px 0 rgba(0,0,0,.4),
-        inset 0 0 3px 5px rgba(0,0,0,.05),
-        2px 2px 4px 0 rgba(0,0,0,.25);
-    border-radius: 5px;
-    vertical-align: center;
-    margin: 1px;
+  color: #000000;
+  background-color: var(--nav-background);
+  font-size: 90%;
+  padding: 8px 16px;
+  padding: 0px 5px 5px 2px;
+  text-align: center;
+  box-shadow: inset 0 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 0 3px 0 rgba(0, 0, 0, 0.4), inset 0 0 3px 5px rgba(0, 0, 0, 0.05),
+    2px 2px 4px 0 rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  vertical-align: center;
+  margin: 1px;
 }
 .promo-button a:link {
-    text-decoration: none;
-    color: #000000;
+  text-decoration: none;
+  color: #000000;
 }
-.promo-button:before, .promo-button:after {
-    content: '';
-    display: block;
-    left: 2px;
-    right: 2px;
-    height: 3px;
+.promo-button:before,
+.promo-button:after {
+  content: "";
+  display: block;
+  left: 2px;
+  right: 2px;
+  height: 3px;
 }
 .promo-button:before {
-    top: 0;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    background: rgba(255,255,255,.6);
-    box-shadow: 0 1px 2px 0 rgba(255,255,255,.6);
+  top: 0;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 2px 0 rgba(255, 255, 255, 0.6);
 }
 /* it would be nice to get this bottom border working, but it's hugging the
  * bottom of the text instead of the bottom of the button
@@ -455,19 +461,18 @@ footer a {
 */
 
 header .cd-carousel-bg {
-    margin-top: 10px;
-    padding-bottom: 20px;
-    /* need to override the bottom margin from our cd-carousel.css or we
+  margin-top: 10px;
+  padding-bottom: 20px;
+  /* need to override the bottom margin from our cd-carousel.css or we
        get a blank chunk between the carousel and the rest of the page */
-    margin-bottom: 0px;
-
+  margin-bottom: 0px;
 }
 @media (max-width: 599px) {
-    /* overriding cd-carousel.css for mobile */
-    header ul#cd-carousel li {
-        width: 60px;
-        height: 60px;
-    }
+  /* overriding cd-carousel.css for mobile */
+  header ul#cd-carousel li {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 .google-searchbox-container {
@@ -477,39 +482,38 @@ header .cd-carousel-bg {
   background-color: var(--header-background-color);
 }
 .google-searchbox {
-    max-width: 500px;
+  max-width: 500px;
 }
 /* this is for covidStatus.html */
 #covid-status-announcement {
-    /* these are from main.p in base.css */
-    /* but we're using a div here, not a p */
-    padding-left: 15px;
-    padding-right: 15px;
+  /* these are from main.p in base.css */
+  /* but we're using a div here, not a p */
+  padding-left: 15px;
+  padding-right: 15px;
 }
 #covid-current {
-    border-radius: 30px;
-    color: white;
-    padding: 2px 4px 2px 4px;
-    margin: 2px;
+  border-radius: 30px;
+  color: white;
+  padding: 2px 4px 2px 4px;
+  margin: 2px;
 }
-
 
 /* ************************ */
 /* from base.css to handle html in like the Display Text form */
 /* ************************ */
 .center {
-    text-align: center;
+  text-align: center;
 }
 h1.dance {
-    text-align: center;
-    color: #993300;
-    /* this font-size not in base.css, but let's drop it down a notch anyway */
-    font-size: 1.2em;
+  text-align: center;
+  color: #993300;
+  /* this font-size not in base.css, but let's drop it down a notch anyway */
+  font-size: 1.2em;
 }
 /* ************************ */
 /* end from base.css */
 /* ************************ */
 
 .hidden {
-    display: none;
+  display: none;
 }
