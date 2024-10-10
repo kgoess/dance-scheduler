@@ -964,8 +964,8 @@ get '/dancefinder-results' => with_types [
         },
 
     },
-    # no wrapper
-    { layout => undef },
+    # gets the wrapper from views/layouts/<whatever>
+    { layout => 'scheduler-page' },
 
 };
 
