@@ -1,11 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
-<html>
-<head>
-<% INCLUDE dancefinder/title.html.tt %>
-<% virtual_include.meta_tags %>
-<link rel="stylesheet" title="base" type="text/css" href="<% bacds_uri_base %>/css/base.css" />
-<link rel="icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
-<link rel="shortcut icon" href="<% bacds_uri_base %>/favicon.ico" type="image/x-icon" />
 <style>
 .search_args {
     margin: 20px;
@@ -14,13 +6,15 @@
 .search_arg {
     font-weight: bold;
 }
+.listing {
+	margin:					1em 2em 1em 2em;
+	text-indent:				-2em;
+}
+.listing a{
+    font-style: italic;
+}
 </style>
-
-</head>
-<body id="scriptoutput">
-<table>
-<tr>
-<td class="main">
+<div style="padding-left: 1em">
 <div class="search_args">
 <% FOREACH style IN style_arg %>
     <span class="search_arg"><% style.name.lower().ucfirst() %></span><% IF !loop.last() %> or <% END %>
@@ -44,9 +38,5 @@ Dances
     <% END %>
 <% END %>
 </div>
-
 <% include dancefinder/listings.tt events => events %>
-
-
-</body>
-</html>
+</div>
