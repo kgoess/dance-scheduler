@@ -102,7 +102,8 @@ preload_accordion_config;
 
 The "before" hook is set up to catch every dancer2 request, check for the
 LoginMethod cookie and associated login cookie, and if they check out then put
-the "signed_in_as" programmer in the var() stash. It also creates an bacds::Scheduler::Auditor in the var() stash under "auditor".
+the "signed_in_as" programmer in the var() stash. It also creates an
+bacds::Scheduler::Auditor in the var() stash under "auditor".
 
 See bacds::Scheduler::FederatedAuth for what sets these cookies.
 
@@ -418,7 +419,7 @@ Create a new event.
 =cut
 
 post '/event/' => can_create_event requires_checksum sub {
-    my $auditor = request->var('auditor');
+    my $auditor = var 'auditor';
 
     my ($event, $err) = $event_model->post_row($auditor, params);
 
@@ -439,7 +440,7 @@ Update an existing event
 =cut
 
 put '/event/:event_id' => requires_checksum can_edit_event sub {
-    my $auditor = request->var('auditor');
+    my $auditor = var 'auditor';
 
     my ($event, $err) = $event_model->put_row($auditor, params);
 
@@ -701,7 +702,7 @@ foreach my $r (@$routes) {
     # PUT /thing/1234 - update an existing thing
     #
     put "/$r->{model}/:$pk_name" => requires_checksum $write_perm->(sub {
-        my $auditor = request->var('auditor');
+        my $auditor = var 'auditor' ;
 
         my ($obj, $err) = $class_name->put_row($auditor, params);
 
