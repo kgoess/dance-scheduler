@@ -225,16 +225,10 @@
       </div>
     </div>
     <footer class="site-footer">
-    <div class="container">
-      <div class="col ml-auto">
-        <h2 class="footer-heading mb-4">Subscribe to our Newsletters</h2>
-        <a href="https://bacds.org/email/">Electronic mailing lists</a>
-      </div>
-    </div>
-    <div class="col-12 text-center border-top pt-3 mt-3">
+    <div class="col-12 text-center">
       <div class="copyright"><small> 
         <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --> 
-        Copyright &copy;<script>document.write(new Date().getFullYear());</script> Bay Area Country Dance Society, All rights reserved | This site is made with <i class="icon-heart text-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" >Colorlib</a> 
+        This site is made with <i class="icon-heart text-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" >Colorlib</a> 
         <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --> 
       </small></div>
     </div>
