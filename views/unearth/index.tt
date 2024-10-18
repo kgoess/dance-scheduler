@@ -44,7 +44,7 @@
   <div class="top-bar">
     <div class="container">
       <div class="row">
-        <div class="col-12"> <a href="mailto:bacds@bacds.org" class="text-white"><span class="mr-2 text-white icon-envelope-open-o"></span> <span class="d-none d-md-inline-block">bacds@bacds.org</span></a>
+        <div class="col-12">
           <div class="float-right">
             <!-- <a href="#" class="text-white"><span class="mr-2 text-white icon-facebook"></span> <span class="d-none d-md-inline-block">Facebook</span></a> -->
             <span class="mx-md-2 d-inline-block text-white bold">Promoting traditional English and American music and dance</span>
