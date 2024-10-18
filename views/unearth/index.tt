@@ -225,71 +225,11 @@
         </div>
       </div>
     </div>
-<!--    
-    <div class="site-section block-13" id="testimonials-section" data-aos="fade">
-      <div class="container">
-        <div class="text-center mb-5">
-          <div class="block-heading-1">
-            <h2>Testimonials</h2>
-          </div>
-        </div>
-        <div class="owl-carousel nonloop-block-13">
-          <div>
-            <div class="block-testimony-1 text-center">
-              <blockquote class="mb-4">
-                <p>&ldquo;When my friends invited me to a dance, I was skeptical. But after I got there, the experience was amazing. I am hooked!&rdquo;</p>
-              </blockquote>
-              <figure> <img src="images/unearth/portrait.jpg" alt="Image" class="img-fluid rounded-circle mx-auto"> </figure>
-              <h3 class="text-black">Happy Dancer</h3>
-            </div>
-          </div>
-          <div>
-            <div class="block-testimony-1 text-center">
-              <figure> <img src="images/unearth/portrait.jpg" alt="Image" class="img-fluid rounded-circle mx-auto"> </figure> 
-              <h3 class="mb-4 text-black">Ima Folkie</h3>
-              <blockquote class="mb-4">
-                <p>&ldquo;I love the live music! Some of the best folk musicians in the country play at these dances.&rdquo;</p>
-              </blockquote>
-            </div>
-          </div>
-          <div>
-            <div class="block-testimony-1 text-center">
-              <blockquote class="mb-4">
-                <p>&ldquo;BACDS does a tremendous service for the entire dance community nationwide by doing so many online virtual dances &amp; concerts.&rdquo;</p>
-              </blockquote>
-                <figure> <img src="images/unearth/portrait.jpg" alt="Image" class="img-fluid rounded-circle mx-auto"> </figure>
-              <h3 class="text-black">Shel Trinplace</h3>
-            </div>
-          </div>
-          <div>
-            <div class="block-testimony-1 text-center">
-              <figure> <img src="images/unearth/portrait.jpg" alt="Image" class="img-fluid rounded-circle mx-auto"> </figure>
-              <h3 class="font-size-20 mb-4 text-black">Well-known Musician</h3>
-              <blockquote class="mb-4">
-                <p>&ldquo;I got my start playing for contra dances at one of the BACDS camps, with workshops and serious quality time with some of my contra musician idols. Now I are one!&rdquo;</p>
-              </blockquote>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
--->    
     <footer class="site-footer">
     <div class="container">
       <div class="col ml-auto">
         <h2 class="footer-heading mb-4">Subscribe to our Newsletters</h2>
         <a href="https://bacds.org/email/">Electronic mailing lists</a>
-<!--    
-        <form action="#" method="post" class="footer-suscribe-form">
-          <div class="input-group mb-3">
-            <input type="text" class="form-control border-secondary text-white bg-transparent" placeholder="Enter Email" aria-label="Enter Email" aria-describedby="button-addon2">
-            <div class="input-group-append">
-              <button class="btn btn-primary text-white" type="button" id="button-addon2">Subscribe</button>
-            </div>
-          </div>
-          </div>
-        </form>
--->       
       </div>
     </div>
     <div class="col-12 text-center border-top pt-3 mt-3">
