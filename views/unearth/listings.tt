@@ -193,7 +193,7 @@ END -%>
       <% END -%>
       <% IF event.venues %> at <% END %>
       <% FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) -%>
-        <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
+        <%- maybe_linkit(venue.hall_name _ "in" _ venue.city, event.custom_url || event.series.series_url) -%>.
       <% END -%>
       <% IF event.long_desc -%>
         <div class="event-long-desc"><% event.long_desc %></div>
@@ -218,11 +218,13 @@ END -%>
         <%- END %>
           <%- IF (event.bands || event.talent) && event.and_friends %>&hellip;and friends<% END %>
         <%- IF !emphasize_name_over_style && event.name %>
-          <%# if it's a special event, print out the title. %>
+          <%# if a special event, print out the title. %>
           <span class="special-event-name"><% event.name %></span>
         <%- END %>
         <%- IF event.short_desc %><div class="event-short-desc"><% event.short_desc %><% END %>
-        <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>
+        <%- IF event.custom_url || event.series.series_url %>
+            <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>
+        <%- END %>
         <% IF event.short_desc %></div><% END %>
       <%- END -%>
       <%- includes_non_bacds_org(event.parent_orgs) -%>
