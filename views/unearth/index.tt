@@ -188,9 +188,6 @@
                     Staff</a></li>
                 <li class="nav-item dropdown-item"><a href="https://bacds.org/covid/" class="nav-link">COVID Safety
                     Info</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/dance-scheduler/" class="nav-link">Dance
-                    Scheduler</a>
-                </li>
                 <li class="nav-item dropdown-item"><a href="https://bacds.org/transit/" class="nav-link">Transit
                     Info</a>
                 </li>
