@@ -11,6 +11,15 @@ jQuery(document).ready(function ($) {
   $(".loader").fadeOut("slow");
   $("#overlayer").fadeOut("slow");
 
+  $("body").on(
+    "click",
+    ".collapse .nav-link:not(.dropdown-toggle)",
+    function (e) {
+      let collapse = document.getElementById("topnav");
+      collapse.className = collapse.className.replace(" show", "");
+    }
+  );
+
   var siteCarousel = function () {
     if ($(".nonloop-block-13").length > 0) {
       $(".nonloop-block-13").owlCarousel({
