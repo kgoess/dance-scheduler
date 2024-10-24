@@ -9,19 +9,20 @@ Want to see all the BACDS dances we know about? Don't make any selections,
 just press the "Get Your Schedule!" button.
 </p>
 <form action="<% request.uri_base %>/dancefinder-results" method="GET">
-  <div class="form-row">
-    <div class="form-group col">
-      <label for="caller-select">Which caller(s)</label>
-      <select name="caller" id="caller-select" class="custom-select" multiple>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <label class="form-label mt-1 mb-0" for="caller-select">Which caller(s)</label>
+      <select name="caller" id="caller-select" class="form-select" multiple>
         <option value="">ALL LEADERS</option>
         <%- FOREACH caller IN callers %>
         <option value="<% caller.0 | html %>"><% caller.1 | html %></option>
         <%- END %>
       </select>
     </div>
-    <div class="form-group col">
-      <label for="muso-select">Which musician(s)</label>
-      <select name="muso" id="muso-select" class="custom-select" multiple>
+    <div class="col">
+      <label class="form-label mt-1 mb-0" for="muso-select">Which musician(s)</label>
+      <select name="muso" id="muso-select" class="form-select" multiple>
         <option value="">ALL MUSICIANS</option>
         <%- FOREACH muso IN musos %>
         <option value="<% muso.0 | html %>"><% muso.1 | html %></option>
@@ -29,34 +30,38 @@ just press the "Get Your Schedule!" button.
       </select>
     </div>
   </div>
-  <div class="form-group">
-    <label for="venue-select">Which venue(s)</label>
-    <select name="venue" id="venue-select" class="custom-select" multiple>
+  <div class="row"><div class="col">
+    <label class="form-label mt-1 mb-0" for="venue-select">Which venue(s)</label>
+    <select name="venue" id="venue-select" class="form-select" multiple>
       <option value="">ALL LOCATIONS</option>
       <%- FOREACH venue_rec IN venues %>
       <option value="<% venue_rec.0 | html %>"><% venue_rec.1 | html %></option>
       <%- END %>
     </select>
+    </div>
   </div>
-  <div class="form-group">
-    <label for="band-select">Which band(s)</label>
-    <select name="band" id="band-select" class="custom-select" multiple>
+  <div class="row"><div class="col">
+    <label class="form-label mt-1 mb-0" for="band-select">Which band(s)</label>
+    <select name="band" id="band-select" class="form-select" multiple>
       <option value="">ALL BANDS</option>
       <%- FOREACH band IN bands %>
       <option value="<% band.0 | html %>"><% band.1 | html %></option>
       <%- END %>
     </select>
   </div>
-  <div class="form-group">
-    <label for="style-select">Which style(s)</label>
-    <select name="style" id="style-select" class="custom-select" multiple>
+  </div>
+  <div class="row"><div class="col">
+    <label class="form-label mt-1 mb-0" for="style-select">Which style(s)</label>
+    <select name="style" id="style-select" class="form-select" multiple>
       <option value="">ALL STYLES</option>
       <%- FOREACH style IN styles %>
       <option value="<% style.0 | html %>"><% style.1 | html %></option>
       <%- END %>
     </select>
   </div>
-  <button type="submit" class="btn btn-primary">Get Your Schedule!</button>
+  </div>
+  <button type="submit" class="btn btn-primary mt-2">Get Your Schedule!</button>
+  </div>
 </form>
 
 </div>
