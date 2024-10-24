@@ -8,8 +8,8 @@ AOS.init({
 });
 
 jQuery(document).ready(function ($) {
-  $(".loader").delay(1000).fadeOut("slow");
-  $("#overlayer").delay(1000).fadeOut("slow");
+  $(".loader").fadeOut("slow");
+  $("#overlayer").fadeOut("slow");
 
   var siteCarousel = function () {
     if ($(".nonloop-block-13").length > 0) {
@@ -66,31 +66,4 @@ jQuery(document).ready(function ($) {
     });
   };
   siteCarousel();
-
-  // navigation
-  var OnePageNavigation = function () {
-    var navToggler = $(".site-menu-toggle");
-
-    $("body").on(
-      "click",
-      ".main-menu li a[href^='#'], .smoothscroll[href^='#'], .site-mobile-menu .site-nav-wrap li a[href^='#']",
-      function (e) {
-        e.preventDefault();
-
-        var hash = this.hash;
-
-        $("html, body").animate(
-          {
-            scrollTop:
-              $("#tonight-section").offset().top -
-              $(".site-navbar").height() -
-              5,
-          },
-          500,
-          "easeInOutExpo"
-        );
-      }
-    );
-  };
-  OnePageNavigation();
 });
