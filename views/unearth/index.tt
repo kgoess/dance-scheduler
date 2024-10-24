@@ -162,26 +162,23 @@
                 <li class="nav-item dropdown-item"><a href="https://bacds.org/odd-sundays/" class="nav-link">Odd
                     Sundays
                     Garage Band Recordings</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/CDs/" class="nav-link">Music CDs</a>
-                </li>
-                <!-- 
-                    TODO: Trying to get multilevel dropdown to work
                 <li class="dropdown-item dropend nav-item dropdown">
                   <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
                     aria-expanded="false">Music CDs</a>
                   <ul class="dropdown-menu">
-                    <li class="nav-item dropdown-item"><a  href="https://bacds.org/events/SOTG/"class="nav-link">Swinging
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/events/SOTG/"
+                        class="nav-link">Swinging
                         on the Gate</a></li>
-                    <li class="nav-item dropdown-item"><a  href="https://bacds.org/events/WaltzCD/"
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/events/WaltzCD/"
                         class="nav-link">Waltzes Before Breakfast</a></li>
-                    <li class="nav-item dropdown-item"><a  href="https://bacds.org/events/WBB2/"class="nav-link">More
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/events/WBB2/" class="nav-link">More
                         Waltzes Before Breakfast</a>
                     </li>
-                    <li class="nav-item dropdown-item"><a  href="https://bacds.org/events/WBB3/"
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/events/WBB3/"
                         class="nav-link">Chocolates Before Breakfast</a></li>
                   </ul>
-                </li> 
-                -->
+                </li>
+
 
                 <li class="nav-item dropdown-item"><a href="https://bacds.org/organization/payment-options/"
                     class="nav-link">Payment Options Policies</a>
