@@ -193,7 +193,7 @@ END -%>
       <% END -%>
       <% IF event.venues %> at <% END %>
       <% FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) -%>
-        <%- maybe_linkit(venue.hall_name _ "in" _ venue.city, event.custom_url || event.series.series_url) -%>.
+        <%- maybe_linkit(venue.hall_name _ " in " _ venue.city, event.custom_url || event.series.series_url) -%>.
       <% END -%>
       <% IF event.long_desc -%>
         <div class="event-long-desc"><% event.long_desc %></div>
