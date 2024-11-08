@@ -79,7 +79,7 @@
       model_name: caller
       table_name: callers
       allow_multi_select: 1
-    - label: The caller intends to use
+    - label: The caller intends to use ___ roles
       name: role_pair_id
       type: dropdown
       model_name: role_pair
