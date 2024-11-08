@@ -67,6 +67,7 @@ subtest 'POST /event' => sub {
         bands       => [],
         callers     => [],
         parent_orgs => [],
+        role_pairs  => [],
         created_ts  => "2022-04-28T02:18:05",
         modified_ts => "2022-04-28T02:18:05",
         is_canceled => 0,

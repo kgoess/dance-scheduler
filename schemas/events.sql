@@ -21,7 +21,9 @@ CREATE TABLE events (
 
     INDEX events_name_idx (name),
     INDEX events_start_time_idx (start_time),
+    INDEX events_start_date on events (start_date),
     INDEX events_series_idx (series_id),
+
 
     FOREIGN KEY (series_id)
         REFERENCES series(series_id)

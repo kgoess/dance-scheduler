@@ -41,6 +41,7 @@ export function displayItem(target, msg) {
 const keyToDisplayInItemRow = {
     event: ['start_date', 'synthetic_name'],
     parent_org: 'abbreviation',
+    role_pair: 'role_pair',
     venue: ['vkey', 'hall_name'],
 };
 export function getLabelForDisplayInItemListbox (modelName, data) {
@@ -198,7 +199,7 @@ export function displayListForModel(modelName, msg) {
 
 /* loadListForModel
  *
- * This pings the server for a list of items for the current accordian tab,
+ * This pings the server for a list of items for the current accordion tab,
  * then populates the .clickable-list with them via displayListForModel()
  */
 export function loadListForModel(modelName) {

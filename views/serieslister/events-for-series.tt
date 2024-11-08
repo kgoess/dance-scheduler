@@ -58,6 +58,10 @@
                         <%- END %>
                     <%- END %>
                     <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
+                    <%- IF event.role_pairs %>
+                        <br/>
+                        The caller intends to use <% event.role_pairs.role_pair %> role names.
+                    <%- END %>
                 </span>
             </p>
             <p class="<% IF event.is_canceled %>canceled-event-comment <% END %>comment">

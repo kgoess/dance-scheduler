@@ -29,6 +29,11 @@ Dances
 <% FOREACH team IN teams_arg %>
     <% IF loop.first() %>Featuring <% END %><span class="search_arg"><% team.name %></span><% IF !loop.last() %> or <% END %>
 <% END %>
+<% FOREACH role_pair IN role_pair_arg %>
+    <% IF loop.first() %>Intending to Use <% END %><span class="role_pair_arg"><% role_pair.role_pair %></span><% IF !loop.last() %> or <% END %>
+     <% IF loop.last() %><% IF role_blanks %> or unspecified <% END %> role names <% END %>
+<% END %>
+<% IF NOT role_pair_arg.size() AND role_blanks %> with unspecified role names <% END %>
 <% IF bands_and_musos_arg.size() %>
     Featuring
     <% FOREACH bands_and_musos IN bands_and_musos_arg %>

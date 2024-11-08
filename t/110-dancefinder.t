@@ -380,17 +380,18 @@ sub test_dancefinder_form_endpoint {
     like $Test->content, qr{
         (?-x:<select name="band"[^>]*>)\s+
         (?-x:<option value="">ALL BANDS</option>)\s+
-        (?-x:<option value="1">test band 1</option>)\s+
-        (?-x:<option value="2">test band 2</option>)\s+
+        (?-x:<option value="1">\s+test band 1\s+</option>)\s+
+        (?-x:<option value="2">\s+test band 2\s+</option>)\s+
              </select>
     }x, "bands found in form";
+#
 
     like $Test->content, qr{
         (?-x:<select name="muso"[^>]*>)\s+
         (?-x:<option value="">ALL MUSICIANS</option>)\s+
-        (?-x:<option value="1">muso 1</option>)\s+
-        (?-x:<option value="2">muso 2</option>)\s+
-        (?-x:<option value="3">muso 3</option>)\s+
+        (?-x:<option value="1">\s+muso 1\s+</option>)\s+
+        (?-x:<option value="2">\s+muso 2\s+</option>)\s+
+        (?-x:<option value="3">\s+muso 3\s+</option>)\s+
              </select>
     }x, "musos found in form";
 }

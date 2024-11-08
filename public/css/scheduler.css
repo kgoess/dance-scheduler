@@ -230,7 +230,7 @@ font-size: 10px;
 .row-label {
     display: flex;
     flex-direction: row;
-    flex: 0 0 10em;
+    flex: 0 0 12em;
     align-items: center;
     gap: 5px;
 }

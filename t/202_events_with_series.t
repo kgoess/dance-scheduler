@@ -60,6 +60,7 @@ subtest 'POST /event' => sub {
         name        => $new_event->{name},
         callers     => [],
         parent_orgs => [],
+        role_pairs  => [],
         series      => [],
         styles      => [],
         venues      => [],
