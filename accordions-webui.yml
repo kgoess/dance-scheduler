@@ -79,6 +79,17 @@
       model_name: caller
       table_name: callers
       allow_multi_select: 1
+    - label: intends to use
+      name: role_pair_id
+      type: dropdown
+      model_name: role_pair
+      table_name: role_pairs
+      help: >
+        Optional. Will be used in the entry in the series page for this dance
+        as "The caller intends to use ___ role names".
+      # role_pairs could be multi_select, the schema supports it, but I feel
+      # like that might be unecessarily confusing for programmers, so we'll
+      # just pretend it's a single
     - label: 'Name (for camps, special events)'
       name: name
       type: text
@@ -432,4 +443,15 @@
       table_name: styles
       allow_multi_select: 1
     - name: team_id
+      type: hidden
+
+- label: Role Names
+  fold_model: role_pair
+  fold_vars:
+    columns:
+    - label: Role Names
+      name: role_pair
+      required: 1
+      type: text
+    - name: role_pair_id
       type: hidden

@@ -33,7 +33,8 @@ sub related_entities_for_upcoming_events {
     my $rs = _all_upcoming_events();
 
     # this all is for displaying the dropdowns on the input form:
-    my (%stylehash, %venuehash, %bandhash, %musohash, %callerhash);
+    my (%stylehash, %venuehash, %bandhash, %musohash, %callerhash,
+        %role_pair_hash);
     while (my $event = $rs->next) {
         # grab the callers
         my $callers = $event->callers;
@@ -74,14 +75,22 @@ sub related_entities_for_upcoming_events {
             next if $style->is_deleted;
             $stylehash{$style->style_id} = $style;
         }
+
+        # grab the role_pairs
+        my $role_pairs = $event->role_pairs;
+        while (my $role_pair = $role_pairs->next) {
+            next if $role_pair->is_deleted;
+            $role_pair_hash{$role_pair->role_pair_id} = $role_pair;
+        }
     }
 
     return {
-        callers => \%callerhash,
-        venues  => \%venuehash,
-        bands   => \%bandhash,
-        musos   => \%musohash,
-        styles  => \%stylehash,
+        callers    => \%callerhash,
+        venues     => \%venuehash,
+        bands      => \%bandhash,
+        musos      => \%musohash,
+        role_pairs => \%role_pair_hash,
+        styles     => \%stylehash,
     };
 }
 
@@ -102,6 +111,7 @@ sub _all_upcoming_events {
         {event_talent_maps => 'talent'},
         {event_venues_maps => 'venue'},
         {event_band_maps => {band => { band_memberships => 'talent'}}},
+        {event_role_pairs_maps => 'role_pair'},
     );
 
     my $start_date = get_today()->ymd;
@@ -140,12 +150,14 @@ sub search_events {
 
     my $start_date_arg = delete $args{start_date};
     my $end_date_arg   = delete $args{end_date};
-    my $caller_arg     = delete $args{caller}     || [];
-    my $venue_arg      = delete $args{venue}      || [];
-    my $band_arg       = delete $args{band}       || [];
-    my $muso_arg       = delete $args{muso}       || [];
-    my $style_arg      = delete $args{style}      || [];
-    my $team_arg       = delete $args{team}       || [];
+    my $caller_arg     = delete $args{caller}    || [];
+    my $venue_arg      = delete $args{venue}     || [];
+    my $band_arg       = delete $args{band}      || [];
+    my $muso_arg       = delete $args{muso}      || [];
+    my $style_arg      = delete $args{style}     || [];
+    my $team_arg       = delete $args{team}      || [];
+    my $role_pair_arg  = delete $args{role_pair} || [];
+    my $role_pair_allow_blank = delete $args{role_pair_allow_blank} || 0;
     my $dbix_debug     = delete $args{dbix_debug};
     # db and dbuser are for dancefinder.pl
     my $db_arg         = delete $args{db};
@@ -167,6 +179,7 @@ sub search_events {
         {event_parent_orgs_maps => 'parent_org'},
         {event_team_maps => 'team'},
         {event_band_maps => {band => { band_memberships => 'talent'}}},
+        {event_role_pairs_maps => 'role_pair'}
     );
 
     my @joins = (
@@ -176,25 +189,43 @@ sub search_events {
         @$muso_arg ? 'event_talent_maps' : (),
         @$band_arg ? 'event_band_maps' : (),
         @$team_arg ? 'event_team_maps' : (),
+        @$role_pair_arg ? 'event_role_pairs_maps' : (),
     );
-
     my $start_date = $start_date_arg || get_today()->ymd;
+
+    my @role_search;
+    if ($role_pair_allow_blank){
+        my $role_non_blank = $dbh->resultset('EventRolePairsMap')->search({},{
+            columns => 'event_id',
+            distinct => 1
+        });
+        @role_search = @$role_pair_arg
+            ? (
+            -or => [
+                'event_role_pairs_maps.role_pair_id' => $role_pair_arg,
+                'me.event_id' => { -not_in => $role_non_blank->as_query}
+            ])
+            : ('me.event_id' => { -not_in => $role_non_blank->as_query});
+    } else {
+        @role_search = @$role_pair_arg ? ('event_role_pairs_maps.role_pair_id' => $role_pair_arg)   : ();
+    }
 
     # wrt join and prefetch see:
     # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
     my $subquery = $dbh->resultset('Event')->search(
         {
+            '-not_bool' => 'is_deleted',
+            start_date =>
+                $end_date_arg
+                ? { '-between' => [$start_date, $end_date_arg] }
+                : { '>=' => $start_date },
             @$caller_arg ? ('event_callers_maps.caller_id' => $caller_arg) : (),
             @$venue_arg  ? ('event_venues_maps.venue_id'   => $venue_arg)  : (),
             @$style_arg  ? ('event_styles_maps.style_id'   => $style_arg)  : (),
             @$muso_arg   ? ('event_talent_maps.talent_id'  => $muso_arg)   : (),
             @$band_arg   ? ('event_band_maps.band_id'      => $band_arg)   : (),
             @$team_arg   ? ('event_team_maps.team_id'     => $team_arg)   : (),
-            start_date =>
-                $end_date_arg
-                ? { '-between' => [$start_date, $end_date_arg] }
-                : { '>=' => $start_date },
-            '-not_bool' => 'is_deleted',
+            @role_search,
         },
         {
             join => \@joins,

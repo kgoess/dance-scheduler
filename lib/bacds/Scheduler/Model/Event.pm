@@ -54,12 +54,15 @@ sub get_many_to_manys {
     [qw/Band bands band_id/],
     [qw/Caller callers caller_id/],
     [qw/ParentOrg parent_orgs parent_org_id/],
+    [qw/RolePair role_pairs role_pair_id/],
     [qw/Style styles style_id/],
     [qw/Talent talent talent_id/],
     [qw/Team teams team_id/],
     [qw/Venue venues venue_id/],
 }
-sub get_one_to_manys { [qw/Series series series_id series/] }
+sub get_one_to_manys {
+    [qw/Series series series_id series/],
+}
 sub get_default_sorting { {-asc => [qw/start_date start_time/]} }
 
 sub filter_input {
