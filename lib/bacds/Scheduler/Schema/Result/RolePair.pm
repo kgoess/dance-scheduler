@@ -118,25 +118,37 @@ __PACKAGE__->add_unique_constraint("role_pair_idx", ["role_pair"]);
 
 =head1 RELATIONS
 
-=head2 event_role_pair_maps
+=head2 event_role_pairs_maps
 
 Type: has_many
 
-Related object: L<bacds::Scheduler::Schema::Result::EventRolePairMap>
+Related object: L<bacds::Scheduler::Schema::Result::EventRolePairsMap>
 
 =cut
 
 __PACKAGE__->has_many(
-  "event_role_pair_maps",
-  "bacds::Scheduler::Schema::Result::EventRolePairMap",
+  "event_role_pairs_maps",
+  "bacds::Scheduler::Schema::Result::EventRolePairsMap",
   { "foreign.role_pair_id" => "self.role_pair_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-07 21:50:43
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8/n9SHO94wC0QkwFCjaWPw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-08 07:26:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ucqbfgEnfbQLYNzPLS+1SQ
+
+use Role::Tiny::With;
+with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
+
+__PACKAGE__->many_to_many(events => 'event_role_pairs_maps', 'event');
 
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+sub get_fields_for_event_row {
+    my ($self) = @_;
+    return {
+        name => $self->role_pair,
+        id   => $self->role_pair_id,
+    };
+}
+
 1;

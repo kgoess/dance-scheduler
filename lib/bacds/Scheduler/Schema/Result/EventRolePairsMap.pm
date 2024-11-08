@@ -1,12 +1,12 @@
 use utf8;
-package bacds::Scheduler::Schema::Result::EventRolePairMap;
+package bacds::Scheduler::Schema::Result::EventRolePairsMap;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-bacds::Scheduler::Schema::Result::EventRolePairMap
+bacds::Scheduler::Schema::Result::EventRolePairsMap
 
 =cut
 
@@ -27,11 +27,11 @@ use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime");
 
-=head1 TABLE: C<event_role_pair_map>
+=head1 TABLE: C<event_role_pairs_map>
 
 =cut
 
-__PACKAGE__->table("event_role_pair_map");
+__PACKAGE__->table("event_role_pairs_map");
 
 =head1 ACCESSORS
 
@@ -152,8 +152,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-07 21:50:43
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:K28Gb9PatnaV4BSP+PitCw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-08 07:26:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:STLFeEXz4u0SlfOecDCfnQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

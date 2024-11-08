@@ -1,4 +1,4 @@
-CREATE TABLE event_role_pair_map (
+CREATE TABLE event_role_pairs_map (
     event_id INT NOT NULL,
     role_pair_id INT NOT NULL,
     ordering INT NOT NULL,

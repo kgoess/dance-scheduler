@@ -256,17 +256,17 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 event_role_pair_maps
+=head2 event_role_pairs_maps
 
 Type: has_many
 
-Related object: L<bacds::Scheduler::Schema::Result::EventRolePairMap>
+Related object: L<bacds::Scheduler::Schema::Result::EventRolePairsMap>
 
 =cut
 
 __PACKAGE__->has_many(
-  "event_role_pair_maps",
-  "bacds::Scheduler::Schema::Result::EventRolePairMap",
+  "event_role_pairs_maps",
+  "bacds::Scheduler::Schema::Result::EventRolePairsMap",
   { "foreign.event_id" => "self.event_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -367,14 +367,15 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-07 21:50:43
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eHKd1dLwkXjRuEPyjPNfRw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-08 07:26:32
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0bsmnO7EdZJ/5M+TFdaQZA
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');
 __PACKAGE__->many_to_many(callers => 'event_callers_maps', 'caller');
 __PACKAGE__->many_to_many(parent_orgs => 'event_parent_orgs_maps', 'parent_org');
 __PACKAGE__->many_to_many(styles => 'event_styles_maps', 'style');
+__PACKAGE__->many_to_many(role_pairs => 'event_role_pairs_maps', 'role_pair');
 __PACKAGE__->many_to_many(talent => 'event_talent_maps', 'talent');
 __PACKAGE__->many_to_many(venues => 'event_venues_maps', 'venue');
 
