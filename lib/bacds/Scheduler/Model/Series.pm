@@ -28,6 +28,7 @@ sub get_fields_for_output {
         created_ts
         series_xid
         series_url
+        photo_url
         display_text
         frequency
         is_deleted
@@ -45,6 +46,7 @@ sub get_fields_for_input {
         display_text
         series_xid
         series_url
+        photo_url
         frequency
         is_deleted
         manager

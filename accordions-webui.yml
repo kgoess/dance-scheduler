@@ -119,7 +119,7 @@
       name: photo_url
       type: text
       help: >
-        Generally the homepage sill display the event with photos of the
+        Generally the homepage will display the event with photos of the
         caller and musos. But for a special one-off event, maybe you want to use the
         poster from the event rather than pictures of the talent.
       preview_image: 1
@@ -251,6 +251,14 @@
     - label: Series URL
       name: series_url
       type: text
+    - label: Photo URL
+      name: photo_url
+      type: text
+      help: >
+        If there aren't pictures of any of the talent, and if the event doesn't
+        have its own standalone photo, this series logo will display. If there
+        is no series logo then we revert to the parent_org logo.
+      preview_image: 1
     - label: Manager Name(s)
       name: manager
       type: text

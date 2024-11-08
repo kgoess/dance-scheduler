@@ -111,6 +111,12 @@ __PACKAGE__->table("series");
   default_value: current_timestamp
   is_nullable: 0
 
+=head2 photo_url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -149,6 +155,8 @@ __PACKAGE__->add_columns(
     default_value => \"current_timestamp",
     is_nullable => 0,
   },
+  "photo_url",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
 );
 
 =head1 PRIMARY KEY
@@ -210,8 +218,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YE/+IJQFFwLfsT+QpaXwlQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-07 19:11:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:GRhT+PO6zJ8Gc4v8biCkfQ
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

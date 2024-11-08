@@ -159,6 +159,8 @@ END -%>
               <% collage_images(event.talent, aos_attrs1, num_columns_per_picture, font_size) %>
               <% collage_images(event.teams, aos_attrs1, num_columns_per_picture, font_size) %>
           <%- END -%>
+        <%- ELSIF event.series && event.series.photo_url %>
+            <%- collage_images(event.series, aos_attrs1, 12, 1) %>
         <%- ELSE -%>
           <% collage_images(event.parent_orgs, aos_attrs1, 12, 1) %>
         <%- END -%>
