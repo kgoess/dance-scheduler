@@ -1,7 +1,7 @@
 CREATE TABLE series (
     series_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_xid CHAR(24) NOT NULL,
-    name VARCHAR(255),
+    name VARCHAR(191),
     frequency VARCHAR(128),
     short_desc varchar(2048),
     sidebar TEXT(32866),

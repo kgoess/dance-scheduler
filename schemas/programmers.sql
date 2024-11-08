@@ -1,7 +1,7 @@
 CREATE TABLE programmers (
     programmer_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    name VARCHAR(191) NOT NULL,
+    email VARCHAR(191) NOT NULL,
     password_hash VARCHAR(128),
     is_superuser BOOLEAN NOT NULL DEFAULT 0,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,

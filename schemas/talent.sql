@@ -1,6 +1,6 @@
 CREATE TABLE talent (
     talent_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(191) NOT NULL,
     url VARCHAR(255),
     photo_url VARCHAR(255),
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
