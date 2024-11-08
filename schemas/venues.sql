@@ -14,4 +14,4 @@ CREATE TABLE venues (
 
     UNIQUE INDEX vkey_idx (vkey),
     UNIQUE INDEX hall_name (hall_name)
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -9,4 +9,4 @@ CREATE TABLE programmers (
     modified_ts TIMESTAMP NOT NULL,
 
     UNIQUE INDEX programmer_email_idx(email)
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

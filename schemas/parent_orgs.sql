@@ -10,4 +10,4 @@ CREATE TABLE parent_orgs (
 
     UNIQUE INDEX parent_org_id_idx(full_name),
     UNIQUE INDEX abbreviation_idx(abbreviation)
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

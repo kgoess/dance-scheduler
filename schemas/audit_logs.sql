@@ -12,4 +12,4 @@ CREATE TABLE audit_logs (
         REFERENCES programmers(programmer_id)
       ON DELETE RESTRICT
 
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

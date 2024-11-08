@@ -29,6 +29,4 @@ CREATE TABLE events (
 
     -- nope, that only works if is_series_defaults is either 1 or null
     -- UNIQUE KEY (series_id, is_series_defaults)
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
-
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

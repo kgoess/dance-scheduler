@@ -14,4 +14,4 @@ CREATE TABLE team_styles_map (
 
     UNIQUE INDEX team_styles_map_idx(team_id, style_id),
     UNIQUE KEY (team_id, ordering)
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

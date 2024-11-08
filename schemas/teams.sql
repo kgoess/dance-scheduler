@@ -18,4 +18,4 @@ CREATE TABLE teams (
 
     UNIQUE INDEX team_name_idx(name),
     UNIQUE INDEX team_xid_idx(team_xid)
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

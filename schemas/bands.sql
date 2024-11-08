@@ -8,4 +8,4 @@ CREATE TABLE bands (
     modified_ts TIMESTAMP NOT NULL,
 
     UNIQUE INDEX band_name_idx(name)
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

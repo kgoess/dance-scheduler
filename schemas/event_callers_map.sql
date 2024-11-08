@@ -15,4 +15,4 @@ CREATE TABLE event_callers_map (
     UNIQUE KEY (event_id, caller_id),
     UNIQUE KEY (event_id, ordering)
 
-) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
