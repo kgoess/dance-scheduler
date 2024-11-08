@@ -49,6 +49,7 @@ use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
 use bacds::Scheduler::Model::Programmer;
+use bacds::Scheduler::Model::RolePair;
 use bacds::Scheduler::Model::Series;
 use bacds::Scheduler::Model::SeriesLister;
 use bacds::Scheduler::Model::Talent;
@@ -93,6 +94,11 @@ register_type_check 'PathMonth' => sub {
     my $m = $_[0];
     return unless $m =~ /^[01][0-9]$/;
     return $m >= 1 && $m <= 12;
+};
+
+# just guessing at this
+register_type_check 'RolePair' => sub {
+    return $_[0] =~ m{^[a-zA-Z /&]{3,64}$};
 };
 
 preload_accordion_config;
@@ -648,6 +654,10 @@ my $routes_yaml = <<EOL;
   read_perm: requires_login
   write_perm: requires_superuser
 
+- model: role_pair
+  write_perm: requires_superuser
+
+
 EOL
 
 my $routes = Load($routes_yaml);
@@ -884,6 +894,7 @@ get '/dancefinder-results' => with_types [
     'optional' => ['query', 'style',  'SchedulerId'],
     'optional' => ['query', 'style-name',  'StyleName'],
     'optional' => ['query', 'team',   'SchedulerId'],
+    'optional' => ['query', 'role_pair', 'RolePair'],
 ] => sub {
 
     my $dbh = get_dbh(debug => 0);
@@ -908,6 +919,7 @@ get '/dancefinder-results' => with_types [
         style  => [@style_ids_from_names,
                    grep $_, query_parameters->get_all('style')],
         team   => [grep $_, query_parameters->get_all('team')],
+        role_pair => [grep $_, query_parameters->get_all('role_pair')],
     );
 
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
@@ -929,7 +941,7 @@ get '/dancefinder-results' => with_types [
         [qw/venue Venue venue_id/],
         [qw/band Band band_id/],
         [qw/muso Talent talent_id /],
-        [qw/team Team team_id /],
+        [qw/role_pair RolePair role_pair_id /],
     );
     my %results;
     foreach my $fetcher (@fetchers) {
@@ -951,7 +963,7 @@ get '/dancefinder-results' => with_types [
         caller_arg => $results{caller},
         venue_arg  => $results{venue},
         bands_and_musos_arg  => [ @{$results{band}}, @{$results{muso}} ],
-        teams_arg  => $results{team},
+        role_pair_arg  => $results{role_pair},
         style_arg  => $results{style},
 
         events => \@events,

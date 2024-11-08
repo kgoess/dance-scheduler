@@ -256,6 +256,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 event_role_pair_maps
+
+Type: has_many
+
+Related object: L<bacds::Scheduler::Schema::Result::EventRolePairMap>
+
+=cut
+
+__PACKAGE__->has_many(
+  "event_role_pair_maps",
+  "bacds::Scheduler::Schema::Result::EventRolePairMap",
+  { "foreign.event_id" => "self.event_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 event_styles_maps
 
 Type: has_many
@@ -352,8 +367,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:WBsREvQkemK+rw8kowABHA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-07 21:50:43
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eHKd1dLwkXjRuEPyjPNfRw
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');
