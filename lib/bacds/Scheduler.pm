@@ -807,7 +807,7 @@ Replacing the old dancefinder cgi, display the form
 =cut
 
 get '/dancefinder' => sub {
-    my ($callers, $venues, $bands, $musos, $styles) = _dancefinder_data();
+    my ($callers, $venues, $bands, $musos, $styles, $role_pairs) = _dancefinder_data();
     my @breadcrumbs = (
         # these hrefs aren't relocalizable, e.g. for dev port :5000--maybe change
         # to uri_for if we break "/series/" into a separate app
@@ -816,11 +816,12 @@ get '/dancefinder' => sub {
     template 'dancefinder/index.html' => {
         bacds_uri_base => 'https://www.bacds.org/',
         page_title => 'Find A Dance Near You!',
-        callers => $callers,
-        venues  => $venues,
-        bands   => $bands,
-        musos   => $musos,
-        styles  => $styles,
+        callers    => $callers,
+        venues     => $venues,
+        bands      => $bands,
+        musos      => $musos,
+        styles     => $styles,
+        role_pairs => $role_pairs,
         season  => get_season(),
         breadcrumbs => \@breadcrumbs,
     },
@@ -833,7 +834,7 @@ sub _dancefinder_data {
     my $data = bacds::Scheduler::Model::DanceFinder
         ->related_entities_for_upcoming_events();
 
-    my (@callers, @venues, @bands, @musos, @styles);
+    my (@callers, @venues, @bands, @musos, @styles, @role_pairs);
 
     # set up the callers
     foreach my $caller_id (keys %{$data->{callers}}) {
@@ -871,12 +872,20 @@ sub _dancefinder_data {
     }
     @styles = sort { $a->[1] cmp $b->[1] } @styles;
 
+    # set up the role_pairs
+    foreach my $role_pair_id (keys %{$data->{role_pairs}}) {
+        my $role_pair = $data->{role_pairs}{$role_pair_id};
+        push @role_pairs, [$role_pair_id, $role_pair->role_pair];
+    }
+    @role_pairs = sort { $a->[1] cmp $b->[1] } @role_pairs;
+
     return 
        \@callers,
        \@venues,
        \@bands,
        \@musos,
-       \@styles;
+       \@styles,
+       \@role_pairs;
 
 };
 
@@ -894,7 +903,7 @@ get '/dancefinder-results' => with_types [
     'optional' => ['query', 'style',  'SchedulerId'],
     'optional' => ['query', 'style-name',  'StyleName'],
     'optional' => ['query', 'team',   'SchedulerId'],
-    'optional' => ['query', 'role_pair', 'RolePair'],
+    'optional' => ['query', 'role_pair', 'SchedulerId'],
 ] => sub {
 
     my $dbh = get_dbh(debug => 0);
@@ -1525,18 +1534,20 @@ get '/unearth' => sub {
     );
     my @special = $rs->all;
 
-    my ($callers, $venues, $bands, $musos, $styles) = _dancefinder_data();
+    my ($callers, $venues, $bands, $musos, $styles, $role_pairs)
+         = _dancefinder_data();
 #    template 'dancefinder/index.html' => {
 
     template 'unearth/index' => {
         eighteen_days => \@eighteen_days,
-        today => \@today,
-        special => \@special,
-        callers => $callers,
-        venues  => $venues,
-        bands   => $bands,
-        musos   => $musos,
-        styles  => $styles,
+        today       => \@today,
+        special     => \@special,
+        callers     => $callers,
+        venues      => $venues,
+        bands       => $bands,
+        musos       => $musos,
+        styles      => $styles,
+        role_pairs  => $role_pairs,
     },
     {layout => undef},
 };

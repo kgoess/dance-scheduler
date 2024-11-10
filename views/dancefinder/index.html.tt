@@ -60,6 +60,16 @@ just press the "Get Your Schedule!" button.
     </select>
   </div>
   </div>
+  <div class="row"><div class="col">
+    <label class="form-label mt-1 mb-0" for="role_pair-select">Which role names(s)</label>
+    <select name="role_pair" id="role_pair-select" class="form-select" multiple>
+      <option value="">ALL ROLE NAMES</option>
+      <%- FOREACH role_pair IN role_pairs %>
+      <option value="<% role_pair.0 | html %>"><% role_pair.1 | html %></option>
+      <%- END %>
+    </select>
+  </div>
+  </div>
   <button type="submit" class="btn btn-primary mt-2">Get Your Schedule!</button>
   </div>
 </form>

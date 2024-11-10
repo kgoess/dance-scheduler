@@ -76,6 +76,7 @@ sub get_upcoming_events_for_series {
     # get_dbh call above
     my @prefetches = (
         {event_callers_maps => 'caller'},
+        {event_role_pairs_maps => 'role_pair'},
         {event_styles_maps => 'style'},
         {event_talent_maps => 'talent'},
         {event_venues_maps => 'venue'},

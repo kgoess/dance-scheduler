@@ -517,3 +517,12 @@ h1.dance {
 .hidden {
   display: none;
 }
+
+/* For the old version of the dancefinder on under bacds.org/dancefinder (not
+ * the one embedded in bacds.org) this just hacks some better spacing. The
+ * classes and stuff are designed for the one embedded in bacds.org. This is
+ * probably a temporary fix until we've migrated everything to the newer
+ * style/layout. */
+.dancefinder .row {
+  margin-top: 10px;
+}
