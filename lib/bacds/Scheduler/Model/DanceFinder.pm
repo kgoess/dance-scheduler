@@ -193,6 +193,25 @@ sub search_events {
 
     my $start_date = $start_date_arg || get_today()->ymd;
 
+#TODO: actually connect this bit up with the rest of this function
+my $role_pair_allow_blank = 0;
+    my @role_search;
+    if ($role_pair_allow_blank){
+        my $role_blank = $dbh->resultset('event_role_pairs_maps')->search({},{
+            columns => 'event_id',
+            distinct => 1
+        });
+        @role_search = @$role_pair_arg
+            ? (
+            -or => [
+                'event_role_pairs_maps.role_pair_id' => $role_pair_arg,
+                'event.event_id' => { -not_in => $role_blank->as_query}
+            ])
+            : (-not_in => $role_blank->as_query);
+    } else {
+        @role_search = @$role_pair_arg ? ('event_role_pairs_maps.role_pair_id' => $role_pair_arg)   : ();
+    }
+
     # wrt join and prefetch see:
     # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
     my $subquery = $dbh->resultset('Event')->search(
@@ -203,7 +222,7 @@ sub search_events {
             @$muso_arg   ? ('event_talent_maps.talent_id'  => $muso_arg)   : (),
             @$band_arg   ? ('event_band_maps.band_id'      => $band_arg)   : (),
             @$team_arg   ? ('event_team_maps.team_id'     => $team_arg)   : (),
-            @$role_pair_arg ? ('event_role_pairs_maps.role_pair_id' => $role_pair_arg)   : (),
+            @role_search,
             start_date =>
                 $end_date_arg
                 ? { '-between' => [$start_date, $end_date_arg] }
