@@ -179,20 +179,21 @@ END -%>
       <span class="event-date"><% date_format(event) %>:</span>
       <% IF event.styles.grep('^SPECIAL$') && event.name;
         emphasize_name_over_style = 1;
+        style_open_parens = '(';
+        style_close_parens = ')';
       ELSE;
         emphasize_name_over_style = 0;
+        style_open_parens = '';
+        style_close_parens = '';
       END;
       IF emphasize_name_over_style -%>
-        <span class="special-event-name"><% event.name %></span> (
+        <span class="special-event-name"><% event.name %></span>
       <% END -%>
       <span class="event-types">
-        <%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) -%>
+        <% style_open_parens %><%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) -%>
           <%- style.name %><% IF !loop.last() %>/<% END -%>
-        <%- END -%>
+        <%- END -%><% style_close_parens %>
       </span>
-      <% IF emphasize_name_over_style -%>
-        )
-      <% END -%>
       <% IF event.venues %> at <% END %>
       <% FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) -%>
         <%- maybe_linkit(venue.hall_name _ " in " _ venue.city, event.custom_url || event.series.series_url) -%>.
