@@ -7,6 +7,7 @@ tables="
     event_talent_map
     event_venues_map
     event_team_map
+    event_role_pairs_map
     programmer_series_map
     programmer_events_map
     programmer_teams_map
@@ -22,6 +23,7 @@ tables="
     callers
     audit_logs
     parent_orgs
+    role_pairs
 "
 
 # leaving programmers so we don't have to keep re-establishing the test passwords
