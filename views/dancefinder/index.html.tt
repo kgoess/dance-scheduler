@@ -63,7 +63,7 @@
         </div>
         <div class="row my-1">
           <div class="btn-group-text lh-base" id="style_group">Which style(s)</div>
-          <div class="btn-group rounded flex-wrap mb-1" role="group">
+          <div class="btn-group rounded mb-1" role="group">
             <% style_i = 0 %>
             <%- FOREACH style IN styles %>
               <input aria-describedby="style_group" type="checkbox" class="btn-check" name="style"
@@ -74,7 +74,7 @@
               <% style_i = style_i + 1 %>
               <% IF style_i % 3 == 0 %>
           </div>
-          <div class="btn-group rounded flex-wrap mb-1" role="group">
+          <div class="btn-group rounded mb-1" role="group">
               <%- END %>
               <%- END %>
           </div>
@@ -82,18 +82,24 @@
         <div class="row my-1">
           <div class="btn-group-text lh-base" id="role_group">Which role
             names(s)</div>
-          <div class="btn-group rounded" role="group">
+          <div class="btn-group rounded mb-1" role="group">
             <input aria-describedby="role_group" type="checkbox" class="btn-check" name="role_blanks" value="true"
               id="role_blanks">
             <label class="btn btn-outline-primary" for="role_blanks">
               unspecified
             </label>
+            <% role_i = 1 %>
             <%- FOREACH role_pair IN role_pairs %>
               <input aria-describedby="role_group" type="checkbox" class="btn-check" name="role_pair"
                 value="<% role_pair.0 | html %>" id="role_<% role_pair.0 | html %>">
               <label class="btn btn-outline-primary" for="role_<% role_pair.0 | html %>">
                 <% role_pair.1 | html %>
               </label>
+              <% role_i = role_i + 1 %>
+              <% IF role_i % 3 == 0 %>
+          </div>
+          <div class="btn-group rounded mb-1" role="group">
+              <%- END %>
               <%- END %>
           </div>
         </div>
