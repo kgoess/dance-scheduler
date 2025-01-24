@@ -72,7 +72,7 @@
                 <% style.1 | html %>
               </label>
               <% style_i = style_i + 1 %>
-              <% IF style_i % 4 == 0 %>
+              <% IF style_i % 3 == 0 %>
           </div>
           <div class="btn-group rounded flex-wrap mb-1" role="group">
               <%- END %>
