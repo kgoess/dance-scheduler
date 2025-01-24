@@ -64,11 +64,6 @@
         <div class="row my-1">
           <div class="btn-group-text lh-base" id="style_group">Which style(s)</div>
           <div class="btn-group rounded" role="group">
-            <input aria-describedby="style_group" type="checkbox" class="btn-check" name="style_blanks" value="true"
-              id="style_blanks">
-            <label class="btn btn-outline-primary" for="style_blanks">
-              Unspecified
-            </label>
             <%- FOREACH style IN styles %>
               <input aria-describedby="style_group" type="checkbox" class="btn-check" name="style"
                 value="<% style.0 | html %>" id="style_<% style.0 | html %>">
