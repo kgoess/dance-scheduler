@@ -829,7 +829,7 @@ get '/dancefinder' => sub {
         breadcrumbs => \@breadcrumbs,
     },
     # gets the wrapper from views/layouts/<whatever>
-    { layout => 'scheduler-page' },
+    { layout => 'unearth-page-wrapper' },
 
 };
 
@@ -1321,7 +1321,8 @@ sub _details_for_series {
 
     template($template, $data,
         # gets the wrapper from views/layouts/<whatever>
-        { layout => 'scheduler-page' },
+        #{ layout => 'scheduler-page' },
+        { layout => 'unearth-page-wrapper' },
     );
 };
 
@@ -1555,7 +1556,7 @@ get '/unearth' => sub {
         styles      => $styles,
         role_pairs  => $role_pairs,
     },
-    {layout => undef},
+    { layout => 'unearth-page-wrapper' },
 };
 
 =head2 Helper Methods

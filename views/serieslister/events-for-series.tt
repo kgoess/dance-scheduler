@@ -1,23 +1,25 @@
 
-<div class="event-content-details">
+<%- MACRO event_type_styling(event) BLOCK;
+        has_border = 0;
+        FOREACH style IN event.styles;
+            IF style.name  == "SPECIAL" or style.name == "WORKSHOP";
+                has_border = 1;
+            END;
+        END;
+        IF has_border; -%>border rounded border-primary border-4<%- END;
+  END %>
+<article>
 
-    <% class_for_type = {
-        SPECIAL => 'special',
-        WOODSHED => 'woodshed',
-        WORKSHOP => 'workshop',
-    }
-    %>
     <% FOREACH event IN events %>
         <% style_names = [];
            FOREACH style IN event.styles;
             style_names.push(style.name);
            END;
         %>
-        <!-- TYPE = <% style_names.join(',') %>-->
-        <div class="<% FOREACH style_name IN style_names %><% class_for_type.$style_name %><% END %>">
+        <div class="p-1 m-1 <% event_type_styling(event) %>">
             <%# I think this anchor is wrong, should be event_id maybe? %>
             <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
-            <p class="dance">
+            <p>
                 <b class="date">
                     <a href="<% ssi_uri_for({ event_id => event.event_id }) %>">
                         <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
@@ -73,4 +75,4 @@
         <% END %>
         <% ldjson %>
     <% END %>
-</div>
+</article>

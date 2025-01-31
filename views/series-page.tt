@@ -1,56 +1,47 @@
-<% # this page is wrapped by views/layouts/scheduler-page.tt %>
+<% # this page is wrapped by views/layouts/unearth-page-wrapper.tt %>
 <% MACRO maybe_linkit(string, url) BLOCK %>
     <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
 <% END -%>
-    <div class="body-and-sidebar">
-      <div class="body-top">
+      <div class="row">
         <!-- ***************************** -->
-        <!-- series-description -->
+        <!-- series description -->
         <!-- ***************************** -->
-        <section class="series-description">
-          <div class="series-name">
+        <section class="col">
+          <h1 class="text-center text-capitalize">
               <a href="<% series.series_url %>"><% series.name %></a>
-          </div>
-          <div class="series-name-sub">
+          </h1>
+          <div class="text-center fw-bold pl-1 fs-2">
               <% series.short_desc %>
           </div>
-          <div class="series-display-text">
+          <div class="p-1">
               <% display_text %>
           </div> <!-- end series-display-text -->
-        </section> <!-- end series-description -->
+        </section>
+      </div> <!-- end row -->
+      <hr>
 
-        <hr>
-
-      </div> <!-- end body-top -->
-
-      <div class="body-bottom">
+      <div class="row">
         <!-- ***************************** -->
         <!-- events list -->
         <!-- ***************************** -->
-        <main>
-          <div class="event-content-container">
-            <div class="event-content-title">
+        <main class="col-lg-9 col-12">
+            <h1 class="text-center text-capitalize">
               <% event_content_title %>:
-            </div>
+            </h1>
 
             <!-- *** here's the meat of the page *** -->
             <!-- *** all the events are displayed from this include *** -->
             <% INCLUDE "serieslister/events-for-series.tt" %>
 
-          </div> <!-- end event-content-container -->
-
-          <div class="sidebar-sep">
-            <hr>
-          </div>
-
         </main>
+
+        <hr class="d-lg-none">
 
         <!-- ***************************** -->
         <!-- sidebar -->
         <!-- ***************************** -->
-        <aside class="sidebar">
+        <aside class="col-lg-3">
             <% sidebar %>
         </aside>
       </div> <!-- end body-bottom -->
-    </div> <!-- end body-and-sidebar -->
 
