@@ -11,62 +11,56 @@
 <article>
 
     <% FOREACH event IN events %>
-        <% style_names = [];
-           FOREACH style IN event.styles;
-            style_names.push(style.name);
-           END;
-        %>
-        <div class="p-1 m-1 <% event_type_styling(event) %>">
-            <%# I think this anchor is wrong, should be event_id maybe? %>
-            <a name="<% event.start_date.ymd() %>-<% style_names.join('/') %>"></a>
-            <p>
-                <b class="date">
-                    <a href="<% ssi_uri_for({ event_id => event.event_id }) %>">
+        <div class="p-1 m-1 lh-sm mb-4 <% event_type_styling(event) %>">
+            <p class="mb-0">
+                <b>
+                    <a class="text-decoration-none" href="<% ssi_uri_for({ event_id => event.event_id }) %>">
                         <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
                     </a>
                     <% IF event.is_canceled %>
                         &mdash; CANCELED
                     <% END %>
                 </b>
-                <br />
-                <span class="<% IF event.is_canceled %>canceled-event<% END %>">
-                    <%- IF event.styles.grep('^SPECIAL$') && event.name %>
-                        <span class="special-event-name"><% event.name %></span><br />
-                    <%- END %>
-                    <%- FOREACH venue IN event.venues %>
-                        <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
-                    <%- END %>
-                    <%- IF event.callers.size() %>
-                        Caller:
-                        <% FOREACH caller IN event.callers %>
-                            <% caller.name %><% IF !loop.last() %>, <% END %>
-                        <% END %>
-                        <br />
-                    <%- END %>
-                    <%- IF event.bands.size() || event.talent.size() %>
-                        Band:
-                    <%- END %>
-                    <%- IF event.bands.size() %>
-                        <%- FOREACH band IN event.bands %>
-                            <% maybe_linkit(band.name, band.url) %><% IF !loop.last() %>, <% END %>
-                        <%- END %>
-                        <%- IF event.talent.size() %>
-                            with
-                        <%- END %>
+            </p>
+            <p class="mb-0">
+                <% IF event.is_canceled %><s class="text-danger fst-italic"><% END %>
+                <%- IF event.styles.grep('^SPECIAL$') && event.name %>
+                    <span class="fs-4 fw-bolder fst-italic" style="font-variant: small-caps"><% event.name %></span><br />
+                <%- END %>
+                <%- FOREACH venue IN event.venues %>
+                    <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
+                <%- END %>
+                <%- IF event.callers.size() %>
+                    Caller:
+                    <% FOREACH caller IN event.callers %>
+                        <% caller.name %><% IF !loop.last() %>, <% END %>
+                    <% END %>
+                    <br />
+                <%- END %>
+                <%- IF event.bands.size() || event.talent.size() %>
+                    Band:
+                <%- END %>
+                <%- IF event.bands.size() %>
+                    <%- FOREACH band IN event.bands %>
+                        <% maybe_linkit(band.name, band.url) %><% IF !loop.last() %>, <% END %>
                     <%- END %>
                     <%- IF event.talent.size() %>
-                        <%- FOREACH talent IN event.talent %>
-                            <% talent.name %><% IF !loop.last() %>, <% END %>
-                        <%- END %>
+                        with
                     <%- END %>
-                    <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
-                    <%- IF event.role_pairs %>
-                        <br/>
-                        The caller intends to use <% event.role_pairs.role_pair %> role names.
+                <%- END %>
+                <%- IF event.talent.size() %>
+                    <%- FOREACH talent IN event.talent %>
+                        <% talent.name %><% IF !loop.last() %>, <% END %>
                     <%- END %>
-                </span>
+                <%- END %>
+                <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
+                <%- IF event.role_pairs %>
+                    <br/>
+                    The caller intends to use <% event.role_pairs.role_pair %> role names.
+                <%- END %>
+                <% IF event.is_canceled %></s><% END %>
             </p>
-            <p class="<% IF event.is_canceled %>canceled-event-comment <% END %>comment">
+            <p class="ms-3 mb-0 <% IF event.is_canceled %>text-danger<% ELSE %>text-primary<% END %>">
                 <% event.short_desc %>
             </p>
         </div>

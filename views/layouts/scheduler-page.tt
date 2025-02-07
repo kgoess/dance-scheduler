@@ -42,7 +42,6 @@
         <% END %>
       }
     </style>
-    <link rel="stylesheet" title="base" type="text/css" href="/css/scheduler-pages.css" />
 </head>
 
 <body>

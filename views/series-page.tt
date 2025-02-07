@@ -13,13 +13,14 @@
           <div class="text-center fw-bold pl-1 fs-2">
               <% series.short_desc %>
           </div>
-          <div class="p-1">
+          <hr class="my-4">
+          <div class="p-1 mx-5 fs-5">
               <% display_text %>
           </div> <!-- end series-display-text -->
         </section>
       </div> <!-- end row -->
-      <hr>
 
+      <hr class="my-4">
       <div class="row">
         <!-- ***************************** -->
         <!-- events list -->
