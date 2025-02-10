@@ -1226,7 +1226,7 @@ and the index.html pages will have this SSI:
     a) the list of upcoming dances for the series
     b) the details of the one particular dance the user clicked on
 
-In the first case, we're the google events single-event version of the page, so
+In the second case, we're the google events single-event version of the page, so
 we also add the json-ld
 
 This is a replacement for the old serieslists.pl
