@@ -121,45 +121,51 @@ $( document ).ready(function() {
     });
     /* This is the code for the modal that pops up when you add a band to an event.
      */
+    const bandDialogYesNoButtons = {
+        Yes: function() {
+            const found = {};
+            $( '[fold_model="event"] select[name="talent_id"]' ).each(function() {
+                found[$(this).val()] = 1;
+            });
+            const emptyTalentSelectboxes = $.makeArray($( '#event-display-form [model-name="talent"] select' ))
+                .filter(item => !$(item).val()) ;
+
+            bandDialog.talentIds.forEach((incomingTalentId, i) => {
+                if (found[incomingTalentId]) {
+                    return;
+                }
+                let firstEmptyTalentSelectbox;
+                if (firstEmptyTalentSelectbox = emptyTalentSelectboxes.shift()) {
+                    $(firstEmptyTalentSelectbox).val(incomingTalentId);
+                } else {
+                    const lastTalentSelectbox = $( '#event-display-form [model-name="talent"] select' ).last();
+                    const clone = multiSelectOptionAdd.call(lastTalentSelectbox);
+                    clone.val(incomingTalentId);
+                }
+            });
+
+            bandDialog.dialog('close');
+        },
+        No: function() {
+            bandDialog.dialog('close');
+        }
+    };
+    const bandDialogOKButton = {
+        OK: function() {
+            bandDialog.dialog('close');
+        }
+    };
     const bandDialog = $( '#add-band-dialog' ).dialog({
         autoOpen: false,
         height: 400,
         width: 350,
         modal: true,
-        buttons: {
-            Yes: function() {
-                const found = {};
-                $( '[fold_model="event"] select[name="talent_id"]' ).each(function() {
-                    found[$(this).val()] = 1;
-                });
-                const emptyTalentSelectboxes = $.makeArray($( '#event-display-form [model-name="talent"] select' ))
-                    .filter(item => !$(item).val()) ;
-
-                bandDialog.talentIds.forEach((incomingTalentId, i) => {
-                    if (found[incomingTalentId]) {
-                        return;
-                    }
-                    let firstEmptyTalentSelectbox;
-                    if (firstEmptyTalentSelectbox = emptyTalentSelectboxes.shift()) {
-                        $(firstEmptyTalentSelectbox).val(incomingTalentId);
-                    } else {
-                        const lastTalentSelectbox = $( '#event-display-form [model-name="talent"] select' ).last();
-                        const clone = multiSelectOptionAdd.call(lastTalentSelectbox);
-                        clone.val(incomingTalentId);
-                    }
-                });
-
-                bandDialog.dialog('close');
-            },
-            No: function() {
-                bandDialog.dialog('close');
-            }
-        },
         open: function() {
             // blank it out to start with otherwise it'll sit there with the
             // last entry
-            $('#band-name-in-popup').text('');
-            $('#add-band-dialog .talent-names').text('loading...');
+            $('#add-band-dialog .text').hide();
+            $('#add-band-dialog .talent-names').text('');
+            bandDialog.dialog({ buttons: {} });
 
             $.ajax({
                 url: `${appUriBase}/band/${bandDialog.bandId}`,
@@ -169,9 +175,17 @@ $( document ).ready(function() {
                 unpackResults(
                     msg,
                     (msg) => {
-                        $('#band-name-in-popup').text(msg.data.name);
+                        $('.band-name-in-popup').text(msg.data.name);
                         const spanForNames = $('#add-band-dialog .talent-names');
                         spanForNames.text('');
+                        if (msg.data.talents.length) {
+                            bandDialog.dialog({ buttons: bandDialogYesNoButtons });
+                            $('#add-band-dialog .add-members').show();
+                        } else {
+                            bandDialog.dialog({ buttons: bandDialogOKButton });
+                            $('#add-band-dialog .no-members').show();
+                            return;
+                        }
                         const olEl = $(document.createElement('ol'));
                         spanForNames.append(olEl);
                         bandDialog.talentIds = [];

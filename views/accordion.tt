@@ -59,8 +59,11 @@
         <div id="add-band-dialog" title="Band Membership">
             <!-- when they pick a band we generate an <ol> with the members and
                  drop it into this div -->
-            <p>
-                Would you like to add these members of <span id="band-name-in-popup"></span> to your event?
+            <p class="text add-members">
+                Would you like to add these members of <span class="band-name-in-popup"></span> to your event?
+            </p>
+            <p class="text no-members">
+                The band "<span class="band-name-in-popup"></span>" has no members.
             </p>
             <div class="talent-names"></div>
         </div>
