@@ -992,7 +992,7 @@ get '/dancefinder-results' => with_types [
 
     },
     # gets the wrapper from views/layouts/<whatever>
-    { layout => 'scheduler-page' },
+    { layout => 'unearth-page-wrapper' },
 
 };
 
@@ -1321,7 +1321,6 @@ sub _details_for_series {
 
     template($template, $data,
         # gets the wrapper from views/layouts/<whatever>
-        #{ layout => 'scheduler-page' },
         { layout => 'unearth-page-wrapper' },
     );
 };
@@ -1438,7 +1437,7 @@ sub archive_calendars {
         next_ym       => $next_ym,
     },
     # gets the wrapper from views/layouts/<whatever>
-    { layout => 'scheduler-page' },
+    { layout => 'unearth-page-wrapper' },
 }
 
 =head2 GET /calendars/yyyy
@@ -1469,7 +1468,7 @@ sub archive_calendars_year {
         breadcrumbs   => \@breadcrumbs,
     },
     # gets the wrapper from views/layouts/<whatever>
-    { layout => 'scheduler-page' },
+    { layout => 'unearth-page-wrapper' },
 }
 
 =head2 GET /calendars
@@ -1497,7 +1496,7 @@ sub archive_calendars_index {
         season => get_season(),
     },
     # gets the wrapper from views/layouts/<whatever>
-    { layout => 'scheduler-page' },
+    { layout => 'unearth-page-wrapper' },
 }
 
 
