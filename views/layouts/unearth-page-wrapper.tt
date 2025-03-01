@@ -56,17 +56,42 @@
               <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">Calendars</a>
               <ul class="dropdown-menu">
+<% MACRO make_link(path, anchor) BLOCK -%>
+<%
+    IF is_homepage;
+        IF path == "";
+            link = anchor;
+        ELSE;
+            link = request.uri_for(path) _ anchor;
+        END;
+    ELSE;
+        IF path == "";
+            IF settings.environment == "development";
+                link = request.uri_for("/unearth") _ anchor;
+            ELSE;
+                link = request.uri_for("/") _ anchor;
+            END;
+        ELSE;
+            link = request.uri_for(path) _ anchor;
+        END;
+    END -%>
+<%- link -%>
+<% END -%>
                 <li class="nav-item dropdown-item">
-                  <a href="#tonight-section" class="nav-link">Tonight&rsquo;s Events</a>
+                  <a href="<% make_link("", "#tonight-section") %>" class="nav-link">Tonight&rsquo;s Events</a>
                 </li>
                 <li class="nav-item dropdown-item">
-                  <a href="#calendar-section" class="nav-link">Calendar</a>
+                  <a href="<% make_link("", "#calendar-section") %>" class="nav-link">Calendar</a>
                 </li>
                 <li class="nav-item dropdown-item">
-                  <a href="#dancefinder-section" class="nav-link">Dance Finder (search)</a>
+                  <% IF is_homepage -%>
+                      <a href="#dancefinder-section" class="nav-link">Dance Finder (search)</a>
+                  <% ELSE -%>
+                      <a href="<% make_link("/dancefinder") %>" class="nav-link">Dance Finder (search)</a>
+                  <% END -%>
                 </li>
                 <li class="nav-item dropdown-item">
-                  <a href="https://bacds.org/calendars/" class="nav-link">Historical Calendars</a>
+                  <a href="<% make_link("/calendars/") %>" class="nav-link">Historical Calendars</a>
                 </li>
               </ul>
             </li>

@@ -1554,6 +1554,7 @@ get '/unearth' => sub {
         musos       => $musos,
         styles      => $styles,
         role_pairs  => $role_pairs,
+        is_homepage => 1,
     },
     { layout => 'unearth-page-wrapper' },
 };
