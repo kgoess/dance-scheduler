@@ -69,7 +69,7 @@
             IF settings.environment == "development";
                 link = request.uri_for("/unearth") _ anchor;
             ELSE;
-                link = request.uri_for("/") _ anchor;
+                link = 'https://bacds.org' _ anchor;
             END;
         ELSE;
             link = request.uri_for(path) _ anchor;
