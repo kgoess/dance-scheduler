@@ -8,7 +8,7 @@ See that for documentation and schemas and more goodies.
 Screenshot
 ----
 
-![dance-scheduler screenshot](dance-scheduler-ss.png)
+![dance-scheduler screenshot](doc/dance-scheduler-ss.png)
 
 
 Development
