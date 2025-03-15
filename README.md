@@ -11,10 +11,13 @@ The sources for all this can be found in github https://github.com/kgoess/dance-
 
 See that for documentation and schemas and more goodies.
 
-Screenshot
-----
 
+Dance Scheduler Screenshot
+----
 ![dance-scheduler screenshot](doc/dance-scheduler-ss.png)
+
+Homepage Screenshot
+----
 
 ![homepage screenshot](doc/bacds-frontpage-ss.png)
 
