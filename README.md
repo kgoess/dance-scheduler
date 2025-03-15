@@ -5,6 +5,12 @@ The sources for all this can be found in github https://github.com/kgoess/dance-
 
 See that for documentation and schemas and more goodies.
 
+Screenshot
+----
+
+![dance-scheduler screenshot](dance-scheduler-ss.png)
+
+
 Development
 ----
 
