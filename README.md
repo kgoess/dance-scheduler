@@ -1,6 +1,12 @@
 BACDS dance schedule manager
 ----
 
+https://bacds.org is the calendar authority for current events hosted by the
+Bay Area Country Dance Society. This dance-scheduler comprises both an admin
+app for managing dance series and events, based on the Dancer2 framework, and a
+rewrite of the site based on the Unearth design from ColorLib dynamically served by the
+same Dancer2 framework.
+
 The sources for all this can be found in github https://github.com/kgoess/dance-scheduler
 
 See that for documentation and schemas and more goodies.
@@ -9,6 +15,8 @@ Screenshot
 ----
 
 ![dance-scheduler screenshot](doc/dance-scheduler-ss.png)
+
+![homepage screenshot](doc/bacds-frontpage-ss.png)
 
 
 Development
