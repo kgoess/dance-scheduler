@@ -1367,6 +1367,13 @@ See also "GET /calendars" => archive_calendars_index below.
 
 =cut
 
+# no trailing slash
+get '/calendars/:year/:month' => with_types [
+    'optional' => ['route', 'year', 'PathYear'],
+    'optional' => ['route', 'month', 'PathMonth'],
+] => \&archive_calendars;
+
+# with trailing slash
 get '/calendars/:year/:month/' => with_types [
     'optional' => ['route', 'year', 'PathYear'],
     'optional' => ['route', 'month', 'PathMonth'],

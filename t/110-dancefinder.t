@@ -8,7 +8,7 @@ use warnings;
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 68;
+use Test::More tests => 69;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -846,4 +846,11 @@ sub test_new_calendar {
                     <span.class="special-event-name">test.event.1</span>.\(\) \s+
             </td>
     }x, 'listings part has a listing';
+
+    # and in a continuation of the trailing slash drama, it turns out the app
+    # needs to handle both--we can't just rely on /calendars/.htaccess because
+    # e.g.'https://bacds.org/dance-scheduler/calendars/2034/06' doesn't go
+    # through that filesystem directory, but goes straight to the
+    # dance-scheduler app, so make sure it's working
+    $Test->get_ok("/calendars/2022/04", "GET /calendars/2022/04/ ok");
 }
