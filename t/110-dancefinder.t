@@ -623,22 +623,19 @@ sub test_serieslister_endpoint {
     $Test->get_ok("/serieslister?series_id=$series_id", "GET /serieslister?series_id ok");
 
     like $Test->content, qr{
-        <!--.TYPE.=.CONTRA--> \s+
-        <div.class=""> \s+
-            <a.name="2022-04-28-CONTRA"></a> \s+
-            <p.class="dance"> \s+
-                <b.class="date"> \s+
-                <a.href="http://localhost/serieslister\?event_id=2"> \s+
+        <div.class=".+?"> \s+
+            <p.class=".+?"> \s+
+                <b(?:.class=".+?")?> \s+
+                <a.(?:class=".+?".)?href="http://localhost/serieslister\?event_id=2"> \s+
                 Thursday,.April.28 \s+
                 </a> \s+
                 </b> \s+
-                <br./> \s+
-                <span.class=""> \s+
+            </p> \s+
+            <p.class=".+?"> \s+
                     Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
-                </span> \s+
-        </p> \s+
-        <p.class="comment"> \s+
-        </p> \s+
+            </p> \s+
+            <p.class=".+?"> \s+
+            </p> \s+
         </div>
     }x, 'serieslist id output ok';
 
@@ -648,22 +645,19 @@ sub test_serieslister_endpoint {
     $Test->get_ok("/serieslister?series_xid=DAW", "GET /serieslister?series_xid");
 
     like $Test->content, qr{
-        <!--.TYPE.=.CONTRA--> \s+
-        <div.class=""> \s+
-            <a.name="2022-04-28-CONTRA"></a> \s+
-            <p.class="dance"> \s+
-                <b.class="date"> \s+
-                <a.href="http://localhost/serieslister\?event_id=2"> \s+
+        <div.class=".+?"> \s+
+            <p.class=".+?"> \s+
+                <b(?:.class=".+?")?> \s+
+                <a.(?:class=".+?".)?href="http://localhost/serieslister\?event_id=2"> \s+
                 Thursday,.April.28 \s+
                 </a> \s+
                 </b> \s+
-                <br./> \s+
-                <span.class=""> \s+
+            </p> \s+
+            <p.class=".+?"> \s+
                     Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
-                </span> \s+
-        </p> \s+
-        <p.class="comment"> \s+
-        </p> \s+
+            </p> \s+
+            <p.class=".+?"> \s+
+            </p> \s+
         </div>
     }x, 'serieslist xid output ok';
 }
@@ -685,7 +679,7 @@ sub test_serieslister_single_event_endpoint {
 
     # this is the same href as the above test
     like $tester->content,
-         qr{<a href="http://localhost/series/english/berkeley_wed\?event_id=1">},
+         qr{<a (?:class=".+" )?href="http://localhost/series/english/berkeley_wed\?event_id=1">},
          'single event request worked, href is correct';
 
     like $tester->content, qr{\Q<script type="application/ld+json">},
