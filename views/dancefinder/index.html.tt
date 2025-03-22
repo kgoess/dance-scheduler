@@ -63,17 +63,16 @@
         </div>
         <div class="row my-1">
           <div class="btn-group-text lh-base" id="style_group">Which style(s)</div>
-            <div class="d-flex flex-wrap justify-content-center">
+          <div class="d-flex flex-wrap justify-content-center">
             <%- FOREACH style IN styles %>
-            <div class="m-1">
-              <input aria-describedby="style_group" type="checkbox" class="btn-check" name="style"
-                value="<% style.0 | html %>" id="style_<% style.0 | html %>">
-              <label class="btn btn-outline-primary" for="style_<% style.0 | html %>">
-                <% style.1 | html %>
-              </label>
-            </div>
+              <div class="m-1">
+                <input aria-describedby="style_group" type="checkbox" class="btn-check" name="style"
+                  value="<% style.0 | html %>" id="style_<% style.0 | html %>">
+                <label class="btn btn-outline-primary" for="style_<% style.0 | html %>">
+                  <% style.1 | html %>
+                </label>
+              </div>
               <%- END %>
-          </div>
           </div>
         </div>
         <div class="row my-1">
@@ -85,18 +84,18 @@
             <label class="btn btn-outline-primary" for="role_blanks">
               unspecified
             </label>
-            <% role_i = 1 %>
-            <%- FOREACH role_pair IN role_pairs %>
-              <input aria-describedby="role_group" type="checkbox" class="btn-check" name="role_pair"
-                value="<% role_pair.0 | html %>" id="role_<% role_pair.0 | html %>">
-              <label class="btn btn-outline-primary" for="role_<% role_pair.0 | html %>">
-                <% role_pair.1 | html %>
-              </label>
-              <% role_i = role_i + 1 %>
-              <% IF role_i % 3 == 0 %>
+            <% role_i=1 %>
+              <%- FOREACH role_pair IN role_pairs %>
+                <input aria-describedby="role_group" type="checkbox" class="btn-check" name="role_pair"
+                  value="<% role_pair.0 | html %>" id="role_<% role_pair.0 | html %>">
+                <label class="btn btn-outline-primary" for="role_<% role_pair.0 | html %>">
+                  <% role_pair.1 | html %>
+                </label>
+                <% role_i=role_i + 1 %>
+                  <% IF role_i % 3==0 %>
           </div>
           <div class="btn-group rounded mb-1" role="group">
-              <%- END %>
+            <%- END %>
               <%- END %>
           </div>
         </div>

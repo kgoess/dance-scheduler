@@ -150,3 +150,12 @@
 .non-bacds-event .event-text {
   font-size: 100%;
 }
+
+@media (min-width: 992px){
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
