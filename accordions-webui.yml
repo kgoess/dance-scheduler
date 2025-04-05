@@ -476,3 +476,45 @@
       type: text
     - name: role_pair_id
       type: hidden
+
+- label: Pages
+  fold_listbox_label_json: '["title", "url_path"]'
+  fold_model: page
+  fold_vars:
+    columns:
+    - label: Navigation Path
+      name: navigation_path
+      required: 0
+      type: text
+      help: >
+        Optional. This is where it's loaded in the menu bar. (details TBD)
+    - label: Title
+      name: title
+      required: 1
+      type: text
+    - label: URL Path
+      name: url_path
+      required: 1
+      type: text
+      help: >
+        This is the relative url path.
+    - label: Short Description
+      name: short_desc
+      required: 0
+      type: textarea
+      help: >
+        Short Desc. is for tooltips for navigation.
+    - label: Page Body
+      name: body
+      required: 1
+      type: textarea
+      help: >
+        Use <a href="https://daringfireball.net/projects/markdown/basics" target="_blank" rel="noopener">markdown</a>
+    - label: Sidebar
+      name: sidebar
+      required: 0
+      type: textarea
+      help: >
+        Sidebar is entirely optional. Use <a href="https://daringfireball.net/projects/markdown/basics" target="_blank" rel="noopener">markdown</a>
+    - name: page_id
+      type: hidden

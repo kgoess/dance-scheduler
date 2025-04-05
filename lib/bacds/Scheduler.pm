@@ -48,6 +48,7 @@ use bacds::Scheduler::Model::Calendar;
 use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Model::Event;
 use bacds::Scheduler::Model::ParentOrg;
+use bacds::Scheduler::Model::Page;
 use bacds::Scheduler::Model::Programmer;
 use bacds::Scheduler::Model::RolePair;
 use bacds::Scheduler::Model::Series;
@@ -626,6 +627,12 @@ Returns all of the programmers in the db not marked "is_deleted".
 
 =head3 PUT /programmer/:programmer_id
 
+=head3 GET /page/:page_id
+
+=head3 POST /page
+
+=head3 PUT /page/:page_id
+
 =cut
 
 my $routes_yaml = <<EOL;
@@ -659,6 +666,9 @@ my $routes_yaml = <<EOL;
 
 - model: role_pair
   write_perm: requires_superuser
+
+- model: page
+  write_perm: requires_login
 
 
 EOL
