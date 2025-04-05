@@ -208,7 +208,6 @@ sub post_row {
     #is_deleted shouldn't ever be null, so I'm setting it to 0 if falsey.
     $row->is_deleted(0) if not $row->is_deleted;
 
-
     my @pkey = $row->primary_columns;
     my $pkey = $pkey[0]; #We're not using composite pkeys
 
@@ -229,7 +228,8 @@ sub post_row {
 
         # fetch the row from the db to return so that they're getting the actual
         # results
-        my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey);
+        my $retrieved_row = $dbh->resultset($model_name)->find($row->$pkey)
+           or die "unable to find row for $model_name $pkey: '".$row->$pkey."'" ;
 
         $auditor->target_id($row->$pkey);
         my $audit_name = $retrieved_row->can('synthetic_name')
