@@ -36,27 +36,42 @@ export function displayItem(target, msg) {
 /* getLabelForDisplayInItemListbox
  *
  * In the data returned from the server for listbox, we usually want to
- * pick the 'name' attribute to display, but in some cases we don't:
+ * pick the "name" attribute to display, but in some cases we don't.
+ *
+ * The fold_listbox_label_json element in accordions-webui.yml has entries like:
+ *
+ *    fold_listbox_label_json: '["start_date", "synthetic_name"]'
+ *    fold_listbox_label_json: '"role_pair"'
+ *
+ * which accordion.tt displays in an HTML attriute like this:
+ *
+ *    data-fold_listbox_label='["start_date", "synthetic_name"]'
+ *
+ * which we're going to extract, and json-parse, and use to populate the listbox.
+ *
+ * https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Solve_HTML_problems/Use_data_attributes
  */
-const keyToDisplayInItemRow = {
-    event: ['start_date', 'synthetic_name'],
-    parent_org: 'abbreviation',
-    role_pair: 'role_pair',
-    venue: ['vkey', 'hall_name'],
-};
-export function getLabelForDisplayInItemListbox (modelName, data) {
+const getLabelForDisplayInItemListbox = (modelName, data) => {
 
-    let keyname;
-    if (keyname = keyToDisplayInItemRow[modelName]) {
-        if (Array.isArray(keyname)) {
-            return keyname.map(item => data[item]).join(' - ');
-        } else {
-            return data[keyname];
-        }
+    let keyName = "name"; // default
+    const fold_label_json = $(`.accordion-container[fold_model=${modelName}]`)
+        .get(0)  // convert the first to an DOM node
+        .dataset.fold_listbox_label; // accesses HTML attribute data-fold_listbox_label
+    if (fold_label_json) {
+        keyName = JSON.parse(fold_label_json);
+    }
+    if (Array.isArray(keyName)) {
+        return keyName.map(item => data[item]).join(' - ');
     } else {
-        return data['name'];
+        return data[keyName];
     }
 }
+
+/* populated from accordion.tt from data in accordions-webui.yml, the
+ * fold_listbox_label fields
+ */
+getLabelForDisplayInItemListbox.keyToDisplayInItemRow = { }
+export { getLabelForDisplayInItemListbox };
 
 /* displayItemRow
  *

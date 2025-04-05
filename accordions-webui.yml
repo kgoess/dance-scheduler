@@ -5,6 +5,11 @@
 # the views/accordion.tt template.
 #
 # - label: the displayed name of the tab
+#   fold_listbox_label_json: the listbox for each accordion fold defaults to
+#       getting its labels from the "name" attribute. If it needs to be a different
+#       attribute then fold_listbox_label_json is the column, or concatenation of
+#       columns, to display in the listbox. See getLabelForDisplayInItemListbox in
+#       helper-functions.js
 #   fold_model: the dbix model name for the accordion fold
 #   fold_vars: a dictionary of vars to send to accordion.tt
 #     form_id: an html ID to assign to the main form for the fold.
@@ -27,6 +32,7 @@
 
       
 - label: Events
+  fold_listbox_label_json: '["start_date", "synthetic_name"]'
   fold_model: event
   fold_vars:
     form_id: event-display-form
@@ -182,6 +188,7 @@
       type: hidden
 
 - label: Venues
+  fold_listbox_label_json: '["vkey", "hall_name"]'
   fold_model: venue
   fold_vars:
     columns:
@@ -352,6 +359,7 @@
       type: hidden
 
 - label: Parent Org
+  fold_listbox_label_json: '"abbreviation"'
   fold_model: parent_org
   fold_vars:
     columns:
@@ -458,6 +466,7 @@
       type: hidden
 
 - label: Role Names
+  fold_listbox_label_json: '"role_pair"'
   fold_model: role_pair
   fold_vars:
     columns:

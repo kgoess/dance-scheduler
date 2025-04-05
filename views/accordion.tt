@@ -22,7 +22,11 @@
         <div class="accordion">
             <hr>
             <% FOR fold IN accordion %>
-                <div class="accordion-container" fold_model="<% fold.fold_model %>">
+                <div
+                    class="accordion-container"
+                     fold_model="<% fold.fold_model %>"
+                     data-fold_listbox_label='<% fold.fold_listbox_label_json %>'
+                >
                     <div class="accordion-label"><% fold.label %></div>
                     <div class="content">
                         <% INCLUDE fold.tt content = fold.fold_vars %>
