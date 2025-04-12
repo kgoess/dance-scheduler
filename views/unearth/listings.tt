@@ -87,13 +87,13 @@ END %>
   IF has_non_bacds_org; -%>
     <div class="mt-3 ms-4"><em>Presented by
     <%- FOREACH parent_org IN parent_orgs;
-      IF loop.last() %> and <% END;
+      IF loop.last() && !loop.first() %> and <% END;
       IF parent_org.abbreviation == 'BACDS' -%>
         the <a href="<% parent_org.url %>">BACDS</a>
       <%- ELSE  %>
         the <a href="<% parent_org.url %>"><% parent_org.full_name %></a>
       <%- END;
-    IF loop.last() %>.</em></div><% ELSE %>, <% END;
+    IF loop.last() %>.</em></div><% END;
     END;
   END;
 END -%>
