@@ -584,6 +584,19 @@ Returns all of the callers in the db not marked "is_deleted".
 
 =head3 PUT /caller/:caller_id
 
+=head2 Pages
+
+These are so we can serve and maintain arbitrary urls from the dancer2 app.
+
+
+=head3 GET /PagesAll
+
+=head3 GET /page/:page_id
+
+=head3 POST /page
+
+=head3 PUT /page/:page_id
+
 =head2 ParentOrgs
 
 Usually the BACDS, but we want the option to track dances for NBCDS, or Santa
@@ -1358,6 +1371,33 @@ sub get_season {
     # see Time::Piece for this localtime() usage
     return $season->{localtime->fullmonth};
 }
+
+=head2 GET /p/
+
+=cut
+
+get '/p/:page_id' => sub {
+    my $page_id = route_parameters->get('page_id');
+
+    say STDERR "page_id is $page_id";
+
+    my $dbh = get_dbh(debug => 0);
+
+    my $page = $dbh->resultset('Page')->find({
+        is_deleted => 0,
+        page_id => $page_id,
+    });
+
+    # use the layout as a temporary shim
+    my $template = 'layouts/unearth-page-wrapper';
+    template($template, { content => $page->body },
+        # gets the wrapper from views/layouts/<whatever>
+        #{ layout => 'unearth-page-wrapper' },
+        { layout => undef},
+    );
+    
+
+};
 
 
 =head2 GET /calendars/yyyy/mm/

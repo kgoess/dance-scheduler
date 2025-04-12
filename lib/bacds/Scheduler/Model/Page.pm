@@ -10,7 +10,6 @@ sub get_fields_for_output {
     qw/
         page_id
         title
-        url_path
         short_desc
         body
         sidebar
@@ -23,7 +22,6 @@ sub get_fields_for_input {
     qw/
         page_id
         title
-        url_path
         short_desc
         body
         sidebar

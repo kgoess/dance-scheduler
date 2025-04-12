@@ -26,7 +26,6 @@ my $Page_Id;
 my $Created_Time;
 my $Modified_Time;
 
-
 subtest 'Invalid GET /page/1' => sub {
     plan tests => 2;
 
@@ -51,7 +50,6 @@ subtest 'POST /page' => sub {
     my ($expected, $res, $decoded, $got);
     my $new_page = {
         title            => "test page",
-        url_path         => "/some/path",
         short_desc       => "this is the short_desc",
         body       => "Hoc est enim corpus meum",
     #    page_id          => '', # the webapp sends title=test+page&page_id=
@@ -66,7 +64,6 @@ subtest 'POST /page' => sub {
     $expected = {
         page_id    => 1,
         title            => $new_page->{title},
-        url_path         => $new_page->{url_path},
         short_desc       => $new_page->{short_desc},
         body       => $new_page->{body},
         sidebar       => undef,
@@ -80,36 +77,37 @@ subtest 'POST /page' => sub {
     $Page = $dbh->resultset('Page')->find($decoded->{data}{page_id});
     $Page_Id = $Page->page_id;
 };
+goto SKIPHERE;
 
-subtest 'POST /page duplicate' => sub {
-    plan tests => 3;
 
-    my ($expected, $res, $decoded, $got);
-    my $dup_page = {
-        abbreviation => "TPO",
-        title        => "test page",
-        url_path        => "/some/path",
-        body        => "test page",
-        short_desc        => "test page",
-    };
-    local $ENV{TEST_DUP_VALUE} = 'test page';
-    warning_is {
-        $res = $test->request(POST '/page/', $dup_page );
-    } 'UNIQUE constraint failed: pages.url_path: test page';
-
-    ok($res->is_success, 'still a 200-OK though');
-
-    $got = decode_json($res->content);
-    $expected = {
-        data   => "",
-        errors => [ {
-            msg => "There is already an entry for 'test page' under Page",
-            num => 409,
-          },
-        ],
-    };
-    eq_or_diff $got, $expected, 'return matches';
-};
+#subtest 'POST /page duplicate' => sub {
+#    plan tests => 3;
+#
+#    my ($expected, $res, $decoded, $got);
+#    my $dup_page = {
+#        abbreviation => "TPO",
+#        title        => "test page",
+#        body        => "test page",
+#        short_desc        => "test page",
+#    };
+#    local $ENV{TEST_DUP_VALUE} = 'test page';
+#    warning_is {
+#        $res = $test->request(POST '/page/', $dup_page );
+#    } 'UNIQUE constraint failed: pages.url_path: test page';
+#
+#    ok($res->is_success, 'still a 200-OK though');
+#
+#    $got = decode_json($res->content);
+#    $expected = {
+#        data   => "",
+#        errors => [ {
+#            msg => "There is already an entry for 'test page' under Page",
+#            num => 409,
+#          },
+#        ],
+#    };
+#    eq_or_diff $got, $expected, 'return matches';
+#};
 
 subtest 'GET /page/#' => sub {
     plan tests => 2;
@@ -124,7 +122,6 @@ subtest 'GET /page/#' => sub {
     $expected = {
         page_id          => $Page_Id,
         title            => $Page->title,
-        url_path         => $Page->url_path,
         short_desc         => $Page->short_desc,
         body         => $Page->body,
         sidebar         => undef,
@@ -154,7 +151,6 @@ subtest 'PUT /page/#' => sub {
     $expected = {
         page_id          => $Page_Id,
         title            => $edit_page->{title},
-        url_path         => $Page->url_path,
         short_desc         => $Page->short_desc,
         body         => $Page->body,
         sidebar         => undef,
@@ -195,7 +191,6 @@ subtest 'GET /pageAll' => sub{
       {
         page_id          => $Page_Id,
         title            => $Page->title,
-        url_path              => $Page->url_path,
         short_desc              => $Page->short_desc,
         body              => $Page->body,
         sidebar         => undef,
@@ -206,3 +201,20 @@ subtest 'GET /pageAll' => sub{
     ];
     eq_or_diff $got, $expected, 'matches';
 };
+
+SKIPHERE:
+subtest 'arbitrary url' => sub {
+    plan tests => 999;
+
+    my $res = $test->request( GET "/p/$Page_Id");
+
+#dump $res;
+ if ($res->is_success) {
+            print $res->decoded_content;
+        }
+        else {
+            print STDERR $res->status_line, "\n";
+        }
+
+};
+

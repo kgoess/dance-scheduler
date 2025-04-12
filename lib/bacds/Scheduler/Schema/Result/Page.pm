@@ -47,12 +47,6 @@ __PACKAGE__->table("pages");
   is_nullable: 0
   size: 191
 
-=head2 url_path
-
-  data_type: 'varchar'
-  is_nullable: 0
-  size: 191
-
 =head2 short_desc
 
   data_type: 'varchar'
@@ -95,8 +89,6 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "title",
   { data_type => "varchar", is_nullable => 0, size => 191 },
-  "url_path",
-  { data_type => "varchar", is_nullable => 0, size => 191 },
   "short_desc",
   { data_type => "varchar", is_nullable => 1, size => 512 },
   "body",
@@ -132,23 +124,9 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("page_id");
 
-=head1 UNIQUE CONSTRAINTS
 
-=head2 C<page_url_idx>
-
-=over 4
-
-=item * L</url_path>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("page_url_idx", ["url_path"]);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2025-04-04 20:01:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Esh8DTAEEIFEE+UP/3xazA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2025-04-11 20:48:37
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:3ImC+Uqrp6Xixhs+44f4/A
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
