@@ -63,20 +63,20 @@
                     <%- link -%>
                       <% END -%>
                         <li class="nav-item dropdown-item">
-                          <a href="<% make_link("", " #tonight-section") %>" class="nav-link">Tonight&rsquo;s Events</a>
+                          <a href="<% make_link("", "#tonight-section") %>" class="nav-link">Tonight&rsquo;s Events</a>
                         </li>
                         <li class="nav-item dropdown-item">
-                          <a href="<% make_link("", " #calendar-section") %>" class="nav-link">Calendar</a>
+                          <a href="<% make_link("", "#calendar-section") %>" class="nav-link">Calendar</a>
                         </li>
                         <li class="nav-item dropdown-item">
                           <% IF is_homepage -%>
                             <a href="#dancefinder-section" class="nav-link">Dance Finder (search)</a>
                             <% ELSE -%>
-                              <a href="<% make_link(" /dancefinder") %>" class="nav-link">Dance Finder (search)</a>
+                              <a href="<% make_link("/dancefinder") %>" class="nav-link">Dance Finder (search)</a>
                               <% END -%>
                         </li>
                         <li class="nav-item dropdown-item">
-                          <a href="<% make_link(" /calendars/") %>" class="nav-link">Historical Calendars</a>
+                          <a href="<% make_link("/calendars/") %>" class="nav-link">Historical Calendars</a>
                         </li>
               </ul>
             </li>
