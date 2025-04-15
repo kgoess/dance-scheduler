@@ -548,7 +548,7 @@ sub test_livecalendar_endpoint {
         id => 5,
         start => "2022-04-28T20:00",
         textColor => "black",
-        title => " test multiday event 1 at . Multiday event",
+        title => " test multiday event 1. Multiday event",
         url => 'https://bacds.org/dance-a-week/',
       },
     ];

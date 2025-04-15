@@ -1045,12 +1045,16 @@ get '/livecalendar-results' => with_types [
     my $ret = [];
 
     foreach my $event ($rs->all) {
+        my $loc_str = '';
+        if (my @venues = $event->venues->all) {
+            $loc_str = ' at '.
+                (join ', and ', map $_->hall_name.' in '.$_->city, @venues);
+        }
         my $titlestring = join '',
             (join '/', map $_->name, $event->styles->all),
             ' ',
             ($event->name//''), # mostly empty except for specials, camps
-            ' at ',
-            (join ', and ', map $_->hall_name.' in '.$_->city, $event->venues->all),
+            $loc_str,
             '.';
         if ($event->callers != 0) {
             $titlestring .= ' Led by ';
