@@ -45,6 +45,7 @@ package OldEvent {
             leader
             band
             musos
+            info_url
             comments
             is_canceled
         / ]
@@ -76,6 +77,7 @@ sub load_events_for_month {
             parent_orgs => join(', ', map $_->abbreviation, $event->parent_orgs->all),
             comments => $event->short_desc, # maybe?
             is_canceled => $event->is_canceled,
+            info_url => $event->custom_url || ($event->series && $event->series->series_url),
         });
         push @res, $old;
     }

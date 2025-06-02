@@ -82,7 +82,7 @@
             <% talent = talent _ ", " %>
         <%- END %>
         <%- talent = talent _ event.musos %>
-        <tr class="<% class_for_non_bacds(event) %>">
+        <tr class="archive-schedule-of-events-row <% class_for_non_bacds(event) %>" style="cursor: pointer" onclick="document.location='<% event.info_url %>'">
             <td class="<% listing_class %>">
                 <a name="<% event.startday_obj.ymd %>">
                     <%- event.startday_obj.month_name %>&nbsp;<% event.startday_obj.day %>

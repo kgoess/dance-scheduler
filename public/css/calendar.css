@@ -123,3 +123,7 @@ table tr th.caltitle {
     font-size: 95%;
 }
 
+.archive-schedule-of-events-row:hover {
+    background-color: oldlace;
+}
+
