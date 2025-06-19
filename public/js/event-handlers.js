@@ -62,6 +62,7 @@ export function displayRowOnclick() {
     }
     display.toggle();
     $(this).find('.row-edit').toggle().focus();
+    $(this).find('.input-disabler').toggle().prop('checked', 'true');
 }
 
 export function saveButtonOnclick() {

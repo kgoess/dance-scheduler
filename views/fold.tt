@@ -27,11 +27,11 @@
     />
 <% END %>
 <% MACRO handle_input_time(column) BLOCK %>
+    <input class="input-disabler" type="checkbox" hidden>
     <input
         class="row-edit"
         name="<% column.name %>"
-        size="5"
-        maxlength="5"
+        type="time"
         hidden
         <% IF column.required %>required<% END %>
     />
@@ -95,7 +95,7 @@
     </span>
 </div>
 <div class="model-display" hidden>
-    <form <% IF content.form_id %>id="<% content.form_id %>"<% END %> class="display-form">
+    <form <% IF content.form_id %>id="<% content.form_id %>"<% END %> class="display-form" autocomplete="off">
         <% FOREACH column IN content.columns %>
             <% IF column.type == "hidden" %>
                 <input name="<% column.name %>" type="hidden">

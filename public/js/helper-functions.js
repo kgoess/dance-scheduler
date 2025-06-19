@@ -82,6 +82,7 @@ export { getLabelForDisplayInItemListbox };
 export function displayItemRow(currentRow, targetObj) {
     currentRow.children('.row-contents').show();
     currentRow.children('.row-edit').hide();
+    currentRow.children('.input-disabler').hide();
     let singleValue = targetObj
         ? targetObj[currentRow.attr('name')]
         : '';
