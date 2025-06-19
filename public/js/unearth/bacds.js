@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
+  let eventsUrl = "/dance-scheduler/livecalendar-results";
+  if (Number(location.port) >= 5000) {
+    eventsUrl = '/livecalendar-results';
+  }
   var calendarEl = document.getElementById("calendar");
   if (calendarEl) {
       var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -8,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         defaultTimedEventDuration: "02:30",
         events: {
-          url: "/dance-scheduler/livecalendar-results",
+          url: eventsUrl,
           failure: function () {
             alert("there was an error while fetching events!");
           },
