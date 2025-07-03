@@ -290,7 +290,15 @@ export function saveAction(target, onSuccess) {
 
     // serialize() makes it into a query string like foo=1&bar=2,
     // and the ajax() turns that into json
-    const dataString = activeForm.serialize();
+    let dataString = activeForm.serialize();
+
+    // if the form had an input-disabler field, make sure to submit it with a NULL if appropriate.
+    activeForm[0].querySelectorAll('.input-disabler').forEach((e)=>{
+        if (!e.checked){
+            const relatedInput = e.parentElement.querySelector('.row-edit');
+            if (relatedInput.value == '') dataString+=`&${relatedInput.getAttribute('name')}=NULL`;
+        }
+    })
 
     let http_method;
     let url;
