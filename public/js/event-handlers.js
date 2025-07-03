@@ -61,7 +61,7 @@ export function displayRowOnclick() {
         return;
     }
     display.toggle();
-    $(this).find('.row-edit').toggle().focus();
+    $(this).find('.row-edit').toggle().focus().prop('disabled', false);
     $(this).find('.input-disabler').toggle().prop('checked', 'true');
 }
 
@@ -222,4 +222,10 @@ export function deleteButtonOnclick() {
     modal.find('#delete-confirmation-what').text(rowName);
 
     deleteConfirmationModal.dialog( 'open' );
+}
+
+export function inputDisablerOnChange(){
+    const linkedElement = this.parentElement.querySelector('.row-edit');
+    linkedElement.disabled = !this.checked;
+    linkedElement.value = '';
 }
