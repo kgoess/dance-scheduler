@@ -282,8 +282,8 @@ sub put_row {
     foreach my $column (@fields_for_input) {
         next unless exists $incoming_data{$column};
         my $filtered_input = $class->filter_input($column, $incoming_data{$column});
-        $auditor->add_update_message($column, $filtered_input)
-            if ($row->$column//'') ne $filtered_input;
+        $auditor->add_update_message($column, $filtered_input//'NULL')
+            if ($row->$column//'') ne ($filtered_input//'');
 
         $row->$column($filtered_input);
     };
