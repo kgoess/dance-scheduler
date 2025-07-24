@@ -1111,12 +1111,16 @@ get '/livecalendar-results' => with_types [
             $end_date = $end_date->ymd;
         }
         
+        
+        my $start_string = $start_date ? $start_date . ($event->start_time ? 'T' . $event->start_time : '') : '';
+        my $end_string = $end_date ? $end_date . ($event->end_time ? 'T' . $event->end_time : '') : '';
+        print STDERR "   start $start_string, end $end_string\n";
 
         push @$ret, {
             id => $event->event_id, # in dancefinder.pl this is just $i++
             url => $url,
-            start => $start_date . 'T' . $event->start_time,
-            ($end_date ? (end => $end_date . (($event->end_time // '') ne '00:00:00' ? 'T' . $event->end_time : '')):()),
+            start => $start_string,
+            ($end_string ? (end => $end_string) : ()),
             #TODO: check for NULL
             title => $titlestring,
             ($allDay ? (allDay => $allDay) : ()),
