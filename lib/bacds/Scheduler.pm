@@ -1114,7 +1114,6 @@ get '/livecalendar-results' => with_types [
         
         my $start_string = $start_date ? $start_date . ($event->start_time ? 'T' . $event->start_time : '') : '';
         my $end_string = $end_date ? $end_date . ($event->end_time ? 'T' . $event->end_time : '') : '';
-        print STDERR "   start $start_string, end $end_string\n";
 
         push @$ret, {
             id => $event->event_id, # in dancefinder.pl this is just $i++
