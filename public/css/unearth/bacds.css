@@ -24,6 +24,11 @@
   color: #2c1919;
 }
 
+.event-time-range {
+  text-wrap-mode: nowrap;
+  text-wrap: nowrap;
+}
+
 .event-short-desc {
   margin-left: 2.5em;
 }
