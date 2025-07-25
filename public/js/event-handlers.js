@@ -15,7 +15,7 @@ let {
  * they type in the box and we filter the selectlist as they type
  */
 export function listFilterOnchange() {
-    const selectList = $(this).next('select');
+    const selectList = $(this).next().find('select');
     const filterText = $(this).val().toLowerCase();
     selectList.children('option').each(function() {
         if ($(this).text().toLowerCase().indexOf(filterText) == -1) {
