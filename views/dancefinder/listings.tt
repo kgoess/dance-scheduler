@@ -136,8 +136,9 @@ page.
     <%- IF event.long_desc -%>
         <%- IF event.name -%>
             <%- event_name(event) %>
-        <%- END -%>
             (<%- event_styles(event) -%>)
+        <%- ELSE -%><strong> <%- event_styles(event) -%></strong>
+        <%- END -%>
             <%- event_venues(event) -%>
             <%- event_is_cancelled(event) -%>
         <br />
@@ -148,7 +149,7 @@ page.
                 <%- event_name(event) %>
                 with 
             <%- END -%>
-            <% event_teams(event) %>
+            <strong><% event_teams(event) %></strong>
             (<%- event_styles(event) -%>)
             <%- event_callers_and_bands(event) -%>
             <%- event_talent(event) -%>
