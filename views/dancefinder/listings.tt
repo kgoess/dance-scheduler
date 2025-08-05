@@ -34,7 +34,7 @@ page.
 
 <%- MACRO event_date(event) BLOCK -%>
     <%- event.start_date.strftime("%A, %B %e") -%>
-    <%- IF event.start_time %><span class="event-time-range"><%- Date.format(event.start_time _ ' 00:00:0000', '%-I:%M%P') -%></span>
+    <%- IF event.start_time %> &#8226; <span class="event-time-range"><%- Date.format(event.start_time _ ' 00:00:0000', '%-I:%M%P') -%></span>
     <%- END -%>
     <%- IF event.end_date %> to <% event.end_date.strftime("%A, %b. %e") -%>
         <%- IF event.end_time %><%  Date.format(event.end_time _ ' 00:00:0000', '%-I:%M%P') %><% END -%>
