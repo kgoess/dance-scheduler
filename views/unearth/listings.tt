@@ -6,6 +6,7 @@ page.
 
 <% USE Math %>
 <% USE POSIX %>
+<% USE Date %>
 
 <% MACRO maybe_linkit(string, url) BLOCK %>
   <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
@@ -224,6 +225,8 @@ END -%>
           <%# if a special event, print out the title. %>
           <span class="special-event-name"><% event.name %></span>
         <%- END %>
+        <%- IF event.start_time && !event.end_date %> <span class="event-time-range">&#8226; <% Date.format(event.start_time _ ' 00:00:0000', '%l:%M%P') -%>
+          <%- IF event.end_time %>&ndash;<%  Date.format(event.end_time _ ' 00:00:0000', '%l:%M%P') %><% END %></span><% END %>
         <%- IF event.short_desc %><div class="event-short-desc"><% event.short_desc %><% END %>
         <%- IF event.custom_url || event.series.series_url %>
             <a class="more-info-link" href="<% event.custom_url || event.series.series_url %>">More Info</a>

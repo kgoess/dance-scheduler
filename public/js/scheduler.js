@@ -9,6 +9,7 @@ let {
     saveAction,
     toastInit, 
     unpackResults,
+    inputDisablerOnchange,
 } = await import(`./helper-functions.js?checksum=${jsChecksum}`);
 
 $( document ).ready(function() {
@@ -29,6 +30,8 @@ $( document ).ready(function() {
 
     // They type in the box and we filter the select list
     $( '.clickable-list-input' ).keyup( h.listFilterOnchange );
+
+    $('.input-disabler').change(h.inputDisablerOnChange)
 
     // Show the editable field when the user clickes the display
     $( '.display-row' ).click( h.displayRowOnclick );

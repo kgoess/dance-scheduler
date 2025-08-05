@@ -3,7 +3,7 @@ CREATE TABLE events (
     name VARCHAR(255),
     synthetic_name varchar(255),
     start_date DATE NOT NULL,
-    start_time TIME NOT NULL,
+    start_time TIME,
     end_date DATE,
     end_time TIME,
     short_desc VARCHAR(2048),    

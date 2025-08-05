@@ -1,4 +1,4 @@
-
+<% USE Date %>
 <%- MACRO event_type_styling(event) BLOCK;
         has_border = 0;
         FOREACH style IN event.styles;
@@ -7,14 +7,15 @@
             END;
         END;
         IF has_border; -%>border rounded border-primary border-4<%- END;
+        IF event.is_canceled; -%>canceled-event<%- END;
   END %>
-<article>
+<section>
 
     <% FOREACH event IN events %>
-        <div class="p-1 m-1 lh-sm mb-4 <% event_type_styling(event) %>">
+        <article class="p-1 m-1 lh-sm mb-4 <% event_type_styling(event) %>">
             <p class="mb-0">
                 <b>
-                    <a class="text-decoration-none" href="<% ssi_uri_for({ event_id => event.event_id }) %>">
+                    <a class="text-decoration-none <% IF event.is_canceled %>canceled-event<% END %>" href="<% ssi_uri_for({ event_id => event.event_id }) %>">
                         <% event.start_date.day_name() %>, <% event.start_date.month_name %> <% event.start_date.day %>
                     </a>
                     <% IF event.is_canceled %>
@@ -22,20 +23,18 @@
                     <% END %>
                 </b>
             </p>
-            <p class="mb-0">
-                <% IF event.is_canceled %><s class="text-danger fst-italic"><% END %>
                 <%- IF event.styles.grep('^SPECIAL$') && event.name %>
-                    <span class="fs-4 fw-bolder fst-italic" style="font-variant: small-caps"><% event.name %></span><br />
+                    <p class="fs-4 fw-bolder fst-italic" style="font-variant: small-caps"><% event.name %></p>
                 <%- END %>
                 <%- FOREACH venue IN event.venues %>
-                    <% venue.hall_name %>, <% venue.address %>, <%venue.city %>.<br />
+                    <p class="mb-0"><% venue.hall_name %>, <% venue.address %>, <%venue.city %>.</p>
                 <%- END %>
                 <%- IF event.callers.size() %>
-                    Caller:
+                    <p class="mb-0">Caller:
                     <% FOREACH caller IN event.callers %>
                         <% caller.name %><% IF !loop.last() %>, <% END %>
                     <% END %>
-                    <br />
+                    </p>
                 <%- END %>
                 <%- IF event.bands.size() || event.talent.size() %>
                     Band:
@@ -55,18 +54,15 @@
                 <%- END %>
                 <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
                 <%- IF event.role_pairs %>
-                    <br/>
-                    The caller intends to use <% event.role_pairs.role_pair %> role names.
+                    <p class="mb-0">The caller intends to use <% event.role_pairs.role_pair %> role names.</p>
                 <%- END %>
                 <% IF event.is_canceled %></s><% END %>
-            </p>
-            <p class="ms-3 mb-0 <% IF event.is_canceled %>text-danger<% ELSE %>text-primary<% END %>">
-                <% event.short_desc %>
-            </p>
-        </div>
-        <% IF event.is_canceled %>
-            </s>
-        <% END %>
+            <%- IF event.short_desc %><p class="ms-3 mb-0"><% event.short_desc %></p><% END -%>
+            <%- IF event.start_time %><p class="ms-3 mb-0 event-time-range">
+                <%- Date.format(event.start_time _ ' 00:00:0000', '%l:%M%P') -%>
+                <%- IF event.end_time %>&ndash;<%  Date.format(event.end_time _ ' 00:00:0000', '%l:%M%P') %><% END %>
+            </p><%- END -%>
+        </article>
         <% ldjson %>
     <% END %>
-</article>
+</section>

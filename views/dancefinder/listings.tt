@@ -4,6 +4,8 @@ the tonight.html, 18-day.html, and specialevents.html bits of the main
 page.
 -%>
 
+<% USE Date %>
+
 <%- MACRO maybe_linkit(string, url) BLOCK -%>
     <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
 <%- END -%>
@@ -31,10 +33,13 @@ page.
 <% END -%>
 
 <%- MACRO event_date(event) BLOCK -%>
-    <% IF event.end_date %>
-        <%- event.start_date.strftime("%A, %b. %e - ") _ event.end_date.strftime("%A, %b. %e") %>
+    <%- event.start_date.strftime("%A, %B %e") -%>
+    <%- IF event.start_time %><span class="event-time-range"><%- Date.format(event.start_time _ ' 00:00:0000', '%l:%M%P') -%></span>
+    <%- END -%>
+    <%- IF event.end_date %> to <% event.end_date.strftime("%A, %b. %e") -%>
+        <%- IF event.end_time %><%  Date.format(event.end_time _ ' 00:00:0000', '%l:%M%P') %><% END -%>
     <%- ELSE -%>
-        <% event.start_date.strftime("%A, %B %e") %>
+    <%- IF event.end_time %>&ndash;<%  Date.format(event.end_time _ ' 00:00:0000', '%l:%M%P') %><% END -%>
     <%- END -%>
 <%- END -%>
 
@@ -132,9 +137,10 @@ page.
         <%- IF event.name -%>
             <%- event_name(event) %>
             (<%- event_styles(event) -%>)
+        <%- ELSE -%><strong> <%- event_styles(event) -%></strong>
+        <%- END -%>
             <%- event_venues(event) -%>
             <%- event_is_cancelled(event) -%>
-        <%- END -%>
         <br />
         <%- event.long_desc -%>
     <%- ELSE -%>
@@ -143,7 +149,7 @@ page.
                 <%- event_name(event) %>
                 with 
             <%- END -%>
-            <% event_teams(event) %>
+            <strong><% event_teams(event) %></strong>
             (<%- event_styles(event) -%>)
             <%- event_callers_and_bands(event) -%>
             <%- event_talent(event) -%>
