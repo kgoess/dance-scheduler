@@ -4,7 +4,7 @@ margin: 0;
 margin-bottom: 25px;
 padding: 0;
 background-color: #ddd;
-//background-image: url("/images/perldancer-bg.jpg");
+/*background-image: url("/images/perldancer-bg.jpg");*/
 background-repeat: no-repeat;
 background-position: top left;
 background-opacity: 0.1;
@@ -437,8 +437,8 @@ form:invalid button.disableable {
     background: white;
     overflow: hidden;
     height: 0;
-    //transition: max-height 0s ease-out ;
-    //max-height: 0;
+    /*transition: max-height 0s ease-out ;
+    /max-height: 0;*/
 }
 
 .accordion hr {
@@ -450,8 +450,8 @@ form:invalid button.disableable {
 /* Unhides the content part when active. Sets the height */
 
 .accordion .accordion-container.active .content {
-    //transition: max-height 0.5s ease-in ;
-    //max-height: 35em;
+    /*transition: max-height 0.5s ease-in ;
+    /max-height: 35em;*/
     height: 100%
 }
 
@@ -593,3 +593,11 @@ https://codepen.io/kieran/pen/ajLvjm
   width: 16px;
 }
 
+@keyframes fadeout {
+    0% {opacity: 1}
+    100% {opacity: 0}
+}
+@keyframes fadein {
+    0% {opacity: 0}
+    100% {opacity: 1}
+}

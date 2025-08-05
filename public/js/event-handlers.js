@@ -226,6 +226,12 @@ export function deleteButtonOnclick() {
 
 export function inputDisablerOnChange(){
     const linkedElement = this.parentElement.querySelector('.row-edit');
-    linkedElement.disabled = !this.checked;
-    linkedElement.value = '';
+    if (this.checked){
+        linkedElement.disabled = false;
+        linkedElement.value = '00:00';
+        linkedElement.style.animation = '0.25s ease-in forwards fadein';
+    } else{
+        linkedElement.disabled = true;
+        linkedElement.style.animation = '0.5s ease-out forwards fadeout';
+    }
 }
