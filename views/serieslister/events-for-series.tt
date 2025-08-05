@@ -59,8 +59,8 @@
                 <% IF event.is_canceled %></s><% END %>
             <%- IF event.short_desc %><p class="ms-3 mb-0"><% event.short_desc %></p><% END -%>
             <%- IF event.start_time %><p class="ms-3 mb-0 event-time-range">
-                <%- Date.format(event.start_time _ ' 00:00:0000', '%l:%M%P') -%>
-                <%- IF event.end_time %>&ndash;<%  Date.format(event.end_time _ ' 00:00:0000', '%l:%M%P') %><% END %>
+                <%- Date.format(event.start_time _ ' 00:00:0000', '%-I:%M%P') -%>
+                <%- IF event.end_time %>&ndash;<%  Date.format(event.end_time _ ' 00:00:0000', '%-I:%M%P') %><% END %>
             </p><%- END -%>
         </article>
         <% ldjson %>
