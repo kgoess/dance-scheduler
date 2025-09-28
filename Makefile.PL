@@ -119,6 +119,7 @@ httpd-conf-install:
 cron-install:
 	@if [ ! $$(id -u) = 0 ]; then  echo -e "\n*****************\n*** You need to run this with sudo: 'sudo make cron-install'***\n*******************\n" ; false; fi
 	install cron/dance-scheduler-backup /etc/cron.daily/dance-scheduler-backup
+	install cron/send-weekly-schedule /etc/cron.d/send-weekly-schedule
 
 MAKE_FRAG
 }

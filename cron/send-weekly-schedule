@@ -1,0 +1,9 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+3 5 * * 1 root /var/lib/dance-scheduler/bin/send-weekly-schedule.pl --html --to bacds-announce+int+3048+4694056256844560631@bacds.groups.io
+
+# testing
+#29 15 * * * root /var/lib/dance-scheduler/bin/send-weekly-schedule.pl --html --to aliastest+int+3163+5616500175863287701@bacds.groups.io
+
