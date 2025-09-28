@@ -10,7 +10,11 @@ chmod 700 $backupdir
 day_of_week=$(date +%A)
 day_of_month=$(date +%d)
 
-mysqldump -uroot schedule > $backupdir/$day_of_week
+# this my.cnf looks like this:
+# [client]
+# user=scheduler
+# password=<<contents of /var/www/bacds.org/dance-scheduler/private/mysql-password>>
+mysqldump --defaults-extra-file=/var/www/bacds.org/dance-scheduler/private/my.cnf schedule > $backupdir/$day_of_week
 
 if [ $day_of_month = '01' ]; then
     if [ -e $backupdir/monthly-old ]; then
