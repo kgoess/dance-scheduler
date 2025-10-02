@@ -19,7 +19,7 @@ use Data::Dump qw/dump/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Time qw/get_today/;
-use Date::Parse qw/str2time/;
+use DateTime::Format::ISO8601 qw/parse_datetime/;
 
 =head2 related_entities_for_upcoming_events
 
