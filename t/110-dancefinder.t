@@ -62,7 +62,7 @@ sub setup_fixture {
         custom_url => 'http://custom-url/test-event-1',
         short_desc => 'big <b> dance party &#9786',
         start_date => get_now->ymd('-'),
-        start_time => '20:00',
+        start_time => '20:00:00',
     });
     $event1->insert;
     $event1->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
@@ -70,7 +70,7 @@ sub setup_fixture {
     my $event2 = $dbh->resultset('Event')->new({
         synthetic_name => 'test event 2 synthname',
         start_date => get_now->ymd('-'),
-        start_time => '20:00',
+        start_time => '20:00:00',
     });
     $event2->insert;
     $event2->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
@@ -80,7 +80,7 @@ sub setup_fixture {
         name => 'Ye Oldde Ewent',
         synthetic_name => 'old event synthname',
         start_date => get_now->subtract(days => 14)->ymd('-'),
-        start_time => '20:00',
+        start_time => '20:00:00',
     });
     $oldevent->insert;
     $oldevent->add_to_parent_orgs($nbcds_parent_org, { ordering => 1 });
@@ -92,7 +92,7 @@ sub setup_fixture {
         short_desc => 'deleted <b> dance party &#9785;',
         is_deleted => 1,
         start_date => get_now->ymd('-'),
-        start_time => '20:00',
+        start_time => '20:00:00',
     });
     $deleted_event->insert;
 
@@ -101,9 +101,9 @@ sub setup_fixture {
         synthetic_name => 'test multiday event 1 synthname',
         short_desc => 'multiday event',
         start_date => get_now->ymd('-'),
-        start_time => '20:00',
+        start_time => '20:00:00',
         end_date => get_now->add(days=>1)->ymd('-'),
-        end_time => '00:15',
+        end_time => '00:15:00',
     });
     $multidayevent->insert;
     $multidayevent->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
@@ -114,7 +114,7 @@ sub setup_fixture {
     $band1->insert;
     $band1->add_to_events($event1, {
         ordering => $i++,
-         created_ts => '2022-07-31T13:33',
+         created_ts => '2022-07-31T13:33:00',
     });
     my $band2 = $dbh->resultset('Band')->new({
         name => 'test band 2',
@@ -122,7 +122,7 @@ sub setup_fixture {
     $band2->insert;
     $band2->add_to_events($event1,
       {  ordering => $i++,
-         created_ts => '2022-07-31T13:33',
+         created_ts => '2022-07-31T13:33:00',
     });
 
     my $muso1 = $dbh->resultset('Talent')->new({
@@ -134,7 +134,7 @@ sub setup_fixture {
     # fetch all the related data even if it doesn't match the search terms.
     $muso1->add_to_bands($band1, {
          ordering => $i++,
-         created_ts => '2022-07-31T13:33',
+         created_ts => '2022-07-31T13:33:00',
     });
     my $muso2 = $dbh->resultset('Talent')->new({
         name => 'muso 2',
@@ -142,7 +142,7 @@ sub setup_fixture {
     $muso2->insert;
     $muso2->add_to_bands($band1, {
          ordering => $i++,
-         created_ts => '2022-07-31T13:33',
+         created_ts => '2022-07-31T13:33:00',
     });
     my $muso3 = $dbh->resultset('Talent')->new({
         name => 'muso 3',
@@ -151,7 +151,7 @@ sub setup_fixture {
     # muso3 isn't in a band, they're just sitting in on event1
     $muso3->add_to_events($event1, {
          ordering => $i++,
-         created_ts => '2022-07-31T13:33',
+         created_ts => '2022-07-31T13:33:00',
     });
 
     # muso4 is only attached to the old event, so they won't show up
@@ -161,7 +161,7 @@ sub setup_fixture {
     $muso4->insert;
     $muso4->add_to_events($oldevent, {
          ordering => $i++,
-         created_ts => '2022-04-01T13:33',
+         created_ts => '2022-04-01T13:33:00',
     });
 
     # deletedmuso is in a band but is_deleted, so shouldn't show up
@@ -172,7 +172,7 @@ sub setup_fixture {
     $deleted_muso->insert;
     $deleted_muso->add_to_bands($band1, {
          ordering => $i++,
-         created_ts => '2022-07-31T13:33',
+         created_ts => '2022-07-31T13:33:00',
     });
 
 
@@ -184,7 +184,7 @@ sub setup_fixture {
     $style1->insert;
     $style1->add_to_events($oldevent, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
     my $style2 = $dbh->resultset('Style')->new({
         name => 'CONTRA',
@@ -192,11 +192,11 @@ sub setup_fixture {
     $style2->insert;
     $style2->add_to_events($oldevent, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
     $style2->add_to_events($event2, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
 
     my $caller1 = $dbh->resultset('Caller')->new({
@@ -205,7 +205,7 @@ sub setup_fixture {
     $caller1->insert;
     $caller1->add_to_events($oldevent, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
     my $caller2 = $dbh->resultset('Caller')->new({
         name => 'Bob Bronson',
@@ -213,7 +213,7 @@ sub setup_fixture {
     $caller2->insert;
     $caller2->add_to_events($oldevent, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
 
     my $band3 = $dbh->resultset('Band')->new({
@@ -222,7 +222,7 @@ sub setup_fixture {
     $band3->insert;
     $band3->add_to_events($oldevent, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
     my $band4 = $dbh->resultset('Band')->new({
         name => 'Blasting Berzerkers',
@@ -230,7 +230,7 @@ sub setup_fixture {
     $band4->insert;
     $band4->add_to_events($oldevent, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
 
     my $venue1 = $dbh->resultset('Venue')->new({
@@ -242,7 +242,7 @@ sub setup_fixture {
     $venue1->insert;
     $venue1->add_to_events($_, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     }) for ($oldevent, $event1, $event2);
 
     my $venue2 = $dbh->resultset('Venue')->new({
@@ -254,7 +254,7 @@ sub setup_fixture {
     $venue2->insert;
     $venue2->add_to_events($oldevent, {
         ordering => $i++,
-        created_ts => '2022-04-01T13:33',
+        created_ts => '2022-04-01T13:33:00',
     });
 
     my $series1 = $dbh->resultset('Series')->new({
@@ -412,7 +412,8 @@ sub test_dancefinder_results_endpoint {
         'vanilla results header with no params';
 
     like $body, qr{
-        Thursday,.April.28:\s+<strong>\s*</strong>\s+at\s+
+        Thursday,.April.28.&\#8226;.<span.class="event-time-range">8:00pm</span>:\s+
+        <strong>\s*</strong>\s+at\s+
         <a.href="http://custom-url/test-event-1">Mr\..Hooper's.Store.in.Sunny.Day</a>\.\s+
             Music.by \s+
             test.band.1,.test.band.2:.muso.3 \s+
@@ -420,7 +421,8 @@ sub test_dancefinder_results_endpoint {
     }x, "event1's title looks right";
 
     like $body, qr{
-        Thursday,.April.28:\s+<strong>\s*CONTRA\s*</strong>\s+at\s+
+        Thursday,.April.28.&\#8226;.<span.class="event-time-range">8:00pm</span>:\s+
+        <strong>\s*CONTRA\s*</strong>\s+at\s+
         <a.href="https://bacds.org/dance-a-week/">Mr\..Hooper's.Store.in.Sunny.Day</a>\. \s+
         <a.href="https://bacds.org/dance-a-week/">More.Info</a> \s+
         </p>
@@ -524,7 +526,7 @@ sub test_livecalendar_endpoint {
         borderColor => "antiquewhite",
         id => 1,
         eventColor => 'yellow',
-        start => "2022-04-28T20:00",
+        start => "2022-04-28T20:00:00",
         textColor => "black",
         title => " test event 1 at Mr. Hooper's Store in Sunny Day. Music by test band 1, test band 2: muso 3. Big  dance party \x{263a}",
         url => 'http://custom-url/test-event-1',
@@ -534,7 +536,7 @@ sub test_livecalendar_endpoint {
         borderColor => "bisque",
         eventColor => 'coral',
         id => 2,
-        start => "2022-04-28T20:00",
+        start => "2022-04-28T20:00:00",
         textColor => "black",
         title => "CONTRA  at Mr. Hooper\'s Store in Sunny Day.",
         url => 'https://bacds.org/dance-a-week/',
@@ -543,10 +545,10 @@ sub test_livecalendar_endpoint {
         allDay => 1, 
         backgroundColor => "yellow",
         borderColor => "antiquewhite",
-        end => '2022-04-30T00:15', 
+        end => '2022-04-30T00:15:00', 
         eventColor => 'yellow',
         id => 5,
-        start => "2022-04-28T20:00",
+        start => "2022-04-28T20:00:00",
         textColor => "black",
         title => " test multiday event 1. Multiday event",
         url => 'https://bacds.org/dance-a-week/',
@@ -566,7 +568,7 @@ sub test_livecalendar_endpoint {
         borderColor => "dimgrey",
         eventColor => 'beige',
         id => 3,
-        start => "2022-04-14T20:00",
+        start => "2022-04-14T20:00:00",
         textColor => "darkgrey",
         title =>
             "ENGLISH/CONTRA ".
@@ -623,7 +625,7 @@ sub test_serieslister_endpoint {
     $Test->get_ok("/serieslister?series_id=$series_id", "GET /serieslister?series_id ok");
 
     like $Test->content, qr{
-        <div.class=".+?"> \s+
+        <article.class=".+?"> \s+
             <p.class=".+?"> \s+
                 <b(?:.class=".+?")?> \s+
                 <a.(?:class=".+?".)?href="http://localhost/serieslister\?event_id=2"> \s+
@@ -631,13 +633,13 @@ sub test_serieslister_endpoint {
                 </a> \s+
                 </b> \s+
             </p> \s+
-            <p.class=".+?"> \s+
-                    Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+            <p.class=".+?"> \s*
+                    Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day. \s*
             </p> \s+
-            <p.class=".+?"> \s+
+            <p.class=".+?">8:00pm \s+
             </p> \s+
-        </div>
-    }x, 'serieslist id output ok';
+        </article>
+    }msx, 'serieslist id output ok';
 
     #
     # test with the XID
@@ -645,7 +647,7 @@ sub test_serieslister_endpoint {
     $Test->get_ok("/serieslister?series_xid=DAW", "GET /serieslister?series_xid");
 
     like $Test->content, qr{
-        <div.class=".+?"> \s+
+        <article.class=".+?"> \s+
             <p.class=".+?"> \s+
                 <b(?:.class=".+?")?> \s+
                 <a.(?:class=".+?".)?href="http://localhost/serieslister\?event_id=2"> \s+
@@ -653,12 +655,12 @@ sub test_serieslister_endpoint {
                 </a> \s+
                 </b> \s+
             </p> \s+
-            <p.class=".+?"> \s+
-                    Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day.<br./> \s+
+            <p.class=".+?"> \s*
+                    Mr..Hooper's.Store,.123.Sesame.St.,.Sunny.Day. \s*
             </p> \s+
-            <p.class=".+?"> \s+
+            <p.class=".+?">8:00pm \s+
             </p> \s+
-        </div>
+        </article>
     }x, 'serieslist xid output ok';
 }
 
@@ -796,7 +798,7 @@ sub test_serieslister_ldjson {
          "name" : ""
       }
    ],
-   "startDate" : "2022-04-28T20:00"
+   "startDate" : "2022-04-28T20:00:00"
 }
 
     </script>
