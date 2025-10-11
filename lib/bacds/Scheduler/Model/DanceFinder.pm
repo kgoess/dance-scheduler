@@ -19,6 +19,7 @@ use Data::Dump qw/dump/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Time qw/get_today/;
+use DateTime::Format::ISO8601 qw/parse_datetime/;
 
 =head2 related_entities_for_upcoming_events
 
@@ -166,6 +167,9 @@ sub search_events {
         if %args;
 
     my $dbh = get_dbh(debug => $dbix_debug, db => $db_arg, user => $dbuser_arg);
+    my $dtf = $dbh->storage->datetime_parser;
+    my $parse_datetime = sub{DateTime::Format::ISO8601->parse_datetime(@_)};
+
 
     # These prefetches means all the data is fetched with one big
     # JOIN, you can verify that by adding debug=>1 in the
@@ -191,7 +195,8 @@ sub search_events {
         @$team_arg ? 'event_team_maps' : (),
         @$role_pair_arg ? 'event_role_pairs_maps' : (),
     );
-    my $start_date = $start_date_arg || get_today()->ymd;
+    my $today = get_today()->truncate(to => 'day');
+    my $start_date = $dtf->format_datetime($start_date_arg ? $parse_datetime->($start_date_arg) : $today);
 
     my @role_search;
     if ($role_pair_allow_blank){
@@ -217,7 +222,7 @@ sub search_events {
             '-not_bool' => 'is_deleted',
             start_date =>
                 $end_date_arg
-                ? { '-between' => [$start_date, $end_date_arg] }
+                ? { '-between' => [$start_date, $dtf->format_datetime($parse_datetime->($end_date_arg))] }
                 : { '>=' => $start_date },
             @$caller_arg ? ('event_callers_maps.caller_id' => $caller_arg) : (),
             @$venue_arg  ? ('event_venues_maps.venue_id'   => $venue_arg)  : (),

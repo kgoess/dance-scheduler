@@ -24,7 +24,7 @@ my $Test = get_tester(auth => 1);
 
 my $dbh = get_dbh();
 
-$ENV{TEST_NOW} = 1651112285; # 2022-04-27
+$ENV{TEST_NOW} = 1651112285; # 2022-04-27 19:18:05
 
 my $i = 0;
 
