@@ -9,6 +9,9 @@
         IF has_border; -%>border rounded border-primary border-4<%- END;
         IF event.is_canceled; -%>canceled-event<%- END;
   END %>
+<% MACRO maybe_linkit_ssh(string, url) BLOCK %>
+  <%- IF url %><a class="quieter-link" href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+<% END %>
 <section>
 
     <% FOREACH event IN events %>
@@ -32,7 +35,7 @@
                 <%- IF event.callers.size() %>
                     <p class="mb-0">Caller:
                     <% FOREACH caller IN event.callers %>
-                        <% caller.name %><% IF !loop.last() %>, <% END %>
+                        <% maybe_linkit_ssh(caller.name, caller.url) %><% IF !loop.last() %>, <% END %>
                     <% END %>
                     </p>
                 <%- END %>
@@ -49,7 +52,7 @@
                 <%- END %>
                 <%- IF event.talent.size() %>
                     <%- FOREACH talent IN event.talent %>
-                        <% talent.name %><% IF !loop.last() %>, <% END %>
+                        <% maybe_linkit_ssh(talent.name, talent.url) %><% IF !loop.last() %>, <% END %>
                     <%- END %>
                 <%- END %>
                 <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
