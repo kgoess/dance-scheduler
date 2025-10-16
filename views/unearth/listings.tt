@@ -11,6 +11,10 @@ page.
 <% MACRO maybe_linkit(string, url) BLOCK %>
   <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
 <% END %>
+<%# a quieter version (ssshh) -%>
+<% MACRO maybe_linkit_ssh(string, url) BLOCK %>
+  <%- IF url %><a class="quieter-link" href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+<% END %>
 
 <% MACRO classes_for_event(event) BLOCK;
   #This macro whitelists event.styles for insertion into a css class list
@@ -204,7 +208,7 @@ END -%>
       <%- ELSE -%>
         <%- IF event.callers -%>
           <%- FOREACH caller IN event.callers({}, { order_by => 'me.ordering' }) -%>
-            <% caller.name %><% IF !loop.last() %>, <% END %>
+            <%- maybe_linkit_ssh(caller.name, caller.url) -%><% IF !loop.last() %>, <% END %>
           <%- END -%>
           <%- IF event.bands || event.talent %> with <% END %>
         <%- ELSE %>
@@ -217,7 +221,7 @@ END -%>
         <%- END %>
         <% IF event.talent %>
           <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
-            <% talent.name %><% IF !loop.last() %>, <% END %>
+            <%- maybe_linkit_ssh(talent.name, talent.url) -%><% IF !loop.last() %>, <% END %>
           <%- END -%>
         <%- END %>
           <%- IF (event.bands || event.talent) && event.and_friends %>&hellip;and friends<% END %>

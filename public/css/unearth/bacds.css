@@ -164,3 +164,17 @@
     right: 0;
   }
 }
+
+a.quieter-link:link,
+a.quieter-link:visited {
+  color: #114289;
+}
+a.quieter-link:hover {
+  color: var(--bs-link-color);
+}
+a.quieter-link  {
+  text-decoration: none;
+}
+a.quieter-link:hover {
+  text-decoration: underline;
+}
