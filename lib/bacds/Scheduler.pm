@@ -18,7 +18,7 @@ These are the url endpoints for the app.
 
 package bacds::Scheduler;
 
-use 5.16.0;
+use 5.32.1;
 use warnings;
 
 use Dancer2;
@@ -27,7 +27,7 @@ use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Dancer2::Plugin::ParamTypes;
 use Date::Calc qw(Today Days_in_Month Day_of_Week Month_to_Text);
 use Data::Dump qw/dump/;
-use DateTime::Format::ISO8601;
+use DateTime::Format::ISO8601 qw/parse_datetime/;
 use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
@@ -1030,8 +1030,8 @@ get '/livecalendar-results' => with_types [
     my $end   = query_parameters->{end};
     my ($start_date, $end_date);
     if ($start =~ /^[0-9]+$/){
-      $start_date = DateTime->from_epoch(epoch => $start)->ymd;
-      $end_date   = DateTime->from_epoch(epoch => $end  )->ymd;
+      $start_date = DateTime->from_epoch(epoch => $start);
+      $end_date   = DateTime->from_epoch(epoch => $end  );
     } else {
       $start_date = DateTime::Format::ISO8601->parse_datetime($start);
       $end_date = DateTime::Format::ISO8601->parse_datetime($end);

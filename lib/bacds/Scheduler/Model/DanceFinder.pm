@@ -167,9 +167,6 @@ sub search_events {
         if %args;
 
     my $dbh = get_dbh(debug => $dbix_debug, db => $db_arg, user => $dbuser_arg);
-    my $dtf = $dbh->storage->datetime_parser;
-    my $parse_datetime = sub{DateTime::Format::ISO8601->parse_datetime(@_)};
-
 
     # These prefetches means all the data is fetched with one big
     # JOIN, you can verify that by adding debug=>1 in the
@@ -195,8 +192,30 @@ sub search_events {
         @$team_arg ? 'event_team_maps' : (),
         @$role_pair_arg ? 'event_role_pairs_maps' : (),
     );
-    my $today = get_today()->truncate(to => 'day');
-    my $start_date = $dtf->format_datetime($start_date_arg ? $parse_datetime->($start_date_arg) : $today);
+
+    my $start_datetime;
+    if ($start_date_arg) {
+        if (ref $start_date_arg) { # it is a datetime object
+            $start_datetime = $start_date_arg;
+        } else { # it is an iso8601 string
+            $start_datetime = DateTime::Format::ISO8601->parse_datetime($start_date_arg);
+        }
+    } else {
+        $start_datetime = get_today();
+    }
+    
+    my $start_date = $dbh->storage->datetime_parser->format_datetime($start_datetime->truncate(to => 'day'));
+
+    my $end_date;
+    if ($end_date_arg){
+        my $end_datetime;
+        if (ref $end_date_arg){
+            $end_datetime = $end_date_arg;
+        } else {
+            $end_datetime = DateTime::Format::ISO8601->parse_datetime($end_date_arg);
+        }
+        $end_date = $dbh->storage->datetime_parser->format_datetime($end_datetime->truncate(to => 'day'));
+    }
 
     my @role_search;
     if ($role_pair_allow_blank){
@@ -221,8 +240,8 @@ sub search_events {
         {
             '-not_bool' => 'is_deleted',
             start_date =>
-                $end_date_arg
-                ? { '-between' => [$start_date, $dtf->format_datetime($parse_datetime->($end_date_arg))] }
+                $end_date
+                ? { '-between' => [$start_date, $end_date] }
                 : { '>=' => $start_date },
             @$caller_arg ? ('event_callers_maps.caller_id' => $caller_arg) : (),
             @$venue_arg  ? ('event_venues_maps.venue_id'   => $venue_arg)  : (),

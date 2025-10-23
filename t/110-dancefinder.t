@@ -44,6 +44,7 @@ test_new_calendar();
 
 sub setup_fixture {
 
+    my $format_date = sub{$dbh->storage->datetime_parser->format_datetime(shift->truncate(to => 'day'))};
     my $bacds_parent_org = $dbh->resultset('ParentOrg')->new({
         full_name => 'Bay Area Country Dance Society',
         abbreviation => 'BACDS',
@@ -61,7 +62,7 @@ sub setup_fixture {
         synthetic_name => 'test event 1 synthname',
         custom_url => 'http://custom-url/test-event-1',
         short_desc => 'big <b> dance party &#9786',
-        start_date => get_now->ymd('-'),
+        start_date => $format_date->(get_now),
         start_time => '20:00:00',
     });
     $event1->insert;
@@ -69,7 +70,7 @@ sub setup_fixture {
 
     my $event2 = $dbh->resultset('Event')->new({
         synthetic_name => 'test event 2 synthname',
-        start_date => get_now->ymd('-'),
+        start_date => $format_date->(get_now),
         start_time => '20:00:00',
     });
     $event2->insert;
@@ -79,7 +80,7 @@ sub setup_fixture {
     my $oldevent = $dbh->resultset('Event')->new({
         name => 'Ye Oldde Ewent',
         synthetic_name => 'old event synthname',
-        start_date => get_now->subtract(days => 14)->ymd('-'),
+        start_date => $format_date->(get_now->subtract(days => 14)),
         start_time => '20:00:00',
     });
     $oldevent->insert;
@@ -91,7 +92,7 @@ sub setup_fixture {
         synthetic_name => 'deleted event synthname',
         short_desc => 'deleted <b> dance party &#9785;',
         is_deleted => 1,
-        start_date => get_now->ymd('-'),
+        start_date => $format_date->(get_now),
         start_time => '20:00:00',
     });
     $deleted_event->insert;
@@ -100,9 +101,9 @@ sub setup_fixture {
         name => 'test multiday event 1',
         synthetic_name => 'test multiday event 1 synthname',
         short_desc => 'multiday event',
-        start_date => get_now->ymd('-'),
+        start_date => $format_date->(get_now),
         start_time => '20:00:00',
-        end_date => get_now->add(days=>1)->ymd('-'),
+        end_date => $format_date->(get_now->add(days=>1)),
         end_time => '00:15:00',
     });
     $multidayevent->insert;
