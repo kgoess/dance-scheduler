@@ -1246,6 +1246,17 @@ get '/serieslister' => with_types [
     'optional' => ['query', 'event_id', 'SchedulerId'],
 ] => \&_details_for_series;
 
+
+get '/series/:style/:series'=> sub{
+    # search series for url like $path and internal redirect
+    # forward '/path';
+
+    my $series_id = bacds::Scheduler::Model::Series->get_id_from_url_path(request->path)
+        or send_error 'Can\'t find a series for "' . request->path . '"', 404;
+    
+    forward '/series-page', {series_id => $series_id};
+};
+
 =head2 GET /series-page
 
 This is the replacement for the old series-pages with their virtual includes

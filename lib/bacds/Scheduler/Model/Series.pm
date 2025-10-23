@@ -14,8 +14,10 @@ bacds::Scheduler::Model::Series - a regular series of events under one managemen
 
 package bacds::Scheduler::Model::Series;
 
-use 5.16.0;
+use 5.32.1;
+use feature 'signatures';
 use warnings;
+no warnings 'experimental::signatures';
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Model::Event;
@@ -83,6 +85,16 @@ sub get_series_defaults_event {
 
     my $event_model = 'bacds::Scheduler::Model::Event';
     return $event_model->get_row($event_id);
+}
+
+sub get_id_from_url_path ($class, $path) {
+    my $dbh = get_dbh();
+    my $rs = $dbh->resultset('Series')->find({
+        series_url => $path,
+        is_deleted => 0,
+    }) or return;
+
+    return $rs->series_id;
 }
 
 1;

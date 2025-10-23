@@ -239,4 +239,13 @@ sub get_fields_for_programmer_row {
         name => $self->name,
     };
 }
+
+sub get_full_url {
+  my ($self) = @_;
+  my $path = $self->series_url;
+  if ($path =~ qr{^/}) {
+    return "https://bacds.org$path";
+  }
+  return $path;
+}
 1;
