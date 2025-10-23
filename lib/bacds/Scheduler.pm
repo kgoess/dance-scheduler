@@ -193,7 +193,7 @@ post '/google-signin' => sub {
 
     if ($err) {
         my ($code, $msg) = @$err;
-        warn "google-signin->check_google_auth returned error $code $msg\n";
+        warning "google-signin->check_google_auth returned error $code $msg\n";
         send_error $msg => $code;
     }
 

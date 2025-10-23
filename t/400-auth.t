@@ -11,7 +11,7 @@ use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use Plack::Test;
-use Test::More tests => 69;
+use Test::More tests => 70;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -52,6 +52,8 @@ sub test_google_login {
     my $app = bacds::Scheduler->to_app;
     my $test = Plack::Test->create($app);
 
+    bacds::Scheduler->dsl->set(logger => 'capture');;
+
     my $res;
 
     $res = $test->request(POST '/google-signin');
@@ -69,6 +71,26 @@ sub test_google_login {
     like $res->content, qr{<h1>Error 400 - Bad Request :\(</h1>}, 'bad request';
 
     like $res->content, qr{JWS: kid_keys lookup failed}, 'invalid jwt';
+    # see Dancer2::Logger::Capture
+    my $trap = bacds::Scheduler->dsl->dancer_app->logger_engine->trapper;
+    my $logged = $trap->read;
+    # these are just the same thing with the package name and date and stuff
+    delete $logged->[0]{formatted};
+    delete $logged->[1]{formatted};
+    is_deeply $logged, [
+        {
+            level => "warning",
+            message => "google-signin->check_google_auth returned error 400 JWT: invalid token format\n\n",
+        },
+        {
+            level => "warning",
+            message => "google-signin->check_google_auth returned error 400 JWS: kid_keys lookup failed\n\n",
+        },
+    ], 'logged messages as expected'
+        or dump $logged;
+
+    # set it back to what it was for other tests
+    bacds::Scheduler->dsl->set(logger => 'console');
 }
 
 sub test_session_key_and_cookie {
