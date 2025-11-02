@@ -103,7 +103,8 @@
                 </li>
                 <li class="nav-item dropdown-item"><a href="https://amweek.camp/" class="nav-link">American Week</a>
                 </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/eweek/" class="nav-link">Hey Days
+                <!-- <li class="nav-item dropdown-item"><a href="https://bacds.org/eweek/" class="nav-link">Hey Days -->
+                <li class="nav-item dropdown-item"><a href="https://heydays.bacds.org" class="nav-link">Hey Days
                     (English)</a></li>
                 <li class="nav-item dropdown-item"><a href="https://bacds.org/familyweek/" class="nav-link">Family
                     Week</a></li>
