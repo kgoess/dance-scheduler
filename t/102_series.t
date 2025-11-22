@@ -28,7 +28,7 @@ my $dbh = get_dbh();
 my ($Series, $Series_Id);
 
 subtest 'Invalid GET /series/1' => sub{
-    plan tests=>2;
+    plan tests => 2;
     my ($res, $decoded, $expected);
 
     $res = $test->request( GET '/series/1' );
@@ -45,7 +45,7 @@ subtest 'Invalid GET /series/1' => sub{
 };
 
 subtest 'POST /series' => sub {
-    plan tests=>2;
+    plan tests => 3;
     my ($res, $decoded, $expected, $got);
 
     my $new_series = {
@@ -90,6 +90,13 @@ subtest 'POST /series' => sub {
     # now save it for the subsequent tests
     $Series = $dbh->resultset('Series')->find($decoded->{data}{series_id});
     $Series_Id = $Series->series_id;
+
+
+    # test get_canonical_url
+    is $Series->get_canonical_url('https', 'testhost.example.com'),
+        'https://testhost.example.com/series/english/trewsday_eng',
+        'get_canonical_url works with relative url',
+    ;
 };
 
 subtest 'POST /series duplicate' => sub {
@@ -151,7 +158,7 @@ subtest 'GET /series/#' => sub {
 
 
 subtest 'PUT /series/1' => sub {
-    plan tests => 5;
+    plan tests => 6;
     my ($expected, $res, $decoded, $got);
 
     $ENV{TEST_NOW} += 100;
@@ -210,6 +217,12 @@ subtest 'PUT /series/1' => sub {
     $decoded = decode_json($test->res->content);
     is $decoded->{errors}[0]{msg}, 'Nothing found for Series: primary key "45789"',
         'failed PUT has expected error msg' or diag explain $decoded;
+
+    # test get_canonical_url
+    is $Series->get_canonical_url('https', 'testhost.example.com'),
+        'https://changed-brie.me',
+        'get_canonical_url works with absolute url',
+    ;
 };
 
 subtest 'GET /seriesAll' => sub {

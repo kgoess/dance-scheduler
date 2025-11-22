@@ -240,12 +240,16 @@ sub get_fields_for_programmer_row {
     };
 }
 
-sub get_full_url {
-  my ($self) = @_;
-  my $path = $self->series_url;
-  if ($path =~ qr{^/}) {
-    return "https://bacds.org$path";
-  }
-  return $path;
+sub get_canonical_url {
+    my ($self, $scheme, $host) = @_;
+    my $series_url = $self->series_url;
+    if ($series_url =~ /^http/) {
+        return $series_url;
+    }
+    return join '',
+        "$scheme://",
+        $host,
+        $series_url,
 }
+
 1;

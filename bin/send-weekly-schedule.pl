@@ -75,12 +75,16 @@ my $today_str = DateTime->now->strftime("%a., %b. %e");
 
 my ($html_part, $text_part);
 $tt->process('send-weekly-schedule/html.tt' => {
+    canonical_scheme => 'https://',
+    canonical_host => 'bacds.org',
     events => \@events,
     highlight_special_types => 1,
     today_str => $today_str,
 }, \$html_part) || die $tt->error;
 
 $tt->process('send-weekly-schedule/text.tt' => {
+    canonical_scheme => 'https://',
+    canonical_host => 'bacds.org',
     events => \@events,
     highlight_special_types => 1,
     today_str => $today_str,

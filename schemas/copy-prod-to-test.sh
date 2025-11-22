@@ -36,6 +36,6 @@ done
 
 set -x
 
-sudo mysqldump -uroot schedule > schedule.dump
-sudo mysql -uroot schedule_test < schedule.dump
+mysqldump -uscheduler --password=`cat /var/www/bacds.org/dance-scheduler/private/mysql-password` schedule > schedule.dump
+mysql -uscheduler_test --password=`cat ~/.mysql-password`  schedule_test < schedule.dump
 rm schedule.dump

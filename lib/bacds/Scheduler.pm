@@ -990,6 +990,8 @@ get '/dancefinder-results' => with_types [
             copyright => _virtual_include('/shared/copyright.html'),
         },
 
+        canonical_scheme => request->scheme,
+        canonical_host   => request->host,
     },
     # gets the wrapper from views/layouts/<whatever>
     { layout => 'unearth-page-wrapper' },
@@ -1337,6 +1339,8 @@ sub _details_for_series {
 
     $data->{season} = get_season();
 
+    $data->{canonical_url} = $series->get_canonical_url(request->scheme, request->host);
+
     template($template, $data,
         # gets the wrapper from views/layouts/<whatever>
         { layout => 'unearth-page-wrapper' },
@@ -1580,6 +1584,8 @@ get '/unearth' => sub {
         styles      => $styles,
         role_pairs  => $role_pairs,
         is_homepage => 1,
+        canonical_scheme => request->scheme,
+        canonical_host   => request->host,
     },
     { layout => 'unearth-page-wrapper' },
 };
