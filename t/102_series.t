@@ -51,13 +51,15 @@ subtest 'POST /series' => sub {
     my $new_series = {
         name       => 'Bree Trewsday English',
         series_xid => 'BREE-TREW-ENG',
-        frequency  => 'second and fourth Trewday',
+        frequency  => 'second and fourth Trewsday',
         series_id   => '', # the webapp sends
                            # name=New+Series&frequency=monthly&is_deleted=0&series_id=
         display_text => 'this is display text',
         short_desc   => 'this is short desc',
         sidebar      => 'this is sidebar',
-        series_url   => 'https://bree.me',
+        # series_url could also be a full url like https://bree.me
+        # trailing slash s/b removed and we enforce lowercase on relative urls
+        series_url   => '/series/english/trewsday_ENG/',
         photo_url    => 'https://photo.jpg',
         manager      => 'Mary Manager',
         programmer_notes => 'this is programmer notes',
@@ -71,11 +73,11 @@ subtest 'POST /series' => sub {
         series_id             => 1,
         name                  => 'Bree Trewsday English',
         series_xid            => 'BREE-TREW-ENG',
-        frequency             => 'second and fourth Trewday',
+        frequency             => 'second and fourth Trewsday',
         display_text          => 'this is display text',
         short_desc            => 'this is short desc',
         sidebar               => 'this is sidebar',
-        series_url            => 'https://bree.me',
+        series_url            => '/series/english/trewsday_eng',
         photo_url             => 'https://photo.jpg',
         manager               => 'Mary Manager',
         programmer_notes      => 'this is programmer notes',
@@ -97,7 +99,7 @@ subtest 'POST /series duplicate' => sub {
     my $dup_series = {
         name       => 'Bree Trewsday English',
         series_xid => 'BREE-TREW-ENG',
-        frequency  => 'second and fourth Trewday',
+        frequency  => 'second and fourth Trewsday',
     };
     local $ENV{TEST_DUP_VALUE} = 'BREE-TREW-ENG';
     warning_is {
@@ -131,9 +133,9 @@ subtest 'GET /series/#' => sub {
         series_id             => 1,
         name                  => 'Bree Trewsday English',
         series_xid            => 'BREE-TREW-ENG',
-        frequency             => 'second and fourth Trewday',
+        frequency             => 'second and fourth Trewsday',
         display_text          => 'this is display text',
-        series_url            => 'https://bree.me',
+        series_url            => '/series/english/trewsday_eng',
         photo_url             => 'https://photo.jpg',
         short_desc            => 'this is short desc',
         sidebar               => 'this is sidebar',

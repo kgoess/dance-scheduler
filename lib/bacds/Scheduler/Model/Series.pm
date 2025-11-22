@@ -97,4 +97,39 @@ sub get_id_from_url_path ($class, $path) {
     return $rs->series_id;
 }
 
+=head2 post_row
+
+=cut
+
+sub post_row ($class, $auditor, %incoming_data) {
+    if ($incoming_data{series_url}) {
+        sanitize_url(\$incoming_data{series_url});
+    }
+
+    $class->SUPER::post_row($auditor, %incoming_data);
+}
+
+=head2 put_row
+
+=cut
+
+sub put_row ($class, $auditor, %incoming_data) {
+    if ($incoming_data{series_url}) {
+        sanitize_url(\$incoming_data{series_url});
+    }
+
+    $class->SUPER::put_row($auditor, %incoming_data);
+}
+
+sub sanitize_url ($series_url_ref) {
+    if ($$series_url_ref =~ m{ ^/ }x) {
+
+        # no trailing slashes for our relative paths
+        $$series_url_ref =~ s{ /$ }{}x;
+
+        # let's enforce lowercase while we're at it
+        $$series_url_ref = lc $$series_url_ref
+    }
+}
+
 1;
