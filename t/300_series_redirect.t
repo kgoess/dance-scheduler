@@ -74,11 +74,3 @@ sub test_match {
 
 };
 
-
-# subtest 'foo' => \&test_foo;
-# sub test_foo{};
-
-
-
-#test if it finds a valid match
-#test if it matches to the correct series
