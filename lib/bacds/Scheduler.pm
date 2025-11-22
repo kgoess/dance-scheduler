@@ -1249,7 +1249,7 @@ get '/serieslister' => with_types [
 ] => \&_details_for_series;
 
 
-get '/series/:style/:series'=> sub{
+get '/series/:style/:series/'=> sub{
     # search series for url like $path and internal redirect
     # forward '/path';
 

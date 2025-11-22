@@ -250,6 +250,7 @@ sub get_canonical_url {
         "$scheme://",
         $host,
         $series_url,
+        '/',
 }
 
 1;
