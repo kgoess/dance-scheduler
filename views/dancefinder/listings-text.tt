@@ -126,7 +126,7 @@ This is used by the send-weekly-schedule cron job
             <%- END -%>
         <%- END -%>
         <%- IF event.short_desc -%><%- "\n" -%><%- END -%><%- event.short_desc -%>
-        <%- "\n" _ (event.custom_url || event.series.series_url || "No link" ) -%>
+        <%- "\n" _ (event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) || "No link" ) -%>
         <%- includes_non_bacds_org(event) -%>
     <%- END -%>
     <%- "\n\n" -%>

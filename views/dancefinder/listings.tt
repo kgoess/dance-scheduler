@@ -89,7 +89,7 @@ page.
 <%- MACRO event_venues(event) BLOCK -%>
     <%- IF event.venues %> at <% END %>
     <%- FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) %>
-        <a href="<% event.custom_url || event.series.series_url %>"><% venue.hall_name %> in <% venue.city %></a>.
+        <a href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) %>"><% venue.hall_name %> in <% venue.city %></a>.
     <%- END %>
 <%- END -%>
  
@@ -174,7 +174,7 @@ page.
         <% END %>
         <% IF event.short_desc %> - <% END %><% event.short_desc %>
         <%- IF event.custom_url || event.series.series_url -%>
-            <a href="<% event.custom_url || event.series.series_url %>">More Info</a>
+            <a href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) %>">More Info</a>
         <%- END -%>
         <%- includes_non_bacds_org(event) -%>
     <%- END -%>
