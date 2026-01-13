@@ -94,7 +94,7 @@ subtest 'POST /series' => sub {
 
     # test get_canonical_url
     is $Series->get_canonical_url('https', 'testhost.example.com'),
-        'https://testhost.example.com/series/english/trewsday_eng',
+        'https://testhost.example.com/series/english/trewsday_eng/',
         'get_canonical_url works with relative url',
     ;
 };
