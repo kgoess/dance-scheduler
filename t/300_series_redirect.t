@@ -27,10 +27,12 @@ subtest 'No match' => \&test_no_match;
 subtest 'Test match' => \&test_match;
 
 sub test_no_match {
-  plan tests => 2;
+  plan tests => 3;
   $test->get('/series/foo/bar');
+  is $test->response->code, 301, 'Missing trailing slash sends 301' or dump $test->response;
+  $test->get('/series/foo/bar/');
   is $test->response->code, 404, 'No match returns 404' or dump $test->response;
-  like $test->response->decoded_content, qr{Can&#39;t find a series for &quot;/series/foo/bar&quot;}, 'No match returns desired error';
+  like $test->response->decoded_content, qr{Can&#39;t find a series for &quot;/series/foo/bar/&quot;}, 'No match returns desired error';
 };
 
 sub test_match {
@@ -46,7 +48,7 @@ sub test_match {
     display_text => 'this is display text',
     short_desc   => 'this is short desc',
     sidebar      => 'this is sidebar',
-    series_url   => '/series/foo/bar',
+    series_url   => '/series/foo/bar/',
     photo_url    => 'https://photo.jpg',
     manager      => 'Mary Manager',
     programmer_notes => 'this is programmer notes',
@@ -61,14 +63,14 @@ sub test_match {
     display_text => 'this is display text',
     short_desc   => 'this is short desc',
     sidebar      => 'this is sidebar',
-    series_url   => '/series/foo/bars',
+    series_url   => '/series/foo/bars/',
     photo_url    => 'https://photo.jpg',
     manager      => 'Mary Manager',
     programmer_notes => 'this is programmer notes',
   };
   $test->post('/series/', $new_series);
 
-  $test->get_ok('/series/foo/bar', 'Match returns success') or dump $test->response;
+  $test->get_ok('/series/foo/bar/', 'Match returns success') or say ">>>>\n\n" . $test->response->decoded_content . "\n<<<<<\n\n";
 
   like $test->response->decoded_content, qr{This is the correct series</a>}, 'Matches correct series' or dump $test->response;
 

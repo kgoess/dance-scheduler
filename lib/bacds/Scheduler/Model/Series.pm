@@ -89,6 +89,12 @@ sub get_series_defaults_event {
 
 sub get_id_from_url_path ($class, $path) {
     my $dbh = get_dbh();
+    
+    # Massage input into cannonical
+    if ($path !~ m{ /$ }x) {
+        $path .= '/';
+    }
+
     my $rs = $dbh->resultset('Series')->find({
         series_url => $path,
         is_deleted => 0,
@@ -124,8 +130,8 @@ sub put_row ($class, $auditor, %incoming_data) {
 sub sanitize_url ($series_url_ref) {
     if ($$series_url_ref =~ m{ ^/ }x) {
 
-        # no trailing slashes for our relative paths
-        $$series_url_ref =~ s{ /$ }{}x;
+        # canonnicalized trailing slashes
+        $$series_url_ref =~ s{ (?<! / )$ }{/}x;
 
         # let's enforce lowercase while we're at it
         $$series_url_ref = lc $$series_url_ref

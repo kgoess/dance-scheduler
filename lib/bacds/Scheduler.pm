@@ -1248,6 +1248,9 @@ get '/serieslister' => with_types [
     'optional' => ['query', 'event_id', 'SchedulerId'],
 ] => \&_details_for_series;
 
+get '/series/:style/:series'=> sub{
+    redirect '/series/:style/:series/' => 301;
+};
 
 get '/series/:style/:series/'=> sub{
     # search series for url like $path and internal redirect

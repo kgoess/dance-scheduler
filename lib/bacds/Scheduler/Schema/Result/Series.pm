@@ -243,14 +243,20 @@ sub get_fields_for_programmer_row {
 sub get_canonical_url {
     my ($self, $scheme, $host) = @_;
     my $series_url = $self->series_url;
+
+    # don't futz with external links
     if ($series_url =~ /^http/) {
         return $series_url;
+    }
+
+    # canonnicalize internal links
+    if ($series_url !~ m{ /$ }x) {
+      $series_url .= '/';
     }
     return join '',
         "$scheme://",
         $host,
         $series_url,
-        '/',
 }
 
 1;
