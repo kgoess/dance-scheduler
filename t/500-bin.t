@@ -30,14 +30,14 @@ sub setup_fixture {
         custom_url => 'http://custom-url/test-event-1',
         short_desc => 'big <b> dance party &#9786',
         start_date => get_now->ymd,
-        start_time => '20:00',
+        start_time => '20:00:00',
     });
     $event1->insert;
     my $event2 = $dbh->resultset('Event')->new({
         name => 'test event 2',
         synthetic_name => 'test event 2 synthname',
         start_date => get_now->add(days => 2)->ymd,
-        start_time => '20:00',
+        start_time => '20:00:00',
     });
     $event2->insert;
     return {
@@ -57,7 +57,7 @@ sub test_dancefinder {
 
     die "ERROR: $stderr" if $exit;
     die "ERROR: $stderr" if $stderr;
- 
+
     like $stdout, qr{<span class="special-event-name">test event 1</span>};
     like $stdout, qr{big <b> dance party &\#9786};
     like $stdout, qr{<span class="special-event-name">test event 2</span>};
