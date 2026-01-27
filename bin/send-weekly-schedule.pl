@@ -1,6 +1,6 @@
-#!/usr/bin/env perl
+#!/usr/bin/env -S perl -CA
 
-use 5.16.0;
+use 5.32.1;
 use warnings;
 
 # local::lib is a no-op if already loaded
@@ -19,12 +19,13 @@ use bacds::Scheduler::Util::Time qw/get_today/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 
-my ($days, $to, $html, $basedir, $db, $dbuser,
+my ($days, $to, $html, $subject, $basedir, $db, $dbuser,
     $dry_run, $verbose, $help);
 GetOptions (
     'days=i'           => \$days,
     'to=s'             => \$to,
     'html'             => \$html,
+    'subject=s'        => \$subject,
     'b|basedir=s'      => \$basedir,
     'db=s'             => \$db,
     'dbuser=s'         => \$dbuser,
@@ -35,8 +36,11 @@ GetOptions (
 
 pod2usage(1) if $help;
 
+my $today_str = DateTime->now->strftime("%a., %b. %e");
+
 $to       ||= 'bacds-announce@bacds.org';
 $days     ||= 8;
+$subject  ||= "Dances for the week of $today_str";
 $db       ||= 'schedule';
 $dbuser   ||= 'scheduler';
 $basedir  ||= '/var/www/bacds.org/dance-scheduler';
@@ -58,8 +62,6 @@ my $tt = Template->new(
     START_TAG => '<%',
     END_TAG   => '%>',
 );
-
-my $today_str = DateTime->now->strftime("%a., %b. %e");
 
 my ($html_part, $text_part);
 $tt->process('send-weekly-schedule/html.tt' => {
@@ -83,7 +85,7 @@ $tt->process('send-weekly-schedule/text.tt' => {
 my $stuffer = Email::Stuffer
     ->from       ('BACDS noreply <noreply@bacds.org>')
     ->to         ($to)
-    ->subject    ("Dances for the week of $today_str")
+    ->subject    ($subject)
     ->text_body  ($text_part)
 ;
 
@@ -120,6 +122,7 @@ Usage: send-weekly-schedule.pl [options]
    --days     number of days to search, defaults to 8
    --to       mailman list, defaults to bacds-announce
    --html     whether to attach an HTML part
+   --subject  (defaults to "Dances for the week of $today_str")
    --db       (defaults to "schedule", is if you want "schedule_test")
    --dbuser   (defaults to "scheduler", is if you want "scheduler_test")
    --dry-run  don't send, just write file and exit
