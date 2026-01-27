@@ -19,7 +19,7 @@ use bacds::Scheduler::Util::Time qw/get_today/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
 
-my ($days, $to, $html, $basedir, $db, $dbuser, $send_approved, $approved,
+my ($days, $to, $html, $basedir, $db, $dbuser,
     $dry_run, $verbose, $help);
 GetOptions (
     'days=i'           => \$days,
@@ -28,8 +28,6 @@ GetOptions (
     'b|basedir=s'      => \$basedir,
     'db=s'             => \$db,
     'dbuser=s'         => \$dbuser,
-    'send-approved'    => \$send_approved,
-    'approved=s'       => \$approved,
     'dry-run'          => \$dry_run,
     "h|help"           => \$help,
     "verbose|debug"    => \$verbose,
@@ -42,19 +40,9 @@ $days     ||= 8;
 $db       ||= 'schedule';
 $dbuser   ||= 'scheduler';
 $basedir  ||= '/var/www/bacds.org/dance-scheduler';
-$approved ||= '/var/lib/send-weekly-schedule/approved';
 
 looks_like_number($days) or pod2usage(1);
 my $end_date = get_today()->add(days => $days)->ymd;
-
-my $moderator_pw;
-if ($send_approved) {
-    open my $fh, "<", $approved or die "can't read $approved: $!";
-    $moderator_pw = <$fh>;
-    close $fh;
-    chomp $moderator_pw;
-    $moderator_pw or die "couldn't get value from $approved";
-}
 
 my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
     end_date   => $end_date,
@@ -98,9 +86,6 @@ my $stuffer = Email::Stuffer
     ->subject    ("Dances for the week of $today_str")
     ->text_body  ($text_part)
 ;
-if ($moderator_pw) {
-    $stuffer->header(Approved => $moderator_pw)
-}
 
 if ($html) {
     $stuffer->html_body($html_part)
@@ -138,14 +123,6 @@ Usage: send-weekly-schedule.pl [options]
    --db       (defaults to "schedule", is if you want "schedule_test")
    --dbuser   (defaults to "scheduler", is if you want "scheduler_test")
    --dry-run  don't send, just write file and exit
-
-   --send-approved
-              boolean, whether to send the "Approved" header
-   --approved path to file with list moderator password, defaults
-              to /var/lib/send-weekly-schedule/approved (file permissions
-              should be tightly restricted to the user running this as cron,
-              probably root)
-
    -b|--basedir  defaults to /var/www/bacds.org/dance-scheduler
    -v|--verbose
    -h|--help     this help message
