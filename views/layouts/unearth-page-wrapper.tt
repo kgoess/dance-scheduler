@@ -161,54 +161,84 @@
               <ul class="dropdown-menu">
                 <li class="nav-item dropdown-item"><a href="https://bacds.org/newcomers/" class="nav-link">Newcomers</a>
                 </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/CodeOfConduct/" class="nav-link">Code
-                    of
-                    Conduct</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.groups.io/g/main/" class="nav-link">Email
-                    Signups</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/organization/"
-                    class="nav-link">Organization</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/memberform/"
-                    class="nav-link">Membership</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/donate/" class="nav-link">Donate</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/odd-sundays/" class="nav-link">Odd
-                    Sundays
-                    Garage Band Recordings</a></li>
                 <li class="dropdown-item dropend nav-item dropdown">
                   <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">Music CDs</a>
+                    aria-expanded="false">For Dancers</a>
                   <ul class="dropdown-menu">
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/CodeOfConduct/" class="nav-link">Code
+                        of Conduct</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.groups.io/g/main/" class="nav-link">Email
+                        List Signups</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/memberform/"
+                        class="nav-link">Become a Member</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/donate/" class="nav-link">Donate</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/covid/" class="nav-link">COVID Safety
+                        Info</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/transit/" class="nav-link">Transit
+                        Info</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/links/" class="nav-link">External
+                        Resources</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="dropdown-item dropend nav-item dropdown">
+                  <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">Our Organization</a>
+                  <ul class="dropdown-menu">
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/organization/"
+                        class="nav-link">Organization</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/organization/payment-options/"
+                        class="nav-link">Payment Options Policies</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://sites.google.com/view/bacds/" class="nav-link">
+                        BACDS History and Stories
+                      </a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/staff_links/" class="nav-link">
+                        Support Our Staff
+                      </a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/dance-scheduler/" class="nav-link">Dance
+                        Scheduler App</a>
+                    </li>
+                  </ul>
+                </li>
+
+                <li class="dropdown-item dropend nav-item dropdown">
+                  <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">Listen to Music</a>
+                  <ul class="dropdown-menu">
+                    <li class="nav-item dropdown-item">
+                        Download Recordings:
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/odd-sundays/" class="nav-link">Odd
+                        Sundays Garage Band</a>
+                    </li>
+                    <li class="nav-item dropdown-item">
+                        Order Music CDs:
+                    </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/events/SOTG/"
-                        class="nav-link">Swinging
-                        on the Gate</a></li>
+                        class="nav-link">Swinging on the Gate</a>
+                    </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/events/WaltzCD/"
-                        class="nav-link">Waltzes Before Breakfast</a></li>
+                        class="nav-link">Waltzes Before Breakfast</a>
+                    </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/events/WBB2/" class="nav-link">More
                         Waltzes Before Breakfast</a>
                     </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/events/WBB3/"
-                        class="nav-link">Chocolates Before Breakfast</a></li>
+                        class="nav-link">Chocolates Before Breakfast</a>
+                    </li>
                   </ul>
                 </li>
 
-
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/organization/payment-options/"
-                    class="nav-link">Payment Options Policies</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/staff_links/" class="nav-link">Support
-                    our
-                    Staff</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/covid/" class="nav-link">COVID Safety
-                    Info</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/transit/" class="nav-link">Transit
-                    Info</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/links/" class="nav-link">External
-                    Resources</a></li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/dance-scheduler/" class="nav-link">Dance
-                    Scheduler App</a></li>
                 <li class="nav-item dropdown-item"><a href="https://bacds.org/contact/" class="nav-link">Contact
                     Us</a>
                 </li>
