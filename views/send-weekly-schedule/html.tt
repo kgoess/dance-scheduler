@@ -1,11 +1,28 @@
 
 <p>
-<b>The BACDS dances for the week of <% today_str %>:</b>
+<b>The BACDS dances <% IF news_html.size() %>and news <% END %>for the week of <% today_str %>:</b>
 </p>
 
+<% IF news_html.size() %>
+<p><em>Scroll to the bottom of this email for BACDS news</em></p>
+<% END %>
+
+</p>
 <div>
 <% INCLUDE dancefinder/listings.tt %>
 </div>
+
+<% IF news_html.size() %>
+<div>
+    <hr>
+    <% FOREACH entry IN news_html %>
+        <div>
+            <% entry %>
+        </div>
+        <hr>
+    <% END %>
+</div>
+<% END %>
 
 <p><i>(You are receiving this email because you are a member of the
 bacds-announce mailing list. To unsubscribe, click on the

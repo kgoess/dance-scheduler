@@ -6,6 +6,7 @@ use warnings;
 # local::lib is a no-op if already loaded
 use local::lib '/var/lib/dance-scheduler';
 
+use Data::Dump qw/dump/;
 use Email::Stuffer;
 use File::Temp;
 use Getopt::Long;
@@ -13,13 +14,12 @@ use Pod::Usage;
 use Scalar::Util qw/looks_like_number/;
 use Template;
 
-
 use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Util::Time qw/get_today/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
+use bacds::Scheduler::WeeklyEmailQueue;
 
-
-my ($days, $to, $html, $subject, $basedir, $db, $dbuser,
+my ($days, $to, $html, $subject, $basedir, $data_dir, $db, $dbuser,
     $dry_run, $verbose, $help);
 GetOptions (
     'days=i'           => \$days,
@@ -27,6 +27,7 @@ GetOptions (
     'html'             => \$html,
     'subject=s'        => \$subject,
     'b|basedir=s'      => \$basedir,
+    'data-dir=s'       => \$data_dir,
     'db=s'             => \$db,
     'dbuser=s'         => \$dbuser,
     'dry-run'          => \$dry_run,
@@ -40,10 +41,11 @@ my $today_str = DateTime->now->strftime("%a., %b. %e");
 
 $to       ||= 'bacds-announce@bacds.org';
 $days     ||= 8;
-$subject  ||= "Dances for the week of $today_str";
+$subject  ||= "Dances and news for the week of $today_str";
 $db       ||= 'schedule';
 $dbuser   ||= 'scheduler';
 $basedir  ||= '/var/www/bacds.org/dance-scheduler';
+$data_dir ||= '/var/lib/dance-scheduler'; # where weekly-email-queue lives
 
 looks_like_number($days) or pod2usage(1);
 my $end_date = get_today()->add(days => $days)->ymd;
@@ -56,6 +58,16 @@ my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
 );
 my @events = $rs->all;
 
+my $q = bacds::Scheduler::WeeklyEmailQueue->new(
+    basedir => $data_dir,
+);
+$q->init;
+my (@news_html, @news_text);
+while (my ($html, $text) = $q->get_next) {
+    push @news_html, $html;
+    push @news_text, $text;
+}
+    
 my $tt = Template->new(
     INCLUDE_PATH => "$basedir/views",
     # these are duplicated from config.yml?
@@ -68,6 +80,7 @@ $tt->process('send-weekly-schedule/html.tt' => {
     canonical_scheme => 'https',
     canonical_host => 'bacds.org',
     events => \@events,
+    news_html => \@news_html,
     highlight_special_types => 1,
     today_str => $today_str,
 }, \$html_part) || die $tt->error;
@@ -76,6 +89,7 @@ $tt->process('send-weekly-schedule/text.tt' => {
     canonical_scheme => 'https',
     canonical_host => 'bacds.org',
     events => \@events,
+    news_text => \@news_text,
     highlight_special_types => 1,
     today_str => $today_str,
 }, \$text_part) || die $tt->error;
@@ -105,6 +119,10 @@ if ($dry_run) {
 
 $stuffer->send or die "sending email failed but that's all I know";
 
+if (!$dry_run) {
+    $q->mark_all_done;
+}
+
 say $stuffer->as_string if ($verbose);
 
 
@@ -129,6 +147,7 @@ Usage: send-weekly-schedule.pl [options]
    --dbuser   (defaults to "scheduler", is if you want "scheduler_test")
    --dry-run  don't send, just write file and exit
    -b|--basedir  defaults to /var/www/bacds.org/dance-scheduler
+    --data-dir  defaults to /var/lib/dance-scheduler (where weekly-email-queue lives)
    -v|--verbose
    -h|--help     this help message
 
