@@ -80,6 +80,8 @@ $tt->process('send-weekly-schedule/text.tt' => {
     today_str => $today_str,
 }, \$text_part) || die $tt->error;
 
+$text_part =~ s/<.+?>//g;
+
 
 #   ->bcc      ('bunbun@sluggy.com')
 my $stuffer = Email::Stuffer
