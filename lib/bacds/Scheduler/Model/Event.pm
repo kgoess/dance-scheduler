@@ -1,9 +1,11 @@
 package bacds::Scheduler::Model::Event;
 
-use 5.16.0;
+use 5.32.1;
 use warnings;
 
 use parent 'bacds::Scheduler::Model';
+
+use Data::UUID;
 
 sub get_model_name { 'Event' }
 sub get_fields_for_output {
@@ -46,6 +48,7 @@ sub get_fields_for_input {
         is_canceled
         is_deleted
         series_id
+        uuid
     /
 }
 
@@ -86,6 +89,11 @@ sub filter_input {
         if ($value !~ /T00:00:00$/) {
             $value .=  'T00:00:00';
         }
+    }
+
+    if ($field eq 'uuid' && !$value) {
+        state $uuid_gen = Data::UUID->new;
+        $value = $uuid_gen->to_string($uuid_gen->create);
     }
 
     return $value;

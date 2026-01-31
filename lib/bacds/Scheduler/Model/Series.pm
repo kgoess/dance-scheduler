@@ -105,6 +105,10 @@ sub get_id_from_url_path ($class, $path) {
 
 =head2 post_row
 
+Hmm, in retrospect I'm not sure that this couldn't be in
+filter_input() instead of this subclass method. Same for put_row()
+below.
+
 =cut
 
 sub post_row ($class, $auditor, %incoming_data) {

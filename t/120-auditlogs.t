@@ -7,6 +7,7 @@ use open ':std', ':encoding(utf8)'; # "wide character in print" warnings from te
 # tests the audit_logs table updates for create/POST and update/PUT requests
 
 use Data::Dump qw/dump/;
+use Data::UUID;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
 use Test::More tests => 41;
@@ -43,6 +44,7 @@ sub setup_fixture {
         short_desc => 'big <b> dance party &#9786',
         start_date => get_now->ymd('-'),
         start_time => '20:00',
+        uuid => uuid(),
     });
     $event1->insert;
 
@@ -298,3 +300,7 @@ sub get_most_recent_log {
     $rs = $dbh->resultset('AuditLog')->find($most_recent);
 }
 
+sub uuid {
+    state $uuid_gen = Data::UUID->new;
+    return $uuid_gen->to_string($uuid_gen->create);
+}

@@ -6,6 +6,7 @@ use warnings;
 # works. Easiest to set up a fresh test fixture in a separate file.
 
 use Data::Dump qw/dump/;
+use Data::UUID;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
 use Test::More tests => 5;
@@ -38,6 +39,7 @@ sub setup_fixture {
         name => 'event without start time',
         start_date => get_now->ymd('-'),
         start_time => '',
+        uuid => uuid(),
     });
     $event1->insert;
     # one at 14:00
@@ -45,6 +47,7 @@ sub setup_fixture {
         name => 'event at 14:00',
         start_date => get_now->ymd('-'),
         start_time => '14:00',
+        uuid => uuid(),
     });
     # one at 15:00
     $event2->insert;
@@ -52,6 +55,7 @@ sub setup_fixture {
         name => 'event at 15:00',
         start_date => get_now->ymd('-'),
         start_time => '15:00',
+        uuid => uuid(),
     });
     $event3->insert;
     # and one with an earlier time to make sure we're not getting the database
@@ -60,6 +64,7 @@ sub setup_fixture {
         name => 'event at 13:00',
         start_date => get_now->ymd('-'),
         start_time => '13:00',
+        uuid => uuid(),
     });
     $event4->insert;
 
@@ -88,6 +93,9 @@ sub test_search_events {
     is $events[1]->name, 'event at 13:00';
     is $events[2]->name, 'event at 14:00';
     is $events[3]->name, 'event at 15:00';
+}
 
-
+sub uuid {
+    state $uuid_gen = Data::UUID->new;
+    return $uuid_gen->to_string($uuid_gen->create);
 }
