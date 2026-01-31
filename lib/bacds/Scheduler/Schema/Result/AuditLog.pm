@@ -80,7 +80,7 @@ __PACKAGE__->table("audit_logs");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
+  default_value: 'current_timestamp()'
   is_nullable: 0
 
 =cut
@@ -108,7 +108,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
+    default_value => "current_timestamp()",
     is_nullable => 0,
   },
 );
@@ -143,8 +143,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-01-08 07:29:30
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9Oa7NOQFy5NGz7GPZ/KdCA
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:25:17
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5z5yejkTqe09N7HIXy8xog
 
 
 use Role::Tiny::With;

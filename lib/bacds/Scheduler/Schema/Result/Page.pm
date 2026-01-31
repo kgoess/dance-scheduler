@@ -1,12 +1,12 @@
 use utf8;
-package bacds::Scheduler::Schema::Result::RolePair;
+package bacds::Scheduler::Schema::Result::Page;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-bacds::Scheduler::Schema::Result::RolePair
+bacds::Scheduler::Schema::Result::Page
 
 =cut
 
@@ -27,31 +27,41 @@ use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components("InflateColumn::DateTime");
 
-=head1 TABLE: C<role_pairs>
+=head1 TABLE: C<pages>
 
 =cut
 
-__PACKAGE__->table("role_pairs");
+__PACKAGE__->table("pages");
 
 =head1 ACCESSORS
 
-=head2 role_pair_id
+=head2 page_id
 
   data_type: 'integer'
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 role_pair
+=head2 title
 
   data_type: 'varchar'
   is_nullable: 0
   size: 191
 
-=head2 is_deleted
+=head2 short_desc
 
-  data_type: 'tinyint'
-  default_value: 0
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 512
+
+=head2 body
+
+  data_type: 'mediumtext'
   is_nullable: 0
+
+=head2 sidebar
+
+  data_type: 'mediumtext'
+  is_nullable: 1
 
 =head2 created_ts
 
@@ -66,15 +76,25 @@ __PACKAGE__->table("role_pairs");
   default_value: 'current_timestamp()'
   is_nullable: 0
 
+=head2 is_deleted
+
+  data_type: 'tinyint'
+  default_value: 0
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
-  "role_pair_id",
+  "page_id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "role_pair",
+  "title",
   { data_type => "varchar", is_nullable => 0, size => 191 },
-  "is_deleted",
-  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
+  "short_desc",
+  { data_type => "varchar", is_nullable => 1, size => 512 },
+  "body",
+  { data_type => "mediumtext", is_nullable => 0 },
+  "sidebar",
+  { data_type => "mediumtext", is_nullable => 1 },
   "created_ts",
   {
     data_type => "datetime",
@@ -88,67 +108,43 @@ __PACKAGE__->add_columns(
     default_value => "current_timestamp()",
     is_nullable => 0,
   },
+  "is_deleted",
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
 
 =over 4
 
-=item * L</role_pair_id>
+=item * L</page_id>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("role_pair_id");
-
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<role_pair_idx>
-
-=over 4
-
-=item * L</role_pair>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("role_pair_idx", ["role_pair"]);
+__PACKAGE__->set_primary_key("page_id");
 
 =head1 RELATIONS
 
-=head2 event_role_pairs_maps
+=head2 navtests
 
 Type: has_many
 
-Related object: L<bacds::Scheduler::Schema::Result::EventRolePairsMap>
+Related object: L<bacds::Scheduler::Schema::Result::Navtest>
 
 =cut
 
 __PACKAGE__->has_many(
-  "event_role_pairs_maps",
-  "bacds::Scheduler::Schema::Result::EventRolePairsMap",
-  { "foreign.role_pair_id" => "self.role_pair_id" },
+  "navtests",
+  "bacds::Scheduler::Schema::Result::Navtest",
+  { "foreign.target_page_id" => "self.page_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:25:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:YvdtBtbyCENwlZgzyNskQw
-
-use Role::Tiny::With;
-with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
-
-__PACKAGE__->many_to_many(events => 'event_role_pairs_maps', 'event');
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:07:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oOZA6q3J/eTTdj1hlf72+g
 
 
-sub get_fields_for_event_row {
-    my ($self) = @_;
-    return {
-        name => $self->role_pair,
-        id   => $self->role_pair_id,
-    };
-}
-
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 1;
