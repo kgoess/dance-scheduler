@@ -20,7 +20,7 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::WeeklyEmailQueue;
 
 my ($days, $to, $html, $subject, $basedir, $data_dir, $db, $dbuser,
-    $dry_run, $verbose, $help);
+    $dry_run, $clear_queue, $verbose, $help);
 GetOptions (
     'days=i'           => \$days,
     'to=s'             => \$to,
@@ -31,6 +31,7 @@ GetOptions (
     'db=s'             => \$db,
     'dbuser=s'         => \$dbuser,
     'dry-run'          => \$dry_run,
+    'clear-queue=i'    => \$clear_queue,
     "h|help"           => \$help,
     "verbose|debug"    => \$verbose,
 );
@@ -46,6 +47,7 @@ $db       ||= 'schedule';
 $dbuser   ||= 'scheduler';
 $basedir  ||= '/var/www/bacds.org/dance-scheduler';
 $data_dir ||= '/var/lib/dance-scheduler'; # where weekly-email-queue lives
+$clear_queue //= 1;
 
 looks_like_number($days) or pod2usage(1);
 my $end_date = get_today()->add(days => $days)->ymd;
@@ -119,7 +121,7 @@ if ($dry_run) {
 
 $stuffer->send or die "sending email failed but that's all I know";
 
-if (!$dry_run) {
+if (!$dry_run && $clear_queue) {
     $q->mark_all_done;
 }
 
@@ -134,7 +136,12 @@ send-weekly-schedule.pl - cron script for weekly email blast
 =head1 SYNOPSIS
 
 Generates HTML and text parts for an email to bacds-announce. Injects the mail
-directly into the mail queue.
+directly into the outgoing mail queue.
+
+You can add news items for this week as markdown files in
+/var/lib/dance-scheduler/weekly-email-queue/. See the README.txt in
+there. After sending, they'll get moved to the old/ directory in
+there (but see --clear-queue below).
 
 Usage: send-weekly-schedule.pl [options]
 
@@ -146,6 +153,7 @@ Usage: send-weekly-schedule.pl [options]
    --db       (defaults to "schedule", is if you want "schedule_test")
    --dbuser   (defaults to "scheduler", is if you want "scheduler_test")
    --dry-run  don't send, just write file and exit
+   --clear-queue (default 1) set to 0 if you want to leave the .md files in the weekly-email-queue directory
    -b|--basedir  defaults to /var/www/bacds.org/dance-scheduler
     --data-dir  defaults to /var/lib/dance-scheduler (where weekly-email-queue lives)
    -v|--verbose

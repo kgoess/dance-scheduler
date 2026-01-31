@@ -1,7 +1,14 @@
-These are the BACDS dances for the week of <% today_str %>:
+These are the BACDS dances <% IF news_text.size() %>and news <% END %>for the week of <% today_str %>:
+
+<% IF news_text.size() %>
+Scroll to the bottom of this email for BACDS news
+<% END %>
 
 <% INCLUDE "dancefinder/listings-text.tt" %>
 
+<% FOREACH entry IN news_text %>
+    <%- entry %>
+<% END %>
 You are receiving this email because you are a member of the
 bacds-announce mailing list. To unsubscribe click on the link at the
 bottom of this message.
