@@ -62,7 +62,7 @@ __PACKAGE__->table("programmer_teams_map");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
+  default_value: 'current_timestamp()'
   is_nullable: 0
 
 =cut
@@ -84,7 +84,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
+    default_value => "current_timestamp()",
     is_nullable => 0,
   },
 );
@@ -138,8 +138,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2023-05-18 19:25:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ZOLmAHQ4x/W/coSYEElQJA
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:25:17
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ATwqbIQDu0yldIuA3thVaA
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';

@@ -69,7 +69,7 @@ __PACKAGE__->table("parent_orgs");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
+  default_value: 'current_timestamp()'
   is_nullable: 0
 
 =head2 url
@@ -105,7 +105,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
+    default_value => "current_timestamp()",
     is_nullable => 0,
   },
   "url",
@@ -185,8 +185,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AW4XDdwtpTruKNNIcDVvoQ
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:25:17
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JZH1pIQCoPWtVykecldHkQ
 
 
 use Role::Tiny::With;

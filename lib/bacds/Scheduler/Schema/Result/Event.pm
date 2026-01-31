@@ -62,7 +62,7 @@ __PACKAGE__->table("events");
 =head2 start_time
 
   data_type: 'time'
-  is_nullable: 0
+  is_nullable: 1
 
 =head2 end_date
 
@@ -125,7 +125,7 @@ __PACKAGE__->table("events");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
+  default_value: 'current_timestamp()'
   is_nullable: 0
 
 =head2 long_desc
@@ -157,7 +157,7 @@ __PACKAGE__->add_columns(
   "start_date",
   { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 0 },
   "start_time",
-  { data_type => "time", is_nullable => 0 },
+  { data_type => "time", is_nullable => 1 },
   "end_date",
   { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 1 },
   "end_time",
@@ -186,7 +186,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
+    default_value => "current_timestamp()",
     is_nullable => 0,
   },
   "long_desc",
@@ -367,8 +367,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-11-08 07:26:32
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0bsmnO7EdZJ/5M+TFdaQZA
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:25:17
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:d/BQhE7/Ll/zVJJthA7UnA
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');

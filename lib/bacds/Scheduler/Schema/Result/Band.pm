@@ -75,7 +75,7 @@ __PACKAGE__->table("bands");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: current_timestamp
+  default_value: 'current_timestamp()'
   is_nullable: 0
 
 =cut
@@ -101,7 +101,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
+    default_value => "current_timestamp()",
     is_nullable => 0,
   },
 );
@@ -165,8 +165,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2024-07-04 17:04:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8iDzkz/wX2QNbE4ThDzKRA
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:25:17
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:sdmONrUYxar9XbFlSH0ToQ
 
 __PACKAGE__->many_to_many(talents => 'band_memberships', 'talent');
 __PACKAGE__->many_to_many(events=> 'event_band_maps', 'event');

@@ -43,12 +43,12 @@ After running that 'eval', new modules get installed there via cpanm, e.g.
 
 The files in lib/bacds/Scheduler/Schema\* were generated via
 
-    dbicdump -o dump_directory=./lib \
+    PERL5LIB=./lib:$PERL5LIB dbicdump -o dump_directory=./lib \
          -o components='["InflateColumn::DateTime"]' \
          -o debug=1 \
          -o skip_load_external=1 \
          bacds::Scheduler::Schema \
-         'dbi:mysql:dbname=schedule_test' \
+         'dbi:MariaDB:dbname=schedule_test' \
          scheduler_test \
          $(cat ~/.mysql-password)
 
