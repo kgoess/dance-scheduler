@@ -119,9 +119,6 @@ my $event_2 = {
     start_date => "2022-05-02",
     start_time => "20:00",
 
-    end_date => "2022-05-02",
-    end_time => "22:00",
-
     short_desc  => "new\nlines\nshortdesc",
     is_canceled => 0,
     and_friends => 0,
@@ -218,7 +215,7 @@ BEGIN:VEVENT
 CLASS:PUBLIC
 CREATED:20220428T021805
 DESCRIPTION: new lines shortdesc
-DTEND:20220502T220000
+DTEND:
 DTSTAMP:20220428T021805
 DTSTART:20220502T200000
 LAST-MODIFIED:20220428T021805

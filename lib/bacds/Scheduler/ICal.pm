@@ -73,11 +73,11 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
         ($e->start_time ? ('T', $e->start_time) : ());
     $dtstart =~ s/[-:]//g;
 
-    my $dtend = join '', 
+    my $dtend = $e->end_date && join '', 
 #        $tz, ':',
         $e->end_date =~ s/T.*//r,
         ($e->end_time ? ('T', $e->end_time) : ());
-    $dtend =~ s/[-:]//g;
+    $dtend && $dtend =~ s/[-:]//g;
 
     my $url = $e->custom_url
         || $e->series && $e->series->get_canonical_url($canonical_scheme, $canonical_host)
