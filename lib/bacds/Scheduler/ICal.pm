@@ -106,7 +106,7 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
             }
         }
         if (@bands || @talent) {
-            $d .= 'Music by ';
+            $d .= 'music by ';
             $d .= join ', ', map $_->name, @bands;
             $d .= join ', ', map $_->name, @talent;
             if ($e->and_friends) {
