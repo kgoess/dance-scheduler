@@ -7,7 +7,7 @@ use utf8;
 
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 14;
+use Test::More tests => 16;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -132,6 +132,7 @@ $test->post_ok('/event/', $event_2 );
 
 basic_test();
 test_url_endpoint($test);
+test_get_dst_transition_starts();
 
 sub basic_test {
 
@@ -162,9 +163,9 @@ CATEGORIES:maypole
 CLASS:PUBLIC
 CREATED:20220428T021805
 DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為
-DTEND:20220501T220000
+DTEND;TZID=America/Los_Angeles:20220501T220000
 DTSTAMP:20220428T021805
-DTSTART:20220501T200000
+DTSTART;TZID=America/Los_Angeles:20220501T200000
 LAST-MODIFIED:20220428T021805
 LOCATION:the hall\, 123 Sesame St.\, Gotham
 ORGANIZER:Bree Mersday English
@@ -186,6 +187,7 @@ sub test_url_endpoint ($test) {
     ok($test->success, 'got /ical');
 
     my $got = $test->content;
+say STDERR $got;
     $got =~ s/\r\n/\n/g;
     $got =~ s/$UUID_RE/someuuid/g;
     my @got = split "\n", $got;
@@ -194,15 +196,30 @@ BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:Data::ICal 0.24
 X-WR-CALNAME:BACDS Calendar
+BEGIN:VTIMEZONE
+TZID:America/Los_Angeles
+BEGIN:DAYLIGHT
+DTSTART:20220313T100000
+TZNAME:PDT
+TZOFFSETFROM:-0800
+TZOFFSETTO:-0700
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20221106T090000
+TZNAME:PST
+TZOFFSETFROM:-0700
+TZOFFSETTO:-0800
+END:STANDARD
+END:VTIMEZONE
 BEGIN:VEVENT
 CATEGORIES:pipesmoking
 CATEGORIES:maypole
 CLASS:PUBLIC
 CREATED:20220428T021805
 DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為
-DTEND:20220501T220000
+DTEND;TZID=America/Los_Angeles:20220501T220000
 DTSTAMP:20220428T021805
-DTSTART:20220501T200000
+DTSTART;TZID=America/Los_Angeles:20220501T200000
 LAST-MODIFIED:20220428T021805
 LOCATION:the hall\, 123 Sesame St.\, Gotham
 ORGANIZER:Bree Mersday English
@@ -215,9 +232,9 @@ BEGIN:VEVENT
 CLASS:PUBLIC
 CREATED:20220428T021805
 DESCRIPTION: new lines shortdesc
-DTEND:20220502
+DTEND;TZID=America/Los_Angeles:20220502
 DTSTAMP:20220428T021805
-DTSTART:20220502T200000
+DTSTART;TZID=America/Los_Angeles:20220502T200000
 LAST-MODIFIED:20220428T021805
 LOCATION:
 ORGANIZER:Bywater Trewsday Contra
@@ -230,4 +247,16 @@ END:VCALENDAR
 EOL
 
     eq_or_diff \@got, \@expected, '/ical endpoint worked';
+}
+
+sub test_get_dst_transition_starts {
+    local $ENV{TEST_NOW} = 1769972062; # 2026
+
+    my ($daylight_start, $standard_start) = bacds::Scheduler::ICal->get_dst_transition_starts;
+
+    # I got these values from the NBCDS ical output
+    # daylight: dtstart => '20260308T100000',
+    # standard: dtstart => '20261101T090000',
+    is $daylight_start, '20260308T100000', 'daylight start ok';
+    is $standard_start, '20261101T090000', 'standard_start_ok';
 }

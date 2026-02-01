@@ -25,6 +25,11 @@ no warnings 'experimental::signatures';
 
 use Data::ICal;
 use Data::ICal::Entry::Event;
+use Data::ICal::Entry::TimeZone;
+use Data::ICal::Entry::TimeZone::Standard;
+use Data::ICal::Entry::TimeZone::Daylight;
+use DateTime;
+use List::Util qw/first/;
 
 use bacds::Scheduler::Util::Time qw/get_now/;
 
@@ -40,6 +45,37 @@ sub events_to_ical ($class, $events, $canonical_scheme, $canonical_host) {
         calname => 'BACDS Calendar',
         rfc_strict => 1,
     );
+    my ($daylight_start, $standard_start) = get_dst_transition_starts();
+
+
+    # Standard Time
+    my $tz_standard = Data::ICal::Entry::TimeZone::Standard->new();
+    $tz_standard->add_properties(
+        tzoffsetfrom => '-0700',
+        tzoffsetto => '-0800',
+        tzname => 'PST',
+        dtstart => $standard_start,
+    );
+    # Daylight Savings Time
+    my $tz_daylight_savings = Data::ICal::Entry::TimeZone::Daylight->new();
+    $tz_daylight_savings->add_properties(
+        tzoffsetfrom => '-0800',
+        tzoffsetto => '-0700',
+        tzname => 'PDT',
+        dtstart => $daylight_start,
+
+    );
+    # the VTIMEZONE section
+    my $vtimezone = Data::ICal::Entry::TimeZone->new();
+    $vtimezone->add_properties(
+        tzid => 'America/Los_Angeles',,
+        #tzurl => "http://zones.stds_r_us.net/tz/US-Eastern"
+    );
+    $vtimezone->add_entry($tz_daylight_savings);
+    $vtimezone->add_entry($tz_standard);
+
+    $calendar->add_entry($vtimezone);
+
     foreach my $event (@$events) {
         my $vevent = $class->event_to_ical($event, $canonical_scheme, $canonical_host);
         $calendar->add_entry($vevent);
@@ -64,20 +100,19 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     # events,
 
     # is this supported in Data::ICal?
-    my $tz = 'TZID=America/Los_Angeles';
-    # TZID=America/Los_Angeles:20260201T140000
+    my $tz = 'America/Los_Angeles';
+    # #DTSTART;TZID=America/Los_Angeles:20260201T140000
 
     my $dtstart = join '',
-#        $tz, ':',
         $e->start_date =~ s/T.*//r,
         ($e->start_time ? ('T', $e->start_time) : ());
     $dtstart =~ s/[-:]//g;
 
     my $end_date = $e->end_date || $e->start_date;
     my $dtend = join '',
-#        $tz, ':',
         $end_date =~ s/T.*//r,
-        ($e->end_time ? ('T', $e->end_time) : ()); # is this right? it passes the validator
+        ($e->end_time ? ('T', $e->end_time) : ('T', '235959')); # is this right? it passes the validator
+        # FIXME I don't think 235959 is right...
     $dtend =~ s/[-:]//g;
 
     my $url = $e->custom_url
@@ -141,8 +176,28 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
         created => $e->created_ts =~ s/[-:]//gr,
         description => $d,
 
-        dtstart => $dtstart,
-        dtend => $dtend,
+        dtstart => [
+            $dtstart,
+            { tzid => $tz }
+        ],
+        # this is how you do extra params like "tzid"
+        #my $todo_props = $todo->add_properties(
+        #    attendee => [
+        #        'MAILTO:janedoe@host.com',
+        #        {
+        #            member => [
+        #                'MAILTO:projectA@host.com',
+        #                'MAILTO:projectB@host.com',
+        #            ],
+        #        }
+        #     ]);
+        #ATTENDEE;MEMBER="MAILTO:projectA@host.com","MAILTO:projectB@host.com":MAILT
+        # O:janedoe@host.com
+
+        dtend => [
+            $dtend,
+            { tzid => $tz }
+        ],
         'last-modified' => $e->modified_ts =~ s/[-:]//gr,
         location => $location,
         organizer => $organizer,
@@ -183,8 +238,91 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
 
 }
 
+my $_dst_transitions;
+my $_dst_transition_year;
+sub get_dst_transition_starts {
+
+    my $transition_for_year = get_now()->year;
+    if ($_dst_transitions && $_dst_transition_year == $transition_for_year) {
+        return @$_dst_transitions;
+    }
+    $_dst_transition_year = $transition_for_year;
+
+    state %months = (
+        Jan => 1,
+        Feb => 2,
+        Mar => 3,
+        Apr => 4,
+        May => 5,
+        Jun => 6,
+        Jul => 7,
+        Aug => 8,
+        Sep => 9,
+        Oct => 10,
+        Nov => 11,
+        Dec => 12,
+    );
+
+    # interestingly there doesn't seem to be any decent way to get this from
+    # Perl's DateTime, but see https://www.perlmonks.org/?node_id=602933
+    # $ zdump -v America/Los_Angeles -c $(date '+%Y'),$(date -d '+1 year' '+%Y')
+    # America/Los_Angeles  -9223372036854775808 = NULL
+    # America/Los_Angeles  -9223372036854689408 = NULL
+    # America/Los_Angeles  Sun Mar  8 09:59:59 2026 UT = Sun Mar  8 01:59:59 2026 PST isdst=0 gmtoff=-28800
+    # America/Los_Angeles  Sun Mar  8 10:00:00 2026 UT = Sun Mar  8 03:00:00 2026 PDT isdst=1 gmtoff=-25200
+    # America/Los_Angeles  Sun Nov  1 08:59:59 2026 UT = Sun Nov  1 01:59:59 2026 PDT isdst=1 gmtoff=-25200
+    # America/Los_Angeles  Sun Nov  1 09:00:00 2026 UT = Sun Nov  1 01:00:00 2026 PST isdst=0 gmtoff=-28800
+    # America/Los_Angeles  9223372036854689407 = NULL
+    # America/Los_Angeles  9223372036854775807 = NULL
+    #
+    # we want to transorm that into these values:
+    # daylight: dtstart => '20260308T100000',
+    # standard: dtstart => '20261101T090000',
+
+    my $transition_for_year_next = $transition_for_year + 1;
+    my $output = `zdump -v America/Los_Angeles -c $transition_for_year,$transition_for_year_next`
+        or die "zdump failed! $!";
+
+    my @output = split "\n", $output;
+
+    my $daylight_start = first { /isdst=1/ } @output;
+    my $standard_start = first { /isdst=0/ } reverse @output;
+
+    my ($tzname, $UT_dow, $UT_mon, $UT_day, $UT_time, $UT_year, $ut, $equals, $PT_dow, $PT_mon, $PT_day, $PT_time, $PT_year, $PT_tzname, $idsdt, $gmtoff);
+    my ($hour, $min, $sec, $date_obj);
+
+    ($tzname, $UT_dow, $UT_mon, $UT_day, $UT_time, $UT_year, $ut, $equals, $PT_dow, $PT_mon, $PT_day, $PT_time, $PT_year, $PT_tzname, $idsdt, $gmtoff) = split /\s+/, $daylight_start;
 
 
+    ($hour, $min, $sec) = split /:/, $UT_time;
+    $date_obj = DateTime->new(
+        year       => $UT_year,
+        month      => $months{$UT_mon},
+        day        => $UT_day,
+        hour       => $hour,
+        minute     => $min,
+        second     => $sec,
+        time_zone  => 'UTC',
+    );
+    my $daylight_start_str = $date_obj->ymd('') . 'T' . $date_obj->hms('');
 
+    ($tzname, $UT_dow, $UT_mon, $UT_day, $UT_time, $UT_year, $ut, $equals, $PT_dow, $PT_mon, $PT_day, $PT_time, $PT_year, $PT_tzname, $idsdt, $gmtoff)
+         = split /\s+/, $standard_start;
+    ($hour, $min, $sec) = split /:/, $UT_time;
+    $date_obj = DateTime->new(
+        year       => $UT_year,
+        month      => $months{$UT_mon},
+        day        => $UT_day,
+        hour       => $hour,
+        minute     => $min,
+        second     => $sec,
+        time_zone  => 'UTC',
+    );
+    my $standard_start_str = $date_obj->ymd('') . 'T' . $date_obj->hms('');
+
+    $_dst_transitions = [$daylight_start_str, $standard_start_str];
+
+    return $daylight_start_str, $standard_start_str;
+}
 
 1;
