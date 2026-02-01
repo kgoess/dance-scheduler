@@ -6,6 +6,7 @@ use warnings;
 # and the url endpoints
 
 use Data::Dump qw/dump/;
+use Data::UUID;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
 use Test::More tests => 69;
@@ -64,6 +65,7 @@ sub setup_fixture {
         short_desc => 'big <b> dance party &#9786',
         start_date => $format_date->(get_now),
         start_time => '20:00:00',
+        uuid => uuid(),
     });
     $event1->insert;
     $event1->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
@@ -72,6 +74,7 @@ sub setup_fixture {
         synthetic_name => 'test event 2 synthname',
         start_date => $format_date->(get_now),
         start_time => '20:00:00',
+        uuid => uuid(),
     });
     $event2->insert;
     $event2->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
@@ -82,6 +85,7 @@ sub setup_fixture {
         synthetic_name => 'old event synthname',
         start_date => $format_date->(get_now->subtract(days => 14)),
         start_time => '20:00:00',
+        uuid => uuid(),
     });
     $oldevent->insert;
     $oldevent->add_to_parent_orgs($nbcds_parent_org, { ordering => 1 });
@@ -94,6 +98,7 @@ sub setup_fixture {
         is_deleted => 1,
         start_date => $format_date->(get_now),
         start_time => '20:00:00',
+        uuid => uuid(),
     });
     $deleted_event->insert;
 
@@ -105,6 +110,7 @@ sub setup_fixture {
         start_time => '20:00:00',
         end_date => $format_date->(get_now->add(days=>1)),
         end_time => '00:15:00',
+        uuid => uuid(),
     });
     $multidayevent->insert;
     $multidayevent->add_to_parent_orgs($bacds_parent_org, { ordering => 1 });
@@ -856,4 +862,9 @@ sub test_new_calendar {
     # through that filesystem directory, but goes straight to the
     # dance-scheduler app, so make sure it's working
     $Test->get_ok("/calendars/2022/04", "GET /calendars/2022/04/ ok");
+}
+
+sub uuid {
+    state $uuid_gen = Data::UUID->new;
+    return $uuid_gen->to_string($uuid_gen->create);
 }

@@ -145,6 +145,13 @@ __PACKAGE__->table("events");
   is_nullable: 1
   size: 255
 
+=head2 uuid
+
+  data_type: 'char'
+  default_value: 'uuid()'
+  is_nullable: 0
+  size: 36
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -195,6 +202,13 @@ __PACKAGE__->add_columns(
   { data_type => "tinyint", default_value => 0, is_nullable => 0 },
   "photo_url",
   { data_type => "varchar", is_nullable => 1, size => 255 },
+  "uuid",
+  {
+    data_type => "char",
+    default_value => "uuid()",
+    is_nullable => 0,
+    size => 36,
+  },
 );
 
 =head1 PRIMARY KEY
@@ -208,6 +222,20 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("event_id");
+
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<events_uuid_unique>
+
+=over 4
+
+=item * L</uuid>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("events_uuid_unique", ["uuid"]);
 
 =head1 RELATIONS
 
@@ -367,8 +395,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:25:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:d/BQhE7/Ll/zVJJthA7UnA
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:53:26
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:R3z7u6nDH+7DDx+jQxggXw
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');

@@ -88,8 +88,7 @@ subtest 'POST /caller' => sub {
     my ($decoded, $got);
 
     my $new_caller = {
-        name       => 'Rose Gamgee',
-        
+        name => 'Rose Gamgee',
     };
     $test->post_ok('/caller/', $new_caller );
     ok($test->success, 'created caller');

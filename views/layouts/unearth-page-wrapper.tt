@@ -81,6 +81,9 @@
                         <li class="nav-item dropdown-item">
                           <a href="<% make_link("/calendars/") %>" class="nav-link">Historical Calendars</a>
                         </li>
+                        <li class="nav-item dropdown-item">
+                          <a href="<% make_link("/ical") %>" class="nav-link">Subscribe To Our Calendar (ical)</a>
+                        </li>
               </ul>
             </li>
             <li class="nav-item dropdown">

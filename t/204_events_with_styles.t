@@ -92,7 +92,6 @@ subtest 'POST /style' => sub {
     my $new_style = {
         name       => 'Rose Gamgee',
         frequency  => 'fourth Trewsday',
-        
     };
     $test->post_ok('/style/', $new_style );
     ok($test->success, 'created style');

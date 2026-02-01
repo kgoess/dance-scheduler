@@ -18,11 +18,14 @@ CREATE TABLE events (
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
     created_ts DATETIME NOT NULL,
     modified_ts TIMESTAMP NOT NULL,
+    uuid char(36) NOT NULL DEFAULT uuid(),
+
 
     INDEX events_name_idx (name),
     INDEX events_start_time_idx (start_time),
     INDEX events_start_date on events (start_date),
     INDEX events_series_idx (series_id),
+    UNIQUE KEY `events_uuid_unique` (`uuid`),
 
 
     FOREIGN KEY (series_id)

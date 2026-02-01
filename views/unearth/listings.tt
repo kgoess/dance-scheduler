@@ -224,7 +224,7 @@ END -%>
             <%- maybe_linkit_ssh(talent.name, talent.url) -%><% IF !loop.last() %>, <% END %>
           <%- END -%>
         <%- END %>
-          <%- IF (event.bands || event.talent) && event.and_friends %>&hellip;and friends<% END %>
+        <%- IF (event.bands || event.talent) && event.and_friends %>&hellip;and friends<% END %>
         <%- IF !emphasize_name_over_style && event.name %>
           <%# if a special event, print out the title. %>
           <span class="special-event-name"><% event.name %></span>

@@ -2,6 +2,7 @@ use 5.16.0;
 use warnings;
 
 use Data::Dump qw/dump/;
+use Data::UUID;
 use DateTime::Format::Strptime qw/strptime/;
 use DateTime;
 use HTTP::Request::Common;
@@ -39,12 +40,14 @@ my $Modified_Time_With_Event;
 my $Modified_Time_With_Teams;
 
 
+my $uuid_gen = Data::UUID->new;
 
 my $Event1 = $dbh->resultset('Event')->new({
     name => 'test event 1',
     synthetic_name => 'test event 1 synthname',
     start_date => get_now->ymd('-'),
     start_time => '20:00',
+    uuid => $uuid_gen->to_string($uuid_gen->create),
 });
 $Event1->insert;
 my $Event2 = $dbh->resultset('Event')->new({
@@ -52,6 +55,7 @@ my $Event2 = $dbh->resultset('Event')->new({
     synthetic_name => 'test event 2 synthname',
     start_date => get_now->ymd('-'),
     start_time => '20:00',
+    uuid => $uuid_gen->to_string($uuid_gen->create),
 });
 $Event2->insert;
 my $Event3 = $dbh->resultset('Event')->new({
@@ -59,6 +63,7 @@ my $Event3 = $dbh->resultset('Event')->new({
     synthetic_name => 'test event 3 synthname',
     start_date => get_now->ymd('-'),
     start_time => '20:00',
+    uuid => $uuid_gen->to_string($uuid_gen->create),
 });
 $Event3->insert;
 
