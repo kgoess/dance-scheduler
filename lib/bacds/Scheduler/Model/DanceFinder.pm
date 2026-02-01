@@ -157,6 +157,7 @@ sub search_events {
     my $muso_arg       = delete $args{muso}      || [];
     my $style_arg      = delete $args{style}     || [];
     my $team_arg       = delete $args{team}      || [];
+    my $parent_org_arg = delete $args{parent_org}|| [];
     my $role_pair_arg  = delete $args{role_pair} || [];
     my $role_pair_allow_blank = delete $args{role_pair_allow_blank} || 0;
     my $dbix_debug     = delete $args{dbix_debug};
@@ -249,6 +250,7 @@ sub search_events {
             @$muso_arg   ? ('event_talent_maps.talent_id'  => $muso_arg)   : (),
             @$band_arg   ? ('event_band_maps.band_id'      => $band_arg)   : (),
             @$team_arg   ? ('event_team_maps.team_id'     => $team_arg)   : (),
+            @$parent_org_arg   ? ('event_parent_orgs_maps.parent_org_id'     => $parent_org_arg)   : (),
             @role_search,
         },
         {

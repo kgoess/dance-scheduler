@@ -49,6 +49,7 @@ WriteMakefile(
         'Dancer2::Plugin::ParamTypes' => 0,
         'Data::Dump' => 0,
         'Data::Entropy::Algorithms' => 0,
+        'Data::ICal' => 0,
         'DateTime' => 0,
         'Digest::Bcrypt' => 0,
         'Email::Stuffer' => 0,

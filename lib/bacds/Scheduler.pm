@@ -39,6 +39,7 @@ use YAML qw/Load/;
 
 use bacds::Scheduler::Auditor;
 use bacds::Scheduler::FederatedAuth;
+use bacds::Scheduler::ICal;
 use bacds::Scheduler::Plugin::AccordionConfig;
 use bacds::Scheduler::Plugin::Auth;
 use bacds::Scheduler::Plugin::Checksum;
@@ -61,6 +62,8 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Results;
 use bacds::Scheduler::Util::Time qw/get_today/;
 my $Results_Class = "bacds::Scheduler::Util::Results";
+my $Event_Model = 'bacds::Scheduler::Model::Event';
+
 
 our $VERSION = '0.1';
 
@@ -301,6 +304,49 @@ get '/login' => sub {
     {layout => undef},
 };
 
+=head2 ical
+
+Gives you a .ics/iCalendar format of upcoming events.
+
+iCalendar protocol (RFC 2445, MIME type "text/calendar"), .ics files
+
+https://en.wikipedia.org/wiki/ICalendar
+
+=cut
+
+get '/ical' => sub {
+
+    my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
+        parent_org => [bacds_parent_org_id()],
+    #   end_date   => $end_date,
+    #   start_date => $start_date,
+    #   style      => \@style_ids,
+    #   dbix_debug => $verbose,
+    #   db         => $db,
+    #   dbuser     => $dbuser
+    );
+    my @events = $rs->all;
+
+    content_type 'text/calendar';
+    return bacds::Scheduler::ICal->events_to_ical(
+        \@events, request->scheme, request->host,
+    );
+};
+
+my $_bacds_parent_org_id;
+sub bacds_parent_org_id {
+    if (!$_bacds_parent_org_id) {
+        my $dbh = get_dbh(debug => 0);
+        my $rs = $dbh->resultset('ParentOrg')->search(
+            { abbreviation => 'BACDS' }
+        );
+        my $bacds = $rs->first;
+        $_bacds_parent_org_id = $bacds->parent_org_id;
+    }
+    return $_bacds_parent_org_id;
+
+}
+
 =head2 main/root
 
 The display page. This is the only endpoint that serves html.
@@ -351,12 +397,10 @@ Returns the flat list of all events in the database
 
 =cut
 
-my $event_model = 'bacds::Scheduler::Model::Event';
-
 get '/eventAll' => requires_checksum sub {
     my $results = $Results_Class->new;
 
-    $results->data($event_model->get_multiple_rows);
+    $results->data($Event_Model->get_multiple_rows);
 
     return $results->format;
 };
@@ -370,7 +414,7 @@ Like /eventAll, but just events from yesterday on.
 get '/eventsUpcoming' => requires_checksum sub {
     my $results = $Results_Class->new;
 
-    $results->data($event_model->get_upcoming_rows);
+    $results->data($Event_Model->get_upcoming_rows);
 
     return $results->format;
 };
@@ -410,7 +454,7 @@ the nested data structures.
 
 get '/event/:event_id' => requires_checksum sub {
     my $event_id = params->{event_id};
-    my ($event, $err) = $event_model->get_row($event_id);
+    my ($event, $err) = $Event_Model->get_row($event_id);
 
     return $err->format if $err;
 
@@ -429,7 +473,7 @@ Create a new event.
 post '/event/' => can_create_event requires_checksum sub {
     my $auditor = request->var('auditor');
 
-    my ($event, $err) = $event_model->post_row($auditor, params);
+    my ($event, $err) = $Event_Model->post_row($auditor, params);
 
     return $err->format if $err;
 
@@ -450,7 +494,7 @@ Update an existing event
 put '/event/:event_id' => requires_checksum can_edit_event sub {
     my $auditor = request->var('auditor');
 
-    my ($event, $err) = $event_model->put_row($auditor, params);
+    my ($event, $err) = $Event_Model->put_row($auditor, params);
 
     return $err->format if $err;
 
