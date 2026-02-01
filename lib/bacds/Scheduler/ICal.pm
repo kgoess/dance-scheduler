@@ -104,14 +104,13 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
             if (@bands || @talent) {
                 $d .= ' with ';
             }
-        } else {
-            if (@bands || @talent) {
-                $d .= 'Music by ';
-                $d .= join ', ', map $_->name, @bands;
-                $d .= join ', ', map $_->name, @talent;
-                if ($e->and_friends) {
-                    $d .= '...and friends';
-                }
+        }
+        if (@bands || @talent) {
+            $d .= 'Music by ';
+            $d .= join ', ', map $_->name, @bands;
+            $d .= join ', ', map $_->name, @talent;
+            if ($e->and_friends) {
+                $d .= '...and friends';
             }
         }
         $d .= ' '.$e->short_desc;
