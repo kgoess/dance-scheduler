@@ -67,17 +67,18 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     my $tz = 'TZID=America/Los_Angeles';
     # TZID=America/Los_Angeles:20260201T140000
 
-    my $dtstart = join '', 
+    my $dtstart = join '',
 #        $tz, ':',
         $e->start_date =~ s/T.*//r,
         ($e->start_time ? ('T', $e->start_time) : ());
     $dtstart =~ s/[-:]//g;
 
-    my $dtend = $e->end_date && join '', 
+    my $end_date = $e->end_date || $e->start_date;
+    my $dtend = join '',
 #        $tz, ':',
-        $e->end_date =~ s/T.*//r,
-        ($e->end_time ? ('T', $e->end_time) : ());
-    $dtend && $dtend =~ s/[-:]//g;
+        $end_date =~ s/T.*//r,
+        ($e->end_time ? ('T', $e->end_time) : ()); # is this right? it passes the validator
+    $dtend =~ s/[-:]//g;
 
     my $url = $e->custom_url
         || $e->series && $e->series->get_canonical_url($canonical_scheme, $canonical_host)
@@ -89,7 +90,7 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     }
 
     # lifted this from views/unearth/listings.tt
-    
+
     my @callers = $e->callers({}, { order_by => 'me.ordering' })->all;
     my @bands   = $e->bands  ({}, { order_by => 'me.ordering' })->all;
     my @talent  = $e->talent ({}, { order_by => 'me.ordering' })->all;
@@ -119,7 +120,7 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     $d =~ s/\n/ /g;
     $d =~ s/<.+?>/ /g; # html tags
     $d =~ s/  +/ /g; # multiple spaces
-        
+
     my $name_for_summary = $e->name || $e->series->name;
     if (@callers) {
         $name_for_summary .= ': ';
@@ -132,7 +133,7 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
 
     my $vevent = Data::ICal::Entry::Event->new();
     $vevent->add_properties(
-        # see 
+        # see
         #  - https://en.wikipedia.org/wiki/ICalendar
         #  - https://icalendar.org/RFC-Specifications/iCalendar-RFC-5545/
         # for details on these fields
@@ -149,7 +150,7 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
         dtstamp => get_now()->iso8601 =~ s/[-:]//gr,
         status => $e->is_canceled ? 'CANCELLED' : 'CONFIRMED',
         summary => $name_for_summary,
-        url => $url, 
+        url => $url,
 
         # unused
         # geo => xxx,
