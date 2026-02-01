@@ -67,17 +67,17 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     my $tz = 'TZID=America/Los_Angeles';
     # TZID=America/Los_Angeles:20260201T140000
 
-#    my $dtstart = join '', 
+    my $dtstart = join '', 
 #        $tz, ':',
-#        $e->start_date,
-#        ($e->start_time ? ('T', $e->start_time) : ());
-#    $dtstart =~ s/[-:]//g;
-#
-#    my $dtend = join '', 
+        $e->start_date =~ s/T.*//r,
+        ($e->start_time ? ('T', $e->start_time) : ());
+    $dtstart =~ s/[-:]//g;
+
+    my $dtend = join '', 
 #        $tz, ':',
-#        $e->end_date,
-#        ($e->end_time ? ('T', $e->end_time) : ());
-#    $dtend =~ s/[-:]//g;
+        $e->end_date =~ s/T.*//r,
+        ($e->end_time ? ('T', $e->end_time) : ());
+    $dtend =~ s/[-:]//g;
 
     my $url = $e->custom_url
         || $e->series && $e->series->get_canonical_url($canonical_scheme, $canonical_host)
@@ -141,8 +141,8 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
         created => $e->created_ts =~ s/[-:]//gr,
         description => $d,
 
-        dtstart => $e->start_date && $e->start_date =~ s/[-:]//gr,
-        dtend => $e->end_date ? $e->end_date =~ s/[-:]//gr : $e->start_date =~ s/[-:]//gr,
+        dtstart => $dtstart,
+        dtend => $dtend,
         'last-modified' => $e->modified_ts =~ s/[-:]//gr,
         location => $location,
         organizer => $organizer,
