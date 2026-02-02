@@ -302,7 +302,7 @@ sub migrate_event {
     my $new = $dbh->resultset('Event')->new({});
 
 
-dump $old;
+#dump $old;
 
     if ($old->type eq 'BALANCE THE BAY SPECIAL CONTRA WEEKEND') {
         $new->name('Balance the Bay');
