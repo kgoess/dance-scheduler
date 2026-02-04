@@ -1576,12 +1576,34 @@ sub archive_calendars_index {
 }
 
 
+=head2 GET /unearth
+
+This is the front page, the main page of the public site, https://bacds.org.
+
+It's called "unearth" because that's the colorlib template set that Eric Black
+found and proposed way back in the day.
+
+It shows everything for the next 18 days as well as any camps and specials
+anywhere in the future.
+
+The main page is pre-generated every minute by a cron job that runs
+scripts/make-frontpage-files.sh in the DocumentRoot directory, and that script
+basically does:
+
+    curl https://bacds.org/dance-scheduler/unearth > index.html
+
+So if you want to see the front page live without waiting up to sixty seconds
+you can use that url too!
+
+=cut
+
 get '/unearth/' => sub { # allowing the trailing slash breaks all the relative links in the html
     redirect '/unearth' => 303;
 };
 
 get '/unearth' => sub {
 
+    # for the next 18 days
     my $end_date = get_today()->add(days=>18)->ymd;
     my $start_date = get_today()->add(days=>1)->ymd;
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
@@ -1593,6 +1615,9 @@ get '/unearth' => sub {
     #   dbuser     => $dbuser
     );
     my @eighteen_days = $rs->all;
+
+
+    # for today
     $end_date = get_today()->ymd;
     $rs = bacds::Scheduler::Model::DanceFinder->search_events(
        end_date   => $end_date,
@@ -1602,8 +1627,11 @@ get '/unearth' => sub {
     #   dbuser     => $dbuser
     );
     my @today = $rs->all;
+
+
+    # any SPECIALs or CAMPs
     my $dbh = get_dbh;
-    my @style_ids = map $_->style_id, $dbh->resultset('Style')->search({
+    state @style_ids = map $_->style_id, $dbh->resultset('Style')->search({
         is_deleted => 0,
         name => ['SPECIAL', 'CAMP'],
     })->all;
@@ -1616,10 +1644,14 @@ get '/unearth' => sub {
     );
     my @special = $rs->all;
 
+
+    # data for the dancefinder search form
     my ($callers, $venues, $bands, $musos, $styles, $role_pairs)
          = _dancefinder_data();
-#    template 'dancefinder/index.html' => {
 
+
+    # "unearth" is the name of the bootstrap layout from Colorlib that we're
+    # using
     template 'unearth/index' => {
         eighteen_days => \@eighteen_days,
         today       => \@today,
