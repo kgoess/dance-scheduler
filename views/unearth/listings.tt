@@ -143,7 +143,10 @@ END -%>
         <% IF photo_count;
           # bootstrap uses a 12-column layout, so a picture that
           # is 4 columns wide occupies 1/3 of the space.
-          IF photo_count >= 10;
+          IF event.photo_url;
+            num_columns_per_picture = 12;
+            font_size = 1;
+          ELSIF photo_count >= 10;
             num_columns_per_picture = 2;    
             font_size = 6;
           ELSIF photo_count >= 5;
