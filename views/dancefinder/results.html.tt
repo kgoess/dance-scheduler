@@ -14,7 +14,7 @@
     font-style: italic;
 }
 </style>
-<div style="padding-left: 1em">
+<div style="padding-left: 1em; padding-bottom: 4em;">
 <div class="search_args">
 <% FOREACH style IN style_arg %>
     <span class="search_arg"><% style.name.lower().ucfirst() %></span><% IF !loop.last() %> or <% END %>
