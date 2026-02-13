@@ -107,6 +107,10 @@ register_type_check 'Bool' => sub {
     return $_[0] =~ m{^(true|false)$}i
 };
 
+register_type_check 'DancefinderResultsFormat' => sub {
+    return $_[0] =~ m{^(ical)$}i # only the one format currently
+};
+
 preload_accordion_config;
 
 
@@ -311,6 +315,9 @@ Gives you a .ics/iCalendar format of upcoming events.
 iCalendar protocol (RFC 2445, MIME type "text/calendar"), .ics files
 
 https://en.wikipedia.org/wiki/ICalendar
+
+This doesn't take any parameters. See the /dancefinder-results
+endpoint for the version that does take parameters.
 
 =cut
 
@@ -951,10 +958,12 @@ get '/dancefinder-results' => with_types [
     'optional' => ['query', 'style-name',  'StyleName'],
     'optional' => ['query', 'team',   'SchedulerId'],
     'optional' => ['query', 'role_pair', 'SchedulerId'],
-    'optional' => ['query', 'role_blanks', 'Bool']
+    'optional' => ['query', 'role_blanks', 'Bool'],
+    'optional' => ['query', 'format', 'DancefinderResultsFormat'],
 ] => sub {
 
     my $dbh = get_dbh(debug => 0);
+
 
     # alternate calling convention for links in the sidebar
     # e.g. dancefilter-results?style-name=ENGLISH
@@ -991,6 +1000,17 @@ get '/dancefinder-results' => with_types [
     my @events = $rs->all;
 
 
+    #
+    # ical format, early return (see also the /ical url endpoint)
+    #
+    if ((query_parameters->get('format') // '') eq 'ical') {
+        content_type 'text/calendar';
+        return bacds::Scheduler::ICal->events_to_ical(
+            \@events, request->scheme, request->host, 'BACDS Custom Calendar',
+        );
+    }
+
+
     # individually look up the query parameters so we can fill them out on the
     # results page
     my @fetchers = (
@@ -1015,6 +1035,12 @@ get '/dancefinder-results' => with_types [
         $results{$key} = \@rs;
     }
 
+    # "mixed" returns the Hash::MultiValue object for multi-valued
+    # query params
+    my $ical_params = query_parameters->mixed;
+    $ical_params->{format} = 'ical';
+    my $ical_url = uri_for(request->path, $ical_params);
+
     template 'dancefinder/results.html' => {
         bacds_uri_base => 'https://www.bacds.org',
         title => 'Results from dancefinder query',
@@ -1036,6 +1062,7 @@ get '/dancefinder-results' => with_types [
 
         canonical_scheme => request->scheme,
         canonical_host   => request->host,
+        ical_url         => $ical_url,
     },
     # gets the wrapper from views/layouts/<whatever>
     { layout => 'unearth-page-wrapper' },

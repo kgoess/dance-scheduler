@@ -33,16 +33,18 @@ use List::Util qw/first/;
 
 use bacds::Scheduler::Util::Time qw/get_now/;
 
-=head2 events_to_ical($event, $canonical_scheme, $canonical_host)
+=head2 events_to_ical($event, $canonical_scheme, $canonical_host, $alt_calname)
 
 $event is a bacds::Scheduler::Schema::Result::Event
 
 =cut
 
-sub events_to_ical ($class, $events, $canonical_scheme, $canonical_host) {
+sub events_to_ical ($class, $events, $canonical_scheme, $canonical_host, $alt_calname='') {
+
+    my $calname = $alt_calname || 'BACDS Calendar';
 
     my $calendar = Data::ICal->new(
-        calname => 'BACDS Calendar',
+        calname => $calname,
         rfc_strict => 1,
     );
     my ($daylight_start, $standard_start) = get_dst_transition_starts();
@@ -148,7 +150,7 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
                 $d .= '...and friends';
             }
         }
-        $d .= ' '.$e->short_desc;
+        $d .= ' '.($e->short_desc || $e->series->name);
     }
     $d =~ s/\r\n/ /g;
     $d =~ s/\n/ /g;

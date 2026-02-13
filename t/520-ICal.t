@@ -187,7 +187,6 @@ sub test_url_endpoint ($test) {
     ok($test->success, 'got /ical');
 
     my $got = $test->content;
-say STDERR $got;
     $got =~ s/\r\n/\n/g;
     $got =~ s/$UUID_RE/someuuid/g;
     my @got = split "\n", $got;
@@ -232,7 +231,7 @@ BEGIN:VEVENT
 CLASS:PUBLIC
 CREATED:20220428T021805
 DESCRIPTION: new lines shortdesc
-DTEND;TZID=America/Los_Angeles:20220502
+DTEND;TZID=America/Los_Angeles:20220502T235959
 DTSTAMP:20220428T021805
 DTSTART;TZID=America/Los_Angeles:20220502T200000
 LAST-MODIFIED:20220428T021805

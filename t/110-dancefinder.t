@@ -9,7 +9,7 @@ use Data::Dump qw/dump/;
 use Data::UUID;
 use JSON::MaybeXS qw/decode_json/;
 use Test::Differences qw/eq_or_diff/;
-use Test::More tests => 69;
+use Test::More tests => 81;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
@@ -33,6 +33,7 @@ my $fixture = setup_fixture();
 test_model_related_entities();
 test_dancefinder_form_endpoint();
 test_dancefinder_results_endpoint($fixture);
+test_dancefinder_results_endpoint_ical($fixture);
 test_search_events($fixture);
 test_livecalendar_endpoint($fixture);
 test_serieslister($fixture);
@@ -513,6 +514,73 @@ sub test_dancefinder_results_endpoint {
         </div>
     }x, 'query with style-name arg looks ok';
 }
+
+sub test_dancefinder_results_endpoint_ical {
+    my ($fixture) = @_;
+
+    #
+    # request with no params
+    #
+    $Test->get_ok("/dancefinder-results?format=ical", "GET /dancefinder-results?format=ical ok");
+
+    my @ical_hashes = ical_to_hashes($Test->content);
+
+    is @ical_hashes, 3, 'three ical events found';
+
+    is $ical_hashes[0]{SUMMARY}, 'test event 1', 'event 1 summary ok';
+    is $ical_hashes[1]{SUMMARY}, 'The Dance-A-Week Series', 'event 2 summary ok';
+    is $ical_hashes[2]{SUMMARY}, 'test multiday event 1', 'event 3 summary ok';
+
+    #
+    # with more params
+    #
+    my $q = join '&',
+        "venue=$fixture->{venue1}",
+        "band=$fixture->{band1}",
+    ;
+
+    $Test->get_ok("/dancefinder-results?format=ical&$q", "GET /dancefinder-results?format=ical&$q ok");
+
+    @ical_hashes = ical_to_hashes($Test->content);
+    is @ical_hashes, 1, 'only one event matches these params';
+
+    my %expected = (
+      "DESCRIPTION" => "music by test band 1\\, test band 2muso 3 big dance party &#9786",
+      "LOCATION" => "Mr. Hooper's Store\\, 123 Sesame St.\\, Sunny Day",
+      "ORGANIZER" => "The Dance-A-Week Series",
+      "SUMMARY" => "test event 1",
+      "URL" => "http://custom-url/test-event-1",
+    );
+    foreach my $key (sort keys %expected) {
+        is $ical_hashes[0]{$key}, $expected{$key}, "GET /dancefinder-results?format=ical&$q $key is $expected{$key}";
+    }
+}
+
+
+sub ical_to_hashes {
+    my ($ical) = @_;
+
+    my @ical = split "\r\n", $ical;
+    my @hashes;
+    my $current_hash = {};
+    my $in_event = 0;
+    foreach (@ical) {
+        if (/^END:VEVENT/) {
+            push @hashes, $current_hash;
+            $current_hash = {};
+            $in_event = 0;
+
+        } elsif ($in_event) {
+            my ($name, $value) = split ':', $_, 2;
+            $current_hash->{$name} = $value;
+
+        } elsif (/^BEGIN:VEVENT/) {
+            $in_event = 1;
+        }
+    }
+    return @hashes;
+}
+
 
 
 sub test_livecalendar_endpoint {

@@ -44,4 +44,11 @@ Dances
 <% END %>
 </div>
 <% include dancefinder/listings.tt events => events %>
+<div style="margin: 40px">
+    <hr>
+    <em>To subscribe to these results in your own calendar program, copy
+    <a href="<% ical_url %>">this iCalendar link</a> into wherever your calendar program takes
+    calendar urls to subscribe to them.</em>
 </div>
+</div>
+
