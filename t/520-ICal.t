@@ -144,7 +144,7 @@ sub basic_test {
     my $vevent = bacds::Scheduler::ICal->event_to_ical($events[0], 'gopher', 'minnesota.edu');
 
     my $calendar = Data::ICal->new(
-        calname => 'BACDS Calendar',
+        calname => 'BACDS Dances',
         rfc_strict => 1,
     );
     $calendar->add_entry($vevent);
@@ -156,7 +156,7 @@ sub basic_test {
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:Data::ICal 0.24
-X-WR-CALNAME:BACDS Calendar
+X-WR-CALNAME:BACDS Dances
 BEGIN:VEVENT
 CATEGORIES:pipesmoking
 CATEGORIES:maypole
@@ -194,7 +194,7 @@ sub test_url_endpoint ($test) {
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:Data::ICal 0.24
-X-WR-CALNAME:BACDS Calendar
+X-WR-CALNAME:BACDS Dances
 BEGIN:VTIMEZONE
 TZID:America/Los_Angeles
 BEGIN:DAYLIGHT

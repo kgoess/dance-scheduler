@@ -41,7 +41,7 @@ $event is a bacds::Scheduler::Schema::Result::Event
 
 sub events_to_ical ($class, $events, $canonical_scheme, $canonical_host, $alt_calname='') {
 
-    my $calname = $alt_calname || 'BACDS Calendar';
+    my $calname = $alt_calname || 'BACDS Dances';
 
     my $calendar = Data::ICal->new(
         calname => $calname,
