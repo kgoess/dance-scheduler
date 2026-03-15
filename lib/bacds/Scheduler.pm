@@ -56,6 +56,7 @@ use bacds::Scheduler::Model::SeriesLister;
 use bacds::Scheduler::Model::Talent;
 use bacds::Scheduler::Model::Team;
 use bacds::Scheduler::Model::Style;
+use bacds::Scheduler::Model::MemberPortal;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
@@ -1773,5 +1774,128 @@ sub ssi_uri_for {
     # extra ${} from Dancer2's uri_for, w/ever
     return ${ $uri->canonical };
 }
+
+=head2 GET /member
+
+Shows the email-entry form for the member self-service portal.
+
+=cut
+
+get '/unearth/member' => sub {
+    template 'member/request' => {
+        page_title => 'Manage Your BACDS Info',
+        season     => get_season(),
+    }, { layout => 'unearth-page-wrapper' };
+};
+
+=head2 POST /member/request-link
+
+Looks up the submitted email in CiviCRM and, if a contact is found, sends
+a magic link email via CiviCRM. Always redirects to the same confirmation
+page regardless of whether the email was recognised (prevents enumeration).
+
+=cut
+
+post '/unearth/member/request-link' => sub {
+    my $email = body_parameters->get('email') // '';
+    $email =~ s/^\s+|\s+$//g;
+
+    if (!$email || $email !~ /\@/) {
+        return template 'member/request' => {
+            page_title => 'Manage Your BACDS Info',
+            season     => get_season(),
+            error      => 'Please enter a valid email address.',
+            email      => $email,
+        }, { layout => 'unearth-page-wrapper' };
+    }
+
+    my $base_url = request->uri_base;
+    eval {
+        bacds::Scheduler::Model::MemberPortal->request_link(
+            $email, get_dbh(), $base_url,
+        );
+    };
+    if ($@) {
+        warn "MemberPortal request_link error for $email: $@";
+        # Don't expose internal errors to the user; fall through to the
+        # same confirmation page so as not to leak information.
+    }
+
+    template 'member/request_sent' => {
+        page_title => 'Check Your Email',
+        season     => get_season(),
+    }, { layout => 'unearth-page-wrapper' };
+};
+
+=head2 GET /member/portal?token=XXX
+
+Validates the magic link token and shows the pre-filled contact edit form.
+
+=cut
+
+get '/unearth/member/portal' => sub {
+    my $token = query_parameters->get('token') // '';
+
+    my ($contact, $error);
+    eval {
+        $contact = bacds::Scheduler::Model::MemberPortal->get_contact_for_portal(
+            $token, get_dbh(),
+        );
+    };
+    $error = $@ if $@;
+
+    template 'member/portal' => {
+        page_title => 'Your BACDS Info',
+        season     => get_season(),
+        token      => $token,
+        contact    => $contact,
+        error      => $error,
+    }, { layout => 'unearth-page-wrapper' };
+};
+
+=head2 POST /member/portal?token=XXX
+
+Re-validates the token, saves the submitted contact data to CiviCRM, and
+marks the token as used.
+
+=cut
+
+post '/unearth/member/portal' => sub {
+    my $token = body_parameters->get('token') // '';
+
+    my %form_data = map {
+        $_ => scalar(body_parameters->get($_))
+    } qw(first_name middle_name last_name nick_name
+         phone street_address city state postal_code country);
+
+    my $error;
+    eval {
+        bacds::Scheduler::Model::MemberPortal->save_contact(
+            $token, \%form_data, get_dbh(),
+        );
+    };
+    $error = $@ if $@;
+
+    if ($error) {
+        my ($contact);
+        eval {
+            $contact = bacds::Scheduler::Model::MemberPortal->get_contact_for_portal(
+                $token, get_dbh(),
+            );
+        };
+        return template 'member/portal' => {
+            page_title => 'Your BACDS Info',
+            season     => get_season(),
+            token      => $token,
+            contact    => $contact // \%form_data,
+            error      => $error,
+        }, { layout => 'unearth-page-wrapper' };
+    }
+
+    template 'member/portal_success' => {
+        page_title => 'Changes Saved',
+        season     => get_season(),
+    }, { layout => 'unearth-page-wrapper' };
+};
 
 true;
