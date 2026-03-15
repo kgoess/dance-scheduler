@@ -1,0 +1,11 @@
+<%# Wrapped by views/layouts/scheduler-page.tt (via unearth-page-wrapper layout) %>
+<div class="body-and-sidebar text-center">
+  <a name="top"></a>
+  <h1>Changes Saved</h1>
+
+  <p>Your BACDS membership information has been updated.</p>
+  <p>
+    If you need to make further changes, please
+    <a href="<% request.uri_base %>/unearth/member">request a new link</a>.
+  </p>
+</div>

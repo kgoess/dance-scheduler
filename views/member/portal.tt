@@ -1,0 +1,100 @@
+<%# Wrapped by views/layouts/scheduler-page.tt (via unearth-page-wrapper layout) %>
+<div class="body-and-sidebar">
+  <a name="top"></a>
+  <h1 class="text-center">Your BACDS Membership Info</h1>
+
+  <% IF error %>
+    <div class="alert alert-danger text-center" role="alert">
+      <% error | html %>
+      <br>
+      <a href="<% request.uri_base %>/unearth/member">Request a new link</a>
+    </div>
+  <% ELSE %>
+
+  <p class="text-center text-muted">
+    Changes are saved directly to your BACDS membership record.
+    To update your email address, please
+    <a href="/contact/">contact us</a>.
+  </p>
+
+  <form action="<% request.uri_base %>/unearth/member/portal" method="POST" style="max-width: 640px; margin: 0 auto;">
+    <input type="hidden" name="token" value="<% token | html %>">
+
+    <h2>Name</h2>
+    <div class="row mb-2">
+      <div class="col-md-4 mb-2">
+        <label class="form-label" for="first_name">First name</label>
+        <input type="text" class="form-control" id="first_name" name="first_name"
+          value="<% contact.first_name | html %>" autocomplete="given-name">
+      </div>
+      <div class="col-md-3 mb-2">
+        <label class="form-label" for="middle_name">Middle name</label>
+        <input type="text" class="form-control" id="middle_name" name="middle_name"
+          value="<% contact.middle_name | html %>">
+      </div>
+      <div class="col-md-4 mb-2">
+        <label class="form-label" for="last_name">Last name</label>
+        <input type="text" class="form-control" id="last_name" name="last_name"
+          value="<% contact.last_name | html %>" autocomplete="family-name">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6 mb-2">
+        <label class="form-label" for="nick_name">Preferred name / nickname</label>
+        <input type="text" class="form-control" id="nick_name" name="nick_name"
+          value="<% contact.nick_name | html %>">
+      </div>
+    </div>
+
+    <h2>Contact</h2>
+    <div class="row mb-2">
+      <div class="col-md-6 mb-2">
+        <label class="form-label" for="email_display">Email (read-only)</label>
+        <input type="email" class="form-control" id="email_display"
+          value="<% contact.email | html %>" disabled>
+      </div>
+      <div class="col-md-6 mb-2">
+        <label class="form-label" for="phone">Phone</label>
+        <input type="tel" class="form-control" id="phone" name="phone"
+          value="<% contact.phone | html %>" autocomplete="tel">
+      </div>
+    </div>
+
+    <h2>Address</h2>
+    <div class="mb-2">
+      <label class="form-label" for="street_address">Street address</label>
+      <input type="text" class="form-control" id="street_address" name="street_address"
+        value="<% contact.street_address | html %>" autocomplete="street-address">
+    </div>
+    <div class="row mb-2">
+      <div class="col-md-5 mb-2">
+        <label class="form-label" for="city">City</label>
+        <input type="text" class="form-control" id="city" name="city"
+          value="<% contact.city | html %>" autocomplete="address-level2">
+      </div>
+      <div class="col-md-3 mb-2">
+        <label class="form-label" for="state">State</label>
+        <input type="text" class="form-control" id="state" name="state"
+          value="<% contact.state | html %>" autocomplete="address-level1"
+          placeholder="e.g. California">
+      </div>
+      <div class="col-md-4 mb-2">
+        <label class="form-label" for="postal_code">ZIP / Postal code</label>
+        <input type="text" class="form-control" id="postal_code" name="postal_code"
+          value="<% contact.postal_code | html %>" autocomplete="postal-code">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6 mb-2">
+        <label class="form-label" for="country">Country</label>
+        <input type="text" class="form-control" id="country" name="country"
+          value="<% contact.country | html %>" autocomplete="country-name">
+      </div>
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary btn-lg">Save changes</button>
+    </div>
+  </form>
+  <% END %>
+</div>
