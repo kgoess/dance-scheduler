@@ -83,6 +83,22 @@
           <% include unearth/listings.tt events=> special, left_right_flipper => 0 %>
       </div>
     </div>
+    <div id="ical-subscribe-section">
+        <div class="row justify-content-center">
+          <div class="col-md-12 text-center">
+            <div class="block-heading-1">
+              <h2>Never Miss a Dance!</h2>
+            </div>
+            <div class="fs-5 mx-5" style="xwidth: 400px">
+              <p>Use this link to add a calendar to your Google Calendar, Apple iCal or compatible app:
+                <blockquote>
+                  <a href="https://bacds.org/ical">https://bacds.org/ical</a>
+                </blockquote>
+              <p>Or if you only want to subscribe to <em>some</em> of our vast offering of events, use the <a href="#dancefinder-section">Dance Finder</a> below to pick what you like, and subscribe to that on its results page.
+            </div>
+          </div>
+      </div>
+    </div>
     <div class="site-section" id="calendar-section">
         <div class="row mb-5 justify-content-center" data-aos="fade" data-aos-delay="">
           <div class="col-md-12 text-center">

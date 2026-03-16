@@ -8,6 +8,12 @@
   font-size: 130%;
 }
 
+#ical-subscribe-section {
+  background-color: #ffdbc4;
+  box-shadow: 0 0 15px 0px #875920;
+  /* font-size: 130%; */
+}
+
 .special-event-name {
   font-size: 120%;
   font-weight: bolder;

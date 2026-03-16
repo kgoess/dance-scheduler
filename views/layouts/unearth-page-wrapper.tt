@@ -66,23 +66,40 @@
                     <%- link -%>
                       <% END -%>
                         <li class="nav-item dropdown-item">
-                          <a href="<% make_link("", "#tonight-section") %>" class="nav-link">Tonight&rsquo;s Events</a>
+                          <a href="<% make_link("", "#tonight-section") %>" class="nav-link"
+                            title="Upcoming events"
+                            >Tonight&rsquo;s Events</a>
                         </li>
                         <li class="nav-item dropdown-item">
-                          <a href="<% make_link("", "#calendar-section") %>" class="nav-link">Calendar</a>
+                          <a href="<% make_link("", "#calendar-section") %>" class="nav-link"
+                            title="A monthly calendar of all our events"
+                            >Calendar</a>
                         </li>
                         <li class="nav-item dropdown-item">
+                          <% title="Search for upcoming dances based on your own preferences (and subscribe to the results!)" %>
                           <% IF is_homepage -%>
-                            <a href="#dancefinder-section" class="nav-link">Dance Finder (search)</a>
+                            <a href="#dancefinder-section" class="nav-link" title="<% title %>">Dance Finder (search)</a>
                             <% ELSE -%>
-                              <a href="<% make_link("/dancefinder") %>" class="nav-link">Dance Finder (search)</a>
-                              <% END -%>
+                              <a href="<% make_link("/dancefinder") %>" class="nav-link" title="<% title %>">Dance Finder (search)</a>
+                             <% END -%>
                         </li>
                         <li class="nav-item dropdown-item">
-                          <a href="<% make_link("/calendars/") %>" class="nav-link">Historical Calendars</a>
+                          <a href="<% make_link("/calendars/") %>" class="nav-link"
+                            title="Browse past events"
+                            >Historical Calendars</a>
                         </li>
+                        <% IF is_homepage -%>
+                            <li class="nav-item dropdown-item">
+                              <a href="#ical-subscribe-section" class="nav-link"
+                                title="How to create another calendar in your Google Calendar, Apple iCal, or other compatible app."
+                            >Subscribe To Our Calendar (ical link)</a>
+                            </li>
+                        <% END %>
                         <li class="nav-item dropdown-item">
-                          <a href="<% make_link("/ical") %>" class="nav-link">Subscribe To Our Calendar (ical)</a>
+                          <a href="https://sites.google.com/view/bacds/dances" class="nav-link"
+                            title="Offsite link"
+                            target="_blank"
+                        >All contra, English, traditional square &amp;<br> Irish dances in the Bay Area</a>
                         </li>
               </ul>
             </li>

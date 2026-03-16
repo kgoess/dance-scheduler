@@ -1,0 +1,11 @@
+  <div class="row mt-2">
+    <div class="col-12 col-lg-3">
+      <div class="row">
+          <p>Use this link to add a calendar to your Google Calendar, Apple iCal or compatible app: 
+            <blockquote>
+              <a href="https://bacds.org/ical">https://bacds.org/ical</a>
+            </blockquote>
+          <p>Or if you only want to subscribe to <em>some</em> of our vast offering of events, use the <a href="#dancefinder-section">DanceFinder</a> to pick what you like, and subscribe to that on its results page.
+        </div>
+    </div>
+</div>
