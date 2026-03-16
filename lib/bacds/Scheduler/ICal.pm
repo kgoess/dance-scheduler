@@ -150,14 +150,18 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
                 $d .= '...and friends';
             }
         }
-        $d .= ' '.($e->short_desc || $e->series->name);
+        $d .= ' '.($e->short_desc || ($e->series && $e->series->name));
     }
     $d =~ s/\r\n/ /g;
     $d =~ s/\n/ /g;
     $d =~ s/<.+?>/ /g; # html tags
     $d =~ s/  +/ /g; # multiple spaces
 
-    my $name_for_summary = $e->name || $e->series->name;
+    my $name_for_summary =
+        $e->name                         ||
+        ($e->series && $e->series->name) ||
+        $e->synthetic_name;
+
     if (@callers) {
         $name_for_summary .= ': ';
         $name_for_summary .= join ', ', map $_->name, @callers;
