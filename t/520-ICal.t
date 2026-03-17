@@ -7,7 +7,7 @@ use utf8;
 
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 16;
+use Test::More tests => 18;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -133,6 +133,7 @@ $test->post_ok('/event/', $event_2 );
 basic_test();
 test_url_endpoint($test);
 test_get_dst_transition_starts();
+test_gcal_ical_urls();
 
 sub basic_test {
 
@@ -258,4 +259,19 @@ sub test_get_dst_transition_starts {
     # standard: dtstart => '20261101T090000',
     is $daylight_start, '20260308T100000', 'daylight start ok';
     is $standard_start, '20261101T090000', 'standard_start_ok';
+}
+
+sub test_gcal_ical_urls {
+
+    my $rs = bacds::Scheduler::Model::DanceFinder
+        ->search_events();
+
+    my @events = $rs->all;
+
+    my $event = $events[0];
+
+    is $event->gcal_link, 'https://www.google.com/calendar/event?action=TEMPLATE&ctz=America%2FLos_Angeles&dates=20220501T200000%2F20220501T220000&details=Rose+Gamgee+itsa+shortdesc+1+%E7%84%A1%E7%82%BA&location=the+hall%2C+123+Sesame+St.%2C+Gotham%2C+CA%2C+USA&sprop=website%3Ahttps%3A%2F%2Fbacds.org%2Fbree-mersday-eng&text=Bree+Mersday+English&trp=false',
+     'gcal link ok';
+
+    is $event->ical_link, 'https://TBD', 'ical link TBD';
 }

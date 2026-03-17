@@ -127,38 +127,11 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     }
 
     # lifted this from views/unearth/listings.tt
-
     my @callers = $e->callers({}, { order_by => 'me.ordering' })->all;
     my @bands   = $e->bands  ({}, { order_by => 'me.ordering' })->all;
     my @talent  = $e->talent ({}, { order_by => 'me.ordering' })->all;
 
-    my $d = '';
-    if (my $long_desc = $e->long_desc) {
-        $d = $long_desc;
-    } else {
-        if (@callers) {
-            $d .= join ',', map $_->name, @callers;
-            if (@bands || @talent) {
-                $d .= ' with ';
-            }
-        }
-        if (@bands || @talent) {
-            $d .= 'music by ';
-            $d .= join ', ', map $_->name, @bands;
-            if (@bands && @talent) {
-                $d .= ': ';
-            }
-            $d .= join ', ', map $_->name, @talent;
-            if ($e->and_friends) {
-                $d .= '...and friends';
-            }
-        }
-        $d .= ' '.($e->short_desc || ($e->series && $e->series->name));
-    }
-    $d =~ s/\r\n/ /g;
-    $d =~ s/\n/ /g;
-    $d =~ s/<.+?>/ /g; # html tags
-    $d =~ s/  +/ /g; # multiple spaces
+    my $description = calendar_description_for_event($e, \@callers, \@bands, \@talent);
 
     my $name_for_summary =
         $e->name                         ||
@@ -183,7 +156,7 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
         uid => $e->uuid,
         class => 'PUBLIC',
         created => $e->created_ts =~ s/[-:]//gr,
-        description => $d,
+        description => $description,
 
         dtstart => [
             $dtstart,
@@ -245,6 +218,44 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
 
     return $vevent;
 
+}
+
+sub calendar_description_for_event ($e, $callers=undef, $bands=undef, $talent=undef) {
+
+    # lifted this from views/unearth/listings.tt
+    $callers ||= [ $e->callers({}, { order_by => 'me.ordering' })->all ];
+    $bands   ||= [ $e->bands  ({}, { order_by => 'me.ordering' })->all ];
+    $talent  ||= [ $e->talent ({}, { order_by => 'me.ordering' })->all ];
+
+    my $d = '';
+    if (my $long_desc = $e->long_desc) {
+        $d = $long_desc;
+    } else {
+        if (@$callers) {
+            $d .= join ',', map $_->name, @$callers;
+            if (@$bands || @$talent) {
+                $d .= ' with ';
+            }
+        }
+        if (@$bands || @$talent) {
+            $d .= 'music by ';
+            $d .= join ', ', map $_->name, @$bands;
+            if (@$bands && @$talent) {
+                $d .= ': ';
+            }
+            $d .= join ', ', map $_->name, @$talent;
+            if ($e->and_friends) {
+                $d .= '...and friends';
+            }
+        }
+        $d .= ' '.($e->short_desc || ($e->series && $e->series->name));
+    }
+    $d =~ s/\r\n/ /g;
+    $d =~ s/\n/ /g;
+    $d =~ s/<.+?>/ /g; # html tags
+    $d =~ s/  +/ /g; # multiple spaces
+
+    return $d;
 }
 
 my $_dst_transitions;
@@ -332,6 +343,72 @@ sub get_dst_transition_starts {
     $_dst_transitions = [$daylight_start_str, $standard_start_str];
 
     return $daylight_start_str, $standard_start_str;
+}
+
+
+=head2 event_to_gcal_link 
+
+See details on params at
+
+     - https://stackoverflow.com/a/2349501
+     - https://useroffline.blogspot.com/2009/06/making-google-calendar-link.html
+
+=cut
+
+sub event_to_gcal_link ($class, $e) {
+
+    my $gcal_url = URI->new('https://www.google.com/calendar/event');
+
+    my $dtstart = join '',
+        $e->start_date =~ s/T.*//r,
+        ($e->start_time ? ('T', $e->start_time) : ());
+    $dtstart =~ s/[-:]//g;
+
+    my $end_date = $e->end_date || $e->start_date;
+    my $dtend = join '',
+        $end_date =~ s/T.*//r,
+        ($e->end_time ? ('T', $e->end_time) : ('T', '235959'));
+    $dtend =~ s/[-:]//g;
+
+    my $location;
+    if ($e->venues && (my $venue = $e->venues->first)) {
+        $location = join ', ', $venue->hall_name, $venue->address, $venue->city, 'CA', 'USA';
+    }
+    my $event_title =
+        $e->name                         ||
+        ($e->series && $e->series->name) ||
+        $e->synthetic_name;
+
+    my $details = calendar_description_for_event($e);
+
+    # these wouldn't work on sandboxes anyway
+    my $canonical_scheme = 'https';
+    my $canonical_host = 'bacds.org';
+    my $bacds_url = $e->custom_url
+        || $e->series && $e->series->get_canonical_url($canonical_scheme, $canonical_host)
+        || 'https://bacds.org';
+
+    my %query_form = (
+        action     => 'TEMPLATE', # required
+        text       => $event_title, # required
+        dates      => join('/', $dtstart, $dtend),
+        details    => $details,
+        location   => $location,
+        trp        => "false", # "transparency", whether you're available
+        sprop      => "website:$bacds_url",
+        ctz        => "America/Los_Angeles",
+    );
+
+    $gcal_url->query_form(\%query_form);
+
+    return $gcal_url->as_string;
+
+}
+
+sub event_to_ical_link ($class, $event) {
+
+    return 'https://TBD';
+
 }
 
 1;

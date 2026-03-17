@@ -410,6 +410,7 @@ __PACKAGE__->many_to_many(venues => 'event_venues_maps', 'venue');
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
+with 'bacds::Scheduler::Schema::Role::CalendarLinks';
 
 sub get_fields_for_programmer_row {
     my ($self) = @_;
