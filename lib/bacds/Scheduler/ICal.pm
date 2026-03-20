@@ -394,7 +394,8 @@ sub event_to_gcal_link ($class, $e) {
         dates      => join('/', $dtstart, $dtend),
         details    => $details,
         location   => $location,
-        trp        => "false", # "transparency", whether you're available
+        trp        => "false", # "transparency", Show event as busy (true) or available (false)
+
         sprop      => "website:$bacds_url",
         ctz        => "America/Los_Angeles",
     );
