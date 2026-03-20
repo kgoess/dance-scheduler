@@ -356,7 +356,10 @@ sub bacds_parent_org_id {
 
 =head2 main/root
 
-The display page. This is the only endpoint that serves html.
+The display page of the dance-scheduler app. Note that /unearth is the front
+page of the website. That's just because we wrote the app first.
+
+This is the only endpoint of the app that serves html.
 
 =cut
 
