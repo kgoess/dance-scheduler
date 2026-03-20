@@ -15,7 +15,23 @@ sub initialize{
     find(
         sub {
             return unless -f $File::Find::name;
-            $sha->addfile($File::Find::name);
+            if (!-r $File::Find::name) {
+                warn "can't read $File::Find::name";
+                return;
+            }
+
+            open my $fh, "<", $File::Find::name or do {
+                warn "couldn't open file $File::Find::name for reading $!";
+                return;
+            };
+            close $fh;
+            eval {
+                $sha->addfile($File::Find::name);
+            };
+            if ($@) {
+                warn "Digest::SHA couldn't read file $File::Find::name: $!";
+                return;
+            }
         },
         config->{'public_dir'}
     );
