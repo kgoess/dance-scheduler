@@ -79,7 +79,7 @@ sub request_link {
         expires_ts         => $now->clone->add(seconds => TOKEN_TTL_SECONDS),
     });
 
-    my $portal_url = "$base_url/member/portal?token=$token";
+    my $portal_url = "$base_url/unearth/member/portal?token=$token";
     $civi->send_magic_link_email($contact_id, $portal_url);
 }
 
