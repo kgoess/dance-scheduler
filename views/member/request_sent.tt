@@ -1,0 +1,15 @@
+<%# Wrapped by views/layouts/scheduler-page.tt (via unearth-page-wrapper layout) %>
+<div class="body-and-sidebar text-center">
+  <a name="top"></a>
+  <h1>Check Your Email</h1>
+
+  <p>
+    If we found a BACDS membership record for that address, we've sent you
+    an email with a link to manage your contact information.
+  </p>
+  <p>
+    The link expires in one hour. If you don't see the email, check your
+    spam folder or
+    <a href="<% request.uri_base %>/unearth/member">try again</a>.
+  </p>
+</div>

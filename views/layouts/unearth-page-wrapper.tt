@@ -194,6 +194,9 @@
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/memberform/"
                         class="nav-link">Become a Member</a>
                     </li>
+                    <li class="nav-item dropdown-item"><a href="<% make_link("/unearth/member") %>"
+                        class="nav-link">Update Membership Details</a>
+                    </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/donate/" class="nav-link">Donate</a>
                     </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/covid/" class="nav-link">COVID Safety
