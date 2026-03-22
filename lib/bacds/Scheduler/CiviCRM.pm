@@ -20,6 +20,29 @@ Data operations use APIv4 (POST /civicrm/ajax/api4/{Entity}/{Action}).
 Email sending uses APIv3 MessageTemplate.send (POST /civicrm/ajax/rest),
 which is not available in APIv4.
 
+  Member browser          dance-scheduler (bacds.org)       CiviCRM (bacds.civicrm.org)
+        |                          |                                  |
+        |-- GET /member ---------->|                                  |
+        |<- email form ------------|                                  |
+        |                          |                                  |
+        |-- POST /member/request ->|-- Email.get (find by email) ---->|
+        |                          |<- contact_id -------------------|
+        |                          | generate token, store in DB      |
+        |                          |-- MessageTemplate.send ---------->|
+        |                          |   (contact_id, tplParams:{url})  |-- sends email -->member
+        |<- "check your inbox" ----|                                  |
+        |                          |                                  |
+        |-- GET /member/portal ---->|                                  |
+        |   ?token=XXX             | validate token                   |
+        |                          |-- Contact.get ------------------>|
+        |                          |   Address.get, Phone.get         |
+        |<- pre-filled form --------|<- contact data -----------------|
+        |                          |                                  |
+        |-- POST /member/portal --->| validate token                  |
+        |   (updated fields)       |-- Contact.create (update) ------>|
+        |                          |   Address.create, Phone.create   |
+        |<- success page -----------|                                  |
+
 =head2 Configuration
 
 Two private files are required (following the same pattern as other secrets
