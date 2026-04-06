@@ -95,7 +95,7 @@ post '/board-agenda/edit' => requires_login sub {
         meeting_date => $meeting_date,
         agenda_text  => $agenda_text,
     );
-    redirect '/board-agenda/edit' => 303;
+    redirect uri_for('/board-agenda/edit') => 303;
 };
 
 =head2 get /board-agenda/email-text
@@ -143,5 +143,5 @@ post '/board-agenda/template' => requires_login sub {
         agenda_text => $agenda_text,
         zoom_url    => $zoom_url,
     );
-    redirect '/board-agenda/template' => 303;
+    redirect uri_for('/board-agenda/template') => 303;
 };

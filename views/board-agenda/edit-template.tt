@@ -1,16 +1,17 @@
 <h1>Agenda Template &amp; Zoom URL</h1>
 <p>Changes here affect the <em>starting point</em> for future agendas.
    They do not alter the current month's agenda once you've begun editing it.</p>
-<p><a href="/board-agenda/edit">← Back to this month's agenda</a></p>
+<p><a href="<% request.uri_for('/board-agenda/edit') %>">← Back to this month's agenda</a></p>
 
 <div id="agenda-edit-template-form" style="margin-bottom: 10em">
-<form method="post" action="/board-agenda/template">
+<form method="post" action="<% request.uri_for('/board-agenda/template') %>">
 
-  <label for="zoom_url">Zoom URL (never published publicly)</label>
+  <p><label for="zoom_url">Zoom URL (never published publicly)</label>
   <input type="url" id="zoom_url" name="zoom_url"
-         value="<% zoom_url | html %>" placeholder="https://zoom.us/j/...">
+         value="<% zoom_url | html %>" placeholder="https://zoom.us/j/..."
+         size="80">
 
-  <label for="agenda_text">Agenda Template</label>
+  <p><label for="agenda_text">Agenda Template</label>
   <p><small>Use <code>[ZOOM LINK]</code> where the Zoom URL should appear.
      Use <code>[MEETING DATE]</code> as a slug for the date.</small></p>
   <textarea id="agenda_text" name="agenda_text"

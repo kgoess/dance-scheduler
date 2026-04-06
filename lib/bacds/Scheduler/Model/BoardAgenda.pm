@@ -136,7 +136,7 @@ sub get_public_text {
     my $text = $row ? $row->agenda_text : ($tmpl ? $tmpl->agenda_text : '');
     $text =~ s{\[ZOOM LINK\]}{[Zoom link available to board members]}g;
     $text =~ s{https://zoom.us[a-zA-Z0-9/?]+}{[Zoom link available to board members]}g; # failsafe
-    if ($row && (my $meeting_date = $row->meeting_date)) {
+    if ($row && (my $meeting_date = $row->meeting_date->ymd)) {
         $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
     }
     return $text;
@@ -158,7 +158,7 @@ sub get_email_text {
     my $text = $row ? $row->agenda_text : ($tmpl ? $tmpl->agenda_text : '');
     my $zoom = $tmpl ? $tmpl->zoom_url : '';
     $text =~ s{\[ZOOM LINK\]}{$zoom}g;
-    if ($row && (my $meeting_date = $row->meeting_date)) {
+    if ($row && (my $meeting_date = $row->meeting_date->ymd)) {
         $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
     }
     return $text;

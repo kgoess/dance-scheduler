@@ -33,7 +33,7 @@ $res = $test->post('/board-agenda/template', {
     zoom_url => "https://zoom.us/whatever",
 });
 ok $res->is_redirect, 'POST gave us a 303 redirect';
-is $res->header('location'), '/board-agenda/template', 'and the redirect is to /board-agenda/template';
+is $res->header('location'), 'http://localhost/board-agenda/template', 'and the redirect is to /board-agenda/template';
 
 
 #
@@ -70,7 +70,7 @@ $res = $test->post('/board-agenda/edit', {
     agenda_text => $updated_agenda,
 });
 ok $res->is_redirect, 'POST gave us a 303 redirect';
-is $res->header('location'), '/board-agenda/edit', 'and the redirect is to /board-agenda/edit';
+is $res->header('location'), 'http://localhost/board-agenda/edit', 'and the redirect is to /board-agenda/edit';
 
 #
 # fetch filled-in public agenda
@@ -83,7 +83,7 @@ $agenda = $1;
 like $agenda, qr{updated agenda blah blah}, 'updated agenda now being served';
 like $agenda, qr{\[Zoom link available to board members\]}, 'no zoom link in public agenda';
 unlike $agenda, qr{\[MEETING DATE\]}, 'meeting date slug is gone';
-like $agenda, qr{date: $tomorrow}, 'meeting date is filled in';
+like $agenda, qr{date: $tomorrow\s*$}m, 'meeting date is filled in';
 
 #
 # check out the endpoint for the copy-to-pastebuffer link
@@ -94,7 +94,7 @@ $agenda = $data->{text};
 like $agenda, qr{updated agenda blah blah}, 'for paste: updated agenda now being served';
 like $agenda, qr{link: https://zoom.us/whatever}, 'for paste: zoom link is filled in';
 unlike $agenda, qr{\[MEETING DATE\]}, 'for paste: meeting date slug is gone';
-like $agenda, qr{date: $tomorrow}, 'for paste: meeting date is filled in';
+like $agenda, qr{date: $tomorrow\s*$}m, 'for paste: meeting date is filled in';
 
 #
 # advance the date past the meeting date and what's served will reset

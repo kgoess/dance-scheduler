@@ -1,15 +1,16 @@
 <div id="agenda-edit-form" style="margin-bottom: 10em">
 <h1>Board Meeting Agenda</h1>
-<p>[<a href="/board-agenda/template">Edit agenda template &amp; Zoom URL</a>]</p>
+<p>[<a href="<% request.uri_for('/board-agenda/template') %>">Edit agenda template &amp; Zoom URL</a>]</p>
 
-<form method="post" action="/board-agenda/edit">
+<form method="post" action="<% request.uri_for('/board-agenda/edit') %>">
 
   <label for="meeting_date">Meeting Date</label>
   <input type="date" id="meeting_date" name="meeting_date"
          value="<% meeting_date %>" required>
   <div>Placeholder slugs:</div>
   <ul>
-    <li><code>[ZOOM LINK]</code> will be filled in with "<% zoom_url | html %>" when you press the "copy for email" button
+    <li><code>[ZOOM LINK]</code> will be filled in with the zoom url from the <a href="<% request.uri_for('/board-agenda/template') %>">agenda template</a> when you press the "copy for email" button:
+    <br>...<small><% zoom_url | html %>"</small>
     <li><code>[MEETING DATE]</code> will be filled in with the meeting date field
   </ul>
 
@@ -31,7 +32,7 @@
 <script>
 document.getElementById('copy-btn').addEventListener('click', async (event) => {
 
-    const resp = await fetch('/board-agenda/email-text');
+    const resp = await fetch('<% request.uri_for('/board-agenda/email-text') %>');
     const data = await resp.json();
     try {
         await navigator.clipboard.writeText(data.text);
