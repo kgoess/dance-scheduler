@@ -76,6 +76,11 @@ get '/board-agenda/edit' => requires_login sub {
         meeting_date => $row ? $row->meeting_date->strftime('%Y-%m-%d') : '',
         agenda_text  => $row ? $row->agenda_text  : $template->agenda_text,
         zoom_url     => $template->zoom_url,
+        last_updated => $row ? $row->modified_ts
+                                   ->set_time_zone('UTC')
+                                   ->set_time_zone('local')
+                                   ->datetime(' ')
+                             : 'not yet updated',
     },
     { layout => 'unearth-page-wrapper' };
 };
@@ -125,6 +130,11 @@ get '/board-agenda/template' => requires_login sub {
         signed_in_as => vars->{signed_in_as}->email,
         agenda_text  => $tmpl ? $tmpl->agenda_text : '',
         zoom_url     => $tmpl ? $tmpl->zoom_url     : '',
+        last_updated => $tmpl ? $tmpl->modified_ts
+                                     ->set_time_zone('UTC')
+                                     ->set_time_zone('local')
+                                     ->datetime(' ')
+                             : 'not yet updated',
     },
     { layout => 'unearth-page-wrapper' };
 };

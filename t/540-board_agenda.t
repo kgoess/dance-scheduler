@@ -6,13 +6,13 @@ no warnings 'experimental::signatures';
 use utf8;
 
 use Data::Dump qw/dump/;
+use DateTime;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 25;
+use Test::More tests => 27;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
 use bacds::Scheduler::Util::Test qw/setup_test_db get_tester/;
-use bacds::Scheduler::Util::Time qw/get_now/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Model::BoardAgenda;
 
@@ -21,13 +21,14 @@ setup_test_db;
 my $test = get_tester(auth => 1);
 my $dbh = get_dbh();
 $ENV{TEST_NOW} = 1651112285;
+my $today_ymd = DateTime->from_epoch(epoch => $ENV{TEST_NOW}, time_zone => 'local')->ymd;
 
 my ($content, $agenda, $res);
 
 #
 # set up the blank agenda template
 #
-my $starting_template = "Board Agenda\nDate: [MEETING DATE]\n- Item 1\n- Item 2\n[ZOOM LINK]\n";
+my $starting_template = "Board Agenda\nDate: [MEETING DATE]\n- Item 1\n- Item 2\n[ZOOM LINK]\nupdated:[LAST UPDATED]";
 $res = $test->post('/board-agenda/template', {
     agenda_text => $starting_template,
     zoom_url => "https://zoom.us/whatever",
@@ -63,8 +64,8 @@ like $agenda, qr{\[MEETING DATE\]}, 'meeting date not set yet';
 #
 # make an edit
 #
-my $tomorrow = DateTime->from_epoch(epoch => $ENV{TEST_NOW} + 60*60*24)->ymd;
-my $updated_agenda = "Agenda\nlink: [ZOOM LINK]\ndate: $tomorrow\nupdated agenda blah blah";
+my $tomorrow = DateTime->from_epoch(epoch => $ENV{TEST_NOW} + 60*60*24, time_zone => 'local')->ymd;
+my $updated_agenda = "Agenda\nlink: [ZOOM LINK]\ndate: $tomorrow\nupdated agenda blah blah\nupdated: [LAST UPDATED]";
 $res = $test->post('/board-agenda/edit', {
     meeting_date => $tomorrow,
     agenda_text => $updated_agenda,
@@ -84,6 +85,7 @@ like $agenda, qr{updated agenda blah blah}, 'updated agenda now being served';
 like $agenda, qr{\[Zoom link available to board members\]}, 'no zoom link in public agenda';
 unlike $agenda, qr{\[MEETING DATE\]}, 'meeting date slug is gone';
 like $agenda, qr{date: $tomorrow\s*$}m, 'meeting date is filled in';
+like $agenda, qr{updated: $today_ymd [0-9]{2}:[0-9]{2}:[0-9]{2}}, 'updated timestamp ok';
 
 #
 # check out the endpoint for the copy-to-pastebuffer link
@@ -95,6 +97,7 @@ like $agenda, qr{updated agenda blah blah}, 'for paste: updated agenda now being
 like $agenda, qr{link: https://zoom.us/whatever}, 'for paste: zoom link is filled in';
 unlike $agenda, qr{\[MEETING DATE\]}, 'for paste: meeting date slug is gone';
 like $agenda, qr{date: $tomorrow\s*$}m, 'for paste: meeting date is filled in';
+like $agenda, qr{updated: $today_ymd [0-9]{2}:[0-9]{2}:[0-9]{2}}, 'updated timestamp ok';
 
 #
 # advance the date past the meeting date and what's served will reset

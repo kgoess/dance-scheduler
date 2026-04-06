@@ -136,8 +136,17 @@ sub get_public_text {
     my $text = $row ? $row->agenda_text : ($tmpl ? $tmpl->agenda_text : '');
     $text =~ s{\[ZOOM LINK\]}{[Zoom link available to board members]}g;
     $text =~ s{https://zoom.us[a-zA-Z0-9/?]+}{[Zoom link available to board members]}g; # failsafe
-    if ($row && (my $meeting_date = $row->meeting_date->ymd)) {
-        $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
+    if ($row) {
+        if (my $meeting_date = $row->meeting_date->ymd) {
+            $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
+        }
+        # it starts out in the "floating" time_zone, so we have to start it at
+        # UTC before converting
+        my $updated = $row->modified_ts
+            ->set_time_zone('UTC')
+            ->set_time_zone('local')
+            ->datetime(' ');
+        $text =~ s{\[LAST UPDATED]}{$updated};
     }
     return $text;
 }
@@ -158,8 +167,17 @@ sub get_email_text {
     my $text = $row ? $row->agenda_text : ($tmpl ? $tmpl->agenda_text : '');
     my $zoom = $tmpl ? $tmpl->zoom_url : '';
     $text =~ s{\[ZOOM LINK\]}{$zoom}g;
-    if ($row && (my $meeting_date = $row->meeting_date->ymd)) {
-        $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
+    if ($row) {
+        if (my $meeting_date = $row->meeting_date->ymd) {
+            $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
+        }
+        # it starts out in the "floating" time_zone, so we have to start it at
+        # UTC before converting
+        my $updated = $row->modified_ts
+            ->set_time_zone('UTC')
+            ->set_time_zone('local')
+            ->datetime(' ');
+        $text =~ s{\[LAST UPDATED]}{$updated};
     }
     return $text;
 }

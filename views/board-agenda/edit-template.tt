@@ -9,14 +9,21 @@
   <p><label for="zoom_url">Zoom URL (never published publicly)</label>
   <input type="url" id="zoom_url" name="zoom_url"
          value="<% zoom_url | html %>" placeholder="https://zoom.us/j/..."
-         size="80">
+         size="60">
 
   <p><label for="agenda_text">Agenda Template</label>
-  <p><small>Use <code>[ZOOM LINK]</code> where the Zoom URL should appear.
-     Use <code>[MEETING DATE]</code> as a slug for the date.</small></p>
+  <p>
+  <div>Placeholder slugs:</div>
+    <ul>
+      <li><code>[ZOOM LINK]</code> where the Zoom URL should appear
+      <li><code>[MEETING DATE]</code> for the meeting date field
+      <li><code>[LAST UPDATED]</code> for when the agenda was last edited
+  </ul>
+<br>
   <textarea id="agenda_text" name="agenda_text"
             rows="20" cols="80"><% agenda_text %></textarea>
 
   <p><button type="submit">Save Template</button>
+    <small>Last updated: <% last_updated | html %></small>
 </form>
 </div>
