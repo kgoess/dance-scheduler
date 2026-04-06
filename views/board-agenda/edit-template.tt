@@ -15,7 +15,7 @@
   <p><small>Use <code>[ZOOM LINK]</code> where the Zoom URL should appear.
      Use <code>[MEETING DATE]</code> as a slug for the date.</small></p>
   <textarea id="agenda_text" name="agenda_text"
-            rows="30" cols="80"><% agenda_text %></textarea>
+            rows="20" cols="80"><% agenda_text %></textarea>
 
   <p><button type="submit">Save Template</button>
 </form>

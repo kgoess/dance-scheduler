@@ -18,7 +18,7 @@
   <label for="agenda_text">Agenda:</label>
   </p>
   <textarea id="agenda_text" name="agenda_text"
-            rows="30" cols="80"><% agenda_text %></textarea>
+            rows="20" cols="80"><% agenda_text %></textarea>
 
   <p><button type="submit">Save Agenda</button>
 </form>
