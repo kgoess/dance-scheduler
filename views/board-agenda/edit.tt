@@ -1,0 +1,60 @@
+<div id="agenda-edit-form" style="margin-bottom: 10em">
+<h1>Board Meeting Agenda</h1>
+<p>[<a href="/board-agenda/template">Edit agenda template &amp; Zoom URL</a>]</p>
+
+<form method="post" action="/board-agenda/edit">
+
+  <label for="meeting_date">Meeting Date</label>
+  <input type="date" id="meeting_date" name="meeting_date"
+         value="<% meeting_date %>" required>
+  <div>Placeholder slugs:</div>
+  <ul>
+    <li><code>[ZOOM LINK]</code> will be filled in with "<% zoom_url | html %>" when you press the "copy for email" button
+    <li><code>[MEETING DATE]</code> will be filled in with the meeting date field
+  </ul>
+
+  <p>
+  <label for="agenda_text">Agenda:</label>
+  </p>
+  <textarea id="agenda_text" name="agenda_text"
+            rows="30" cols="80"><% agenda_text %></textarea>
+
+  <p><button type="submit">Save Agenda</button>
+</form>
+
+<hr>
+<button id="copy-btn" type="button">Copy agenda with Zoom link (for board email)</button>
+<span id="copy-status"></span>
+
+</div>
+
+<script>
+document.getElementById('copy-btn').addEventListener('click', async (event) => {
+
+    const resp = await fetch('/board-agenda/email-text');
+    const data = await resp.json();
+    try {
+        await navigator.clipboard.writeText(data.text);
+    } catch (err) {
+        console.log("writeText caught err: ", err);
+        alert("copy-to-clipboard only works under https");
+        return;
+    }
+    document.getElementById('copy-status').textContent = '✓ Copied!';
+    setTimeout(() => document.getElementById('copy-status').textContent = '', 3000);
+});
+
+const inputEls = document.querySelectorAll('#agenda_text, #meeting_date');
+
+inputEls.forEach(el => {
+  el.addEventListener('input', () => {
+    const copyBtn = document.getElementById('copy-btn');
+    if (copyBtn.disabled == false) {
+        copyBtn.innerHTML = copyBtn.innerHTML + ' *** You need to save your changes before taking a copy with this button ***';
+    }
+
+    copyBtn.disabled = true;
+  });
+});
+
+</script>

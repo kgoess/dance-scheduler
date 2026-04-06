@@ -24,6 +24,8 @@ tables="
     audit_logs
     parent_orgs
     role_pairs
+    board_agenda
+    board_agenda_template
 "
 
 # leaving programmers so we don't have to keep re-establishing the test passwords

@@ -1,0 +1,7 @@
+<div id="public-meeting-agenda">
+<h1>BACDS Board Meeting Agenda</h1>
+<p><em>This agenda is updated as items are added throughout the month.
+Check back closer to the meeting date for the final version.</em></p>
+
+<pre><% agenda_text | html %></pre>
+</div>
