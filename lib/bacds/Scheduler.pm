@@ -38,6 +38,7 @@ use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref/;
 use YAML qw/Load/;
 
 use bacds::Scheduler::Auditor;
+use bacds::Scheduler::BoardAgenda; # loads routes under /board-agenda/
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::ICal;
 use bacds::Scheduler::Plugin::AccordionConfig;
