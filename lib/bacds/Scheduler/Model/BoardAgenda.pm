@@ -142,7 +142,15 @@ sub get_public_text {
         }
 
         # draft_minutes_url never goes to the public
-        $text =~ s{^ *\[DRAFT MINUTES URL\](\n|\r\n)?}{}gms;
+        # if it's on a line by itself, remove the whole line
+        # otherwise just remove the slug
+        $text =~ s{
+            (
+                (?-x:^ *\[DRAFT MINUTES URL\](\n|\r\n)?)
+                |
+                (?-x:\[DRAFT MINUTES URL\])
+            )
+        }{}xmsg;
 
         # it starts out in the "floating" time_zone, so we have to start it at
         # UTC before converting

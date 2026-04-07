@@ -8,7 +8,7 @@ use utf8;
 use Data::Dump qw/dump/;
 use DateTime;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 34;
+use Test::More tests => 37;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -119,3 +119,34 @@ like $agenda, qr{- Item 1\s+- Item 2}ms, 'back to empty template agenda';
 like $agenda, qr{\[MEETING DATE\]}, "the next meeting date isn't set yet";
 like $agenda, qr{\[DRAFT MINUTES URL\]}, 'draft minutes url not set yet';
 
+#
+# test fancy removal handling of the slug
+#
+#
+# make an edit
+#
+$tomorrow = DateTime->from_epoch(epoch => $ENV{TEST_NOW} + 60*60*24, time_zone => 'local')->ymd;
+$updated_agenda = <<EOL;
+- Approve minutes
+    [DRAFT MINUTES URL]
+here is some text [DRAFT MINUTES URL] more text
+EOL
+$res = $test->post('/board-agenda/edit', {
+    meeting_date => $tomorrow,
+    agenda_text => $updated_agenda,
+    draft_minutes_url => 'https://github.com/asdfasdf',
+});
+ok $res->is_redirect, 'POST gave us a 303 redirect';
+$test->get_ok('/board-agenda');
+$content = $test->content;
+$content =~ m{<div id="public-meeting-agenda".*?>(.+?)</div>}ms
+    or die "can't find public-meeting-agenda div in response: $content";
+$agenda = $1;
+$content =~ m{<pre>(.+?)</pre>}ms
+    or die "can't find pre tags in content $content";
+$agenda = $1;
+$agenda =~ s/\r\n/\n/g;
+is $agenda, <<EOL, 'special DRAFT MINUTES URL slug removal ok';
+- Approve minutes
+here is some text  more text
+EOL
