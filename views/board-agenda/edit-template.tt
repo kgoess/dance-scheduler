@@ -11,14 +11,15 @@
          value="<% zoom_url | html %>" placeholder="https://zoom.us/j/..."
          size="60">
 
-  <p><label for="agenda_text">Agenda Template</label>
   <p>
   <div>Placeholder slugs:</div>
     <ul>
       <li><code>[ZOOM LINK]</code> where the Zoom URL should appear
       <li><code>[MEETING DATE]</code> for the meeting date field
+      <li><code>[DRAFT MINUTES URL]</code> will not be shown to the public, is only in the copy-for-email button
       <li><code>[LAST UPDATED]</code> for when the agenda was last edited
   </ul>
+  <p><label for="agenda_text">Agenda Template:</label>
 <br>
   <textarea id="agenda_text" name="agenda_text"
             rows="20" cols="80"><% agenda_text %></textarea>
