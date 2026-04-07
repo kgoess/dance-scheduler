@@ -8,7 +8,7 @@ use utf8;
 use Data::Dump qw/dump/;
 use DateTime;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 27;
+use Test::More tests => 34;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -28,7 +28,7 @@ my ($content, $agenda, $res);
 #
 # set up the blank agenda template
 #
-my $starting_template = "Board Agenda\nDate: [MEETING DATE]\n- Item 1\n- Item 2\n[ZOOM LINK]\nupdated:[LAST UPDATED]";
+my $starting_template = "Board Agenda\nDate: [MEETING DATE]\n- Item 1\n- Item 2\n[ZOOM LINK]\n   [DRAFT MINUTES URL]\nupdated:[LAST UPDATED]";
 $res = $test->post('/board-agenda/template', {
     agenda_text => $starting_template,
     zoom_url => "https://zoom.us/whatever",
@@ -48,6 +48,7 @@ $agenda = $1;
 like $agenda, qr{- Item 1\s+- Item 2}ms, 'starting with empty template in public agenda';
 like $agenda, qr{\[Zoom link available to board members\]}, 'no zoom link in public agenda';
 like $agenda, qr{\[MEETING DATE\]}, 'meeting date not set yet';
+like $agenda, qr{\[DRAFT MINUTES URL\]}, 'minutes url not set yet';
 
 #
 # fetch edit page
@@ -60,15 +61,17 @@ $agenda = $1;
 like $agenda, qr{- Item 1\s+- Item 2}ms, 'starting with empty template in public agenda';
 like $agenda, qr{\[ZOOM LINK\]}, 'zoom link slug is present';
 like $agenda, qr{\[MEETING DATE\]}, 'meeting date not set yet';
+like $agenda, qr{\[DRAFT MINUTES URL\]}, 'draft minutes url not set yet';
 
 #
 # make an edit
 #
 my $tomorrow = DateTime->from_epoch(epoch => $ENV{TEST_NOW} + 60*60*24, time_zone => 'local')->ymd;
-my $updated_agenda = "Agenda\nlink: [ZOOM LINK]\ndate: $tomorrow\nupdated agenda blah blah\nupdated: [LAST UPDATED]";
+my $updated_agenda = "Agenda\nlink: [ZOOM LINK]\ndate: $tomorrow\nupdated agenda blah blah\n[DRAFT MINUTES URL]\nupdated: [LAST UPDATED]";
 $res = $test->post('/board-agenda/edit', {
     meeting_date => $tomorrow,
     agenda_text => $updated_agenda,
+    draft_minutes_url => 'https://github.com/asdfasdf',
 });
 ok $res->is_redirect, 'POST gave us a 303 redirect';
 is $res->header('location'), 'http://localhost/board-agenda/edit', 'and the redirect is to /board-agenda/edit';
@@ -86,6 +89,8 @@ like $agenda, qr{\[Zoom link available to board members\]}, 'no zoom link in pub
 unlike $agenda, qr{\[MEETING DATE\]}, 'meeting date slug is gone';
 like $agenda, qr{date: $tomorrow\s*$}m, 'meeting date is filled in';
 like $agenda, qr{updated: $today_ymd [0-9]{2}:[0-9]{2}:[0-9]{2}}, 'updated timestamp ok';
+unlike $agenda, qr{\[DRAFT MINUTES URL\]}, 'draft minutes url slug is gone';
+unlike $agenda, qr{https://github.com/asdfasdf}, 'draft minutes url not shown to public';
 
 #
 # check out the endpoint for the copy-to-pastebuffer link
@@ -98,6 +103,8 @@ like $agenda, qr{link: https://zoom.us/whatever}, 'for paste: zoom link is fille
 unlike $agenda, qr{\[MEETING DATE\]}, 'for paste: meeting date slug is gone';
 like $agenda, qr{date: $tomorrow\s*$}m, 'for paste: meeting date is filled in';
 like $agenda, qr{updated: $today_ymd [0-9]{2}:[0-9]{2}:[0-9]{2}}, 'updated timestamp ok';
+unlike $agenda, qr{\[DRAFT MINUTES URL\]}, 'draft minutes url slug is gone';
+like $agenda, qr{https://github.com/asdfasdf}, 'draft minutes url not shown to public';
 
 #
 # advance the date past the meeting date and what's served will reset
@@ -110,4 +117,5 @@ $content =~ m{<div id="public-meeting-agenda".*?>(.+?)</div>}ms
 $agenda = $1;
 like $agenda, qr{- Item 1\s+- Item 2}ms, 'back to empty template agenda';
 like $agenda, qr{\[MEETING DATE\]}, "the next meeting date isn't set yet";
+like $agenda, qr{\[DRAFT MINUTES URL\]}, 'draft minutes url not set yet';
 

@@ -65,6 +65,13 @@ __PACKAGE__->table("board_agenda");
   datetime_undef_if_invalid: 1
   is_nullable: 0
 
+=head2 draft_minutes_url
+
+  data_type: 'varchar'
+  default_value: (empty string)
+  is_nullable: 0
+  size: 512
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -86,6 +93,8 @@ __PACKAGE__->add_columns(
     datetime_undef_if_invalid => 1,
     is_nullable => 0,
   },
+  "draft_minutes_url",
+  { data_type => "varchar", default_value => "", is_nullable => 0, size => 512 },
 );
 
 =head1 PRIMARY KEY
@@ -100,8 +109,9 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("board_agenda_id");
 
-# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-04-06 10:50:29
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:NxYWVD/d6xtTCEJFm6Q6/w
+
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-04-07 06:42:58
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:dhhfoKfLPI/J6Yes7RUKgQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -13,11 +13,15 @@
     standing template until you get around to changing the date into the future for
     the next month's meeting.
   </div>
+  <label for="draft_minutes_url">Draft Minutes URL</label>
+  <input type="url" id="draft_minutes_url" name="draft_minutes_url" size="30"
+         value="<% draft_minutes_url %>" >
   <div>Placeholder slugs:</div>
   <ul>
     <li><code>[ZOOM LINK]</code> will be filled in with the zoom url from the <a href="<% request.uri_for('/board-agenda/template') %>">agenda template</a> when you press the "copy for email" button:
     <br>...<small><% zoom_url | html %>"</small>
     <li><code>[MEETING DATE]</code> will be filled in with the meeting date field
+    <li><code>[DRAFT MINUTES URL]</code> will not be shown to the public, is only in the copy-for-email button
     <li><code>[LAST UPDATED]</code> for when the agenda was last edited
   </ul>
 

@@ -98,7 +98,7 @@ Updates the single row in the board_agenda table.
 
 sub save_agenda {
     my ($class, %args) = @_;
-    # %args: meeting_date, agenda_text
+    # %args: meeting_date, agenda_text, draft_minutes_url
     # Note: zoom_url is NOT stored in board_agenda, it lives in the template
     my $dbh = get_dbh();
     my $now = get_now();
@@ -140,6 +140,10 @@ sub get_public_text {
         if (my $meeting_date = $row->meeting_date->ymd) {
             $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
         }
+
+        # draft_minutes_url never goes to the public
+        $text =~ s{^ *\[DRAFT MINUTES URL\](\n|\r\n)?}{}gms;
+
         # it starts out in the "floating" time_zone, so we have to start it at
         # UTC before converting
         my $updated = $row->modified_ts
@@ -170,6 +174,9 @@ sub get_email_text {
     if ($row) {
         if (my $meeting_date = $row->meeting_date->ymd) {
             $text =~ s{\[MEETING DATE\]}{$meeting_date}g;
+        }
+        if (my $draft_minutes_url = $row->draft_minutes_url) {
+            $text =~ s{\[DRAFT MINUTES URL\]}{$draft_minutes_url}g;
         }
         # it starts out in the "floating" time_zone, so we have to start it at
         # UTC before converting

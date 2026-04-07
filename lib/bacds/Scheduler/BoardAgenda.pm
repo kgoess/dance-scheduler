@@ -71,12 +71,13 @@ get '/board-agenda/edit' => requires_login sub {
         ->get_template_row();
 
     template 'board-agenda/edit' => {
-        title        => 'Edit Board Agenda',
-        signed_in_as => vars->{signed_in_as}->email,
-        meeting_date => $row ? $row->meeting_date->strftime('%Y-%m-%d') : '',
-        agenda_text  => $row ? $row->agenda_text  : $template->agenda_text,
-        zoom_url     => $template->zoom_url,
-        last_updated => $row ? $row->modified_ts
+        title             => 'Edit Board Agenda',
+        signed_in_as      => vars->{signed_in_as}->email,
+        meeting_date      => $row ? $row->meeting_date->strftime('%Y-%m-%d') : '',
+        agenda_text       => $row ? $row->agenda_text  : $template->agenda_text,
+        zoom_url          => $template->zoom_url,
+        draft_minutes_url => $row ? $row->draft_minutes_url : '',
+        last_updated      => $row ? $row->modified_ts
                                    ->set_time_zone('UTC')
                                    ->set_time_zone('local')
                                    ->datetime(' ')
@@ -94,11 +95,13 @@ Accepts submission of the edit form, does post-redirect-get.
 post '/board-agenda/edit' => requires_login sub {
     my $meeting_date = body_parameters->get('meeting_date')
         or send_error 'missing meeting_date' => 400;
+    my $draft_minutes_url = body_parameters->get('draft_minutes_url') // '';
     my $agenda_text = body_parameters->get('agenda_text') // '';
 
     bacds::Scheduler::Model::BoardAgenda->save_agenda(
-        meeting_date => $meeting_date,
-        agenda_text  => $agenda_text,
+        meeting_date      => $meeting_date,
+        agenda_text       => $agenda_text,
+        draft_minutes_url => $draft_minutes_url,
     );
     redirect uri_for('/board-agenda/edit') => 303;
 };
