@@ -316,6 +316,16 @@ font-size: 10px;
     display: flex;
     flex-direction: column;
 }
+.search-flex {
+    display: flex;
+}
+.search-flex .clickable-list-input {
+    flex: 1;
+}
+.search-flex .search-date{
+    flex: 0 content;
+    padding: 3px;
+}
 
 .button-container {
     display: flex;

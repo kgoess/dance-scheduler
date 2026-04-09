@@ -85,7 +85,10 @@
 <div class="list-and-button">
     <form><!-- This is filled via loadListForModel() --> 
         <div class="flex-vertical">
-            <input class="clickable-list-input" placeholder="search...">
+            <div class="search-flex">
+                <input class="clickable-list-input" placeholder="search...">
+                <% IF content.show_date_selector %><span class="search-date">from-date</span><% END %>
+            </div>
             <div><select class="clickable-list" size="10">
             </select></div>
         </div>

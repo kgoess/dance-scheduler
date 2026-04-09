@@ -35,6 +35,7 @@
   fold_listbox_label_json: '["start_date", "synthetic_name"]'
   fold_model: event
   fold_vars:
+    show_date_selector: true
     form_id: event-display-form
     scripts:
       - events
