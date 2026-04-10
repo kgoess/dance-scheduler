@@ -70,8 +70,13 @@
                   href="<% event.gcal_link %>"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style="display:inline-block; color:#555555; font-family:Arial,sans-serif; font-size:12px; padding:4px 10px; border:1px solid #bbbbbb; border-radius:3px; text-decoration:none; margin-top:6px;"
-                > + Add to Google Calendar </a>
+                  class="calendar-subscription-button"
+                > + Google Calendar </a>
+                <a href="<% event.ical_link %>"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="calendar-subscription-button"
+                > + iCal export</a>
             <% END %>
         </article>
         <% ldjson %>

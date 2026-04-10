@@ -7,7 +7,7 @@ use utf8;
 
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 18;
+use Test::More tests => 22;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -134,6 +134,7 @@ basic_test();
 test_url_endpoint($test);
 test_get_dst_transition_starts();
 test_gcal_ical_urls();
+test_ical_for_event($test);
 
 sub basic_test {
 
@@ -262,16 +263,110 @@ sub test_get_dst_transition_starts {
 }
 
 sub test_gcal_ical_urls {
-
     my $rs = bacds::Scheduler::Model::DanceFinder
         ->search_events();
-
     my @events = $rs->all;
-
     my $event = $events[0];
 
     is $event->gcal_link, 'https://www.google.com/calendar/event?action=TEMPLATE&ctz=America%2FLos_Angeles&dates=20220501T200000%2F20220501T220000&details=Rose+Gamgee+itsa+shortdesc+1+%E7%84%A1%E7%82%BA&location=the+hall%2C+123+Sesame+St.%2C+Gotham%2C+CA%2C+USA&sprop=website%3Ahttps%3A%2F%2Fbacds.org%2Fbree-mersday-eng&text=Bree+Mersday+English&trp=false',
      'gcal link ok';
 
-    is $event->ical_link, 'https://TBD', 'ical link TBD';
+    is $event->ical_link, 'https://bacds.org/ical-event/1', 'ical link TBD';
+}
+
+sub test_ical_for_event ($test) {
+    my $rs = bacds::Scheduler::Model::DanceFinder
+        ->search_events();
+    my @events = $rs->all;
+    my $event = $events[0];
+
+    is $event->ical_link, 'https://bacds.org/ical-event/1',
+     'ical link ok';
+
+    $test->get_ok($event->ical_link, 'fetched '.$event->ical_link.' ok');
+    ok($test->success, 'got /ical-event');
+
+    my $got = $test->content;
+    $got =~ s/UID:[\w-]+/UID:...snip.../;
+    my @got = split /\r\n/, $got;
+
+    my @expected = split /\n/, <<EOL;
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:Data::ICal 0.24
+X-WR-CALNAME:Bree Mersday English
+BEGIN:VTIMEZONE
+TZID:America/Los_Angeles
+BEGIN:DAYLIGHT
+DTSTART:20220313T100000
+TZNAME:PDT
+TZOFFSETFROM:-0800
+TZOFFSETTO:-0700
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20221106T090000
+TZNAME:PST
+TZOFFSETFROM:-0700
+TZOFFSETTO:-0800
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+CATEGORIES:pipesmoking
+CATEGORIES:maypole
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為
+DTEND;TZID=America/Los_Angeles:20220501T220000
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220501T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:the hall\\, 123 Sesame St.\\, Gotham
+ORGANIZER:Bree Mersday English
+STATUS:CONFIRMED
+SUMMARY:Bree Mersday English: Rose Gamgee
+UID:...snip...
+URL:https://bacds.org/bree-mersday-eng
+END:VEVENT
+END:VCALENDAR
+EOL
+
+    eq_or_diff \@got, \@expected, 'ical-event content';
+
+# from nbcds event page:
+#BEGIN:VCALENDAR
+#VERSION:2.0
+#PRODID:-//North Bay Country Dance Society - ECPv5.0.3.1//NONSGML v1.0//EN
+#CALSCALE:GREGORIAN
+#METHOD:PUBLISH
+#X-WR-CALNAME:North Bay Country Dance Society
+#X-ORIGINAL-URL:https://nbcds.org
+#X-WR-CALDESC:Events for North Bay Country Dance Society
+#BEGIN:VTIMEZONE
+#TZID:America/Los_Angeles
+#BEGIN:DAYLIGHT
+#TZOFFSETFROM:-0800
+#TZOFFSETTO:-0700
+#TZNAME:PDT
+#DTSTART:20260308T100000
+#END:DAYLIGHT
+#BEGIN:STANDARD
+#TZOFFSETFROM:-0700
+#TZOFFSETTO:-0800
+#TZNAME:PST
+#DTSTART:20261101T090000
+#END:STANDARD
+#END:VTIMEZONE
+#BEGIN:VEVENT
+#DTSTART;TZID=America/Los_Angeles:20260411T140000
+#DTEND;TZID=America/Los_Angeles:20260411T140000
+#DTSTAMP:20260410T170146
+#CREATED:20251215T033019Z
+#LAST-MODIFIED:20251215T033406Z
+#UID:11059-1775916000-1775916000@nbcds.org
+#SUMMARY:Marin English Country Dance
+#DESCRIPTION:\n\nApril 11\, 2026 @ 2:00 pm – 4:30 pm\n\n\n\nCaller: Bruce Herbold \nMusicians: Charlie Hancock...
+#URL:https://nbcds.org/event/marin-english-country-dance-12/
+#CATEGORIES:English Country Dance
+#END:VEVENT
+
 }

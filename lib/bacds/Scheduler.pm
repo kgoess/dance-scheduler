@@ -112,6 +112,7 @@ register_type_check 'DancefinderResultsFormat' => sub {
     return $_[0] =~ m{^(ical)$}i # only the one format currently
 };
 
+
 preload_accordion_config;
 
 
@@ -309,7 +310,7 @@ get '/login' => sub {
     {layout => undef},
 };
 
-=head2 ical
+=head2 get /ical
 
 Gives you a .ics/iCalendar format of upcoming events.
 
@@ -323,7 +324,6 @@ endpoint for the version that does take parameters.
 =cut
 
 get '/ical' => sub {
-
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
         parent_org => [bacds_parent_org_id()],
     #   end_date   => $end_date,
@@ -340,6 +340,34 @@ get '/ical' => sub {
         \@events, request->scheme, request->host,
     );
 };
+
+=head2 get /ical-event
+
+Returns the .ics iCalendar for a single event
+
+=cut
+
+get '/ical-event/:event' => with_types [
+    ['route', 'event', 'SchedulerId'],
+] => sub {
+    my $event_id = route_parameters->get('event');
+    my $dbh = get_dbh(debug => 0);
+    my $event = $dbh->resultset('Event')->find({
+        #is_deleted => 0,
+        event_id => $event_id,
+    }) or die "ical-event can't find event $event_id";
+
+    my $event_name =
+        $event->name                             ||
+        ($event->series && $event->series->name) ||
+        $event->synthetic_name;
+
+    content_type 'text/calendar';
+    return bacds::Scheduler::ICal->events_to_ical(
+        [$event], request->scheme, request->host, $event_name,
+    );
+};
+
 
 my $_bacds_parent_org_id;
 sub bacds_parent_org_id {

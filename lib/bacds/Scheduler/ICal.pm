@@ -120,6 +120,11 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     my $url = $e->custom_url
         || $e->series && $e->series->get_canonical_url($canonical_scheme, $canonical_host)
         || 'https://bacds.org';
+    # instead of the series page we could also link back to the
+    # individual event on the series page?
+    # https://bacds.org/dance-scheduler/series-page?event_id=4765
+    # but I think it's better to show them all the other events in
+    # the series
 
     my $location;
     if ($e->venues && (my $venue = $e->venues->first)) {
@@ -356,7 +361,6 @@ See details on params at
 =cut
 
 sub event_to_gcal_link ($class, $e) {
-
     my $gcal_url = URI->new('https://www.google.com/calendar/event');
 
     my $dtstart = join '',
@@ -403,13 +407,12 @@ sub event_to_gcal_link ($class, $e) {
     $gcal_url->query_form(\%query_form);
 
     return $gcal_url->as_string;
-
 }
 
 sub event_to_ical_link ($class, $event) {
+    my $event_id = $event->event_id;
 
-    return 'https://TBD';
-
+    return "https://bacds.org/ical-event/$event_id";
 }
 
 1;

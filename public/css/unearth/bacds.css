@@ -184,3 +184,15 @@ a.quieter-link  {
 a.quieter-link:hover {
   text-decoration: underline;
 }
+
+.calendar-subscription-button {
+  display:inline-block;
+  color:#555555;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  padding:4px 10px;
+  border:1px solid #bbbbbb;
+  border-radius:3px;
+  text-decoration:none;
+  margin-top:6px;"
+}
