@@ -29,6 +29,7 @@ use Data::ICal::Entry::TimeZone;
 use Data::ICal::Entry::TimeZone::Standard;
 use Data::ICal::Entry::TimeZone::Daylight;
 use DateTime;
+use HTML::Entities qw/decode_entities/;
 use List::Util qw/first/;
 
 use bacds::Scheduler::Util::Time qw/get_now/;
@@ -259,6 +260,8 @@ sub calendar_description_for_event ($e, $callers=undef, $bands=undef, $talent=un
     $d =~ s/\n/ /g;
     $d =~ s/<.+?>/ /g; # html tags
     $d =~ s/  +/ /g; # multiple spaces
+
+    decode_entities($d); # remove e.g. &#8212;
 
     return $d;
 }

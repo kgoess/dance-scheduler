@@ -104,7 +104,7 @@ my $event_1 = {
     end_date => "2022-05-01",
     end_time => "22:00",
 
-    short_desc  => "itsa shortdesc 1 無為",
+    short_desc  => "itsa shortdesc 1 無為 X&mdash;Y",
     is_canceled => 0,
     and_friends => 0,
     is_series_defaults => 0,
@@ -164,7 +164,7 @@ CATEGORIES:pipesmoking
 CATEGORIES:maypole
 CLASS:PUBLIC
 CREATED:20220428T021805
-DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為
+DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為 X—Y
 DTEND;TZID=America/Los_Angeles:20220501T220000
 DTSTAMP:20220428T021805
 DTSTART;TZID=America/Los_Angeles:20220501T200000
@@ -217,7 +217,7 @@ CATEGORIES:pipesmoking
 CATEGORIES:maypole
 CLASS:PUBLIC
 CREATED:20220428T021805
-DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為
+DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為 X—Y
 DTEND;TZID=America/Los_Angeles:20220501T220000
 DTSTAMP:20220428T021805
 DTSTART;TZID=America/Los_Angeles:20220501T200000
@@ -268,7 +268,7 @@ sub test_gcal_ical_urls {
     my @events = $rs->all;
     my $event = $events[0];
 
-    is $event->gcal_link, 'https://www.google.com/calendar/event?action=TEMPLATE&ctz=America%2FLos_Angeles&dates=20220501T200000%2F20220501T220000&details=Rose+Gamgee+itsa+shortdesc+1+%E7%84%A1%E7%82%BA&location=the+hall%2C+123+Sesame+St.%2C+Gotham%2C+CA%2C+USA&sprop=website%3Ahttps%3A%2F%2Fbacds.org%2Fbree-mersday-eng&text=Bree+Mersday+English&trp=false',
+    is $event->gcal_link, 'https://www.google.com/calendar/event?action=TEMPLATE&ctz=America%2FLos_Angeles&dates=20220501T200000%2F20220501T220000&details=Rose+Gamgee+itsa+shortdesc+1+%E7%84%A1%E7%82%BA+X%E2%80%94Y&location=the+hall%2C+123+Sesame+St.%2C+Gotham%2C+CA%2C+USA&sprop=website%3Ahttps%3A%2F%2Fbacds.org%2Fbree-mersday-eng&text=Bree+Mersday+English&trp=false',
      'gcal link ok';
 
     is $event->ical_link, 'https://bacds.org/ical-event/1', 'ical link TBD';
@@ -315,7 +315,7 @@ CATEGORIES:pipesmoking
 CATEGORIES:maypole
 CLASS:PUBLIC
 CREATED:20220428T021805
-DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為
+DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為 X—Y
 DTEND;TZID=America/Los_Angeles:20220501T220000
 DTSTAMP:20220428T021805
 DTSTART;TZID=America/Los_Angeles:20220501T200000
