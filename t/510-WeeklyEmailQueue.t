@@ -3,6 +3,7 @@ use 5.32.1;
 use warnings;
 use feature 'signatures';
 no warnings "experimental::signatures";
+use open qw(:std :encoding(UTF-8)); # for "wide characer in print" from unit tests
 
 use File::Basename qw/dirname/;
 use Test::More tests => 5;
@@ -34,7 +35,7 @@ sub basic_test ($basedir) {
     my $queuedir = "$basedir/".QUEUE_DIRNAME;
     open my $fh, ">", "$queuedir/file1.md";
     print $fh <<EOL;
-this is first entry
+this is first entry utf8:caller\x{2019}s
 ---------------
 EOL
     close $fh;
@@ -56,10 +57,10 @@ EOL
 
     ($html, $text) = $q->get_next;
     is $html, <<EOL;
-<h2>this is first entry</h2>
+<h2>this is first entry utf8:caller\x{2019}s</h2>
 EOL
     is $text, <<EOL;
-this is first entry
+this is first entry utf8:caller\x{2019}s
 ---------------
 EOL
 

@@ -98,7 +98,7 @@ sub init ($self) {
         next if $entry =~ /^README/;
         my $fullpath = "$queuedir/$entry";
         next if -d $fullpath;
-        open my $fh, "<", $fullpath or die "can't read $fullpath $!";
+        open my $fh, "<:utf8", $fullpath or die "can't read $fullpath $!";
         my $markdown = join '', <$fh>;
 
         push $self->_filenames->@*, $entry;
