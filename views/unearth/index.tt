@@ -85,16 +85,41 @@
     </div>
     <div id="ical-subscribe-section">
         <div class="row justify-content-center">
-          <div class="col-md-12 text-center">
-            <div class="block-heading-1">
+          <div class="col-md-12">
+            <div class="block-heading-1  text-center">
               <h2>Never Miss a Dance!</h2>
             </div>
-            <div class="fs-5 mx-5" style="xwidth: 400px">
-              <p>Use this link to add a calendar to your Google Calendar, Apple iCal or compatible app:
+            <div class="fs-5 mx-5" style="width: 800px">
+              <!-- <p>Use this link to add a calendar to your Google Calendar, Apple iCal or compatible app:
                 <blockquote>
                   <a href="https://bacds.org/ical">https://bacds.org/ical</a>
                 </blockquote>
               <p>Or if you only want to subscribe to <em>some</em> of our vast offering of events, use the <a href="#dancefinder-section">Dance Finder</a> below to pick what you like, and subscribe to that on its results page.
+                -->
+                <p>
+                Subscribe to all upcoming events: 
+                <a href="https://bacds.org/ical"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="calendar-subscription-button"
+                > + iCal subscription (updates automatically)</a>
+                <button type="button" class="btn btn-link p-0"
+                        data-bs-toggle="popover"
+                        data-bs-title="Subscribe with iCal"
+                        data-bs-content='
+                         Don&apos;t click on the button, but ctrl-click on it to copy the link.<br>
+                         Then go to your calendaring app&mdash;Google Calendar or Apple Calendar or whatever.<br>
+                         Find the place to add a new calendar subscription by url, paste the link there, and you should have a new calendar named something like "Berkeley Contra" which you can turn on and off at will.<br>
+                         Enjoy!<hr>
+                         <img width="200px" src="/images/unearth/calendar-subscribe.png">
+                        '
+                  >
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                <p>Or go to a series page to subscribe just to the events for that series.
+                <p>Or if you want to subscribe to a custom set of events, use
+                   the <a href="#dancefinder-section">Dance Finder</a> below to pick what you
+                   like, and subscribe to that on the Dance Finder results page.
             </div>
           </div>
       </div>
