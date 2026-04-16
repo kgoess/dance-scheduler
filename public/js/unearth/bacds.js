@@ -28,6 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       calendar.render();
     }
+    // this is for the (?) iCal help
+    $('[data-bs-toggle="popover"]').popover({
+        html: true,
+    })
 });
 
 /** multi-level dropdown code from https://stackoverflow.com/a/66470962 */
