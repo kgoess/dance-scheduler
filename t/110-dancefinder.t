@@ -545,7 +545,7 @@ sub test_dancefinder_results_endpoint_ical {
     is @ical_hashes, 1, 'only one event matches these params';
 
     my %expected = (
-      "DESCRIPTION" => "music by test band 1\\, test band 2muso 3 big dance party &#9786",
+      "DESCRIPTION" => "music by test band 1\\, test band 2: muso 3 big dance party \x{263a}", # that's a ☺
       "LOCATION" => "Mr. Hooper's Store\\, 123 Sesame St.\\, Sunny Day",
       "ORGANIZER" => "The Dance-A-Week Series",
       "SUMMARY" => "test event 1",
@@ -713,6 +713,8 @@ sub test_serieslister_endpoint {
             </p> \s+
             <p.class=".+?">8:00pm \s+
             </p> \s+
+            (?ms-x:<a.+> \+ Google Calendar </a>) \s+
+            (?ms-x:<a.+> \+ iCal export</a>) \s+
         </article>
     }msx, 'serieslist id output ok';
 
@@ -735,6 +737,8 @@ sub test_serieslister_endpoint {
             </p> \s+
             <p.class=".+?">8:00pm \s+
             </p> \s+
+             (?ms-x:<a.+> \+ Google Calendar </a>) \s+
+             (?ms-x:<a.+> \+ iCal export</a>) \s+
         </article>
     }x, 'serieslist xid output ok';
 }
