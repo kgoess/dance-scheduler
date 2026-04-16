@@ -1,6 +1,8 @@
 
 use 5.16.0;
 use warnings;
+use open ':std', ':encoding(utf8)'; # "wide character in print" warnings from test outpu
+
 
 # this tests dancefinder and livecalendar and serieslister, both the backend
 # and the url endpoints
