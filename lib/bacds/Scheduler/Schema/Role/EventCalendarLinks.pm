@@ -1,4 +1,4 @@
-package bacds::Scheduler::Schema::Role::CalendarLinks;
+package bacds::Scheduler::Schema::Role::EventCalendarLinks;
 
 use 5.32.1;
 use warnings;

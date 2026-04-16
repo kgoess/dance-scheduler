@@ -32,7 +32,10 @@
 
             <!-- *** here's the meat of the page *** -->
             <!-- *** all the events are displayed from this include *** -->
+            <section>
+            <% INCLUDE "serieslister/ical-link-for-series.tt" series=series %>
             <% INCLUDE "serieslister/events-for-series.tt" %>
+            </section>
 
         </main>
 

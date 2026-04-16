@@ -341,7 +341,7 @@ get '/ical' => sub {
     );
 };
 
-=head2 get /ical-event
+=head2 get /ical-event/:event_id
 
 Returns the .ics iCalendar for a single event
 
@@ -355,7 +355,7 @@ get '/ical-event/:event' => with_types [
     my $event = $dbh->resultset('Event')->find({
         #is_deleted => 0,
         event_id => $event_id,
-    }) or die "ical-event can't find event $event_id";
+    }) or send_error "ical-event can't find event $event_id"=> 400;
 
     my $event_name =
         $event->name                             ||
@@ -365,6 +365,33 @@ get '/ical-event/:event' => with_types [
     content_type 'text/calendar';
     return bacds::Scheduler::ICal->events_to_ical(
         [$event], request->scheme, request->host, $event_name,
+    );
+};
+
+=head2 get /ical-series/:series-xid
+
+Returns the .ics iCalendar subscription link for a series_xid
+e.g. https://bacds.org//ical-series/BERK-CONTRA
+
+=cut
+
+get '/ical-series/:series-xid' => with_types [
+    ['route', 'series-xid', 'XID'],
+] => sub {
+    my $dbh = get_dbh(debug => 0);
+    my $series_xid = route_parameters->get('series-xid');
+    my $series = $dbh->resultset('Series')->find({
+        series_xid => $series_xid,
+    }) or send_error "ical-series can't find series $series_xid"=> 400;
+
+    my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
+        series_xid => $series_xid,
+    );
+    my @events = $rs->all;
+
+    content_type 'text/calendar';
+    return bacds::Scheduler::ICal->events_to_ical(
+        \@events, request->scheme, request->host, $series->name,
     );
 };
 

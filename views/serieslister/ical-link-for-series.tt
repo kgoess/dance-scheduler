@@ -1,0 +1,13 @@
+
+<article class="p-1 m-1 lh-sm mb-4 <% event_type_styling(event) %>">
+<div class="text-center pl-1">
+  <!-- 📅 -->
+    Subscribe to all upcoming events: 
+    <a href="<% series.ical_link %>"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="calendar-subscription-button"
+    > + iCal series subscription (updates automatically)</a>
+</div>
+
+</article>

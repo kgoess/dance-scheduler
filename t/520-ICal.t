@@ -7,7 +7,7 @@ use utf8;
 
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 22;
+use Test::More tests => 37;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -116,6 +116,24 @@ my $event_1 = {
     parent_org_id => $parent_org_id,
 };
 my $event_2 = {
+    start_date => "2022-05-03",
+    start_time => "20:00",
+
+    end_date => "2022-05-03",
+    end_time => "22:00",
+
+    short_desc  => "event #2",
+    is_canceled => 0,
+    and_friends => 0,
+    is_series_defaults => 0,
+    synthetic_name => "ENGLISH this is second event in first series",
+    series_id   => $series_1_id,
+    style_id => [$style_1_id, $style_2_id],
+    venue_id => $venue_id,
+    caller_id => $caller_id,
+    parent_org_id => $parent_org_id,
+};
+my $event_3 = {
     start_date => "2022-05-02",
     start_time => "20:00",
 
@@ -129,12 +147,16 @@ my $event_2 = {
 };
 $test->post_ok('/event/', $event_1 );
 $test->post_ok('/event/', $event_2 );
+$test->post_ok('/event/', $event_3 );
 
 basic_test();
 test_url_endpoint($test);
 test_get_dst_transition_starts();
 test_gcal_ical_urls();
 test_ical_for_event($test);
+test_ical_for_series_1($test);
+test_ical_for_series_2($test);
+test_bad_ids($test);
 
 sub basic_test {
 
@@ -185,12 +207,12 @@ EOL
 }
 
 sub test_url_endpoint ($test) {
-    $test->get_ok('/ical', $series_1);
+    $test->get_ok('/ical');
     ok($test->success, 'got /ical');
 
     my $got = $test->content;
     $got =~ s/\r\n/\n/g;
-    $got =~ s/$UUID_RE/someuuid/g;
+    $got =~ s/$UUID_RE/...snip.../g;
     my @got = split "\n", $got;
     my @expected = split "\n", <<'EOL';
 BEGIN:VCALENDAR
@@ -226,7 +248,7 @@ LOCATION:the hall\, 123 Sesame St.\, Gotham
 ORGANIZER:Bree Mersday English
 STATUS:CONFIRMED
 SUMMARY:Bree Mersday English: Rose Gamgee
-UID:someuuid
+UID:...snip...
 URL:https://bacds.org/bree-mersday-eng
 END:VEVENT
 BEGIN:VEVENT
@@ -241,12 +263,28 @@ LOCATION:
 ORGANIZER:Bywater Trewsday Contra
 STATUS:CONFIRMED
 SUMMARY:Bywater Trewsday Contra
-UID:someuuid
+UID:...snip...
 URL:https://bacds.org/bywater-trewsday-contra
+END:VEVENT
+BEGIN:VEVENT
+CATEGORIES:pipesmoking
+CATEGORIES:maypole
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION:Rose Gamgee event #2
+DTEND;TZID=America/Los_Angeles:20220503T220000
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220503T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:the hall\, 123 Sesame St.\, Gotham
+ORGANIZER:Bree Mersday English
+STATUS:CONFIRMED
+SUMMARY:Bree Mersday English: Rose Gamgee
+UID:...snip...
+URL:https://bacds.org/bree-mersday-eng
 END:VEVENT
 END:VCALENDAR
 EOL
-
     eq_or_diff \@got, \@expected, '/ical endpoint worked';
 }
 
@@ -271,7 +309,7 @@ sub test_gcal_ical_urls {
     is $event->gcal_link, 'https://www.google.com/calendar/event?action=TEMPLATE&ctz=America%2FLos_Angeles&dates=20220501T200000%2F20220501T220000&details=Rose+Gamgee+itsa+shortdesc+1+%E7%84%A1%E7%82%BA+X%E2%80%94Y&location=the+hall%2C+123+Sesame+St.%2C+Gotham%2C+CA%2C+USA&sprop=website%3Ahttps%3A%2F%2Fbacds.org%2Fbree-mersday-eng&text=Bree+Mersday+English&trp=false',
      'gcal link ok';
 
-    is $event->ical_link, 'https://bacds.org/ical-event/1', 'ical link TBD';
+    is $event->ical_link, 'https://bacds.org/ical-event/1', 'ical link';
 }
 
 sub test_ical_for_event ($test) {
@@ -368,5 +406,158 @@ EOL
 #URL:https://nbcds.org/event/marin-english-country-dance-12/
 #CATEGORIES:English Country Dance
 #END:VEVENT
+
+}
+
+sub test_ical_for_series_1 ($test) {
+    my $rs = bacds::Scheduler::Model::DanceFinder
+        ->search_events();
+    my @events = $rs->all;
+    my $event = $events[0];
+    my $series = $event->series;
+    my $series_xid = $series->series_xid;
+
+    my $ical_link = $series->ical_link;
+    is $ical_link, "https://bacds.org/ical-series/$series_xid", 'ical link ok';
+
+    $test->get_ok($ical_link, "fetched $ical_link ok");
+    ok($test->success, "got $ical_link");
+
+    my $got = $test->content;
+    $got =~ s/UID:[\w-]+/UID:...snip.../g;
+    my @got = split /\r\n/, $got;
+
+    my @expected = split /\n/, <<EOL;
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:Data::ICal 0.24
+X-WR-CALNAME:Bree Mersday English
+BEGIN:VTIMEZONE
+TZID:America/Los_Angeles
+BEGIN:DAYLIGHT
+DTSTART:20220313T100000
+TZNAME:PDT
+TZOFFSETFROM:-0800
+TZOFFSETTO:-0700
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20221106T090000
+TZNAME:PST
+TZOFFSETFROM:-0700
+TZOFFSETTO:-0800
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+CATEGORIES:pipesmoking
+CATEGORIES:maypole
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION:Rose Gamgee itsa shortdesc 1 \x{7121}\x{70BA} X\x{2014}Y
+DTEND;TZID=America/Los_Angeles:20220501T220000
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220501T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:the hall\\, 123 Sesame St.\\, Gotham
+ORGANIZER:Bree Mersday English
+STATUS:CONFIRMED
+SUMMARY:Bree Mersday English: Rose Gamgee
+UID:...snip...
+URL:https://bacds.org/bree-mersday-eng
+END:VEVENT
+BEGIN:VEVENT
+CATEGORIES:pipesmoking
+CATEGORIES:maypole
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION:Rose Gamgee event #2
+DTEND;TZID=America/Los_Angeles:20220503T220000
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220503T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:the hall\\, 123 Sesame St.\\, Gotham
+ORGANIZER:Bree Mersday English
+STATUS:CONFIRMED
+SUMMARY:Bree Mersday English: Rose Gamgee
+UID:...snip...
+URL:https://bacds.org/bree-mersday-eng
+END:VEVENT
+END:VCALENDAR
+EOL
+    eq_or_diff \@got, \@expected;
+}
+
+sub test_ical_for_series_2 ($test) {
+    my $rs = bacds::Scheduler::Model::DanceFinder
+        ->search_events();
+    my @events = $rs->all;
+    my $event = $events[1]; # sorted by date, so middle one is the contra
+    my $series = $event->series;
+    my $series_xid = $series->series_xid;
+
+    my $ical_link = $series->ical_link;
+    is $ical_link, "https://bacds.org/ical-series/$series_xid", 'ical link ok';
+
+    $test->get_ok($ical_link, "fetched $ical_link ok");
+    ok($test->success, "got $ical_link");
+
+    my $got = $test->content;
+    $got =~ s/UID:[\w-]+/UID:...snip.../g;
+    my @got = split /\r\n/, $got;
+
+    my @expected = split /\n/, <<'EOL';
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:Data::ICal 0.24
+X-WR-CALNAME:Bywater Trewsday Contra
+BEGIN:VTIMEZONE
+TZID:America/Los_Angeles
+BEGIN:DAYLIGHT
+DTSTART:20220313T100000
+TZNAME:PDT
+TZOFFSETFROM:-0800
+TZOFFSETTO:-0700
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20221106T090000
+TZNAME:PST
+TZOFFSETFROM:-0700
+TZOFFSETTO:-0800
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION: new lines shortdesc
+DTEND;TZID=America/Los_Angeles:20220502T235959
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220502T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:
+ORGANIZER:Bywater Trewsday Contra
+STATUS:CONFIRMED
+SUMMARY:Bywater Trewsday Contra
+UID:...snip...
+URL:https://bacds.org/bywater-trewsday-contra
+END:VEVENT
+END:VCALENDAR
+EOL
+    eq_or_diff \@got, \@expected;
+}
+
+sub test_bad_ids ($tester) {
+
+    my $res;
+
+    my $bad_event_link = 'https://bacds.org/ical-event/99999';
+    $res = $test->get($bad_event_link);
+    is $res->code, 400, "$bad_event_link returned 400";
+    is $res->message, 'Bad Request';
+    like $res->as_string, qr/ical-event can&#39;t find event 99999/;
+
+    my $bad_series_link = 'https://bacds.org/ical-series/NOT-A-SERIES';
+    $res = $test->get($bad_series_link);
+    is $res->code, 400, "$bad_series_link returned 400";
+    is $res->message, 'Bad Request';
+    like $res->as_string, qr/ical-series can&#39;t find series NOT-A-SERIES/;
 
 }

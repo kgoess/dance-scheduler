@@ -151,6 +151,7 @@ sub search_events {
 
     my $start_date_arg = delete $args{start_date};
     my $end_date_arg   = delete $args{end_date};
+    my $series_xid_arg = delete $args{series_xid};
     my $caller_arg     = delete $args{caller}    || [];
     my $venue_arg      = delete $args{venue}     || [];
     my $band_arg       = delete $args{band}      || [];
@@ -244,6 +245,7 @@ sub search_events {
                 $end_date
                 ? { '-between' => [$start_date, $end_date] }
                 : { '>=' => $start_date },
+            $series_xid_arg ? ('series_xid' => $series_xid_arg) : (),
             @$caller_arg ? ('event_callers_maps.caller_id' => $caller_arg) : (),
             @$venue_arg  ? ('event_venues_maps.venue_id'   => $venue_arg)  : (),
             @$style_arg  ? ('event_styles_maps.style_id'   => $style_arg)  : (),

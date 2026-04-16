@@ -418,4 +418,12 @@ sub event_to_ical_link ($class, $event) {
     return "https://bacds.org/ical-event/$event_id";
 }
 
+sub series_to_ical_link ($class, $series) {
+    my $series_xid = $series->series_xid;
+
+    return "https://bacds.org/ical-series/$series_xid";
+}
+
+
+
 1;

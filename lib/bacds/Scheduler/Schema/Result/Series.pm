@@ -223,6 +223,7 @@ __PACKAGE__->has_many(
 
 use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
+with 'bacds::Scheduler::Schema::Role::SeriesCalendarLinks';
 
 sub get_fields_for_event_row {
     my ($self) = @_;
