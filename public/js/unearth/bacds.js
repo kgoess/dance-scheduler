@@ -32,6 +32,41 @@ document.addEventListener("DOMContentLoaded", function () {
     $('[data-bs-toggle="popover"]').popover({
         html: true,
     })
+
+
+    // this is for the iCal subscribe buttons on the main page and the series page
+    document.querySelectorAll('.calendar-subscription-button').forEach(
+        (element, index, array) => {
+            element.addEventListener('click', async (event) => {
+                try {
+                    const url = element.getAttribute('data-ical-link');
+                    await navigator.clipboard.writeText(url);
+                } catch (err) {
+                    console.log("writeText caught err: ", err);
+                    alert("copy-to-clipboard only works under https");
+                    if (Number(location.port) < 5000) {
+                        return;
+                    }
+                }
+                document.getElementById('calendar-subscription-button-copy-status').textContent = '✓ Copied!';
+                setTimeout(() => document.getElementById('calendar-subscription-button-copy-status').textContent = '', 3000);
+            })
+        }
+    );
+
+    const inputEls = document.querySelectorAll('#agenda_text, #meeting_date');
+
+    inputEls.forEach(el => {
+      el.addEventListener('input', () => {
+        const copyBtn = document.getElementById('copy-btn');
+        if (copyBtn.disabled == false) {
+            copyBtn.innerHTML = copyBtn.innerHTML + ' *** You need to save your changes before taking a copy with this button ***';
+        }
+
+        copyBtn.disabled = true;
+      });
+    });
+    // end handling for iCal subscribe button
 });
 
 /** multi-level dropdown code from https://stackoverflow.com/a/66470962 */
