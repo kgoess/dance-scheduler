@@ -349,7 +349,7 @@ subtest 'GET /eventAll' => sub {
 
 
 subtest 'GET /eventsUpcoming' => sub {
-    plan tests => 9;
+    plan tests => 11;
 
     # could these tests all have independent data?
 
@@ -360,8 +360,10 @@ subtest 'GET /eventsUpcoming' => sub {
         year       => 2022,
         month      => 5,
         day        => 1,
+        time_zone  => 'local',
     );
     $ENV{TEST_NOW} = $now->epoch;
+    my $original_now_ymd = $now->ymd;
 
     $test->get_ok('/eventsUpcoming', 'GET /eventsUpcoming ok')
         or die "GET /eventsUpcoming failed: ".$test->res->content;
@@ -394,4 +396,11 @@ subtest 'GET /eventsUpcoming' => sub {
     $decoded = decode_json($test->res->content);
     $got = $decoded->{data};
     is @$got, 0, "no events are future from $now";
+
+    $test->get_ok("/eventsUpcoming?start_date=$original_now_ymd",
+        'get /eventsUpcoming ok'
+    ) or die "GET /eventsUpcoming failed: ".$test->res->content;
+    $decoded = decode_json($test->res->content);
+    $got = $decoded->{data};
+    is @$got, 2, "all events are future from start_date arg $original_now_ymd even though today is $now";
 };

@@ -87,7 +87,16 @@
         <div class="flex-vertical">
             <div class="search-flex">
                 <input class="clickable-list-input" placeholder="search...">
-                <% IF content.show_date_selector %><span class="search-date">from-date</span><% END %>
+                <% IF content.show_date_selector %><div class="from-date" title="Earliest event to show">
+                        <input
+                            class="row-edit datepicker"
+                            name="start_date"
+                            size="10"
+                            maxlength="10"
+                            value="<% yesterday_ymd %>"
+                            hidden />
+                        <span class="row-contents"><% yesterday_ymd %></span>
+                    </div><% END %>
             </div>
             <div><select class="clickable-list" size="10">
             </select></div>

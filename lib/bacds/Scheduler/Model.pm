@@ -117,18 +117,28 @@ Return all rows from yesterday into the future. Useful for the UI.
 =cut
 
 sub get_upcoming_rows {
-    my $class = shift;
+    my ($class, %args) = @_;
     my $dbh = get_dbh();
 
-    my $yesterday = DateTime
-        ->from_epoch(epoch => ($ENV{TEST_NOW} || time))
-        ->subtract(days => 1);
+    my ($start_date);
+
+    if ($args{start_date}) {
+        my ($yy, $mm, $dd) = split '-', $args{start_date};
+        $start_date = DateTime
+            ->new(year => $yy, month => $mm, day => $dd, time_zone => 'local')
+            ->set_time_zone('floating')
+    } else {
+        $start_date = DateTime
+            ->from_epoch(epoch => ($ENV{TEST_NOW} || time))
+            ->set_time_zone('floating')
+            ->subtract(days => 1);
+    }
 
     # see DBIx::Class::Manual::FAQ "format a DateTime object for searching"
     my $dtf = $dbh->storage->datetime_parser;
 
     my $search_args = {
-        start_date => { '>=' => $dtf->format_date($yesterday) }
+        start_date => { '>=' => $dtf->format_date($start_date) }
     };
 
     return $class->get_multiple_rows($search_args);

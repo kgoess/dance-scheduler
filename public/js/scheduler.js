@@ -36,6 +36,11 @@ $( document ).ready(function() {
     // Show the editable field when the user clickes the display
     $( '.display-row' ).click( h.displayRowOnclick );
 
+    // Show the from-date field when the user clicks its display
+    $( '.from-date' ).click( h.displayRowOnclick );
+    $( '.from-date .row-edit').change( ()=>loadListForModel('event'))
+    $( '.from-date .row-edit').keyup( (e)=>{if(e.keyUp == 'Return') loadListForModel('event')})
+
     // because we're handling the submit ourselves with the button
     $( 'form' ).submit(function(e){ e.preventDefault() });
 

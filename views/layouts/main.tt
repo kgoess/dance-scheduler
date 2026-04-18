@@ -25,6 +25,7 @@
 <script>
 var appUriBase = "<% request.uri_base %>";
 var jsChecksum = "<% checksum %>";
+var yesterday = "<% yesterday_ymd %>";
 </script>
 
 <!--Popup Lightbox for photo_url previews https://codehimblog.github.io/jquery-popup-lightbox/-->

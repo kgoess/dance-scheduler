@@ -84,6 +84,15 @@ register_type_check 'Timestamp' => sub {
     }
     return;
 };
+register_type_check 'DateYMD' => sub {
+    return 1 unless length($_[0]);
+    return unless $_[0] =~ /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
+    my ($year, $month, $day) = ($1, $2, $3);
+    return unless $year > 1990 && $year < 2100;
+    return unless $month >= 1 and $month <= 12;
+    return unless $day >= 1 and $day <= 31;
+    return 1;
+};
 # usable for series.series_xid or venue.vkey
 register_type_check 'XID' => sub {
     return $_[0] =~ /^[A-Z0-9._-]{3,32}$/;
@@ -427,12 +436,20 @@ get '/' => requires_login sub {
     my $checksum = bacds::Scheduler::Util::Initialize::get_checksum();
     cookie Checksum => $checksum;
 
+    my $yesterday_ymd = DateTime
+        ->from_epoch(epoch => ($ENV{TEST_NOW} || time), time_zone => 'local')
+        ->set_time_zone('floating')
+        ->subtract(days => 1)
+        ->ymd;
+
+
     template 'accordion' => {
         checksum => $checksum,
         title => 'Dance Scheduler',
         signed_in_as => vars->{signed_in_as}->email,
         test_db_name => bacds::Scheduler::Util::Db->using_test_db,
         accordion => $accordion,
+        yesterday_ymd => $yesterday_ymd,
     };
 };
 
@@ -477,10 +494,14 @@ Like /eventAll, but just events from yesterday on.
 
 =cut
 
-get '/eventsUpcoming' => requires_checksum sub {
+get '/eventsUpcoming' => requires_checksum with_types [
+    'optional' => ['query', 'start_date', 'DateYMD'],
+] => sub {
+    my $start_date = query_parameters->get('start_date');
+
     my $results = $Results_Class->new;
 
-    $results->data($Event_Model->get_upcoming_rows);
+    $results->data($Event_Model->get_upcoming_rows(start_date => $start_date));
 
     return $results->format;
 };

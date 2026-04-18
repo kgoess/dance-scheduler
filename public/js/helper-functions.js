@@ -225,12 +225,16 @@ export function loadListForModel(modelName) {
     };
     const url = urlForModel[modelName] || `${modelName}All`;
 
-    getParentContainerForModelName(modelName).find('.clickable-list' ).empty();
+    const parentContainer = getParentContainerForModelName(modelName);
+    parentContainer.find('.clickable-list' ).empty();
+    var data = parentContainer.find('.from-date')?.find('.row-edit').serialize() ?? '';
+
     $( `#${modelName}-display` ).first().hide();
 
     $.ajax({
         url: `${appUriBase}/${url}`,
-        dataType: 'json'
+        dataType: 'json',
+        data
     })
     .done(msg => {
         unpackResults(
