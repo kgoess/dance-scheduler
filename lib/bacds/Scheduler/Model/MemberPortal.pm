@@ -37,7 +37,7 @@ Tokens expire after one hour.
 
 package bacds::Scheduler::Model::MemberPortal;
 
-use 5.16.0;
+use 5.32.1;
 use warnings;
 
 use Carp qw/croak/;

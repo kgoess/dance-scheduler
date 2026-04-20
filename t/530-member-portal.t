@@ -3,7 +3,7 @@
 #   bacds::Scheduler::Model::MemberPortal
 #   GET/POST /unearth/member and /unearth/member/portal
 
-use 5.16.0;
+use 5.32.1;
 use warnings;
 
 use DateTime;

@@ -62,7 +62,7 @@ template should include a {$selfservice_url} Smarty variable for the link.
 
 package bacds::Scheduler::CiviCRM;
 
-use 5.16.0;
+use 5.32.1;
 use warnings;
 
 use Carp qw/croak/;
