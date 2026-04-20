@@ -275,7 +275,7 @@
     <!-- -->
     <!-- end of header page, content below -->
     <!-- -->
-    <div class="container my-2">
+    <div class="container my-2 mb-5">
       <% content %>
     </div>
     <!-- -->
