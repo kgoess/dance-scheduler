@@ -14,6 +14,7 @@
   <p class="text-center text-muted">
     Changes are saved directly to your BACDS membership record.
     To update your email address, please
+<!-- FIXME TODO there is no /contact/ url -->
     <a href="/contact/">contact us</a>.
   </p>
 

@@ -26,22 +26,22 @@ which is not available in APIv4.
         |<- email form ------------|                                  |
         |                          |                                  |
         |-- POST /member/request ->|-- Email.get (find by email) ---->|
-        |                          |<- contact_id -------------------|
+        |                          |<- contact_id --------------------|
         |                          | generate token, store in DB      |
-        |                          |-- MessageTemplate.send ---------->|
+        |                          |-- MessageTemplate.send --------->|
         |                          |   (contact_id, tplParams:{url})  |-- sends email -->member
         |<- "check your inbox" ----|                                  |
         |                          |                                  |
-        |-- GET /member/portal ---->|                                  |
+        |-- GET /member/portal --->|                                  |
         |   ?token=XXX             | validate token                   |
         |                          |-- Contact.get ------------------>|
         |                          |   Address.get, Phone.get         |
-        |<- pre-filled form --------|<- contact data -----------------|
+        |<- pre-filled form -------|<- contact data ------------------|
         |                          |                                  |
-        |-- POST /member/portal --->| validate token                  |
+        |-- POST /member/portal -->| validate token                   |
         |   (updated fields)       |-- Contact.create (update) ------>|
         |                          |   Address.create, Phone.create   |
-        |<- success page -----------|                                  |
+        |<- success page ----------|                                  |
 
 =head2 Configuration
 
@@ -66,17 +66,24 @@ use 5.32.1;
 use warnings;
 
 use Carp qw/croak/;
+use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/encode_json decode_json/;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
 use constant CIVICRM_BASE_URL => 'https://bacds.civicrm.org';
 
+use constant DEBUG => 1;
+
 sub new {
     my ($class) = @_;
     my $self = bless {}, $class;
-    $self->{api_key}     = _read_private_file('civicrm-api-key');
-    $self->{template_id} = _read_private_file('civicrm-magic-link-template-id');
+    state $api_key     = _read_private_file('civicrm-api-key');
+    state $site_key    = _read_private_file('civicrm-site-key');
+    state $template_id = _read_private_file('civicrm-magic-link-template-id');
+    $self->{api_key}     = $api_key;
+    $self->{site_key}    = $site_key;
+    $self->{template_id} = $template_id;
     $self->{ua}          = LWP::UserAgent->new(timeout => 15);
     return $self;
 }
@@ -286,6 +293,10 @@ sub _call_v4 {
     my $url = CIVICRM_BASE_URL . "/civicrm/ajax/api4/$entity/$action";
     my $req = POST($url,
         'X-Civi-Auth' => 'Bearer ' . $self->{api_key},
+        # trying the site_key in response to
+        # HTTP 401 Login not permitted. Must satisfy guard (site_key, perm)
+        # from https://bacds.civicrm.org/civicrm/contact/view?reset=1&cid=11
+        'X-Civi-Key' => $self->{site_key},
         Content_Type  => 'application/json',
         Content       => encode_json($params),
     );
@@ -298,12 +309,18 @@ sub _call_v3 {
     my ($self, $entity, $action, $params) = @_;
 
     my $url  = CIVICRM_BASE_URL . '/civicrm/ajax/rest';
-    my $body = encode_json({ entity => $entity, action => $action, %$params });
+    my $body = encode_json({ %$params });
     my $req  = POST($url,
         'X-Civi-Auth' => 'Bearer ' . $self->{api_key},
         Content_Type  => 'application/x-www-form-urlencoded',
-        Content       => [json => $body],
+        Content       => [
+            entity => $entity,
+            action => $action,
+            json => $body
+        ],
     );
+    say STDERR 'v3 about to send: ', $req->as_string
+        if DEBUG;
 
     return $self->_dispatch($req);
 }
@@ -313,7 +330,7 @@ sub _dispatch {
 
     my $response = $self->{ua}->request($req);
 
-    croak "CiviCRM HTTP error: " . $response->status_line
+    croak "CiviCRM HTTP error: " . $response->status_line . ' - ' . $response->content
         unless $response->is_success;
 
     my $data = eval { decode_json($response->decoded_content) };
