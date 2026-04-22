@@ -63,11 +63,16 @@ sub request_link {
 
     my $civi = bacds::Scheduler::CiviCRM->new;
 
-    my $contact_ids = $civi->find_contacts_by_email($email);
-    return unless @$contact_ids;  # silent ignore for unknown emails
+    my $contacts = $civi->find_contacts_by_email($email);
+    #return unless @$contacts;  # silent ignore for unknown emails
+    if (!@$contacts) {
+        warn "civicrm request_link: no contacts found for $email";
+        return;
+    }
 
     # Use the contact with the lowest id (first in the sorted list)
-    my $contact_id = $contact_ids->[0];
+    my $contact = $contacts->[0];
+    my ($contact_id, $display_name) = ($contact->{contact_id}, $contact->{display_name});
 
     my $token = _generate_token();
     my $now   = DateTime->now;
@@ -80,7 +85,7 @@ sub request_link {
     });
 
     my $portal_url = "$base_url/unearth/member/portal?token=$token";
-    $civi->send_magic_link_email($contact_id, $portal_url);
+    $civi->send_magic_link_email($contact_id, $email, $display_name, $portal_url);
 }
 
 =head2 get_contact_for_portal($token, $dbh)
@@ -123,6 +128,9 @@ sub save_contact {
 
 # --- private helpers ---
 
+# FIXME this token isn't checked that it belongs to the
+# MemberToken.civicrm_contact_id, so could be used to update *any* contact
+# record???
 sub _validate_token {
     my ($token, $dbh) = @_;
 
@@ -132,10 +140,10 @@ sub _validate_token {
     my $row = $dbh->resultset('MemberToken')->find({ token => $token })
         or croak "This link is not valid.";
 
-    croak "This link has already been used. Please request a new one."
+    croak "This link has already been used. Please request a new one.\n"
         if $row->used_ts;
 
-    croak "This link has expired. Please request a new one."
+    croak "This link has expired. Please request a new one.\n"
         if DateTime->compare(DateTime->now, $row->expires_ts) > 0;
 
     return $row;

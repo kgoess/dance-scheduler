@@ -6,10 +6,11 @@ bacds::Scheduler::CiviCRM - Client for the CiviCRM REST API
 
     my $civi = bacds::Scheduler::CiviCRM->new;
 
-    my $contact_ids = $civi->find_contacts_by_email('member@example.com');
-    my $contact     = $civi->get_contact($contact_id);
+    my $contact = $civi->find_contacts_by_email('member@example.com');
+    my $contact_id = $contacts->[0]{contact_id}
+    my $contact    = $civi->get_contact($contact_id);
     $civi->update_contact($contact_id, \%new_data);
-    $civi->send_magic_link_email($contact_id, $url);
+    $civi->send_magic_link_email($contact_id, $email, $display_name, $url);
 
 =head1 DESCRIPTION
 
@@ -51,12 +52,58 @@ in this app):
   Production: /var/www/bacds.org/dance-scheduler/private/civicrm-api-key
   Dev:        ~/.civicrm-api-key
 
+  Production: /var/www/bacds.org/dance-scheduler/private/civicrm-site-key
+  Dev:        ~/.civicrm-site-key
+
   Production: /var/www/bacds.org/dance-scheduler/private/civicrm-magic-link-template-id
   Dev:        ~/.civicrm-magic-link-template-id
 
 Each file contains a single value on one line. The template ID is the numeric
 ID of the CiviCRM message template used to send the magic link email. The
 template should include a {$selfservice_url} Smarty variable for the link.
+
+The API key you generate and assign to a Contact record. The Site Key shows up
+on the Contact's "API Key" screen.
+
+=head2 handy links for development:
+
+=over 4
+
+=item api4 explorer
+
+https://bacds.civicrm.org/civicrm/api4/rest#/explorer/
+
+=item api4 docs
+
+https://docs.civicrm.org/dev/en/latest/api/v4/usage/
+
+=item api3 explorer
+
+https://bacds.civicrm.org/civicrm/api3#explorer
+
+=item the PHP version of what does this:
+
+https://github.com/systopia/de.systopia.selfservice/blob/master/api/v3/Selfservice/Sendlink.php
+
+=item permissions and access control
+
+https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control/
+
+=item auth
+
+https://docs.civicrm.org/dev/en/latest/framework/authx/
+
+=item api key
+
+https://docs.civicrm.org/sysadmin/en/latest/setup/api-keys/
+
+https://civicrm.org/extensions/api-key
+
+https://civicrm.stackexchange.com/questions/9945/how-do-i-set-up-an-api-key-for-a-user
+
+=back
+
+=head1 METHODS
 
 =cut
 
@@ -73,7 +120,7 @@ use HTTP::Request::Common;
 
 use constant CIVICRM_BASE_URL => 'https://bacds.civicrm.org';
 
-use constant DEBUG => 1;
+use constant DEBUG => 0;
 
 sub new {
     my ($class) = @_;
@@ -84,14 +131,28 @@ sub new {
     $self->{api_key}     = $api_key;
     $self->{site_key}    = $site_key;
     $self->{template_id} = $template_id;
+    $self->{from}        = 'noreply+bacds@notification.civimail.org';
     $self->{ua}          = LWP::UserAgent->new(timeout => 15);
+
+    if ($ENV{CIVICRM_UA_DEBUG}) {
+        $self->{ua}->add_handler("request_send",  sub { shift->dump; return });
+        $self->{ua}->add_handler("response_done", sub { shift->dump; return });
+    }
     return $self;
 }
 
 =head2 find_contacts_by_email($email)
 
-Returns an arrayref of CiviCRM contact_ids (sorted ascending by id) for
-non-deleted, non-deceased contacts that have the given email address.
+Returns an arrayref of CiviCRM contact hashes:
+
+    {
+        contact_id => 1234,
+        display_name => 'Alice Smith',
+    }
+
+(sorted ascending by id) for non-deleted, non-deceased contacts that have the
+given email address.
+
 Returns an empty arrayref if none found.
 
 =cut
@@ -100,16 +161,25 @@ sub find_contacts_by_email {
     my ($self, $email) = @_;
 
     my $result = $self->_call_v4('Email', 'get', {
-        select  => ['contact_id'],
+        select  => ['contact_id', 'contact_id.display_name'],
         where   => [
             ['email',                  '=', $email],
             ['contact_id.is_deleted',  '=', \0],
             ['contact_id.is_deceased', '=', \0],
+            # JSON::MaybeXS->false?
         ],
-        orderBy => [['contact_id', 'ASC']],
+        orderBy => {'contact_id', 'ASC'},
+        #debug => JSON::MaybeXS->true,
     });
 
-    return [map { $_->{contact_id} } @{ $result->{values} }];
+    return [
+        map {
+            {
+                contact_id => $_->{contact_id},
+                display_name => $_->{'contact_id.display_name'},
+            }
+        } @{ $result->{values} }
+     ];
 }
 
 =head2 get_contact($contact_id)
@@ -267,21 +337,40 @@ sub update_contact {
     }
 }
 
-=head2 send_magic_link_email($contact_id, $url)
+=head2 send_magic_link_email($contact_id, $email, $display_name, $url)
 
 Sends the magic link email to the contact via CiviCRM's MessageTemplate.send
 (APIv3). The template (configured via civicrm-magic-link-template-id) must
 contain a {$selfservice_url} Smarty variable.
 
+The relevant code in api/v3/Selfservice/Sendlink.php from
+git@github.com:systopia/de.systopia.selfservice.git is:
+
+    $contact_id = min(array_keys($contact_ids));
+    civicrm_api3('MessageTemplate', 'send', [
+        'check_permissions' => 0,
+        'id'                => $template_email_known,
+        'to_name'           => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
+        'from'              => $config->getSetting('sender'),
+        'contact_id'        => $contact_id,
+        'to_email'          => trim($params['email']),
+    ]);
+
+
 =cut
 
 sub send_magic_link_email {
-    my ($self, $contact_id, $url) = @_;
+    my ($self, $contact_id, $email, $display_name, $url) = @_;
 
     $self->_call_v3('MessageTemplate', 'send', {
         id         => $self->{template_id},
         contact_id => $contact_id,
         tplParams  => { selfservice_url => $url },
+        to_email   => $email,
+        from       => $self->{from},
+        to_name    => $display_name,
+        #to_name => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
+        #check_permissions => 0, ???
     });
 }
 
@@ -293,13 +382,21 @@ sub _call_v4 {
     my $url = CIVICRM_BASE_URL . "/civicrm/ajax/api4/$entity/$action";
     my $req = POST($url,
         'X-Civi-Auth' => 'Bearer ' . $self->{api_key},
-        # trying the site_key in response to
+        # using the site_key in response to
         # HTTP 401 Login not permitted. Must satisfy guard (site_key, perm)
         # from https://bacds.civicrm.org/civicrm/contact/view?reset=1&cid=11
         'X-Civi-Key' => $self->{site_key},
-        Content_Type  => 'application/json',
-        Content       => encode_json($params),
+        Content_Type => 'application/x-www-form-urlencoded',
+        Content       => 'params='.encode_json($params),
+
+    # To ensure broad compatibility, APIv4 REST clients should set this
+    # HTTP header:
+    # https://docs.civicrm.org/dev/en/latest/api/v4/rest/
+    'X-Requested-With' => 'XMLHttpRequest',
     );
+
+    say STDERR 'v4 about to send: ', $req->as_string
+        if DEBUG;
 
     return $self->_dispatch($req);
 }
@@ -316,10 +413,10 @@ sub _call_v3 {
         Content       => [
             entity => $entity,
             action => $action,
-            json => $body
+            json => $body,
         ],
     );
-    say STDERR 'v3 about to send: ', $req->as_string
+    say STDERR 'v3 about to send: ', $req->as_string, "\n", $body
         if DEBUG;
 
     return $self->_dispatch($req);
@@ -334,11 +431,12 @@ sub _dispatch {
         unless $response->is_success;
 
     my $data = eval { decode_json($response->decoded_content) };
-    croak "CiviCRM returned invalid JSON: $@" if $@;
+    croak "CiviCRM returned invalid JSON: $@\n".$response->decoded_content if $@;
 
     if ($data->{is_error}) {
         croak "CiviCRM API error: " . ($data->{error_message} // 'unknown error');
     }
+    dump '_dispatch response:', $data if DEBUG;
 
     return $data;
 }
