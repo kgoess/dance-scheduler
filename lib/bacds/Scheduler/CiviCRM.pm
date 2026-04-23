@@ -52,9 +52,6 @@ in this app):
   Production: /var/www/bacds.org/dance-scheduler/private/civicrm-api-key
   Dev:        ~/.civicrm-api-key
 
-  Production: /var/www/bacds.org/dance-scheduler/private/civicrm-site-key
-  Dev:        ~/.civicrm-site-key
-
   Production: /var/www/bacds.org/dance-scheduler/private/civicrm-magic-link-template-id
   Dev:        ~/.civicrm-magic-link-template-id
 
@@ -62,8 +59,12 @@ Each file contains a single value on one line. The template ID is the numeric
 ID of the CiviCRM message template used to send the magic link email. The
 template should include a {$selfservice_url} Smarty variable for the link.
 
-The API key you generate and assign to a Contact record. The Site Key shows up
-on the Contact's "API Key" screen.
+The API key you generate and assign to a Contact record. That Contact has to
+have Administrator permissions or at least enough permissions to view and edit
+Contact, Email, Address and Phone records, and to call MessageTemplate.send.
+
+If you need the site_key (I thought I might but currently don't seem to), it
+shows up on the Contact's "API Key" screen.
 
 =head2 handy links for development:
 
@@ -118,18 +119,18 @@ use JSON::MaybeXS qw/encode_json decode_json/;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-use constant CIVICRM_BASE_URL => 'https://bacds.civicrm.org';
+our $CIVICRM_BASE_URL = 'https://bacds.civicrm.org';
 
 use constant DEBUG => 0;
+
+our $MOCK_API_KEY;
 
 sub new {
     my ($class) = @_;
     my $self = bless {}, $class;
-    state $api_key     = _read_private_file('civicrm-api-key');
-    state $site_key    = _read_private_file('civicrm-site-key');
+    state $api_key     = $MOCK_API_KEY || _read_private_file('civicrm-api-key');
     state $template_id = _read_private_file('civicrm-magic-link-template-id');
     $self->{api_key}     = $api_key;
-    $self->{site_key}    = $site_key;
     $self->{template_id} = $template_id;
     $self->{from}        = 'noreply+bacds@notification.civimail.org';
     $self->{ua}          = LWP::UserAgent->new(timeout => 15);
@@ -379,20 +380,20 @@ sub send_magic_link_email {
 sub _call_v4 {
     my ($self, $entity, $action, $params) = @_;
 
-    my $url = CIVICRM_BASE_URL . "/civicrm/ajax/api4/$entity/$action";
+    my $url = $CIVICRM_BASE_URL . "/civicrm/ajax/api4/$entity/$action";
     my $req = POST($url,
         'X-Civi-Auth' => 'Bearer ' . $self->{api_key},
-        # using the site_key in response to
+        # tried using the site_key in response to
         # HTTP 401 Login not permitted. Must satisfy guard (site_key, perm)
         # from https://bacds.civicrm.org/civicrm/contact/view?reset=1&cid=11
-        'X-Civi-Key' => $self->{site_key},
+        #'X-Civi-Key' => $self->{site_key},
+        # but it turned out to be some different issue and site_key is unnecessary.
         Content_Type => 'application/x-www-form-urlencoded',
         Content       => 'params='.encode_json($params),
 
-    # To ensure broad compatibility, APIv4 REST clients should set this
-    # HTTP header:
-    # https://docs.civicrm.org/dev/en/latest/api/v4/rest/
-    'X-Requested-With' => 'XMLHttpRequest',
+        # To ensure broad compatibility, APIv4 REST clients should set this
+        # HTTP header https://docs.civicrm.org/dev/en/latest/api/v4/rest/
+        'X-Requested-With' => 'XMLHttpRequest',
     );
 
     say STDERR 'v4 about to send: ', $req->as_string
@@ -405,7 +406,7 @@ sub _call_v4 {
 sub _call_v3 {
     my ($self, $entity, $action, $params) = @_;
 
-    my $url  = CIVICRM_BASE_URL . '/civicrm/ajax/rest';
+    my $url  = $CIVICRM_BASE_URL . '/civicrm/ajax/rest';
     my $body = encode_json({ %$params });
     my $req  = POST($url,
         'X-Civi-Auth' => 'Bearer ' . $self->{api_key},
