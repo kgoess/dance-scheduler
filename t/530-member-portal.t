@@ -9,6 +9,7 @@ use warnings;
 use DateTime;
 use HTTP::Request::Common;
 use Test::More;
+use Test::Warn;
 
 use bacds::Scheduler;
 use bacds::Scheduler::CiviCRM;
@@ -53,7 +54,7 @@ my ($find_contacts_stub, $get_contact_stub, $last_magic_link, $last_update);
     };
 
     *bacds::Scheduler::CiviCRM::send_magic_link_email = sub {
-        my ($self, $contact_id, $url) = @_;
+        my ($self, $contact_id, $email, $display_name, $url) = @_;
         $last_magic_link = { contact_id => $contact_id, url => $url };
     };
 }
@@ -89,6 +90,7 @@ sub test_post_request_link_bad_email {
     like $res->content, qr{Please enter a valid email address},
         'shows validation error for empty email';
 
+
     $res = $Test->request(POST '/unearth/member/request-link', { email => 'notanemail' });
     ok $res->is_success, 'POST with no @ returns 200';
     like $res->content, qr{Please enter a valid email address},
@@ -99,8 +101,13 @@ sub test_post_request_link_unknown_email {
     $find_contacts_stub = [];
     $last_magic_link    = undef;
 
-    my $res = $Test->request(POST '/unearth/member/request-link',
-        { email => 'unknown@example.com' });
+    my $res;
+    warning_like {
+        $res = $Test->request(POST '/unearth/member/request-link',
+            { email => 'unknown@example.com' }
+        );
+    } qr{^civicrm request_link: no contacts found for unknown\@example.com},
+    'got expected warning no contacts found for unknown@example.com';
 
     ok $res->is_success, 'POST with unknown email returns 200';
     like $res->content, qr{Check Your Email}, 'shows confirmation page';
@@ -108,11 +115,12 @@ sub test_post_request_link_unknown_email {
 }
 
 sub test_post_request_link_known_email {
-    $find_contacts_stub = [42];
+    $find_contacts_stub = [{ contact_id => 42, display_name => 'Alice' }];
     $last_magic_link    = undef;
 
     my $res = $Test->request(POST '/unearth/member/request-link',
-        { email => 'member@example.com' });
+        { email => 'member@example.com' }
+    );
 
     ok $res->is_success, 'POST with known email returns 200';
     like $res->content, qr{Check Your Email}, 'shows confirmation page';
@@ -131,7 +139,11 @@ sub test_post_request_link_known_email {
 
 sub test_post_request_link_multiple_contacts {
     # When multiple contacts share the email, the lowest contact_id is used
-    $find_contacts_stub = [7, 99, 150];
+    $find_contacts_stub = [
+        {contact_id => 7, display_name => 'Alice'},
+        {contact_id => 99, display_name => 'Bob'},
+        {contact_id => 150, display_name => 'Carlos'},
+    ];
     $last_magic_link    = undef;
 
     $Test->request(POST '/unearth/member/request-link',
