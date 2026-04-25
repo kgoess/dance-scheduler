@@ -100,9 +100,9 @@ app-install:
 	install -d $(APPDIR)/public/js     --mode 2775 --group dev
 	install -d $(APPDIR)/public/css    --mode 2775 --group dev
 	install -d $(APPDIR)/private       --mode 2770 --group apache
-	cp -r environments   $(APPDIR)
-	cp -r views          $(APPDIR)
-	cp -r public         $(APPDIR)
+	find environments -type f -exec install -Dm 664 "{}" "$(APPDIR)/{}" \;
+	find views -type f -exec install -Dm 664 "{}" "$(APPDIR)/{}" \;
+	find public -type f -exec install -Dm 664 "{}" "$(APPDIR)/{}" \;
 	@if [ ! -e $(APPDIR)/private/mysql-password ]; then \
 	    echo -e "\n***************"; \
 	    echo "Please put the mysql password into $(APPDIR)/private/mysql-password"; \
