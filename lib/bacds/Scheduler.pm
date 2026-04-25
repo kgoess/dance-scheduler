@@ -1400,8 +1400,11 @@ get '/serieslister' => with_types [
     'optional' => ['query', 'event_id', 'SchedulerId'],
 ] => \&_details_for_series;
 
+# Add a trailing / if none was supplied.
 get '/series/:style/:series'=> sub{
-    redirect '/series/:style/:series/' => 301;
+    my $style  = route_parameters->get('style');
+    my $series = route_parameters->get('series');
+    redirect "/series/$style/$series/" => 302;
 };
 
 get '/series/:style/:series/'=> sub{
