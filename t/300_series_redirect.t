@@ -29,7 +29,7 @@ subtest 'Test match' => \&test_match;
 sub test_no_match {
   plan tests => 3;
   $test->get('/series/foo/bar');
-  is $test->response->code, 301, 'Missing trailing slash sends 301' or dump $test->response;
+  is $test->response->code, 302, 'Missing trailing slash sends 302' or dump $test->response;
   $test->get('/series/foo/bar/');
   is $test->response->code, 404, 'No match returns 404' or dump $test->response;
   like $test->response->decoded_content, qr{Can&#39;t find a series for &quot;/series/foo/bar/&quot;}, 'No match returns desired error';
