@@ -6,7 +6,7 @@ bacds::Scheduler::CiviCRM - Client for the CiviCRM REST API
 
     my $civi = bacds::Scheduler::CiviCRM->new;
 
-    my $contact = $civi->find_contacts_by_email('member@example.com');
+    my $contact = $civi->find_member_contacts_by_email('member@example.com');
     my $contact_id = $contacts->[0]{contact_id}
     my $contact    = $civi->get_contact($contact_id);
     $civi->update_contact($contact_id, \%new_data);
@@ -115,6 +115,7 @@ use warnings;
 
 use Carp qw/croak/;
 use Data::Dump qw/dump/;
+use DateTime;
 use JSON::MaybeXS qw/encode_json decode_json/;
 use LWP::UserAgent;
 use HTTP::Request::Common;
@@ -142,7 +143,7 @@ sub new {
     return $self;
 }
 
-=head2 find_contacts_by_email($email)
+=head2 find_member_contacts_by_email($email)
 
 Returns an arrayref of CiviCRM contact hashes:
 
@@ -152,35 +153,40 @@ Returns an arrayref of CiviCRM contact hashes:
     }
 
 (sorted ascending by id) for non-deleted, non-deceased contacts that have the
-given email address.
+given email address AND have at least one membership record.
+
+CiviCRM may also hold contacts who have never been members — e.g. people who
+registered for an event or made a one-off payment. Those contacts are excluded
+here because the member portal is specifically for reviewing and updating
+membership information, and showing it to non-members would be confusing.
 
 Returns an empty arrayref if none found.
 
 =cut
 
-sub find_contacts_by_email {
+sub find_member_contacts_by_email {
     my ($self, $email) = @_;
 
     my $result = $self->_call_v4('Email', 'get', {
         select  => ['contact_id', 'contact_id.display_name'],
+        join    => [['Membership AS membership', 'INNER', ['contact_id', '=', 'membership.contact_id']]],
         where   => [
             ['email',                  '=', $email],
             ['contact_id.is_deleted',  '=', \0],
             ['contact_id.is_deceased', '=', \0],
-            # JSON::MaybeXS->false?
         ],
-        orderBy => {'contact_id', 'ASC'},
-        #debug => JSON::MaybeXS->true,
+        groupBy => ['contact_id'],
+        orderBy => {'contact_id' => 'ASC'},
     });
 
     return [
         map {
             {
-                contact_id => $_->{contact_id},
+                contact_id   => $_->{contact_id},
                 display_name => $_->{'contact_id.display_name'},
             }
         } @{ $result->{values} }
-     ];
+    ];
 }
 
 =head2 get_contact($contact_id)
@@ -232,22 +238,40 @@ sub get_contact {
         limit => 1,
     });
 
-    my $addr  = $addr_result->{values}[0]  // {};
-    my $phone = $phone_result->{values}[0] // {};
+    my $membership_result = $self->_call_v4('Membership', 'get', {
+        select  => [qw(
+            end_date
+            membership_type_id:name
+        )],
+        where   => [['contact_id', '=', $contact_id]],
+        orderBy => {'end_date' => 'DESC'},
+        limit   => 1,
+    });
+
+    my $addr       = $addr_result->{values}[0]       // {};
+    my $phone      = $phone_result->{values}[0]      // {};
+    my $membership = $membership_result->{values}[0] // {};
 
     return {
-        contact_id     => $contact_id,
-        first_name     => $contact->{first_name}              // '',
-        middle_name    => $contact->{middle_name}             // '',
-        last_name      => $contact->{last_name}               // '',
-        nick_name      => $contact->{nick_name}               // '',
-        email          => $contact->{'email_primary.email'}   // '',
-        street_address => $addr->{street_address}             // '',
-        city           => $addr->{city}                       // '',
-        state          => $addr->{'state_province_id:label'}  // '',
-        postal_code    => $addr->{postal_code}                // '',
-        country        => $addr->{'country_id:label'}         // 'United States',
-        phone          => $phone->{phone}                     // '',
+        contact_id           => $contact_id,
+        first_name           => $contact->{first_name} // '',
+        middle_name          => $contact->{middle_name} // '',
+        last_name            => $contact->{last_name} // '',
+        nick_name            => $contact->{nick_name} // '',
+        email                => $contact->{'email_primary.email'} // '',
+        street_address       => $addr->{street_address} // '',
+        city                 => $addr->{city} // '',
+        state                => $addr->{'state_province_id:label'} // '',
+        postal_code          => $addr->{postal_code} // '',
+        country              => $addr->{'country_id:label'} // 'United States',
+        phone                => $phone->{phone} // '',
+        membership_type_name => $membership->{'membership_type_id:name'} // '',
+        membership_end       => $membership->{end_date} // '',
+        membership_is_active => (
+            $membership->{end_date}
+                ? (DateTime->now->ymd le $membership->{end_date} ? 1 : 0)
+                : undef
+        ),
     };
 }
 

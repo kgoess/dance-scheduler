@@ -38,7 +38,7 @@ my ($find_contacts_stub, $get_contact_stub, $last_magic_link, $last_update);
         bless {}, shift;
     };
 
-    *bacds::Scheduler::CiviCRM::find_contacts_by_email = sub {
+    *bacds::Scheduler::CiviCRM::find_member_contacts_by_email = sub {
         my ($self, $email) = @_;
         return $find_contacts_stub // [];
     };
@@ -62,12 +62,15 @@ my ($find_contacts_stub, $get_contact_stub, $last_magic_link, $last_update);
 test_get_request_page();
 test_post_request_link_bad_email();
 test_post_request_link_unknown_email();
+test_post_request_link_non_member_email();
 test_post_request_link_known_email();
 test_post_request_link_multiple_contacts();
 test_portal_invalid_token();
 test_portal_expired_token();
 test_portal_used_token();
 test_portal_valid_token();
+test_portal_valid_token_no_membership();
+test_portal_valid_token_expired_membership();
 test_portal_save_success();
 test_portal_save_consumes_token();
 
@@ -112,6 +115,25 @@ sub test_post_request_link_unknown_email {
     ok $res->is_success, 'POST with unknown email returns 200';
     like $res->content, qr{Check Your Email}, 'shows confirmation page';
     ok !$last_magic_link, 'no email sent for unknown address (silent ignore)';
+}
+
+sub test_post_request_link_non_member_email {
+    # Email is known in CiviCRM but the contact has no membership record;
+    # find_member_contacts_by_email returns [] just like an unknown email.
+    $find_contacts_stub = [];
+    $last_magic_link    = undef;
+
+    my $res;
+    warning_like {
+        $res = $Test->request(POST '/unearth/member/request-link',
+            { email => 'nonmember@example.com' }
+        );
+    } qr{^civicrm request_link: no contacts found for nonmember\@example.com},
+    'got expected warning for non-member email';
+
+    ok $res->is_success, 'POST with non-member email returns 200';
+    like $res->content, qr{Check Your Email}, 'shows same confirmation page as unknown email';
+    ok !$last_magic_link, 'no email sent for non-member address';
 }
 
 sub test_post_request_link_known_email {
@@ -210,11 +232,46 @@ sub test_portal_valid_token {
 
     my $res = $Test->request(GET "/unearth/member/portal?token=$token");
     ok $res->is_success, 'GET portal with valid token returns 200';
-    like $res->content, qr{Wanda},            'shows contact first name';
-    like $res->content, qr{Tinasky},          'shows contact last name';
+    like $res->content, qr{Wanda},               'shows contact first name';
+    like $res->content, qr{Tinasky},             'shows contact last name';
     like $res->content, qr{wanda\@example\.com}, 'shows contact email';
+    like $res->content, qr{Regular},             'shows membership type';
+    like $res->content, qr{2026-12-31},          'shows membership expiry';
+    like $res->content, qr{input-group-text text-success}, 'shows green check for current membership';
     unlike $res->content, qr{already been used|expired|not valid|Invalid link},
         'no error message on valid token';
+}
+
+sub test_portal_valid_token_no_membership {
+    my $token = _insert_valid_token(42);
+    $get_contact_stub = {
+        _fake_contact(42)->%*,
+        membership_type_name => '',
+        membership_end       => '',
+        membership_is_active => undef,
+    };
+
+    my $res = $Test->request(GET "/unearth/member/portal?token=$token");
+    ok $res->is_success, 'GET portal with no membership returns 200';
+    like $res->content, qr{No membership record found},
+        'shows error for contact with no membership history';
+    unlike $res->content, qr{Save changes},
+        'does not show the edit form for non-members';
+}
+
+sub test_portal_valid_token_expired_membership {
+    my $token = _insert_valid_token(42);
+    $get_contact_stub = {
+        _fake_contact(42)->%*,
+        membership_type_name => 'Regular',
+        membership_end       => '2020-01-01',
+        membership_is_active => 0,
+    };
+
+    my $res = $Test->request(GET "/unearth/member/portal?token=$token");
+    ok $res->is_success, 'GET portal with expired membership returns 200';
+    like $res->content, qr{input-group-text text-danger},   'shows red X for lapsed membership';
+    unlike $res->content, qr{input-group-text text-success}, 'does not show green check';
 }
 
 sub test_portal_save_success {
@@ -272,18 +329,21 @@ sub test_portal_save_consumes_token {
 sub _fake_contact {
     my ($id) = @_;
     return {
-        contact_id     => $id,
-        first_name     => 'Wanda',
-        middle_name    => '',
-        last_name      => 'Tinasky',
-        nick_name      => '',
-        email          => 'wanda@example.com',
-        phone          => '',
-        street_address => '',
-        city           => '',
-        state          => '',
-        postal_code    => '',
-        country        => 'United States',
+        contact_id           => $id,
+        first_name           => 'Wanda',
+        middle_name          => '',
+        last_name            => 'Tinasky',
+        nick_name            => '',
+        email                => 'wanda@example.com',
+        phone                => '',
+        street_address       => '',
+        city                 => '',
+        state                => '',
+        postal_code          => '',
+        country              => 'United States',
+        membership_type_name => 'Regular',
+        membership_end       => '2026-12-31',
+        membership_is_active => 1,
     };
 }
 
