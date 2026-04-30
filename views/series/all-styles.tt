@@ -1,0 +1,31 @@
+<% # this page is wrapped by views/layouts/unearth-page-wrapper.tt %>
+<% # This is the full list of series, subdivided by style %>
+<h1>Regularly-Scheduled Dance Series</h1>
+
+
+BACDS operates many regularly-scheduled dance series on most evenings, and Sunday afternoons.
+ If you live in the greater San Francisco bay area, one of our regular dances is close to you.
+ See the individual series page for start and end times, prices, and maps, or our
+ <a href="<% request.uri_for('/directions/') %>">directions</a> page for an overall area map. 
+
+<div class="row py-3">
+<%- FOR style IN styles -%>
+  <div class="col-4"><a href="#<% style.name %>"><% style.name %></a></div>
+<%- END -%>
+</div>
+<div class="row">
+<%- FOR style IN styles -%>
+<section>
+  <h2><a class="link-target" id="<% style.name %>" href="<% request.uri_for('/series/' _ style.name) %>" ><% style.name %></a></h2>
+  <%- IF style.series -%>
+  <ul>
+    <%- FOR series IN style.series -%>
+      <li><% series.name %></li>
+    <%- END -%>
+  </ul>
+  <%- ELSE -%>
+    There are not currently any series for this style
+  <%- END -%>
+</section>
+<%- END -%>
+</div>

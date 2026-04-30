@@ -184,6 +184,10 @@ a.quieter-link  {
 a.quieter-link:hover {
   text-decoration: underline;
 }
+a.link-target {  /* this should ideally be responsive to the different navbar heights on mobile,
+  but that would be really complicated */
+  scroll-margin-top: 2em;
+}
 
 .calendar-subscription-button {
   display:inline-block;

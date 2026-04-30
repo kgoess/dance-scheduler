@@ -1400,14 +1400,52 @@ get '/serieslister' => with_types [
     'optional' => ['query', 'event_id', 'SchedulerId'],
 ] => \&_details_for_series;
 
+=head2 GET /series/
+
+This is the list of all the styles, with links to the pages for the individual
+styles as well as a small blurb about each one.
+
+=cut
+get '/series/' => sub {
+
+    my $data = {};
+
+    my $dbh = get_dbh;
+    my @styles = $dbh->resultset('Style')->search({
+        is_deleted => 0,
+    }, {
+        order_by => ['name']
+    })->all;
+    #TODO: We need to add the series table into this query, so that the nested
+    # for loops in the tt can work
+
+    # We want to promote the core "English" and "Contra" styles, so make them
+    # first
+    my (@main_styles, @other_styles);
+    foreach my $style (@styles) {
+        if ( $style->name =~ /^(CONTRA|ENGLISH)$/ ) {
+            push @main_styles, $style;
+        } else {
+            push @other_styles, $style;
+        }
+    }
+    @styles = (@main_styles, @other_styles);
+    $data->{styles} = \@styles;
+
+    template('series/all-styles', $data,
+        # gets the wrapper from views/layouts/<whatever>
+        { layout => 'unearth-page-wrapper' },
+    );
+};
+
 # Add a trailing / if none was supplied.
-get '/series/:style/:series'=> sub{
+get '/series/:style/:series'=> sub {
     my $style  = route_parameters->get('style');
     my $series = route_parameters->get('series');
     redirect "/series/$style/$series/" => 302;
 };
 
-get '/series/:style/:series/'=> sub{
+get '/series/:style/:series/'=> sub {
     # search series for url like $path and internal redirect
     # forward '/path';
 
