@@ -619,7 +619,7 @@ sub test_livecalendar_endpoint {
         url => 'https://bacds.org/dance-a-week/',
       },
       {
-        allDay => 1, 
+        allDay => $^V >= v5.40.2 ? JSON::MaybeXS->true : 1, # dudley vs. maud
         backgroundColor => "yellow",
         borderColor => "antiquewhite",
         end => '2022-04-30T00:15:00', 

@@ -31,7 +31,7 @@ use warnings;
 
 use Carp;
 use Data::Dump qw/dump/;
-use Dancer2::Serializer::JSON qw/to_json/;
+use Dancer2::Serializer::JSON;
 use Encode qw/decode_utf8/;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;

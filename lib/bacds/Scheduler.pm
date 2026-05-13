@@ -27,7 +27,7 @@ use Dancer2::Plugin::HTTP::ContentNegotiation;
 use Dancer2::Plugin::ParamTypes;
 use Date::Calc qw(Today Days_in_Month Day_of_Week Month_to_Text);
 use Data::Dump qw/dump/;
-use DateTime::Format::ISO8601 qw/parse_datetime/;
+use DateTime::Format::ISO8601;
 use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
