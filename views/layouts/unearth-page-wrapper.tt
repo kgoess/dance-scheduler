@@ -286,6 +286,12 @@
     <!-- -->
     <footer class="site-footer position-lg-fixed">
       <div class="col-12 text-center">
+        <div><small>
+          All <a href="https://bacds.org/donate/">contributions</a> to the Bay
+          Area Country Dance Society are tax-deductible as allowable by law under IRS
+          Code Section 501(c)(3).  The tax ID of the BACDS is 94-2576366.
+        </small>
+        </div>
         <div class="copyright"><small>
             <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
             This site is made with <i class="icon-heart text-danger" aria-hidden="true"></i> by <a
