@@ -289,7 +289,7 @@
         <div><small>
           All <a href="https://bacds.org/donate/">contributions</a> to the Bay
           Area Country Dance Society are tax-deductible as allowable by law under IRS
-          Code Section 501(c)(3).  The tax ID of the BACDS is 94-2576366.
+          Code Section 501(c)(3).  The tax ID of the BACDS is 94-<span></span>2576366. <!-- the spans to keep iphone from marking it as a clickable phone number -->
         </small>
         </div>
         <div class="copyright"><small>
