@@ -153,14 +153,14 @@ use HTTP::Request::Common;
 
 sub fetch_google_oauth_keys {
 
-    my $min_acceptable_age = time() - 60*60*24;
+    my $min_acceptable_mtime = time() - 60*60*24;
 
     my $cache_dir = $ENV{TEST_CACHE_PATH} || '/var/cache/httpd/dance-scheduler';
     my $path = "$cache_dir/google-oauth-keys.json";
 
     my $json;
 
-    if (! -e $path || (stat($path))[9] < $min_acceptable_age) {
+    if (! -e $path || (stat($path))[9] < $min_acceptable_mtime) {
         $json = refresh_google_oauth_keys($cache_dir, $path);
 
     } else {
