@@ -89,7 +89,7 @@
             <div class="block-heading-1  text-center">
               <h2>Never Miss a Dance!</h2>
             </div>
-            <div class="fs-5 mx-5" style="width: 800px">
+            <div class="fs-5 mx-5" style="max-width: 800px">
               <!-- <p>Use this link to add a calendar to your Google Calendar, Apple iCal or compatible app:
                 <blockquote>
                   <a href="https://bacds.org/ical">https://bacds.org/ical</a>
