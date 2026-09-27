@@ -69,7 +69,7 @@ call MessageTemplate.send.
 
 The directory and mailing preferences are Yes/No custom fields in the
 AdditionalContactFields custom group, listed by id in
-L</@PREFERENCE_FIELDS>. APIv4 addresses custom fields as
+L</%PREFERENCE_FIELDS>. APIv4 addresses custom fields as
 C<GroupName.field_name>, so the ids are resolved to those names with one
 CustomField.get call, cached for the life of the process.
 
@@ -138,7 +138,7 @@ our $MOCK_API_KEY;
 
 # Our key for each preference => CiviCRM CustomField id
 # (AdditionalContactFields group), in display order.
-our @PREFERENCE_FIELDS = (
+my %PREFERENCE_FIELDS = (
     directory_include      => 3,  # Include me in membership directory?
     directory_show_email   => 4,  # Show my email address in directory?
     directory_show_phone   => 5,  # Show my phone number in directory?
@@ -146,7 +146,7 @@ our @PREFERENCE_FIELDS = (
     mass_email_ok          => 7,  # Include me in mass emails from bacds.org
     mass_postal_ok         => 8,  # Include me in mass postal mailings
 );
-our %PREFERENCE_FIELD_ID = @PREFERENCE_FIELDS;
+sub preference_field_keys { return keys %PREFERENCE_FIELDS }
 
 sub new {
     my ($class) = @_;
@@ -217,7 +217,7 @@ Returns a hashref with the contact's name, email (read-only), primary
 address, primary phone, and most recent membership. Missing fields default
 to ''.
 
-Also includes each key of %PREFERENCE_FIELD_ID (directory_include,
+Also includes each key of %PREFERENCE_FIELDS (directory_include,
 mass_email_ok, etc.) as 1 or 0; an unset field counts as 0.
 
 =cut
@@ -282,7 +282,7 @@ sub get_contact {
 
     my %prefs = map {
         $_ => ($contact->{ $pref_api_name->{$_} } ? 1 : 0)
-    } keys %PREFERENCE_FIELD_ID;
+    } keys %PREFERENCE_FIELDS;
 
     return {
         %prefs,
@@ -325,9 +325,9 @@ sub update_contact {
     for my $field (qw(first_name middle_name last_name nick_name)) {
         $contact_fields{$field} = $data->{$field} if exists $data->{$field};
     }
-    if (grep { exists $data->{$_} } keys %PREFERENCE_FIELD_ID) {
+    if (grep { exists $data->{$_} } keys %PREFERENCE_FIELDS) {
         my $pref_api_name = $self->_preference_api_names;
-        for my $key (keys %PREFERENCE_FIELD_ID) {
+        for my $key (keys %PREFERENCE_FIELDS) {
             next unless exists $data->{$key};
             $contact_fields{ $pref_api_name->{$key} } = $data->{$key} ? \1 : \0;
         }
@@ -444,7 +444,7 @@ sub send_magic_link_email {
 
 # Returns a hashref of our preference key => APIv4 field name, e.g.
 #   directory_include => 'AdditionalContactFields.Include_in_directory'
-# looked up from the CustomField ids in %PREFERENCE_FIELD_ID. Cached for
+# looked up from the CustomField ids in %PREFERENCE_FIELDS. Cached for
 # the life of the process.
 sub _preference_api_names {
     my ($self) = @_;
@@ -454,13 +454,13 @@ sub _preference_api_names {
 
     my $result = $self->_call_v4('CustomField', 'get', {
         select => ['id', 'name', 'data_type', 'custom_group_id:name'],
-        where  => [['id', 'IN', [values %PREFERENCE_FIELD_ID]]],
+        where  => [['id', 'IN', [values %PREFERENCE_FIELDS]]],
     });
     my %field_by_id = map { $_->{id} => $_ } @{ $result->{values} };
 
     my %found;
-    for my $key (keys %PREFERENCE_FIELD_ID) {
-        my $id = $PREFERENCE_FIELD_ID{$key};
+    for my $key (keys %PREFERENCE_FIELDS) {
+        my $id = $PREFERENCE_FIELDS{$key};
         my $field = $field_by_id{$id}
             or croak "CiviCRM custom field $id ($key) not found";
         $field->{data_type} eq 'Boolean'

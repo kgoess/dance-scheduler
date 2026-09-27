@@ -1953,8 +1953,8 @@ post '/unearth/member/portal' => sub {
          phone street_address city state postal_code country);
 
     # Unchecked checkboxes aren't submitted at all, so absent means "no"
-    for my $pref (keys %bacds::Scheduler::CiviCRM::PREFERENCE_FIELD_ID) {
-        $form_data{$pref} = body_parameters->get($pref) ? 1 : 0;
+    for my $pref_field_key (bacds::Scheduler::CiviCRM->preference_field_keys) {
+        $form_data{$pref_field_key} = body_parameters->get($pref_field_key) ? 1 : 0;
     }
 
     my $error;

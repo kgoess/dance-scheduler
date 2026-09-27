@@ -361,7 +361,7 @@ sub test_portal_save_preferences {
 
     is_deeply
         { map { $_ => $last_update->{data}{$_} }
-            keys %bacds::Scheduler::CiviCRM::PREFERENCE_FIELD_ID },
+            bacds::Scheduler::CiviCRM->preference_field_keys },
         {
             directory_include      => 1,
             directory_show_email   => 0,
