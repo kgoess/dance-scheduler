@@ -39,6 +39,7 @@ use YAML qw/Load/;
 
 use bacds::Scheduler::Auditor;
 use bacds::Scheduler::BoardAgenda; # loads routes under /board-agenda/
+use bacds::Scheduler::CiviCRM;
 use bacds::Scheduler::FederatedAuth;
 use bacds::Scheduler::ICal;
 use bacds::Scheduler::Plugin::AccordionConfig;
@@ -1950,6 +1951,11 @@ post '/unearth/member/portal' => sub {
         $_ => scalar(body_parameters->get($_))
     } qw(first_name middle_name last_name nick_name
          phone street_address city state postal_code country);
+
+    # Unchecked checkboxes aren't submitted at all, so absent means "no"
+    for my $pref (keys %bacds::Scheduler::CiviCRM::PREFERENCE_FIELD_ID) {
+        $form_data{$pref} = body_parameters->get($pref) ? 1 : 0;
+    }
 
     my $error;
     eval {

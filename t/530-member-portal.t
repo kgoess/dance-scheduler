@@ -73,6 +73,8 @@ test_portal_valid_token_no_membership();
 test_portal_valid_token_expired_membership();
 test_portal_save_success();
 test_portal_save_consumes_token();
+test_portal_shows_preferences();
+test_portal_save_preferences();
 
 done_testing;
 
@@ -324,6 +326,53 @@ sub test_portal_save_consumes_token {
         'second POST shows already-used error';
 }
 
+sub test_portal_shows_preferences {
+    my $token = _insert_valid_token(42);
+    $get_contact_stub = {
+        _fake_contact(42)->%*,
+        directory_include    => 1,
+        directory_show_email => 1,
+        mass_postal_ok       => 1,
+    };
+
+    my $res = $Test->request(GET "/unearth/member/portal?token=$token");
+    ok $res->is_success, 'GET portal with preferences returns 200';
+    for my $pref (qw(directory_include directory_show_email mass_postal_ok)) {
+        like $res->content, qr{name="$pref"\s+value="1" checked>}, "$pref is checked";
+    }
+    for my $pref (qw(directory_show_phone directory_show_address mass_email_ok)) {
+        like $res->content, qr{name="$pref"\s+value="1">}, "$pref is unchecked";
+    }
+}
+
+sub test_portal_save_preferences {
+    my $token = _insert_valid_token(42);
+    $last_update = undef;
+
+    # Browsers omit unchecked checkboxes entirely
+    my $res = $Test->request(POST '/unearth/member/portal', {
+        token             => $token,
+        first_name        => 'Wanda',
+        last_name         => 'Tinasky',
+        directory_include => 1,
+        mass_email_ok     => 1,
+    });
+    like $res->content, qr{Changes Saved}, 'save with preferences succeeds';
+
+    is_deeply
+        { map { $_ => $last_update->{data}{$_} }
+            keys %bacds::Scheduler::CiviCRM::PREFERENCE_FIELD_ID },
+        {
+            directory_include      => 1,
+            directory_show_email   => 0,
+            directory_show_phone   => 0,
+            directory_show_address => 0,
+            mass_email_ok          => 1,
+            mass_postal_ok         => 0,
+        },
+        'checked boxes saved as 1, missing ones as 0';
+}
+
 # --- helpers ---
 
 sub _fake_contact {
@@ -344,6 +393,12 @@ sub _fake_contact {
         membership_type_name => 'Regular',
         membership_end       => '2026-12-31',
         membership_is_active => 1,
+        directory_include      => 0,
+        directory_show_email   => 0,
+        directory_show_phone   => 0,
+        directory_show_address => 0,
+        mass_email_ok          => 0,
+        mass_postal_ok         => 0,
     };
 }
 

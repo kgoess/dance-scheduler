@@ -13,7 +13,8 @@
   <% ELSE %>
 
   <p class="text-center text-muted">
-    You can update your name, contact, and address information below.
+    You can update your name, contact, address, directory, and mailing
+    preferences below.
     Membership status is shown for reference and cannot be changed here.
     To update your email address, please
 <!-- FIXME TODO there is no /contact/ url -->
@@ -116,10 +117,70 @@
       </div>
     </div>
 
+    <h2>Directory</h2>
+    <div class="mb-3">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="directory_include" name="directory_include"
+          value="1"<% IF contact.directory_include %> checked<% END %>>
+        <label class="form-check-label" for="directory_include">Include me in membership directory</label>
+      </div>
+      <div class="ms-4" id="directory_options">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="directory_show_email" name="directory_show_email"
+            value="1"<% IF contact.directory_show_email %> checked<% END %>>
+          <label class="form-check-label" for="directory_show_email">Show my email address in directory</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="directory_show_phone" name="directory_show_phone"
+            value="1"<% IF contact.directory_show_phone %> checked<% END %>>
+          <label class="form-check-label" for="directory_show_phone">Show my phone number in directory</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="directory_show_address" name="directory_show_address"
+            value="1"<% IF contact.directory_show_address %> checked<% END %>>
+          <label class="form-check-label" for="directory_show_address">Show my street address in directory</label>
+        </div>
+      </div>
+    </div>
+
+    <h2>Mailings</h2>
+    <div class="mb-3">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="mass_email_ok" name="mass_email_ok"
+          value="1"<% IF contact.mass_email_ok %> checked<% END %>>
+        <label class="form-check-label" for="mass_email_ok">Include me in mass emails from bacds.org</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="mass_postal_ok" name="mass_postal_ok"
+          value="1"<% IF contact.mass_postal_ok %> checked<% END %>>
+        <label class="form-check-label" for="mass_postal_ok">Include me in mass postal mailings</label>
+      </div>
+    </div>
+
     <div class="text-center">
       <button type="submit" class="btn btn-primary btn-lg">Save changes</button>
     </div>
   </form>
+  <script>
+    // Grey out the directory sub-options when not in the directory. They're
+    // re-enabled on submit because disabled inputs aren't sent, which would
+    // reset them to "no" in CiviCRM.
+    (function () {
+      var form = document.querySelector('form.member-portal');
+      var include = document.getElementById('directory_include');
+      var options = document.getElementById('directory_options');
+      var boxes = options.querySelectorAll('input');
+      function sync() {
+        boxes.forEach(function (box) { box.disabled = !include.checked; });
+        options.classList.toggle('opacity-50', !include.checked);
+      }
+      include.addEventListener('change', sync);
+      form.addEventListener('submit', function () {
+        boxes.forEach(function (box) { box.disabled = false; });
+      });
+      sync();
+    })();
+  </script>
   <% END %>
   </div>
 </div>
