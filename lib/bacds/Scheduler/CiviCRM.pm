@@ -61,7 +61,17 @@ template should include a {$selfservice_url} Smarty variable for the link.
 
 The API key you generate and assign to a Contact record. That Contact has to
 have Administrator permissions or at least enough permissions to view and edit
-Contact, Email, Address and Phone records, and to call MessageTemplate.send.
+Contact, Email, Address and Phone records (including the
+AdditionalContactFields custom fields), to read CustomField metadata, and to
+call MessageTemplate.send.
+
+=head2 Preference custom fields
+
+The directory and mailing preferences are Yes/No custom fields in the
+AdditionalContactFields custom group, listed by id in
+L</%PREFERENCE_FIELDS>. APIv4 addresses custom fields as
+C<GroupName.field_name>, so the ids are resolved to those names with one
+CustomField.get call, cached for the life of the process.
 
 If you need the site_key (I thought I might but currently don't seem to), it
 shows up on the Contact's "API Key" screen.
@@ -125,6 +135,18 @@ our $CIVICRM_BASE_URL = 'https://bacds.civicrm.org';
 use constant DEBUG => 0;
 
 our $MOCK_API_KEY;
+
+# Our key for each preference => CiviCRM CustomField id
+# (AdditionalContactFields group), in display order.
+my %PREFERENCE_FIELDS = (
+    directory_include      => 3,  # Include me in membership directory?
+    directory_show_email   => 4,  # Show my email address in directory?
+    directory_show_phone   => 5,  # Show my phone number in directory?
+    directory_show_address => 6,  # Show my street address in directory?
+    mass_email_ok          => 7,  # Include me in mass emails from bacds.org
+    mass_postal_ok         => 8,  # Include me in mass postal mailings
+);
+sub preference_field_keys { return keys %PREFERENCE_FIELDS }
 
 sub new {
     my ($class) = @_;
@@ -192,12 +214,18 @@ sub find_member_contacts_by_email {
 =head2 get_contact($contact_id)
 
 Returns a hashref with the contact's name, email (read-only), primary
-address, and primary phone. Missing fields default to ''.
+address, primary phone, and most recent membership. Missing fields default
+to ''.
+
+Also includes each key of %PREFERENCE_FIELDS (directory_include,
+mass_email_ok, etc.) as 1 or 0; an unset field counts as 0.
 
 =cut
 
 sub get_contact {
     my ($self, $contact_id) = @_;
+
+    my $pref_api_name = $self->_preference_api_names;
 
     my $contact_result = $self->_call_v4('Contact', 'get', {
         select => [qw(
@@ -206,7 +234,7 @@ sub get_contact {
             last_name
             nick_name
             email_primary.email
-        )],
+        ), values %$pref_api_name],
         where => [['id', '=', $contact_id]],
     });
 
@@ -252,7 +280,12 @@ sub get_contact {
     my $phone      = $phone_result->{values}[0]      // {};
     my $membership = $membership_result->{values}[0] // {};
 
+    my %prefs = map {
+        $_ => ($contact->{ $pref_api_name->{$_} } ? 1 : 0)
+    } keys %PREFERENCE_FIELDS;
+
     return {
+        %prefs,
         contact_id           => $contact_id,
         first_name           => $contact->{first_name} // '',
         middle_name          => $contact->{middle_name} // '',
@@ -277,23 +310,31 @@ sub get_contact {
 
 =head2 update_contact($contact_id, \%data)
 
-Updates the contact's name fields, primary address, and primary phone in
-CiviCRM. Email is intentionally excluded (read-only). Each section is only
-updated if its keys are present in %data.
+Updates the contact's name fields, preference custom fields, primary
+address, and primary phone in CiviCRM. Email is intentionally excluded
+(read-only). Each field is only updated if its key is present in %data;
+preference values are treated as booleans.
 
 =cut
 
 sub update_contact {
     my ($self, $contact_id, $data) = @_;
 
-    # Update core name fields
-    my %name_fields;
+    # Update core name fields and preference custom fields
+    my %contact_fields;
     for my $field (qw(first_name middle_name last_name nick_name)) {
-        $name_fields{$field} = $data->{$field} if exists $data->{$field};
+        $contact_fields{$field} = $data->{$field} if exists $data->{$field};
     }
-    if (%name_fields) {
+    if (grep { exists $data->{$_} } keys %PREFERENCE_FIELDS) {
+        my $pref_api_name = $self->_preference_api_names;
+        for my $key (keys %PREFERENCE_FIELDS) {
+            next unless exists $data->{$key};
+            $contact_fields{ $pref_api_name->{$key} } = $data->{$key} ? \1 : \0;
+        }
+    }
+    if (%contact_fields) {
         $self->_call_v4('Contact', 'update', {
-            values => \%name_fields,
+            values => \%contact_fields,
             where  => [['id', '=', $contact_id]],
         });
     }
@@ -400,6 +441,36 @@ sub send_magic_link_email {
 }
 
 # --- private helpers ---
+
+# Returns a hashref of our preference key => APIv4 field name, e.g.
+#   directory_include => 'AdditionalContactFields.Include_in_directory'
+# looked up from the CustomField ids in %PREFERENCE_FIELDS. Cached for
+# the life of the process.
+sub _preference_api_names {
+    my ($self) = @_;
+
+    state %api_name;
+    return \%api_name if %api_name;
+
+    my $result = $self->_call_v4('CustomField', 'get', {
+        select => ['id', 'name', 'data_type', 'custom_group_id:name'],
+        where  => [['id', 'IN', [values %PREFERENCE_FIELDS]]],
+    });
+    my %field_by_id = map { $_->{id} => $_ } @{ $result->{values} };
+
+    my %found;
+    for my $key (keys %PREFERENCE_FIELDS) {
+        my $id = $PREFERENCE_FIELDS{$key};
+        my $field = $field_by_id{$id}
+            or croak "CiviCRM custom field $id ($key) not found";
+        $field->{data_type} eq 'Boolean'
+            or croak "CiviCRM custom field $id ($key) is $field->{data_type}, expected Boolean";
+        $found{$key} = "$field->{'custom_group_id:name'}.$field->{name}";
+    }
+    %api_name = %found;
+
+    return \%api_name;
+}
 
 sub _call_v4 {
     my ($self, $entity, $action, $params) = @_;
