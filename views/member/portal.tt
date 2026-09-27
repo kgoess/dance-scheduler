@@ -119,6 +119,9 @@
 
     <h2>Directory</h2>
     <div class="mb-3">
+    <p class="text-muted">
+        In the event that we get back to offering a Membership Directory someday:
+    </p>
       <div class="form-check">
         <input class="form-check-input" type="checkbox" id="directory_include" name="directory_include"
           value="1"<% IF contact.directory_include %> checked<% END %>>
@@ -144,6 +147,12 @@
     </div>
 
     <h2>Mailings</h2>
+    <p class="text-muted">
+    To join our BACDS email lists, see <a href="https://bacds.groups.io/g/main">bacds.groups.io</a>
+    </p>
+    <p class="text-muted">
+    But in the event that we someday return to general deliveries of things like directories or newsletters:
+    </p>
     <div class="mb-3">
       <div class="form-check">
         <input class="form-check-input" type="checkbox" id="mass_email_ok" name="mass_email_ok"
