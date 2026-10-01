@@ -170,6 +170,20 @@
       yes_color: darksalmon
       help: >
         Show &quot;&#8230;and friends&quot; at the end of the &quot;Music by&quot; list
+    - label: Force iCal
+      name: force_canon_ical
+      type: bool
+      no: No
+      yes: Yes
+      yes_color: blue
+      help: >
+        <b>Publish iCal entry even though not a BACDS event</b><br>
+        The /ical endpoint doesn't publish events that are not BACDS, so that
+        the universe doesn't get multiple entries for the same event but with
+        different UUIDs.<br>
+        Check this box if you want us to publish an /ical entry <i>anyway</i> because
+        nobody else is publishing one for this event, i.e. if our BACDS entry is the
+        canonical one.
     - name: is_series_defaults
       type: hidden
     - name: event_id

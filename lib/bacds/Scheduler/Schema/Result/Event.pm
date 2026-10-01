@@ -152,6 +152,12 @@ __PACKAGE__->table("events");
   is_nullable: 0
   size: 36
 
+=head2 force_canon_ical
+
+  data_type: 'tinyint'
+  default_value: 0
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -209,6 +215,8 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
     size => 36,
   },
+  "force_canon_ical",
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -395,8 +403,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-01-31 12:53:26
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:R3z7u6nDH+7DDx+jQxggXw
+# Created by DBIx::Class::Schema::Loader v0.07052 @ 2026-10-01 12:50:18
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:m5PRB6J3kXUUOzWjbcLurA
 
 __PACKAGE__->many_to_many(bands => 'event_band_maps', 'band');
 __PACKAGE__->many_to_many(teams => 'event_team_maps', 'team');

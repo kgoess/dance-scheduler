@@ -336,7 +336,7 @@ endpoint for the version that does take parameters.
 
 get '/ical' => sub {
     my $rs = bacds::Scheduler::Model::DanceFinder->search_events(
-        parent_org => [bacds_parent_org_id()],
+    #   parent_org => [bacds_parent_org_id()],
     #   end_date   => $end_date,
     #   start_date => $start_date,
     #   style      => \@style_ids,
@@ -344,8 +344,19 @@ get '/ical' => sub {
     #   db         => $db,
     #   dbuser     => $dbuser
     );
-    my @events = $rs->all;
-
+    my @events;
+    my $allow_force_canon_ical = query_parameters->get('include_non_bacds');
+    foreach my $event ($rs->all) {
+        if (List::Util::any { $_->parent_org_id eq bacds_parent_org_id() }
+            $event->parent_orgs
+        ){
+            push @events, $event;
+        } elsif ($allow_force_canon_ical and $event->force_canon_ical) {
+            push @events, $event;
+        } else {
+            next;
+        }
+    }
     content_type 'text/calendar';
     return bacds::Scheduler::ICal->events_to_ical(
         \@events, request->scheme, request->host,

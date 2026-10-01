@@ -22,6 +22,7 @@ sub get_fields_for_output {
         custom_url
         photo_url
         custom_pricing
+        force_canon_ical
         is_series_defaults
         created_ts
         modified_ts
@@ -43,6 +44,7 @@ sub get_fields_for_input {
         custom_url
         photo_url
         custom_pricing
+        force_canon_ical
         is_series_defaults
         and_friends
         is_canceled

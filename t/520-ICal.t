@@ -7,7 +7,7 @@ use utf8;
 
 use Data::Dump qw/dump/;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 37;
+use Test::More tests => 45;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -89,12 +89,20 @@ my $caller_id = $decoded->{data}{caller_id};
 my $parent_org = {
     full_name    => 'Bree Ambidextrous Cloth Dying',
     abbreviation => 'BACDS',
-    
+};
+my $ffcds = {
+    full_name => 'Fangorn Forest Country Dancer Society',
+    abbreviation => 'FFCDS',
 };
 $test->post_ok('/parent_org/', $parent_org );
 ok($test->success, 'created parent_org');
 $decoded = decode_json($test->content);
 my $parent_org_id = $decoded->{data}{parent_org_id};
+
+$test->post_ok('/parent_org/', $ffcds );
+ok($test->success, 'created FFCDS parent_org');
+$decoded = decode_json($test->content);
+my $ffcds_org_id = $decoded->{data}{parent_org_id};
 
 
 my $event_1 = {
@@ -109,6 +117,7 @@ my $event_1 = {
     and_friends => 0,
     is_series_defaults => 0,
     synthetic_name => "ENGLISH this is first event",
+    force_canon_ical => 0,
     series_id   => $series_1_id,
     style_id => [$style_1_id, $style_2_id],
     venue_id => $venue_id,
@@ -127,6 +136,7 @@ my $event_2 = {
     and_friends => 0,
     is_series_defaults => 0,
     synthetic_name => "ENGLISH this is second event in first series",
+    force_canon_ical => 0,
     series_id   => $series_1_id,
     style_id => [$style_1_id, $style_2_id],
     venue_id => $venue_id,
@@ -142,12 +152,54 @@ my $event_3 = {
     and_friends => 0,
     is_series_defaults => 0,
     synthetic_name  => "CONTRA this is second event ﷽",
+    force_canon_ical => 0,
     series_id   => $series_2_id,
     parent_org_id => $parent_org_id,
 };
 $test->post_ok('/event/', $event_1 );
 $test->post_ok('/event/', $event_2 );
 $test->post_ok('/event/', $event_3 );
+
+# some non-bacds events
+my $fangorn_contra = {
+    name       => 'Fangorn Contra',
+    series_xid => 'FANG-CONTRA',
+    frequency  => 'fourth Trewsday',
+    series_url => 'https://bacds.org/fangorn-contra',
+};
+$test->post_ok('/series/', $fangorn_contra);
+$decoded = decode_json($test->content);
+my $fangorn_series_id = $decoded->{data}{series_id};
+
+my $non_bacds_no_ical = {
+    start_date => "2022-05-10",
+    start_time => "20:00",
+
+    short_desc  => "non-bacds dance no ical",
+    is_canceled => 0,
+    and_friends => 0,
+    is_series_defaults => 0,
+    synthetic_name  => "should not show on ical",
+    force_canon_ical => 0,
+    series_id   => $fangorn_series_id,
+    parent_org_id => $ffcds_org_id,
+};
+my $non_bacds_force_ical = {
+    start_date => "2022-05-11",
+    start_time => "20:00",
+    short_desc  => "non-bacds dance yes ical",
+    is_canceled => 0,
+    and_friends => 0,
+    is_series_defaults => 0,
+    synthetic_name  => "should show on ical",
+
+    force_canon_ical => 1, # the crux here
+
+    series_id   => $fangorn_series_id,
+    parent_org_id => $ffcds_org_id,
+};
+$test->post_ok('/event/', $non_bacds_no_ical );
+$test->post_ok('/event/', $non_bacds_force_ical );
 
 basic_test();
 test_url_endpoint($test);
@@ -201,9 +253,7 @@ END:VEVENT
 END:VCALENDAR
 EOL
 
-
     eq_or_diff [split(/\r\n/, $got)], [split(/\n/, $expected_1)];
-
 }
 
 sub test_url_endpoint ($test) {
@@ -214,7 +264,82 @@ sub test_url_endpoint ($test) {
     $got =~ s/\r\n/\n/g;
     $got =~ s/$UUID_RE/...snip.../g;
     my @got = split "\n", $got;
-    my @expected = split "\n", <<'EOL';
+
+    my $event1 = <<'EOL';
+BEGIN:VEVENT
+CATEGORIES:pipesmoking
+CATEGORIES:maypole
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為 X—Y
+DTEND;TZID=America/Los_Angeles:20220501T220000
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220501T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:the hall\, 123 Sesame St.\, Gotham
+ORGANIZER:Bree Mersday English
+STATUS:CONFIRMED
+SUMMARY:Bree Mersday English: Rose Gamgee
+UID:...snip...
+URL:https://bacds.org/bree-mersday-eng
+END:VEVENT
+EOL
+    my $event2 = <<'EOL';
+BEGIN:VEVENT
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION: new lines shortdesc
+DTEND;TZID=America/Los_Angeles:20220502T235959
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220502T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:
+ORGANIZER:Bywater Trewsday Contra
+STATUS:CONFIRMED
+SUMMARY:Bywater Trewsday Contra
+UID:...snip...
+URL:https://bacds.org/bywater-trewsday-contra
+END:VEVENT
+EOL
+    my $event3 = <<'EOL';
+BEGIN:VEVENT
+CATEGORIES:pipesmoking
+CATEGORIES:maypole
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION:Rose Gamgee event #2
+DTEND;TZID=America/Los_Angeles:20220503T220000
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220503T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:the hall\, 123 Sesame St.\, Gotham
+ORGANIZER:Bree Mersday English
+STATUS:CONFIRMED
+SUMMARY:Bree Mersday English: Rose Gamgee
+UID:...snip...
+URL:https://bacds.org/bree-mersday-eng
+END:VEVENT
+EOL
+    my $non_bacds_but_included_anyway = <<'EOL';
+BEGIN:VEVENT
+CLASS:PUBLIC
+CREATED:20220428T021805
+DESCRIPTION: non-bacds dance yes ical
+DTEND;TZID=America/Los_Angeles:20220511T235959
+DTSTAMP:20220428T021805
+DTSTART;TZID=America/Los_Angeles:20220511T200000
+LAST-MODIFIED:20220428T021805
+LOCATION:
+ORGANIZER:Fangorn Contra
+STATUS:CONFIRMED
+SUMMARY:Fangorn Contra
+UID:...snip...
+URL:https://bacds.org/fangorn-contra
+END:VEVENT
+EOL
+
+    chomp $_ for ($event1, $event2, $event3, $non_bacds_but_included_anyway);
+    my @expected = split "\n", <<EOL;
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:Data::ICal 0.24
@@ -234,55 +359,47 @@ TZOFFSETFROM:-0700
 TZOFFSETTO:-0800
 END:STANDARD
 END:VTIMEZONE
-BEGIN:VEVENT
-CATEGORIES:pipesmoking
-CATEGORIES:maypole
-CLASS:PUBLIC
-CREATED:20220428T021805
-DESCRIPTION:Rose Gamgee itsa shortdesc 1 無為 X—Y
-DTEND;TZID=America/Los_Angeles:20220501T220000
-DTSTAMP:20220428T021805
-DTSTART;TZID=America/Los_Angeles:20220501T200000
-LAST-MODIFIED:20220428T021805
-LOCATION:the hall\, 123 Sesame St.\, Gotham
-ORGANIZER:Bree Mersday English
-STATUS:CONFIRMED
-SUMMARY:Bree Mersday English: Rose Gamgee
-UID:...snip...
-URL:https://bacds.org/bree-mersday-eng
-END:VEVENT
-BEGIN:VEVENT
-CLASS:PUBLIC
-CREATED:20220428T021805
-DESCRIPTION: new lines shortdesc
-DTEND;TZID=America/Los_Angeles:20220502T235959
-DTSTAMP:20220428T021805
-DTSTART;TZID=America/Los_Angeles:20220502T200000
-LAST-MODIFIED:20220428T021805
-LOCATION:
-ORGANIZER:Bywater Trewsday Contra
-STATUS:CONFIRMED
-SUMMARY:Bywater Trewsday Contra
-UID:...snip...
-URL:https://bacds.org/bywater-trewsday-contra
-END:VEVENT
-BEGIN:VEVENT
-CATEGORIES:pipesmoking
-CATEGORIES:maypole
-CLASS:PUBLIC
-CREATED:20220428T021805
-DESCRIPTION:Rose Gamgee event #2
-DTEND;TZID=America/Los_Angeles:20220503T220000
-DTSTAMP:20220428T021805
-DTSTART;TZID=America/Los_Angeles:20220503T200000
-LAST-MODIFIED:20220428T021805
-LOCATION:the hall\, 123 Sesame St.\, Gotham
-ORGANIZER:Bree Mersday English
-STATUS:CONFIRMED
-SUMMARY:Bree Mersday English: Rose Gamgee
-UID:...snip...
-URL:https://bacds.org/bree-mersday-eng
-END:VEVENT
+$event1
+$event2
+$event3
+END:VCALENDAR
+EOL
+    eq_or_diff \@got, \@expected, '/ical endpoint worked';
+
+    #
+    # do again with the ?include_non_bacds=1 param
+    $test->get_ok('/ical?include_non_bacds=1');
+    ok($test->success, 'got /ical');
+
+    $got = $test->content;
+    $got =~ s/\r\n/\n/g;
+    $got =~ s/$UUID_RE/...snip.../g;
+    @got = split "\n", $got;
+
+    @expected = split "\n", <<EOL;
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:Data::ICal 0.24
+X-WR-CALNAME:BACDS Dances
+BEGIN:VTIMEZONE
+TZID:America/Los_Angeles
+BEGIN:DAYLIGHT
+DTSTART:20220313T100000
+TZNAME:PDT
+TZOFFSETFROM:-0800
+TZOFFSETTO:-0700
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20221106T090000
+TZNAME:PST
+TZOFFSETFROM:-0700
+TZOFFSETTO:-0800
+END:STANDARD
+END:VTIMEZONE
+$event1
+$event2
+$event3
+$non_bacds_but_included_anyway
 END:VCALENDAR
 EOL
     eq_or_diff \@got, \@expected, '/ical endpoint worked';

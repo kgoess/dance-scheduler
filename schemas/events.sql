@@ -14,6 +14,7 @@ CREATE TABLE events (
     is_series_defaults BOOLEAN NOT NULL DEFAULT 0,
     series_id INT,
     and_friends BOOLEAN NOT NULL DEFAULT 0,
+    force_canon_ical BOOLEAN NOT NULL DEFAULT 0,
     is_canceled BOOLEAN NOT NULL DEFAULT 0,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
     created_ts DATETIME NOT NULL,
