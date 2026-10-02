@@ -41,6 +41,7 @@ subtest 'POST /event' => sub {
         short_desc  => "itsa shortdesc",
         is_canceled => 0,
         and_friends => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
         name        => "saturday night test event",
     };
@@ -72,6 +73,7 @@ subtest 'POST /event' => sub {
         is_deleted  => 0,
         is_canceled  => 0,
         and_friends  => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
@@ -133,6 +135,7 @@ subtest 'POST /event/# with team' => sub {
         is_deleted    => 0,
         is_canceled   => 0,
         and_friends   => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;

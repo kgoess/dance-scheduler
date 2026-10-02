@@ -309,6 +309,7 @@ sub test_can_edit {
         name           => "saturday night test event £ ウ",
         is_canceled    => 0,
         and_friends    => 0,
+        force_canon_ical => 0,
         is_series_defaults    => 0,
         synthetic_name => 'Saturday Night Test',
     };
@@ -402,6 +403,7 @@ sub test_can_edit {
         name           => "some other event",
         is_canceled    => 0,
         and_friends    => 0,
+        force_canon_ical => 0,
         is_series_defaults    => 0,
         synthetic_name => 'some other event',
     };
@@ -496,6 +498,7 @@ sub test_can_edit_team {
         name           => "saturday night test event £ ウ",
         is_canceled    => 0,
         and_friends    => 0,
+        force_canon_ical => 0,
         is_series_defaults    => 0,
         synthetic_name => 'Saturday Night Test',
     };

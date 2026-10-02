@@ -42,6 +42,7 @@ subtest 'POST /event' => sub {
         style_id    => undef,
         is_canceled => 0,
         and_friends => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -72,6 +73,7 @@ subtest 'POST /event' => sub {
         modified_ts => "2022-04-28T02:18:05",
         is_canceled => 0,
         and_friends => 0,
+        force_canon_ical => 0,
         is_deleted  => 0,
         is_series_defaults => 0,
     };
@@ -125,6 +127,7 @@ subtest 'POST /event/# with style' => sub {
         style_id    => $Style_Id,
         is_canceled => 0,
         and_friends => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;

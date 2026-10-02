@@ -41,6 +41,7 @@ subtest 'POST /event' => sub {
         caller_id   => undef,
         is_canceled => 0,
         and_friends => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;
@@ -71,6 +72,7 @@ subtest 'POST /event' => sub {
         is_deleted  => 0,
         is_canceled => 0,
         and_friends => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
     };
     eq_or_diff $got, $expected, 'return matches';
@@ -124,6 +126,7 @@ subtest 'POST /event/# with caller' => sub {
         caller_id   => $Caller_Id,
         is_canceled => 0,
         and_friends => 0,
+        force_canon_ical => 0,
         is_series_defaults => 0,
     };
     $ENV{TEST_NOW} = 1651112285;

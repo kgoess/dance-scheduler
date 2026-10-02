@@ -42,6 +42,7 @@ sub setup_fixture {
         synthetic_name => 'test event 1 synthname',
         custom_url => 'http://custom-url/test-event-1',
         short_desc => 'big <b> dance party &#9786',
+        force_canon_ical => 0,
         start_date => get_now->ymd('-'),
         start_time => '20:00',
         uuid => uuid(),
@@ -148,6 +149,7 @@ sub test_create {
         and_friends => 0,
         is_canceled => 0,
         is_series_defaults => 0,
+        force_canon_ical => 0,
     };
     $test->post_ok('/event/', $new_event );
 
