@@ -31,6 +31,7 @@ sub setup_fixture {
         short_desc => 'big <b> dance party &#9786',
         start_date => get_now->ymd,
         start_time => '20:00:00',
+        uuid => Data::UUID->new->create_b64,
     });
     $event1->insert;
     my $event2 = $dbh->resultset('Event')->new({
@@ -38,6 +39,7 @@ sub setup_fixture {
         synthetic_name => 'test event 2 synthname',
         start_date => get_now->add(days => 2)->ymd,
         start_time => '20:00:00',
+        uuid => Data::UUID->new->create_b64,
     });
     $event2->insert;
     return {
