@@ -536,7 +536,9 @@ sub _call_v4 {
         #'X-Civi-Key' => $self->{site_key},
         # but it turned out to be some different issue and site_key is unnecessary.
         Content_Type => 'application/x-www-form-urlencoded',
-        Content       => 'params='.encode_json($params),
+        # As a list so it gets URL-encoded; a raw string would turn a "+"
+        # in an email address or phone number into a space.
+        Content       => [ params => encode_json($params) ],
 
         # To ensure broad compatibility, APIv4 REST clients should set this
         # HTTP header https://docs.civicrm.org/dev/en/latest/api/v4/rest/
