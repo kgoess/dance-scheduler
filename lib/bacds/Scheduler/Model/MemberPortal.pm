@@ -63,7 +63,12 @@ sub request_link {
 
     my $civi = bacds::Scheduler::CiviCRM->new;
 
+    # Contacts with a membership of their own come first; only if there are
+    # none, look for contacts covered by a relative's membership (e.g. a
+    # spouse on a Family membership)
     my $contacts = $civi->find_member_contacts_by_email($email);
+    $contacts = $civi->find_related_member_contacts_by_email($email)
+        unless @$contacts;
     #return unless @$contacts;  # silent ignore for unknown emails
     if (!@$contacts) {
         warn "civicrm request_link: no contacts found for $email";

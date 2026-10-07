@@ -70,7 +70,13 @@
         </div>
       </div>
     </div>
-    <% IF contact.membership_payment_url %>
+    <% IF contact.membership_owner_name %>
+    <p class="mb-3">
+      Your membership is through <% contact.membership_owner_name | html %>'s
+      <% contact.membership_type_name | html %> membership. Please use their email
+      address to manage the membership payments.
+    </p>
+    <% ELSIF contact.membership_payment_url %>
     <div class="mb-3">
       <a class="btn btn-outline-primary" href="<% contact.membership_payment_url | html %>"
         target="_blank" rel="noopener">Pay or renew membership</a>

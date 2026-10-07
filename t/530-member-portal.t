@@ -25,11 +25,12 @@ my $Test = get_tester();  # no auth needed - portal is public
 # --- Mock CiviCRM so tests don't need real API keys or network ---
 #
 # $find_contacts_stub: arrayref of contact_ids to return, or undef for []
+# $find_related_stub:  same, for find_related_member_contacts_by_email
 # $get_contact_stub:   hashref to return, or undef for the default fake contact
 # $last_magic_link:    populated whenever send_magic_link_email is called
 # $last_update:        populated whenever update_contact is called
 
-my ($find_contacts_stub, $get_contact_stub, $last_magic_link, $last_update);
+my ($find_contacts_stub, $find_related_stub, $get_contact_stub, $last_magic_link, $last_update);
 
 {
     no warnings 'redefine';
@@ -41,6 +42,11 @@ my ($find_contacts_stub, $get_contact_stub, $last_magic_link, $last_update);
     *bacds::Scheduler::CiviCRM::find_member_contacts_by_email = sub {
         my ($self, $email) = @_;
         return $find_contacts_stub // [];
+    };
+
+    *bacds::Scheduler::CiviCRM::find_related_member_contacts_by_email = sub {
+        my ($self, $email) = @_;
+        return $find_related_stub // [];
     };
 
     *bacds::Scheduler::CiviCRM::get_contact = sub {
@@ -75,6 +81,9 @@ test_portal_save_success();
 test_portal_save_consumes_token();
 test_portal_shows_preferences();
 test_portal_save_preferences();
+test_post_request_link_related_contact();
+test_post_request_link_prefers_own_membership();
+test_portal_membership_through_someone_else();
 
 done_testing;
 
@@ -376,6 +385,53 @@ sub test_portal_save_preferences {
         'checked boxes saved as 1, missing ones as 0';
 }
 
+sub test_post_request_link_related_contact {
+    # No membership of their own, but covered by a spouse's Family membership
+    $find_contacts_stub = [];
+    $find_related_stub  = [{ contact_id => 739, display_name => 'Spouse' }];
+    $last_magic_link    = undef;
+
+    my $res = $Test->request(POST '/unearth/member/request-link',
+        { email => 'spouse@example.com' });
+    like $res->content, qr{Check Your Email}, 'related contact sees confirmation page';
+    ok $last_magic_link, 'email sent to related contact';
+    is $last_magic_link->{contact_id}, 739, 'link is for the related contact';
+
+    $find_related_stub = undef;
+}
+
+sub test_post_request_link_prefers_own_membership {
+    # A shared email: one contact holds the membership, another is related
+    $find_contacts_stub = [{ contact_id => 16,  display_name => 'Holder' }];
+    $find_related_stub  = [{ contact_id => 739, display_name => 'Spouse' }];
+    $last_magic_link    = undef;
+
+    $Test->request(POST '/unearth/member/request-link',
+        { email => 'shared-family@example.com' });
+    is $last_magic_link->{contact_id}, 16,
+        'contact with their own membership wins over a related one';
+
+    $find_related_stub = undef;
+}
+
+sub test_portal_membership_through_someone_else {
+    my $token = _insert_valid_token(739);
+    $get_contact_stub = {
+        _fake_contact(739)->%*,
+        membership_type_name   => 'Family',
+        membership_owner_name  => 'Pat Holder',
+        membership_payment_url => '',
+    };
+
+    my $res = $Test->request(GET "/unearth/member/portal?token=$token");
+    ok $res->is_success, 'GET portal for related contact returns 200';
+    like $res->content, qr{Your membership is through Pat Holder's\s+Family membership},
+        'says whose membership covers them';
+    unlike $res->content, qr{Pay or renew membership},
+        'no payment button when someone else holds the membership';
+    like $res->content, qr{Save changes}, 'related contact can still edit their info';
+}
+
 # --- helpers ---
 
 sub _fake_contact {
@@ -394,6 +450,7 @@ sub _fake_contact {
         postal_code          => '',
         country              => 'United States',
         membership_id        => 147,
+        membership_owner_name => '',
         membership_payment_url => 'https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2&cid=42&mid=147&cs=abc_123_1',
         membership_type_name => 'Regular',
         membership_end       => '2026-12-31',
