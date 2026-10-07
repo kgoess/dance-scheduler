@@ -218,6 +218,55 @@ sub find_member_contacts_by_email {
     ];
 }
 
+=head2 find_related_member_contacts_by_email($email)
+
+Like L</find_member_contacts_by_email>, but for contacts who have no
+membership of their own and are instead covered by someone else's. For
+example, the spouse of a Family member when CiviCRM didn't create an
+inherited membership for them (say the type's max_related was already
+reached).
+
+A contact qualifies if they have a current relationship to a contact who
+directly holds a membership, and that membership's type lists the
+relationship type and direction for inheritance. This is the same rule
+CiviCRM uses to create inherited memberships; see
+L</_owner_memberships_via_relationship>.
+
+Returns the same shape as find_member_contacts_by_email, sorted ascending by
+contact_id, or an empty arrayref.
+
+=cut
+
+sub find_related_member_contacts_by_email {
+    my ($self, $email) = @_;
+
+    my $result = $self->_call_v4('Email', 'get', {
+        select  => ['contact_id', 'contact_id.display_name'],
+        where   => [
+            ['email',                  '=', $email],
+            ['contact_id.is_deleted',  '=', \0],
+            ['contact_id.is_deceased', '=', \0],
+        ],
+        groupBy => ['contact_id'],
+        orderBy => {'contact_id' => 'ASC'},
+    });
+    my @contacts = @{ $result->{values} }
+        or return [];
+
+    my $owner_memberships = $self->_owner_memberships_via_relationship(
+        [ map { $_->{contact_id} } @contacts ]
+    );
+
+    return [
+        map {
+            {
+                contact_id   => $_->{contact_id},
+                display_name => $_->{'contact_id.display_name'},
+            }
+        } grep { $owner_memberships->{ $_->{contact_id} } } @contacts
+    ];
+}
+
 =head2 get_contact($contact_id)
 
 Returns a hashref with the contact's name, email (read-only), primary
@@ -227,9 +276,16 @@ to ''.
 Also includes each key of %PREFERENCE_FIELDS (directory_include,
 mass_email_ok, etc.) as 1 or 0; an unset field counts as 0.
 
-If the contact has a membership, membership_payment_url is a link to the
-CiviCRM contribution page with the contact's email and membership level
-pre-filled (see L</membership_payment_url>); otherwise it's ''.
+The membership fields describe the latest-ending membership that covers
+the contact. That's either their own (possibly inherited) membership, or one
+held by a related contact (see L</find_related_member_contacts_by_email>).
+
+If the membership is held by someone else, either as an inherited
+membership or through a relationship, membership_owner_name is the holder's
+display name and membership_payment_url is '', since only the holder can
+renew it. Otherwise membership_owner_name is '', and membership_payment_url
+links to the CiviCRM contribution page with the contact's email and
+membership level pre-filled (see L</membership_payment_url>).
 
 =cut
 
@@ -282,15 +338,37 @@ sub get_contact {
             id
             end_date
             membership_type_id:name
+            owner_membership_id
+            owner_membership_id.contact_id.display_name
         )],
         where   => [['contact_id', '=', $contact_id]],
         orderBy => {'end_date' => 'DESC'},
         limit   => 1,
     });
 
+    my @memberships;
+    if (my $own = $membership_result->{values}[0]) {
+        push @memberships, {
+            id         => $own->{id},
+            end_date   => $own->{end_date},
+            type_name  => $own->{'membership_type_id:name'},
+            owner_name => (
+                $own->{owner_membership_id}
+                    ? $own->{'owner_membership_id.contact_id.display_name'}
+                    : ''
+            ),
+        };
+    }
+    my $related = $self->_owner_memberships_via_relationship([$contact_id]);
+    push @memberships, @{ $related->{$contact_id} // [] };
+
+    my ($membership) = sort {
+        ($b->{end_date} // '') cmp ($a->{end_date} // '')
+    } @memberships;
+    $membership //= {};
+
     my $addr       = $addr_result->{values}[0]       // {};
     my $phone      = $phone_result->{values}[0]      // {};
-    my $membership = $membership_result->{values}[0] // {};
 
     my %prefs = map {
         $_ => ($contact->{ $pref_api_name->{$_} } ? 1 : 0)
@@ -311,12 +389,13 @@ sub get_contact {
         country              => $addr->{'country_id:label'} // 'United States',
         phone                => $phone->{phone} // '',
         membership_id        => $membership->{id} // '',
+        membership_owner_name => $membership->{owner_name} // '',
         membership_payment_url => (
-            $membership->{id}
+            $membership->{id} && !$membership->{owner_name}
                 ? $self->membership_payment_url($contact_id, $membership->{id})
                 : ''
         ),
-        membership_type_name => $membership->{'membership_type_id:name'} // '',
+        membership_type_name => $membership->{type_name} // '',
         membership_end       => $membership->{end_date} // '',
         membership_is_active => (
             $membership->{end_date}
@@ -493,6 +572,126 @@ sub send_magic_link_email {
 }
 
 # --- private helpers ---
+
+# Given an arrayref of contact ids, returns a hashref of
+#   contact_id => [ { id, end_date, type_name, owner_name }, ... ]
+# listing the memberships held directly (not inherited) by other contacts
+# that cover each of them through a relationship. Contacts with none are
+# left out.
+#
+# This mirrors CRM_Member_BAO_Membership::checkMembershipRelationship, the
+# rule CiviCRM uses to create inherited memberships:
+#  - the relationship must be current: active, and no end_date in the past
+#  - the membership type must list the relationship type with the owner's
+#    direction: "a_b" means the owner is contact_a, "b_a" means contact_b
+#  - relationship types with the same name both ways (e.g. "Spouse of")
+#    count in either direction
+sub _owner_memberships_via_relationship {
+    my ($self, $contact_ids) = @_;
+
+    my $types_result = $self->_call_v4('MembershipType', 'get', {
+        select => [qw(id relationship_type_id relationship_direction)],
+        where  => [['relationship_type_id', 'IS NOT EMPTY']],
+    });
+    # $inherits{$membership_type_id}{"${relationship_type_id}_$owner_dir"}
+    # $inherits{$membership_type_id}{$relationship_type_id} for any direction
+    my %inherits;
+    for my $type (@{ $types_result->{values} }) {
+        my @rel_type_ids = @{ $type->{relationship_type_id}   // [] };
+        my @directions   = @{ $type->{relationship_direction} // [] };
+        for my $i (0 .. $#rel_type_ids) {
+            $inherits{ $type->{id} }{ $rel_type_ids[$i] } = 1;
+            $inherits{ $type->{id} }{ "$rel_type_ids[$i]_$directions[$i]" } = 1;
+        }
+    }
+    my %rel_type_ids = map { %$_ } values %inherits;
+    my @rel_type_ids = map { $_ + 0 } grep { /\A\d+\z/ } keys %rel_type_ids;
+    return {} unless @rel_type_ids;
+
+    my $rels_result = $self->_call_v4('Relationship', 'get', {
+        select => [qw(
+            contact_id_a
+            contact_id_b
+            relationship_type_id
+            relationship_type_id.name_a_b
+            relationship_type_id.name_b_a
+        )],
+        where  => [
+            ['is_active',            '=',  \1],
+            ['relationship_type_id', 'IN', \@rel_type_ids],
+            ['OR', [
+                ['end_date', 'IS NULL'],
+                ['end_date', '>=', DateTime->now->ymd],
+            ]],
+            ['OR', [
+                ['contact_id_a', 'IN', $contact_ids],
+                ['contact_id_b', 'IN', $contact_ids],
+            ]],
+        ],
+    });
+
+    # Each candidate => the other side, with the owner's direction
+    my %is_candidate = map { $_ => 1 } @$contact_ids;
+    my @links;
+    for my $rel (@{ $rels_result->{values} }) {
+        my $either_way = $rel->{'relationship_type_id.name_a_b'}
+                      eq $rel->{'relationship_type_id.name_b_a'};
+        my @sides = (
+            [ $rel->{contact_id_b}, $rel->{contact_id_a}, 'a_b' ],
+            [ $rel->{contact_id_a}, $rel->{contact_id_b}, 'b_a' ],
+        );
+        for my $side (@sides) {
+            my ($contact_id, $owner_id, $owner_dir) = @$side;
+            next unless $is_candidate{$contact_id};
+            push @links, {
+                contact_id   => $contact_id,
+                owner_id     => $owner_id,
+                rel_type_dir => "$rel->{relationship_type_id}_$owner_dir",
+                rel_type_any => ($either_way ? $rel->{relationship_type_id} : undef),
+            };
+        }
+    }
+    return {} unless @links;
+
+    my $memberships_result = $self->_call_v4('Membership', 'get', {
+        select => [qw(
+            id
+            contact_id
+            end_date
+            membership_type_id
+            membership_type_id:name
+            contact_id.display_name
+        )],
+        where  => [
+            ['contact_id',            'IN', [ map { $_->{owner_id} } @links ]],
+            ['owner_membership_id',   'IS NULL'],
+            ['contact_id.is_deleted', '=',  \0],
+        ],
+    });
+    my %memberships_by_owner;
+    for my $membership (@{ $memberships_result->{values} }) {
+        push @{ $memberships_by_owner{ $membership->{contact_id} } }, $membership;
+    }
+
+    my %covered;
+    for my $link (@links) {
+        for my $membership (@{ $memberships_by_owner{ $link->{owner_id} } // [] }) {
+            my $inherits = $inherits{ $membership->{membership_type_id} }
+                or next;
+            next unless $inherits->{ $link->{rel_type_dir} }
+                     || (defined $link->{rel_type_any}
+                         && $inherits->{ $link->{rel_type_any} });
+            push @{ $covered{ $link->{contact_id} } }, {
+                id         => $membership->{id},
+                end_date   => $membership->{end_date},
+                type_name  => $membership->{'membership_type_id:name'},
+                owner_name => $membership->{'contact_id.display_name'},
+            };
+        }
+    }
+
+    return \%covered;
+}
 
 # Returns a hashref of our preference key => APIv4 field name, e.g.
 #   directory_include => 'AdditionalContactFields.Include_in_directory'
