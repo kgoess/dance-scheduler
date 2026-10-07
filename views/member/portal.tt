@@ -70,6 +70,13 @@
         </div>
       </div>
     </div>
+    <% IF contact.membership_payment_url %>
+    <div class="mb-3">
+      <a class="btn btn-outline-primary" href="<% contact.membership_payment_url | html %>"
+        target="_blank" rel="noopener">Pay or renew membership</a>
+      <div class="form-text">Opens BACDS's secure payment page in a new tab.</div>
+    </div>
+    <% END %>
 
     <h2>Contact</h2>
     <div class="row mb-2">
