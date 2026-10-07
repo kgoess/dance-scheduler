@@ -240,6 +240,9 @@ sub test_portal_valid_token {
     like $res->content, qr{Regular},             'shows membership type';
     like $res->content, qr{2026-12-31},          'shows membership expiry';
     like $res->content, qr{input-group-text text-success}, 'shows green check for current membership';
+    like $res->content,
+        qr{href="https://bacds\.civicrm\.org/civicrm/contribute/transact\?reset=1&amp;id=2&amp;cid=42&amp;mid=147&amp;cs=abc_123_1"},
+        'shows membership payment link';
     unlike $res->content, qr{already been used|expired|not valid|Invalid link},
         'no error message on valid token';
 }
@@ -390,6 +393,8 @@ sub _fake_contact {
         state                => '',
         postal_code          => '',
         country              => 'United States',
+        membership_id        => 147,
+        membership_payment_url => 'https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2&cid=42&mid=147&cs=abc_123_1',
         membership_type_name => 'Regular',
         membership_end       => '2026-12-31',
         membership_is_active => 1,

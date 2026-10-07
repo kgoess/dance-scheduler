@@ -129,12 +129,19 @@ use DateTime;
 use JSON::MaybeXS qw/encode_json decode_json/;
 use LWP::UserAgent;
 use HTTP::Request::Common;
+use URI;
 
 our $CIVICRM_BASE_URL = 'https://bacds.civicrm.org';
 
 use constant DEBUG => 0;
 
 our $MOCK_API_KEY;
+
+# The CiviCRM contribution page members use to pay for or renew a membership
+our $MEMBERSHIP_PAYMENT_PAGE_ID = 2;
+
+# How long the checksum in the payment link stays valid, in hours
+use constant PAYMENT_LINK_TTL_HOURS => 1;
 
 # Our key for each preference => CiviCRM CustomField id
 # (AdditionalContactFields group), in display order.
@@ -220,6 +227,10 @@ to ''.
 Also includes each key of %PREFERENCE_FIELDS (directory_include,
 mass_email_ok, etc.) as 1 or 0; an unset field counts as 0.
 
+If the contact has a membership, membership_payment_url is a link to the
+CiviCRM contribution page with the contact's email and membership level
+pre-filled (see L</membership_payment_url>); otherwise it's ''.
+
 =cut
 
 sub get_contact {
@@ -268,6 +279,7 @@ sub get_contact {
 
     my $membership_result = $self->_call_v4('Membership', 'get', {
         select  => [qw(
+            id
             end_date
             membership_type_id:name
         )],
@@ -298,6 +310,12 @@ sub get_contact {
         postal_code          => $addr->{postal_code} // '',
         country              => $addr->{'country_id:label'} // 'United States',
         phone                => $phone->{phone} // '',
+        membership_id        => $membership->{id} // '',
+        membership_payment_url => (
+            $membership->{id}
+                ? $self->membership_payment_url($contact_id, $membership->{id})
+                : ''
+        ),
         membership_type_name => $membership->{'membership_type_id:name'} // '',
         membership_end       => $membership->{end_date} // '',
         membership_is_active => (
@@ -306,6 +324,40 @@ sub get_contact {
                 : undef
         ),
     };
+}
+
+=head2 membership_payment_url($contact_id, $membership_id)
+
+Returns a link to the membership contribution page,
+$MEMBERSHIP_PAYMENT_PAGE_ID, for this contact and membership:
+
+    https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2&cid=...&mid=...&cs=...
+
+cid and mid pre-fill the email address and pre-select the membership level.
+The cs checksum lets CiviCRM accept cid without the member logging in; it
+expires after PAYMENT_LINK_TTL_HOURS.
+
+=cut
+
+sub membership_payment_url {
+    my ($self, $contact_id, $membership_id) = @_;
+
+    my $result = $self->_call_v4('Contact', 'getChecksum', {
+        contactId => $contact_id,
+        ttl       => PAYMENT_LINK_TTL_HOURS,
+    });
+    my $checksum = $result->{values}[0]{checksum}
+        or croak "CiviCRM returned no checksum for contact $contact_id";
+
+    my $uri = URI->new("$CIVICRM_BASE_URL/civicrm/contribute/transact");
+    $uri->query_form(
+        reset => 1,
+        id    => $MEMBERSHIP_PAYMENT_PAGE_ID,
+        cid   => $contact_id,
+        mid   => $membership_id,
+        cs    => $checksum,
+    );
+    return $uri->as_string;
 }
 
 =head2 update_contact($contact_id, \%data)
