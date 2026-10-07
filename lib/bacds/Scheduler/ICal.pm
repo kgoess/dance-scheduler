@@ -254,7 +254,7 @@ sub calendar_description_for_event ($e, $callers=undef, $bands=undef, $talent=un
                 $d .= '...and friends';
             }
         }
-        $d .= ' '.($e->short_desc || ($e->series && $e->series->name));
+        $d .= ' '.($e->short_desc || ($e->series && $e->series->name) || '');
     }
     $d =~ s/\r\n/ /g;
     $d =~ s/\n/ /g;
