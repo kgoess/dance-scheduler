@@ -30,7 +30,7 @@ Remove the scratch dir afterwards.
 ## Tests
 
 - Run one file with `prove -Ilib t/NNN-name.t`; run everything with
-  `perl Makefile.PL && make && make test`.
+  `perl Makefile.PL && make && make test HARNESS_OPTIONS=j3`.
 - Tests use a throwaway test DB set up by `setup_test_db` in
   `bacds::Scheduler::Util::Test`.
 - `t/530-member-portal.t` mocks the `bacds::Scheduler::CiviCRM` methods, so it
