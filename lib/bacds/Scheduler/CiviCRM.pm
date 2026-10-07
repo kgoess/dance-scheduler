@@ -182,8 +182,9 @@ sub new {
 Returns an arrayref of CiviCRM contact hashes:
 
     {
-        contact_id => 1234,
+        contact_id   => 1234,
         display_name => 'Alice Smith',
+        email        => 'alice@example.com',  # as stored in CiviCRM
     }
 
 (sorted ascending by id) for non-deleted, non-deceased contacts that have the
@@ -194,6 +195,9 @@ registered for an event or made a one-off payment. Those contacts are excluded
 here because the member portal is specifically for reviewing and updating
 membership information, and showing it to non-members would be confusing.
 
+Send mail to the returned C<email>, not to $email; see
+_contacts_matching_email for why they can differ.
+
 Returns an empty arrayref if none found.
 
 =cut
@@ -202,25 +206,17 @@ sub find_member_contacts_by_email {
     my ($self, $email) = @_;
 
     my $result = $self->_call_v4('Email', 'get', {
-        select  => ['contact_id', 'contact_id.display_name'],
+        select  => ['contact_id', 'contact_id.display_name', 'email'],
         join    => [['Membership AS membership', 'INNER', ['contact_id', '=', 'membership.contact_id']]],
         where   => [
             ['email',                  '=', $email],
             ['contact_id.is_deleted',  '=', \0],
             ['contact_id.is_deceased', '=', \0],
         ],
-        groupBy => ['contact_id'],
         orderBy => {'contact_id' => 'ASC'},
     });
 
-    return [
-        map {
-            {
-                contact_id   => $_->{contact_id},
-                display_name => $_->{'contact_id.display_name'},
-            }
-        } @{ $result->{values} }
-    ];
+    return _contacts_matching_email($email, $result->{values});
 }
 
 =head2 find_related_member_contacts_by_email($email)
@@ -246,30 +242,22 @@ sub find_related_member_contacts_by_email {
     my ($self, $email) = @_;
 
     my $result = $self->_call_v4('Email', 'get', {
-        select  => ['contact_id', 'contact_id.display_name'],
+        select  => ['contact_id', 'contact_id.display_name', 'email'],
         where   => [
             ['email',                  '=', $email],
             ['contact_id.is_deleted',  '=', \0],
             ['contact_id.is_deceased', '=', \0],
         ],
-        groupBy => ['contact_id'],
         orderBy => {'contact_id' => 'ASC'},
     });
-    my @contacts = @{ $result->{values} }
+    my @contacts = @{ _contacts_matching_email($email, $result->{values}) }
         or return [];
 
     my $owner_memberships = $self->_owner_memberships_via_relationship(
         [ map { $_->{contact_id} } @contacts ]
     );
 
-    return [
-        map {
-            {
-                contact_id   => $_->{contact_id},
-                display_name => $_->{'contact_id.display_name'},
-            }
-        } grep { $owner_memberships->{ $_->{contact_id} } } @contacts
-    ];
+    return [ grep { $owner_memberships->{ $_->{contact_id} } } @contacts ];
 }
 
 =head2 get_contact($contact_id)
@@ -856,6 +844,30 @@ sub _covered_by_membership {
             keys %covered
         ],
     };
+}
+
+# Turns Email.get rows into [ { contact_id, display_name, email }, ... ],
+# one per contact, keeping only rows whose stored address equals $email
+# ignoring case.
+#
+# CiviCRM's email "=" uses MySQL's utf8mb4_unicode_ci collation, which also
+# ignores accents, so an address on a lookalike domain (an accented letter
+# in place of a plain one) would otherwise match someone else's record.
+sub _contacts_matching_email {
+    my ($email, $rows) = @_;
+
+    my $wanted = lc $email;
+    my (%seen, @contacts);
+    for my $row (@{ $rows // [] }) {
+        next unless defined $row->{email} && lc($row->{email}) eq $wanted;
+        next if $seen{ $row->{contact_id} }++;
+        push @contacts, {
+            contact_id   => $row->{contact_id},
+            display_name => $row->{'contact_id.display_name'},
+            email        => $row->{email},
+        };
+    }
+    return \@contacts;
 }
 
 # Given an arrayref of contact ids, returns a hashref of
