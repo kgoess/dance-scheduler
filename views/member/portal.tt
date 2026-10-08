@@ -70,8 +70,9 @@
         </div>
       </div>
     </div>
-    <% IF contact.membership_covers.size %>
+    <% IF contact.membership_covers.size || contact.membership_add_url || contact.membership_at_max_related %>
     <div class="mb-3">
+      <% IF contact.membership_covers.size %>
       <p class="mb-1">
         Your <% contact.membership_type_name | html %> membership also covers:
       </p>
@@ -101,10 +102,23 @@
         To stop your membership covering someone, check Remove and save your
         changes. Their own contact information stays on file.
       </div>
+      <% END %>
       <% IF contact.membership_max_related %>
       <div class="form-text">
         A <% contact.membership_type_name | html %> membership can cover up to
         <% contact.membership_max_related | html %> people besides you.
+      </div>
+      <% END %>
+      <% IF contact.membership_add_url %>
+      <div class="mt-2">
+        <a class="btn btn-outline-secondary btn-sm" href="<% contact.membership_add_url | html %>"
+          target="_blank" rel="noopener">Add someone to your membership</a>
+        <div class="form-text">Opens a form on BACDS's membership system (CiviCRM) in a new tab. New additions are reviewed by BACDS membership staff before they go live.</div>
+      </div>
+      <% ELSIF contact.membership_at_max_related %>
+      <div class="form-text mt-2">
+        Your membership already covers as many people as it can. To add someone
+        else, remove someone first.
       </div>
       <% END %>
     </div>

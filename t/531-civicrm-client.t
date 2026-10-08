@@ -76,6 +76,10 @@ my %own_membership = (
 
 my @relationship_updates;
 
+# What WorkflowMessage.render returns, and the params it was called with
+our $rendered_text = 'https://bacds.civicrm.org/civicrm/add-family-member?_aff=Bearer%20abc.def.ghi';
+my @render_calls;
+
 # Keep the real one for test_call_v4_url_encodes_params
 my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
 
@@ -88,6 +92,10 @@ my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
         if ("$entity.$action" eq 'Relationship.update') {
             push @relationship_updates, $params;
             return { values => [] };
+        }
+        if ("$entity.$action" eq 'WorkflowMessage.render') {
+            push @render_calls, $params;
+            return { values => [{ subject => '', text => $rendered_text, html => '' }] };
         }
         return \%membership_types if $entity eq 'MembershipType';
         return \%relationships    if $entity eq 'Relationship';
@@ -116,6 +124,9 @@ test_get_contact_inherited_membership();
 test_get_contact_through_relationship();
 test_covered_by_membership();
 test_end_covered_relationships();
+test_add_to_membership_url();
+test_add_to_membership_url_failure();
+test_get_contact_at_max_related();
 test_call_v4_url_encodes_params();
 
 done_testing;
@@ -176,6 +187,44 @@ sub test_end_covered_relationships {
     is scalar @relationship_updates, 0, 'no Relationship.update call';
 }
 
+sub test_add_to_membership_url {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+    @render_calls = ();
+
+    is $civi->add_to_membership_url(16), $rendered_text, 'returns the signed form link';
+    is_deeply $render_calls[0], {
+        workflow        => 'generic',
+        messageTemplate => {
+            msg_subject => '',
+            msg_text    => '{form.afformAddSomeoneToYourMembershipUrl}',
+            msg_html    => '',
+        },
+        values          => { contactID => 16 },
+    }, 'renders just the form URL token for the contact';
+}
+
+sub test_add_to_membership_url_failure {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+
+    # CiviCRM renders an unknown form token as '', e.g. if the form was
+    # renamed or lost its Message Tokens placement
+    local $rendered_text = '';
+    my $url;
+    warning_like { $url = $civi->add_to_membership_url(16) }
+        qr{can't get link for contact 16: .*isn't a signed form link},
+        'warns when the token does not render to a link';
+    is $url, '', 'and returns no link';
+}
+
+sub test_get_contact_at_max_related {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+    local $membership_types{values}[0]{max_related} = 2;  # 100 and 101 are covered
+
+    my $contact = $civi->get_contact(16);
+    is $contact->{membership_at_max_related}, 1, 'at limit: flagged';
+    is $contact->{membership_add_url}, '', 'at limit: no add link';
+}
+
 sub test_get_contact_own_membership {
     my $civi = bacds::Scheduler::CiviCRM->new;
     my $contact = $civi->get_contact(16);
@@ -183,6 +232,8 @@ sub test_get_contact_own_membership {
     is_deeply [ map { $_->{contact_id} } @{ $contact->{membership_covers} } ], [100, 101],
         'holder: lists who the membership covers';
     is $contact->{membership_max_related}, 10, 'holder: max_related';
+    is $contact->{membership_add_url}, $rendered_text, 'holder: gets the add link';
+    is $contact->{membership_at_max_related}, 0, 'holder: not at the limit';
 
     is $contact->{membership_id}, 867, 'holder: own membership';
     is $contact->{membership_owner_name}, '', 'holder: no owner name';
@@ -198,6 +249,7 @@ sub test_get_contact_inherited_membership {
     is $contact->{membership_owner_name}, 'Pat Holder', 'inherited: names the holder';
     is $contact->{membership_payment_url}, '', 'inherited: no payment link';
     is_deeply $contact->{membership_covers}, [], 'inherited: no covered list';
+    is $contact->{membership_add_url}, '', 'inherited: no add link';
 }
 
 sub test_get_contact_through_relationship {

@@ -94,6 +94,7 @@ test_portal_membership_through_someone_else();
 test_portal_shows_who_membership_covers();
 test_portal_save_removes_covered();
 test_portal_save_without_removals();
+test_portal_add_someone_link();
 
 done_testing;
 
@@ -499,6 +500,42 @@ sub test_portal_save_without_removals {
     ok !$last_end_covered, 'end_covered_relationships not called';
 }
 
+sub test_portal_add_someone_link {
+    my $add_url = 'https://bacds.civicrm.org/civicrm/add-family-member?_aff=Bearer%20abc';
+
+    # A Family holder nobody else is covered by yet still gets the button
+    $get_contact_stub = {
+        _fake_contact(16)->%*,
+        membership_type_name   => 'Family',
+        membership_max_related => 10,
+        membership_add_url     => $add_url,
+    };
+    my $res = $Test->request(GET '/unearth/member/portal?token=' . _insert_valid_token(16));
+    like $res->content,
+        qr{href="https://bacds\.civicrm\.org/civicrm/add-family-member\?_aff=Bearer%20abc"\s+target="_blank" rel="noopener">Add someone to your membership</a>},
+        'holder sees the add-someone button';
+    unlike $res->content, qr{also covers}, 'no covered table when nobody is covered yet';
+
+    # At the limit: an explanation instead of the button
+    $get_contact_stub = {
+        _fake_contact(16)->%*,
+        membership_type_name      => 'Family',
+        membership_covers         => [
+            { contact_id => 735, display_name => 'Robin Holder', relationship => 'Spouse of' },
+        ],
+        membership_max_related    => 1,
+        membership_at_max_related => 1,
+    };
+    $res = $Test->request(GET '/unearth/member/portal?token=' . _insert_valid_token(16));
+    unlike $res->content, qr{Add someone to your membership</a>}, 'no button at the limit';
+    like $res->content, qr{already covers as many people as it can}, 'explains the limit';
+
+    # Not a holder
+    $get_contact_stub = _fake_contact(42);
+    $res = $Test->request(GET '/unearth/member/portal?token=' . _insert_valid_token(42));
+    unlike $res->content, qr{Add someone to your membership}, 'no button for non-holders';
+}
+
 # --- helpers ---
 
 sub _fake_contact {
@@ -520,6 +557,8 @@ sub _fake_contact {
         membership_owner_name => '',
         membership_covers    => [],
         membership_max_related => undef,
+        membership_at_max_related => 0,
+        membership_add_url   => '',
         membership_payment_url => 'https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2&cid=42&mid=147&cs=abc_123_1',
         membership_type_name => 'Regular',
         membership_end       => '2026-12-31',
