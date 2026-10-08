@@ -70,6 +70,32 @@
         </div>
       </div>
     </div>
+    <% IF contact.membership_covers.size %>
+    <div class="mb-3">
+      <p class="mb-1">
+        Your <% contact.membership_type_name | html %> membership also covers:
+      </p>
+      <table class="table table-sm mb-1">
+        <thead>
+          <tr><th scope="col">Name</th><th scope="col">Relationship to you</th></tr>
+        </thead>
+        <tbody>
+          <% FOREACH person IN contact.membership_covers %>
+          <tr>
+            <td><% person.display_name | html %></td>
+            <td><% person.relationship | html %></td>
+          </tr>
+          <% END %>
+        </tbody>
+      </table>
+      <% IF contact.membership_max_related %>
+      <div class="form-text">
+        A <% contact.membership_type_name | html %> membership can cover up to
+        <% contact.membership_max_related | html %> people besides you.
+      </div>
+      <% END %>
+    </div>
+    <% END %>
     <% IF contact.membership_owner_name %>
     <p class="mb-3">
       Your membership is through <% contact.membership_owner_name | html %>'s

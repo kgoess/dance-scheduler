@@ -287,6 +287,13 @@ renew it. Otherwise membership_owner_name is '', and membership_payment_url
 links to the CiviCRM contribution page with the contact's email and
 membership level pre-filled (see L</membership_payment_url>).
 
+When the contact holds the membership themselves, membership_covers lists
+the other people it covers through a relationship, as
+C<< { contact_id, display_name, relationship } >> hashes (relationship is
+the other person's side, e.g. "Spouse of"), and membership_max_related is
+the membership type's limit on them, or undef for none. Otherwise
+membership_covers is [] and membership_max_related is undef.
+
 =cut
 
 sub get_contact {
@@ -337,6 +344,7 @@ sub get_contact {
         select  => [qw(
             id
             end_date
+            membership_type_id
             membership_type_id:name
             owner_membership_id
             owner_membership_id.contact_id.display_name
@@ -351,6 +359,7 @@ sub get_contact {
         push @memberships, {
             id         => $own->{id},
             end_date   => $own->{end_date},
+            type_id    => $own->{membership_type_id},
             type_name  => $own->{'membership_type_id:name'},
             owner_name => (
                 $own->{owner_membership_id}
@@ -366,6 +375,12 @@ sub get_contact {
         ($b->{end_date} // '') cmp ($a->{end_date} // '')
     } @memberships;
     $membership //= {};
+
+    # If they hold it themselves, who else it covers
+    my $covered = { max_related => undef, covered => [] };
+    if ($membership->{id} && !$membership->{owner_name}) {
+        $covered = $self->_covered_by_membership($contact_id, $membership->{type_id});
+    }
 
     my $addr       = $addr_result->{values}[0]       // {};
     my $phone      = $phone_result->{values}[0]      // {};
@@ -396,6 +411,8 @@ sub get_contact {
                 : ''
         ),
         membership_type_name => $membership->{type_name} // '',
+        membership_covers    => $covered->{covered},
+        membership_max_related => $covered->{max_related},
         membership_end       => $membership->{end_date} // '',
         membership_is_active => (
             $membership->{end_date}
@@ -573,6 +590,142 @@ sub send_magic_link_email {
 
 # --- private helpers ---
 
+# Returns how each membership type passes to related contacts:
+#   {
+#     inherits => {
+#       $membership_type_id => {
+#         "${relationship_type_id}_$owner_dir" => 1,  # e.g. "8_a_b"
+#         $relationship_type_id                => 1,  # listed in any direction
+#       },
+#     },
+#     max_related           => { $membership_type_id => $max_or_undef },
+#     relationship_type_ids => [ all relationship type ids listed ],
+#   }
+# See _owner_memberships_via_relationship for what the directions mean.
+sub _membership_inheritance {
+    my ($self) = @_;
+
+    my $types_result = $self->_call_v4('MembershipType', 'get', {
+        select => [qw(id relationship_type_id relationship_direction max_related)],
+        where  => [['relationship_type_id', 'IS NOT EMPTY']],
+    });
+
+    my (%inherits, %max_related, %rel_type_ids);
+    for my $type (@{ $types_result->{values} }) {
+        my @rel_type_ids = @{ $type->{relationship_type_id}   // [] };
+        my @directions   = @{ $type->{relationship_direction} // [] };
+        for my $i (0 .. $#rel_type_ids) {
+            $inherits{ $type->{id} }{ $rel_type_ids[$i] } = 1;
+            $inherits{ $type->{id} }{ "$rel_type_ids[$i]_$directions[$i]" } = 1;
+            $rel_type_ids{ $rel_type_ids[$i] } = 1;
+        }
+        $max_related{ $type->{id} } = $type->{max_related};
+    }
+
+    return {
+        inherits              => \%inherits,
+        max_related           => \%max_related,
+        relationship_type_ids => [ map { $_ + 0 } sort keys %rel_type_ids ],
+    };
+}
+
+# True for relationship types with the same name both ways, like "Spouse
+# of", which CiviCRM lets a membership pass through in either direction.
+# Takes a Relationship.get row that selected relationship_type_id.name_a_b
+# and relationship_type_id.name_b_a.
+sub _is_either_way {
+    my ($rel) = @_;
+    return $rel->{'relationship_type_id.name_a_b'}
+        eq $rel->{'relationship_type_id.name_b_a'};
+}
+
+# The where clause for relationships CiviCRM counts as current
+sub _current_relationship_where {
+    return (
+        ['is_active', '=', \1],
+        ['OR', [
+            ['end_date', 'IS NULL'],
+            ['end_date', '>=', DateTime->now->ymd],
+        ]],
+    );
+}
+
+# For a contact who directly holds a membership of type $membership_type_id,
+# returns
+#   {
+#     max_related => the type's limit, or undef for none,
+#     covered     => [ { contact_id, display_name, relationship }, ... ],
+#   }
+# where covered lists the other contacts that membership passes to through
+# a current relationship, by the same rule as
+# _owner_memberships_via_relationship, sorted by name. relationship
+# describes each contact's side, e.g. "Spouse of" or "Child of".
+sub _covered_by_membership {
+    my ($self, $owner_id, $membership_type_id) = @_;
+
+    my $inheritance = $self->_membership_inheritance;
+    my $inherits    = $inheritance->{inherits}{$membership_type_id};
+    my $max_related = $inheritance->{max_related}{$membership_type_id};
+    return { max_related => $max_related, covered => [] }
+        unless $inherits;
+
+    my $rels_result = $self->_call_v4('Relationship', 'get', {
+        select => [qw(
+            contact_id_a
+            contact_id_b
+            contact_id_a.display_name
+            contact_id_b.display_name
+            contact_id_a.is_deleted
+            contact_id_b.is_deleted
+            relationship_type_id
+            relationship_type_id.name_a_b
+            relationship_type_id.name_b_a
+            relationship_type_id.label_a_b
+            relationship_type_id.label_b_a
+        )],
+        where  => [
+            _current_relationship_where(),
+            ['relationship_type_id', 'IN', $inheritance->{relationship_type_ids}],
+            ['OR', [
+                ['contact_id_a', '=', $owner_id],
+                ['contact_id_b', '=', $owner_id],
+            ]],
+        ],
+    });
+
+    my %covered;
+    for my $rel (@{ $rels_result->{values} }) {
+        my $owner_is_a = $rel->{contact_id_a} == $owner_id;
+        my $owner_dir  = $owner_is_a ? 'a_b' : 'b_a';
+        next unless $inherits->{"$rel->{relationship_type_id}_$owner_dir"}
+                 || (_is_either_way($rel) && $inherits->{ $rel->{relationship_type_id} });
+
+        # The covered contact's side: contact_a is "label_a_b" contact_b
+        my ($side, $label) = $owner_is_a ? ('b', 'label_b_a') : ('a', 'label_a_b');
+        my $contact_id = $rel->{"contact_id_$side"};
+        next if $contact_id == $owner_id
+             || $rel->{"contact_id_$side.is_deleted"};
+        push @{ $covered{$contact_id}{relationships} },
+            $rel->{"relationship_type_id.$label"};
+        $covered{$contact_id}{display_name} = $rel->{"contact_id_$side.display_name"};
+    }
+
+    return {
+        max_related => $max_related,
+        covered     => [
+            map {
+                {
+                    contact_id   => $_,
+                    display_name => $covered{$_}{display_name},
+                    relationship => join(', ', @{ $covered{$_}{relationships} }),
+                }
+            }
+            sort { lc $covered{$a}{display_name} cmp lc $covered{$b}{display_name} }
+            keys %covered
+        ],
+    };
+}
+
 # Given an arrayref of contact ids, returns a hashref of
 #   contact_id => [ { id, end_date, type_name, owner_name }, ... ]
 # listing the memberships held directly (not inherited) by other contacts
@@ -589,24 +742,10 @@ sub send_magic_link_email {
 sub _owner_memberships_via_relationship {
     my ($self, $contact_ids) = @_;
 
-    my $types_result = $self->_call_v4('MembershipType', 'get', {
-        select => [qw(id relationship_type_id relationship_direction)],
-        where  => [['relationship_type_id', 'IS NOT EMPTY']],
-    });
-    # $inherits{$membership_type_id}{"${relationship_type_id}_$owner_dir"}
-    # $inherits{$membership_type_id}{$relationship_type_id} for any direction
-    my %inherits;
-    for my $type (@{ $types_result->{values} }) {
-        my @rel_type_ids = @{ $type->{relationship_type_id}   // [] };
-        my @directions   = @{ $type->{relationship_direction} // [] };
-        for my $i (0 .. $#rel_type_ids) {
-            $inherits{ $type->{id} }{ $rel_type_ids[$i] } = 1;
-            $inherits{ $type->{id} }{ "$rel_type_ids[$i]_$directions[$i]" } = 1;
-        }
-    }
-    my %rel_type_ids = map { %$_ } values %inherits;
-    my @rel_type_ids = map { $_ + 0 } grep { /\A\d+\z/ } keys %rel_type_ids;
-    return {} unless @rel_type_ids;
+    my $inheritance = $self->_membership_inheritance;
+    my %inherits    = %{ $inheritance->{inherits} };
+    my @rel_type_ids = @{ $inheritance->{relationship_type_ids} }
+        or return {};
 
     my $rels_result = $self->_call_v4('Relationship', 'get', {
         select => [qw(
@@ -617,12 +756,8 @@ sub _owner_memberships_via_relationship {
             relationship_type_id.name_b_a
         )],
         where  => [
-            ['is_active',            '=',  \1],
+            _current_relationship_where(),
             ['relationship_type_id', 'IN', \@rel_type_ids],
-            ['OR', [
-                ['end_date', 'IS NULL'],
-                ['end_date', '>=', DateTime->now->ymd],
-            ]],
             ['OR', [
                 ['contact_id_a', 'IN', $contact_ids],
                 ['contact_id_b', 'IN', $contact_ids],
@@ -634,8 +769,7 @@ sub _owner_memberships_via_relationship {
     my %is_candidate = map { $_ => 1 } @$contact_ids;
     my @links;
     for my $rel (@{ $rels_result->{values} }) {
-        my $either_way = $rel->{'relationship_type_id.name_a_b'}
-                      eq $rel->{'relationship_type_id.name_b_a'};
+        my $either_way = _is_either_way($rel);
         my @sides = (
             [ $rel->{contact_id_b}, $rel->{contact_id_a}, 'a_b' ],
             [ $rel->{contact_id_a}, $rel->{contact_id_b}, 'b_a' ],
