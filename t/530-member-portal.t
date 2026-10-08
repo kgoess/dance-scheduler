@@ -31,6 +31,7 @@ my $Test = get_tester();  # no auth needed - portal is public
 # $last_update:        populated whenever update_contact is called
 
 my ($find_contacts_stub, $find_related_stub, $get_contact_stub, $last_magic_link, $last_update);
+my $last_end_covered;  # populated whenever end_covered_relationships is called
 
 {
     no warnings 'redefine';
@@ -59,6 +60,12 @@ my ($find_contacts_stub, $find_related_stub, $get_contact_stub, $last_magic_link
         $last_update = { contact_id => $contact_id, data => $data };
     };
 
+    *bacds::Scheduler::CiviCRM::end_covered_relationships = sub {
+        my ($self, $holder_id, $contact_ids) = @_;
+        $last_end_covered = { holder_id => $holder_id, contact_ids => $contact_ids };
+        return scalar @$contact_ids;
+    };
+
     *bacds::Scheduler::CiviCRM::send_magic_link_email = sub {
         my ($self, $contact_id, $email, $display_name, $url) = @_;
         $last_magic_link = { contact_id => $contact_id, url => $url };
@@ -85,6 +92,8 @@ test_post_request_link_related_contact();
 test_post_request_link_prefers_own_membership();
 test_portal_membership_through_someone_else();
 test_portal_shows_who_membership_covers();
+test_portal_save_removes_covered();
+test_portal_save_without_removals();
 
 done_testing;
 
@@ -451,10 +460,43 @@ sub test_portal_shows_who_membership_covers {
     like $res->content, qr{<td>Sam Holder</td>\s*<td>Child of</td>},    'lists the child';
     like $res->content, qr{can cover up to\s+10 people besides you}, 'shows the limit';
     like $res->content, qr{Pay or renew membership}, 'holder still gets the payment button';
+    like $res->content, qr{name="remove_covered" value="735"}, 'remove checkbox for the spouse';
+    like $res->content, qr{name="remove_covered" value="12"},  'remove checkbox for the child';
 
     $get_contact_stub = _fake_contact(42);
     $res = $Test->request(GET '/unearth/member/portal?token=' . _insert_valid_token(42));
     unlike $res->content, qr{also covers}, 'no covered list when the membership covers nobody else';
+}
+
+sub test_portal_save_removes_covered {
+    my $token = _insert_valid_token(16);
+    ($last_update, $last_end_covered) = ();
+
+    my $res = $Test->request(POST '/unearth/member/portal', [
+        token          => $token,
+        first_name     => 'Pat',
+        last_name      => 'Holder',
+        remove_covered => 735,
+        remove_covered => 12,
+        remove_covered => 'junk',
+    ]);
+    like $res->content, qr{Changes Saved}, 'save with removals succeeds';
+    is $last_end_covered->{holder_id}, 16, 'removals are for the holder';
+    is_deeply $last_end_covered->{contact_ids}, [735, 12],
+        'checked people passed through, junk dropped';
+    ok !exists $last_update->{data}{remove_covered},
+        'removals not passed to update_contact';
+}
+
+sub test_portal_save_without_removals {
+    my $token = _insert_valid_token(16);
+    $last_end_covered = undef;
+
+    my $res = $Test->request(POST '/unearth/member/portal', {
+        token => $token, first_name => 'Pat', last_name => 'Holder',
+    });
+    like $res->content, qr{Changes Saved}, 'save without removals succeeds';
+    ok !$last_end_covered, 'end_covered_relationships not called';
 }
 
 # --- helpers ---

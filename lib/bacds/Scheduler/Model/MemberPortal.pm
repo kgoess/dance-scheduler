@@ -123,6 +123,10 @@ Re-validates the token, updates CiviCRM with the submitted form data, then
 marks the token as used so it cannot be replayed. Dies with a
 human-readable message on token or CiviCRM errors.
 
+$form_data{remove_covered}, if present, is an arrayref of contact ids the
+member's membership should stop covering (see
+bacds::Scheduler::CiviCRM->end_covered_relationships).
+
 =cut
 
 sub save_contact {
@@ -130,8 +134,13 @@ sub save_contact {
 
     my $token_row = _validate_token($token, $dbh);
 
+    my %contact_data   = %$form_data;
+    my $remove_covered = delete $contact_data{remove_covered} // [];
+
     my $civi = bacds::Scheduler::CiviCRM->new;
-    $civi->update_contact($token_row->civicrm_contact_id, $form_data);
+    $civi->update_contact($token_row->civicrm_contact_id, \%contact_data);
+    $civi->end_covered_relationships($token_row->civicrm_contact_id, $remove_covered)
+        if @$remove_covered;
 
     $token_row->update({ used_ts => DateTime->now });
 }

@@ -1968,6 +1968,11 @@ post '/unearth/member/portal' => sub {
         $form_data{$pref_field_key} = body_parameters->get($pref_field_key) ? 1 : 0;
     }
 
+    # People the member wants their membership to stop covering
+    $form_data{remove_covered} = [
+        grep { /\A\d+\z/ } body_parameters->get_all('remove_covered')
+    ];
+
     my $error;
     eval {
         bacds::Scheduler::Model::MemberPortal->save_contact(

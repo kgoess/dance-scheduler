@@ -6,9 +6,11 @@
 use 5.32.1;
 use warnings;
 
+use DateTime;
 use HTTP::Response;
 use JSON::MaybeXS qw/decode_json/;
 use Test::More;
+use Test::Warn;
 use URI;
 
 use bacds::Scheduler::CiviCRM;
@@ -72,6 +74,8 @@ my %own_membership = (
              'membership_type_id:name' => 'Individual', owner_membership_id => undef },
 );
 
+my @relationship_updates;
+
 # Keep the real one for test_call_v4_url_encodes_params
 my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
 
@@ -81,6 +85,10 @@ my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
         my ($self, $entity, $action, $params) = @_;
         my $where = $params->{where} // [];
 
+        if ("$entity.$action" eq 'Relationship.update') {
+            push @relationship_updates, $params;
+            return { values => [] };
+        }
         return \%membership_types if $entity eq 'MembershipType';
         return \%relationships    if $entity eq 'Relationship';
         return { values => [{ checksum => 'abc_123_1' }] }
@@ -107,6 +115,7 @@ test_get_contact_own_membership();
 test_get_contact_inherited_membership();
 test_get_contact_through_relationship();
 test_covered_by_membership();
+test_end_covered_relationships();
 test_call_v4_url_encodes_params();
 
 done_testing;
@@ -131,9 +140,40 @@ sub test_covered_by_membership {
 
     is $result->{max_related}, 10, 'max_related comes from the membership type';
     is_deeply $result->{covered}, [
-        { contact_id => 100, display_name => 'Contact 100', relationship => 'Spouse of' },
-        { contact_id => 101, display_name => 'Contact 101', relationship => 'Household Member is' },
+        { contact_id => 100, display_name => 'Contact 100', relationship => 'Spouse of',
+          relationship_ids => [5100] },
+        { contact_id => 101, display_name => 'Contact 101', relationship => 'Household Member is',
+          relationship_ids => [5101] },
     ], "lists who the holder's membership covers, with their side of the relationship";
+}
+
+sub test_end_covered_relationships {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+    @relationship_updates = ();
+
+    my $ended;
+    warnings_like {
+        $ended = $civi->end_covered_relationships(16, [100, 102, 999]);
+    } [
+        qr{contact 102 isn't covered by a membership held by 16, skipping},
+        qr{contact 999 isn't covered by a membership held by 16, skipping},
+    ], 'warns about contacts the membership does not cover';
+
+    is $ended, 1, 'ended one relationship';
+    is scalar @relationship_updates, 1, 'one Relationship.update call';
+    is_deeply $relationship_updates[0]{where}, [['id', 'IN', [5100]]],
+        "only the covered spouse's relationship";
+    is_deeply $relationship_updates[0]{values}, {
+        is_active => \0,
+        end_date  => DateTime->now->ymd,
+    }, 'set inactive with an end date, not deleted';
+
+    @relationship_updates = ();
+    warning_like {
+        $ended = $civi->end_covered_relationships(16, [103]);
+    } qr{contact 103 isn't covered}, 'warns for an unlisted relationship type';
+    is $ended, 0, 'nothing ended';
+    is scalar @relationship_updates, 0, 'no Relationship.update call';
 }
 
 sub test_get_contact_own_membership {
@@ -192,6 +232,7 @@ sub test_call_v4_url_encodes_params {
 sub _rel {
     my ($a, $b, $type, $name_a_b, $name_b_a, $extra) = @_;
     return {
+        id                               => 5000 + $a + $b - 16,
         contact_id_a                     => $a,
         contact_id_b                     => $b,
         'contact_id_a.display_name'      => "Contact $a",
