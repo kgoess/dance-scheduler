@@ -22,6 +22,11 @@ setup_test_db;
 my $dbh  = get_dbh();
 my $Test = get_tester();  # no auth needed - portal is public
 
+# The public URL that magic links point at. It comes from config, as in
+# production, never from the request.
+my $Portal_base_url = 'https://bacds.example.org/dance-scheduler';
+bacds::Scheduler::set(member_portal_base_url => $Portal_base_url);
+
 # --- Mock CiviCRM so tests don't need real API keys or network ---
 #
 # $find_contacts_stub: arrayref of contact_ids to return, or undef for []
@@ -78,6 +83,9 @@ test_post_request_link_unknown_email();
 test_post_request_link_non_member_email();
 test_post_request_link_known_email();
 test_post_request_link_multiple_contacts();
+test_post_request_link_ignores_forged_host();
+test_post_request_link_ignores_forwarded_host();
+test_post_request_link_without_base_url_sends_nothing();
 test_portal_invalid_token();
 test_portal_expired_token();
 test_portal_used_token();
@@ -195,6 +203,79 @@ sub test_post_request_link_multiple_contacts {
 
     ok $last_magic_link, 'email sent for ambiguous address';
     is $last_magic_link->{contact_id}, 7, 'used the lowest contact_id';
+}
+
+sub test_post_request_link_ignores_forged_host {
+    # Attack: request a link for a victim's address with a Host header
+    # pointing at the attacker's server. The victim gets a genuine BACDS
+    # email, and clicking it would hand the token to the attacker.
+    $find_contacts_stub = [{
+        contact_id => 42, display_name => 'Alice', email => 'member@example.com',
+    }];
+    $last_magic_link    = undef;
+
+    $Test->request(POST '/unearth/member/request-link',
+        Host    => 'evil.example',
+        Content => { email => 'member@example.com' },
+    );
+
+    ok $last_magic_link, 'email sent';
+    like $last_magic_link->{url},
+        qr{\A\Q$Portal_base_url\E/unearth/member/portal\?token=[0-9a-f]{64}\z},
+        'link uses the configured base URL';
+    unlike $last_magic_link->{url}, qr{evil\.example},
+        'link does not use the Host header from the request';
+
+    $find_contacts_stub = undef;
+}
+
+sub test_post_request_link_ignores_forwarded_host {
+    # Same attack via X-Forwarded-Host, in case behind_proxy is ever
+    # turned on
+    $find_contacts_stub = [{
+        contact_id => 42, display_name => 'Alice', email => 'member@example.com',
+    }];
+    $last_magic_link    = undef;
+
+    $Test->request(POST '/unearth/member/request-link',
+        'X-Forwarded-Host'  => 'evil.example',
+        'X-Forwarded-Proto' => 'http',
+        Content => { email => 'member@example.com' },
+    );
+
+    ok $last_magic_link, 'email sent';
+    unlike $last_magic_link->{url}, qr{evil\.example},
+        'link does not use X-Forwarded-Host';
+    like $last_magic_link->{url}, qr{\A\Q$Portal_base_url\E/},
+        'link uses the configured base URL';
+
+    $find_contacts_stub = undef;
+}
+
+sub test_post_request_link_without_base_url_sends_nothing {
+    # If the base URL isn't configured, fail closed rather than falling
+    # back to the request's Host header
+    bacds::Scheduler::set(member_portal_base_url => undef);
+    $find_contacts_stub = [{
+        contact_id => 42, display_name => 'Alice', email => 'member@example.com',
+    }];
+    $last_magic_link    = undef;
+
+    my $res;
+    warning_like {
+        $res = $Test->request(POST '/unearth/member/request-link',
+            Host    => 'evil.example',
+            Content => { email => 'member@example.com' },
+        );
+    } qr{member_portal_base_url is not configured},
+    'warns that the base URL is missing';
+
+    like $res->content, qr{Check Your Email},
+        'user still sees the usual confirmation page';
+    ok !$last_magic_link, 'no email sent without a configured base URL';
+
+    bacds::Scheduler::set(member_portal_base_url => $Portal_base_url);
+    $find_contacts_stub = undef;
 }
 
 sub test_portal_invalid_token {
