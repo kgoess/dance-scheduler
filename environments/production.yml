@@ -22,3 +22,7 @@ no_server_tokens: 1
 # and yet I still had to set DANCER_VIEWS, DANCER_ENVDIR,
 # DANCER_PUBLIC in the httpd.conf?
 appdir: /var/www/bacds.org/dance-scheduler
+
+# Public base URL for links in member-portal emails. Set here rather than
+# taken from the request's Host header, which the client controls.
+member_portal_base_url: "https://bacds.org/dance-scheduler"

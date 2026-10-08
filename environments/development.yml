@@ -18,3 +18,7 @@ show_errors: 1
 
 # print the banner
 startup_info: 1
+
+# Public base URL for links in member-portal emails (see production.yml).
+# Matches `plackup -p 5000 bin/app.psgi`.
+member_portal_base_url: "http://localhost:5000"
