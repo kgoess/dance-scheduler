@@ -29,7 +29,7 @@ sub setup_fixture {
         synthetic_name => 'test event 1 synthname',
         custom_url => 'http://custom-url/test-event-1',
         short_desc => 'big <b> dance party &#9786',
-        start_date => get_now->ymd,
+        start_date => get_now->add(days => 1)->ymd,
         start_time => '20:00:00',
         uuid => Data::UUID->new->create_b64,
     });
