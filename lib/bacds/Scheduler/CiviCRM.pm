@@ -143,6 +143,11 @@ our $MEMBERSHIP_PAYMENT_PAGE_ID = 2;
 # How long the checksum in the payment link stays valid, in hours
 use constant PAYMENT_LINK_TTL_HOURS => 1;
 
+# The CiviCRM FormBuilder form membership holders use to add someone to
+# their membership. It must have the "Message Tokens" placement so CiviCRM
+# can make a signed per-contact link to it; see add_to_membership_url.
+our $ADD_TO_MEMBERSHIP_FORM = 'afformAddSomeoneToYourMembership';
+
 # Our key for each preference => CiviCRM CustomField id
 # (AdditionalContactFields group), in display order.
 my %PREFERENCE_FIELDS = (
@@ -294,6 +299,12 @@ the other person's side, e.g. "Spouse of"), and membership_max_related is
 the membership type's limit on them, or undef for none. Otherwise
 membership_covers is [] and membership_max_related is undef.
 
+For a holder whose membership type passes to related contacts,
+membership_add_url is a signed link to the "add someone" form (see
+L</add_to_membership_url>), unless they're already at
+membership_max_related, in which case membership_at_max_related is 1 and
+membership_add_url is ''. For everyone else both are false.
+
 =cut
 
 sub get_contact {
@@ -376,10 +387,16 @@ sub get_contact {
     } @memberships;
     $membership //= {};
 
-    # If they hold it themselves, who else it covers
+    # If they hold it themselves, who else it covers, and whether they can
+    # add someone
     my $covered = { max_related => undef, covered => [] };
+    my ($add_url, $at_max_related) = ('', 0);
     if ($membership->{id} && !$membership->{owner_name}) {
         $covered = $self->_covered_by_membership($contact_id, $membership->{type_id});
+        my $max = $covered->{max_related};
+        $at_max_related = ($max && @{ $covered->{covered} } >= $max) ? 1 : 0;
+        $add_url = $self->add_to_membership_url($contact_id)
+            if $covered->{passes_to_related} && !$at_max_related;
     }
 
     my $addr       = $addr_result->{values}[0]       // {};
@@ -413,6 +430,8 @@ sub get_contact {
         membership_type_name => $membership->{type_name} // '',
         membership_covers    => $covered->{covered},
         membership_max_related => $covered->{max_related},
+        membership_at_max_related => $at_max_related,
+        membership_add_url   => $add_url,
         membership_end       => $membership->{end_date} // '',
         membership_is_active => (
             $membership->{end_date}
@@ -549,6 +568,53 @@ sub update_contact {
             });
         }
     }
+}
+
+=head2 add_to_membership_url($contact_id)
+
+Returns a link to the $ADD_TO_MEMBERSHIP_FORM FormBuilder form, signed so
+it logs $contact_id in for that form only:
+
+    https://bacds.civicrm.org/civicrm/add-family-member?_aff=Bearer...
+
+CiviCRM makes these links for forms with the "Message Tokens" placement, as
+the C<{form.FORMNAMEUrl}> token. We get one by rendering just that token
+with APIv4 WorkflowMessage.render. The link expires after CiviCRM's
+site-wide "Checksum Lifespan" setting, in days (Administer > System
+Settings > Misc); the API has no way to set a shorter expiry for just this
+link.
+
+Returns '' with a warning if CiviCRM can't make the link, e.g. if the form
+was renamed or lost its Message Tokens placement, so the portal page still
+works without the button.
+
+=cut
+
+sub add_to_membership_url {
+    my ($self, $contact_id) = @_;
+
+    my $url = eval {
+        my $result = $self->_call_v4('WorkflowMessage', 'render', {
+            workflow        => 'generic',
+            messageTemplate => {
+                msg_subject => '',
+                msg_text    => "{form.${ADD_TO_MEMBERSHIP_FORM}Url}",
+                msg_html    => '',
+            },
+            values          => { contactID => $contact_id },
+        });
+        my $text = $result->{values}[0]{text} // '';
+        $text =~ s/\A\s+|\s+\z//g;
+        $text =~ m{\Ahttps://\S+[?&]_aff=\S+\z}
+            or die "rendered {form.${ADD_TO_MEMBERSHIP_FORM}Url} isn't a signed "
+                  ."form link: '$text'\n";
+        $text;
+    };
+    if (!defined $url) {
+        warn "add_to_membership_url: can't get link for contact $contact_id: $@";
+        return '';
+    }
+    return $url;
 }
 
 =head2 end_covered_relationships($holder_id, \@contact_ids)
@@ -711,6 +777,7 @@ sub _current_relationship_where {
 # For a contact who directly holds a membership of type $membership_type_id,
 # returns
 #   {
+#     passes_to_related => 1 if the type passes to related contacts at all,
 #     max_related => the type's limit, or undef for none,
 #     covered     => [
 #       { contact_id, display_name, relationship, relationship_ids }, ...
@@ -727,7 +794,7 @@ sub _covered_by_membership {
     my $inheritance = $self->_membership_inheritance;
     my $inherits    = $inheritance->{inherits}{$membership_type_id};
     my $max_related = $inheritance->{max_related}{$membership_type_id};
-    return { max_related => $max_related, covered => [] }
+    return { passes_to_related => 0, max_related => $max_related, covered => [] }
         unless $inherits;
 
     my $rels_result = $self->_call_v4('Relationship', 'get', {
@@ -774,6 +841,7 @@ sub _covered_by_membership {
     }
 
     return {
+        passes_to_related => 1,
         max_related => $max_related,
         covered     => [
             map {
