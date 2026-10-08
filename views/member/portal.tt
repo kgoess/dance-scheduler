@@ -77,17 +77,30 @@
       </p>
       <table class="table table-sm mb-1">
         <thead>
-          <tr><th scope="col">Name</th><th scope="col">Relationship to you</th></tr>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Relationship to you</th>
+            <th scope="col" class="text-end">Remove</th>
+          </tr>
         </thead>
         <tbody>
           <% FOREACH person IN contact.membership_covers %>
           <tr>
             <td><% person.display_name | html %></td>
             <td><% person.relationship | html %></td>
+            <td class="text-end">
+              <input class="form-check-input remove-covered" type="checkbox"
+                name="remove_covered" value="<% person.contact_id | html %>"
+                aria-label="Remove <% person.display_name | html %> from your membership">
+            </td>
           </tr>
           <% END %>
         </tbody>
       </table>
+      <div class="form-text">
+        To stop your membership covering someone, check Remove and save your
+        changes. Their own contact information stays on file.
+      </div>
       <% IF contact.membership_max_related %>
       <div class="form-text">
         A <% contact.membership_type_name | html %> membership can cover up to
@@ -227,6 +240,22 @@
         boxes.forEach(function (box) { box.disabled = false; });
       });
       sync();
+    })();
+
+    // Confirm before removing anyone from the membership
+    (function () {
+      var form = document.querySelector('form.member-portal');
+      form.addEventListener('submit', function (event) {
+        var count = form.querySelectorAll('input.remove-covered:checked').length;
+        if (!count) return;
+        var who = count === 1 ? '1 person' : count + ' people';
+        if (!window.confirm('Remove ' + who + ' from your membership?')) {
+          event.preventDefault();
+          // the directory script re-enabled its options for the submit
+          document.getElementById('directory_include')
+            .dispatchEvent(new Event('change'));
+        }
+      });
     })();
   </script>
   <% END %>

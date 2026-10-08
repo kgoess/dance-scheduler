@@ -551,6 +551,64 @@ sub update_contact {
     }
 }
 
+=head2 end_covered_relationships($holder_id, \@contact_ids)
+
+For a contact who holds a membership themselves, stops it covering each of
+@contact_ids by ending the relationships that pass it to them (see
+membership_covers in L</get_contact>). The relationships are set inactive
+with today's end date rather than deleted, so CiviCRM keeps the history.
+CiviCRM then removes any inherited membership it created for them.
+
+Contact ids the holder's membership doesn't cover are skipped with a
+warning, so a stale or tampered form can't end other relationships.
+Returns the number of relationships ended.
+
+=cut
+
+sub end_covered_relationships {
+    my ($self, $holder_id, $contact_ids) = @_;
+
+    my $memberships_result = $self->_call_v4('Membership', 'get', {
+        select => [qw(id membership_type_id)],
+        where  => [
+            ['contact_id',          '=', $holder_id],
+            ['owner_membership_id', 'IS NULL'],
+        ],
+    });
+    my %type_ids = map { $_->{membership_type_id} => 1 }
+        @{ $memberships_result->{values} };
+
+    my %relationship_ids_for;
+    for my $type_id (sort keys %type_ids) {
+        my $covered = $self->_covered_by_membership($holder_id, $type_id);
+        for my $person (@{ $covered->{covered} }) {
+            push @{ $relationship_ids_for{ $person->{contact_id} } },
+                @{ $person->{relationship_ids} };
+        }
+    }
+
+    my %to_end;
+    for my $contact_id (@$contact_ids) {
+        if (my $ids = $relationship_ids_for{$contact_id}) {
+            $to_end{$_} = 1 for @$ids;
+        } else {
+            warn "end_covered_relationships: contact $contact_id isn't covered by "
+                ."a membership held by $holder_id, skipping\n";
+        }
+    }
+    return 0 unless %to_end;
+
+    $self->_call_v4('Relationship', 'update', {
+        values => {
+            is_active => \0,
+            end_date  => DateTime->now->ymd,
+        },
+        where  => [['id', 'IN', [ map { $_ + 0 } sort { $a <=> $b } keys %to_end ]]],
+    });
+
+    return scalar keys %to_end;
+}
+
 =head2 send_magic_link_email($contact_id, $email, $display_name, $url)
 
 Sends the magic link email to the contact via CiviCRM's MessageTemplate.send
@@ -654,12 +712,15 @@ sub _current_relationship_where {
 # returns
 #   {
 #     max_related => the type's limit, or undef for none,
-#     covered     => [ { contact_id, display_name, relationship }, ... ],
+#     covered     => [
+#       { contact_id, display_name, relationship, relationship_ids }, ...
+#     ],
 #   }
 # where covered lists the other contacts that membership passes to through
 # a current relationship, by the same rule as
 # _owner_memberships_via_relationship, sorted by name. relationship
-# describes each contact's side, e.g. "Spouse of" or "Child of".
+# describes each contact's side, e.g. "Spouse of" or "Child of", and
+# relationship_ids are the CiviCRM relationships that make them covered.
 sub _covered_by_membership {
     my ($self, $owner_id, $membership_type_id) = @_;
 
@@ -671,6 +732,7 @@ sub _covered_by_membership {
 
     my $rels_result = $self->_call_v4('Relationship', 'get', {
         select => [qw(
+            id
             contact_id_a
             contact_id_b
             contact_id_a.display_name
@@ -707,6 +769,7 @@ sub _covered_by_membership {
              || $rel->{"contact_id_$side.is_deleted"};
         push @{ $covered{$contact_id}{relationships} },
             $rel->{"relationship_type_id.$label"};
+        push @{ $covered{$contact_id}{relationship_ids} }, $rel->{id};
         $covered{$contact_id}{display_name} = $rel->{"contact_id_$side.display_name"};
     }
 
@@ -718,6 +781,7 @@ sub _covered_by_membership {
                     contact_id   => $_,
                     display_name => $covered{$_}{display_name},
                     relationship => join(', ', @{ $covered{$_}{relationships} }),
+                    relationship_ids => $covered{$_}{relationship_ids},
                 }
             }
             sort { lc $covered{$a}{display_name} cmp lc $covered{$b}{display_name} }
