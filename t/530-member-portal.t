@@ -84,6 +84,7 @@ test_portal_save_preferences();
 test_post_request_link_related_contact();
 test_post_request_link_prefers_own_membership();
 test_portal_membership_through_someone_else();
+test_portal_shows_who_membership_covers();
 
 done_testing;
 
@@ -432,6 +433,30 @@ sub test_portal_membership_through_someone_else {
     like $res->content, qr{Save changes}, 'related contact can still edit their info';
 }
 
+sub test_portal_shows_who_membership_covers {
+    my $token = _insert_valid_token(16);
+    $get_contact_stub = {
+        _fake_contact(16)->%*,
+        membership_type_name   => 'Family',
+        membership_covers      => [
+            { contact_id => 735, display_name => 'Robin Holder', relationship => 'Spouse of' },
+            { contact_id => 12,  display_name => 'Sam Holder',   relationship => 'Child of' },
+        ],
+        membership_max_related => 10,
+    };
+
+    my $res = $Test->request(GET "/unearth/member/portal?token=$token");
+    like $res->content, qr{Your Family membership also covers:}, 'holder sees the covered list';
+    like $res->content, qr{<td>Robin Holder</td>\s*<td>Spouse of</td>}, 'lists the spouse';
+    like $res->content, qr{<td>Sam Holder</td>\s*<td>Child of</td>},    'lists the child';
+    like $res->content, qr{can cover up to\s+10 people besides you}, 'shows the limit';
+    like $res->content, qr{Pay or renew membership}, 'holder still gets the payment button';
+
+    $get_contact_stub = _fake_contact(42);
+    $res = $Test->request(GET '/unearth/member/portal?token=' . _insert_valid_token(42));
+    unlike $res->content, qr{also covers}, 'no covered list when the membership covers nobody else';
+}
+
 # --- helpers ---
 
 sub _fake_contact {
@@ -451,6 +476,8 @@ sub _fake_contact {
         country              => 'United States',
         membership_id        => 147,
         membership_owner_name => '',
+        membership_covers    => [],
+        membership_max_related => undef,
         membership_payment_url => 'https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2&cid=42&mid=147&cs=abc_123_1',
         membership_type_name => 'Regular',
         membership_end       => '2026-12-31',
