@@ -111,9 +111,17 @@
       <% END %>
       <% IF contact.membership_add_url %>
       <div class="mt-2">
+      <!--
         <a class="btn btn-outline-secondary btn-sm" href="<% contact.membership_add_url | html %>"
           target="_blank" rel="noopener">Add someone to your membership</a>
         <div class="form-text">Opens a form on BACDS's membership system (CiviCRM) in a new tab. New additions are reviewed by BACDS membership staff before they go live.</div>
+      -->
+        <!-- *** -->
+        <a class="btn btn-outline-secondary btn-sm" href="mailto:membership.bacds@gmail.com"
+          target="_blank" rel="noopener">Add someone to your membership</a>
+        <div class="form-text">Send an email to membership.bacds@gmail.com to add to your membership, until CiviCRM ships <a href="https://github.com/civicrm/civicrm-core/pull/36582">the bugfix we need.</a></div>
+        <!-- *** -->
+
       </div>
       <% ELSIF contact.membership_at_max_related %>
       <div class="form-text mt-2">
