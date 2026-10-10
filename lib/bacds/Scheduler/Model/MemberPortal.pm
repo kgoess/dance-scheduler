@@ -79,6 +79,11 @@ sub request_link {
     my $contact = $contacts->[0];
     my ($contact_id, $display_name) = ($contact->{contact_id}, $contact->{display_name});
 
+    # The address on file, not the typed one (see
+    # CiviCRM::_contacts_matching_email)
+    my $to_email = $contact->{email}
+        or croak "CiviCRM contact $contact_id has no stored email";
+
     my $token = _generate_token();
     my $now   = DateTime->now;
 
@@ -90,7 +95,7 @@ sub request_link {
     });
 
     my $portal_url = "$base_url/unearth/member/portal?token=$token";
-    $civi->send_magic_link_email($contact_id, $email, $display_name, $portal_url);
+    $civi->send_magic_link_email($contact_id, $to_email, $display_name, $portal_url);
 }
 
 =head2 get_contact_for_portal($token, $dbh)
