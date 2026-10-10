@@ -1889,6 +1889,11 @@ Looks up the submitted email in CiviCRM and, if a contact is found, sends
 a magic link email via CiviCRM. Always redirects to the same confirmation
 page regardless of whether the email was recognised (prevents enumeration).
 
+The link is built from the C<member_portal_base_url> setting (see
+environments/*.yml), never from the request, so a forged Host or
+X-Forwarded-Host header can't point the emailed link at another server.
+If the setting is missing, no email is sent.
+
 =cut
 
 post '/unearth/member/request-link' => sub {
@@ -1904,8 +1909,12 @@ post '/unearth/member/request-link' => sub {
         }, { layout => 'unearth-page-wrapper' };
     }
 
-    my $base_url = request->uri_base;
     eval {
+        # Not request->uri_base: that comes from the Host header, which
+        # the client controls
+        my $base_url = config->{member_portal_base_url}
+            or die "member_portal_base_url is not configured\n";
+        $base_url =~ s{/+\z}{};
         bacds::Scheduler::Model::MemberPortal->request_link(
             $email, get_dbh(), $base_url,
         );
