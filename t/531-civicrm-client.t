@@ -5,6 +5,7 @@
 
 use 5.32.1;
 use warnings;
+use utf8;
 
 use DateTime;
 use HTTP::Response;
@@ -79,6 +80,9 @@ my @relationship_updates;
 # What WorkflowMessage.render returns, and the params it was called with
 our $rendered_text = 'https://bacds.civicrm.org/civicrm/add-family-member?_aff=Bearer%20abc.def.ghi';
 my @render_calls;
+# Canned Email.get rows, standing in for whatever CiviCRM's case- and
+# accent-insensitive match returns
+my @email_rows;
 
 # Keep the real one for test_call_v4_url_encodes_params
 my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
@@ -97,6 +101,7 @@ my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
             push @render_calls, $params;
             return { values => [{ subject => '', text => $rendered_text, html => '' }] };
         }
+        return { values => [ @email_rows ] } if $entity eq 'Email';
         return \%membership_types if $entity eq 'MembershipType';
         return \%relationships    if $entity eq 'Relationship';
         return { values => [{ checksum => 'abc_123_1' }] }
@@ -128,6 +133,10 @@ test_add_to_membership_url();
 test_add_to_membership_url_failure();
 test_get_contact_at_max_related();
 test_call_v4_url_encodes_params();
+test_find_member_contacts_returns_stored_email();
+test_find_member_contacts_ignores_lookalike_email();
+test_find_related_contacts_returns_stored_email();
+test_find_related_contacts_ignores_lookalike_email();
 
 done_testing;
 
@@ -279,6 +288,67 @@ sub test_call_v4_url_encodes_params {
     my %form = URI->new('?' . $req->content)->query_form;
     is decode_json($form{params})->{where}[0][2], 'pat+bacds@example.com',
         'a "+" in a param survives form decoding';
+}
+
+sub test_find_member_contacts_returns_stored_email {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+
+    # The membership join gives one row per membership, so contact 42 shows
+    # up twice
+    @email_rows = (
+        _email_row(42, 'Alice', 'alice@example.com'),
+        _email_row(42, 'Alice', 'alice@example.com'),
+    );
+    my $contacts = $civi->find_member_contacts_by_email('ALICE@Example.com');
+
+    is_deeply $contacts, [{
+        contact_id   => 42,
+        display_name => 'Alice',
+        email        => 'alice@example.com',
+    }], 'returns each contact once, with the address stored in CiviCRM';
+}
+
+sub test_find_member_contacts_ignores_lookalike_email {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+
+    @email_rows = (_email_row(42, 'Alice', 'alice@example.com'));
+    my $contacts = $civi->find_member_contacts_by_email('alice@exámple.com');
+
+    is_deeply $contacts, [],
+        'an accent-insensitive collation match is not treated as the same address';
+}
+
+sub test_find_related_contacts_returns_stored_email {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+
+    # 100 is covered by the holder's Family membership (see %relationships)
+    @email_rows = (_email_row(100, 'Sam Spouse', 'spouse@example.com'));
+    my $contacts = $civi->find_related_member_contacts_by_email('Spouse@example.com');
+
+    is_deeply $contacts, [{
+        contact_id   => 100,
+        display_name => 'Sam Spouse',
+        email        => 'spouse@example.com',
+    }], 'related contact comes back with the address stored in CiviCRM';
+}
+
+sub test_find_related_contacts_ignores_lookalike_email {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+
+    @email_rows = (_email_row(100, 'Sam Spouse', 'spouse@example.com'));
+    my $contacts = $civi->find_related_member_contacts_by_email('spöuse@example.com');
+
+    is_deeply $contacts, [],
+        'lookalike address does not match a related contact either';
+}
+
+sub _email_row {
+    my ($contact_id, $display_name, $email) = @_;
+    return {
+        contact_id                => $contact_id,
+        'contact_id.display_name' => $display_name,
+        email                     => $email,
+    };
 }
 
 sub _rel {

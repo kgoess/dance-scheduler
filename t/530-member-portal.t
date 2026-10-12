@@ -7,6 +7,7 @@ use 5.32.1;
 use warnings;
 
 use DateTime;
+use Encode qw/encode_utf8/;
 use HTTP::Request::Common;
 use Test::More;
 use Test::Warn;
@@ -68,7 +69,9 @@ my $last_end_covered;  # populated whenever end_covered_relationships is called
 
     *bacds::Scheduler::CiviCRM::send_magic_link_email = sub {
         my ($self, $contact_id, $email, $display_name, $url) = @_;
-        $last_magic_link = { contact_id => $contact_id, url => $url };
+        $last_magic_link = {
+            contact_id => $contact_id, to_email => $email, url => $url,
+        };
     };
 }
 
@@ -95,6 +98,8 @@ test_portal_shows_who_membership_covers();
 test_portal_save_removes_covered();
 test_portal_save_without_removals();
 test_portal_add_someone_link();
+test_post_request_link_sends_to_stored_address();
+test_post_request_link_lookalike_address_gets_nothing();
 
 done_testing;
 
@@ -159,7 +164,7 @@ sub test_post_request_link_non_member_email {
 }
 
 sub test_post_request_link_known_email {
-    $find_contacts_stub = [{ contact_id => 42, display_name => 'Alice' }];
+    $find_contacts_stub = [{ contact_id => 42, display_name => 'Alice', email => 'member@example.com' }];
     $last_magic_link    = undef;
 
     my $res = $Test->request(POST '/unearth/member/request-link',
@@ -184,9 +189,9 @@ sub test_post_request_link_known_email {
 sub test_post_request_link_multiple_contacts {
     # When multiple contacts share the email, the lowest contact_id is used
     $find_contacts_stub = [
-        {contact_id => 7, display_name => 'Alice'},
-        {contact_id => 99, display_name => 'Bob'},
-        {contact_id => 150, display_name => 'Carlos'},
+        {contact_id => 7,   display_name => 'Alice',  email => 'shared@example.com'},
+        {contact_id => 99,  display_name => 'Bob',    email => 'shared@example.com'},
+        {contact_id => 150, display_name => 'Carlos', email => 'shared@example.com'},
     ];
     $last_magic_link    = undef;
 
@@ -399,7 +404,7 @@ sub test_portal_save_preferences {
 sub test_post_request_link_related_contact {
     # No membership of their own, but covered by a spouse's Family membership
     $find_contacts_stub = [];
-    $find_related_stub  = [{ contact_id => 739, display_name => 'Spouse' }];
+    $find_related_stub  = [{ contact_id => 739, display_name => 'Spouse', email => 'spouse@example.com' }];
     $last_magic_link    = undef;
 
     my $res = $Test->request(POST '/unearth/member/request-link',
@@ -413,8 +418,8 @@ sub test_post_request_link_related_contact {
 
 sub test_post_request_link_prefers_own_membership {
     # A shared email: one contact holds the membership, another is related
-    $find_contacts_stub = [{ contact_id => 16,  display_name => 'Holder' }];
-    $find_related_stub  = [{ contact_id => 739, display_name => 'Spouse' }];
+    $find_contacts_stub = [{ contact_id => 16,  display_name => 'Holder', email => 'shared-family@example.com' }];
+    $find_related_stub  = [{ contact_id => 739, display_name => 'Spouse', email => 'shared-family@example.com' }];
     $last_magic_link    = undef;
 
     $Test->request(POST '/unearth/member/request-link',
@@ -534,6 +539,38 @@ sub test_portal_add_someone_link {
     $get_contact_stub = _fake_contact(42);
     $res = $Test->request(GET '/unearth/member/portal?token=' . _insert_valid_token(42));
     unlike $res->content, qr{Add someone to your membership}, 'no button for non-holders';
+}
+
+sub test_post_request_link_sends_to_stored_address {
+    $find_contacts_stub = [{
+        contact_id => 42, display_name => 'Alice', email => 'member@example.com',
+    }];
+    $last_magic_link = undef;
+
+    $Test->request(POST '/unearth/member/request-link',
+        { email => 'MEMBER@Example.COM' });
+
+    ok $last_magic_link, 'email sent for a case-variant of a known address';
+    is $last_magic_link->{to_email}, 'member@example.com',
+        'link is sent to the address stored in CiviCRM, not the typed one';
+}
+
+sub test_post_request_link_lookalike_address_gets_nothing {
+    # CiviCRM's lookup matches this to alice@example.com
+    my $lookalike = "alice\@ex\x{e1}mple.com";
+    $find_contacts_stub = [{
+        contact_id => 42, display_name => 'Alice', email => 'alice@example.com',
+    }];
+    $last_magic_link = undef;
+
+    # Browsers submit forms as UTF-8
+    $Test->request(POST '/unearth/member/request-link',
+        { email => encode_utf8($lookalike) });
+
+    is $last_magic_link->{to_email}, 'alice@example.com',
+        'link goes to the real owner, not the lookalike that was typed';
+
+    $find_contacts_stub = undef;
 }
 
 # --- helpers ---
