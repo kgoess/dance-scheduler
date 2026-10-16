@@ -81,17 +81,8 @@ plugin_keywords requires_superuser => sub {
         if ($programmer->is_superuser) {
             return $route_sub->($self, @args);
         } else {
-            my $results = bacds::Scheduler::Util::Results->new;
-
-            $results->add_error(40302, "You do not have permission to do that");
-            $results->data(
-                {
-                    #url => $plugin->get_login_page_url($self),
-                }
-            );
-            $self->response->status(403);
-            $self->response->headers->content_type('application/json');
-            $self->response->content($results->format);
+            return $plugin->json_error($self, 403, 40302,
+                "You do not have permission to do that");
         }
         
     };
@@ -140,9 +131,11 @@ plugin_keywords can_edit_event => sub {
         }
 
         my $event_id = $self->app->request->param('event_id')
-            or die "missing event_id in call to can_edit_event\n";
+            or return $plugin->json_error($self, 400, 40001,
+                "Missing event_id");
         my $event = $dbh->resultset('Event')->find($event_id)
-            or die "no event found for event_id '$event_id' in can_edit_event\n";
+            or return $plugin->json_error($self, 404, 40401,
+                "There's no event $event_id");
         my $series_id = $event->series_id;
         my @series_rs = $programmer->series(
              { 'series.series_id' => $series_id }
@@ -157,17 +150,8 @@ plugin_keywords can_edit_event => sub {
         if (@series_rs or @event_rs or @teams_rs) {
             $route_sub->($self, @args); # this is success
         } else {
-            my $results = bacds::Scheduler::Util::Results->new;
-
-            $results->add_error(40301, "You do not have permission to modify this event");
-            $results->data(
-                {
-                    #url => $plugin->get_login_page_url($self),
-                }
-            );
-            $self->response->status(403);
-            $self->response->headers->content_type('application/json');
-            $self->response->content($results->format);
+            return $plugin->json_error($self, 403, 40301,
+                "You do not have permission to modify this event");
         }
     };
 };
@@ -202,17 +186,8 @@ plugin_keywords can_create_event => sub {
         if (@series_rs ) {
             return $route_sub->($self, @args); # this is success
         } else {
-            my $results = bacds::Scheduler::Util::Results->new;
-
-            $results->add_error(40303, "You do not have permission to create this event");
-            $results->data(
-                {
-                    #url => $plugin->get_login_page_url($self),
-                }
-            );
-            $self->response->status(403);
-            $self->response->headers->content_type('application/json');
-            $self->response->content($results->format);
+            return $plugin->json_error($self, 403, 40303,
+                "You do not have permission to create this event");
         }
     };
 };
@@ -277,6 +252,25 @@ sub login_redirect_json {
     # this 401 will trigger this in the js app:
     #     alert("You don't have authorization to do that!");
     $app->response->status(401);
+    $app->response->headers->content_type('application/json');
+    $app->response->content($results->format);
+}
+
+=head2 json_error
+
+Sets the response to a JSON error in the bacds::Scheduler::Util::Results
+format, with the given HTTP status, error number and message.
+
+=cut
+
+sub json_error {
+    my ($plugin, $app, $status, $num, $msg) = @_;
+
+    my $results = bacds::Scheduler::Util::Results->new;
+    $results->add_error($num, $msg);
+    $results->data({});
+
+    $app->response->status($status);
     $app->response->headers->content_type('application/json');
     $app->response->content($results->format);
 }

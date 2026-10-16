@@ -31,6 +31,7 @@ use DateTime::Format::ISO8601;
 use Hash::MultiValue;
 use List::Util; # "any" is exported by Dancer2 qw/any/;
 use HTML::Entities qw/decode_entities/;
+use HTTP::Negotiate qw/choose/;
 use Scalar::Util qw/looks_like_number/;
 use Switch::Plain qw/sswitch/;
 use Time::Piece;
@@ -147,6 +148,76 @@ if (my $overrides = config->{rate_limits}) {
 config->{engines}{template}{template_toolkit}{FILTERS}
     = bacds::Scheduler::Util::Escape->tt_filters;
 
+
+=head2 error hooks: JSON errors for the scheduler's javascript
+
+When a route dies, or calls send_error, Dancer2 renders one of the
+views/NNN.tt error pages. That's right for a browser, but the scheduler's
+javascript asks for JSON (jQuery's C<dataType: 'json'>), can't parse the
+HTML, and could only say "something bad happened".
+
+So when the request prefers JSON over HTML, these hooks replace the error
+page with the same shape as bacds::Scheduler::Util::Results, keeping the
+HTTP status:
+
+    { "data": "", "errors": [ { "num": 500, "msg": "..." } ] }
+
+For a 500 the message is generic, since it's an unexpected exception
+(the exception itself is in the log already). With show_errors on, as in
+development, the exception is appended. For other statuses the message is
+the one passed to send_error, which is meant for the user.
+
+=cut
+
+hook before_error => sub {
+    my ($error) = @_;
+
+    my $request = $error->app->request
+        or return;
+    _wants_json($request)
+        or return;
+
+    my $status = $error->status;
+    my $msg;
+    if ($status == 500) {
+        $msg = "Something went wrong on the server, so that didn't work. "
+             . "The details are in the server's error log.";
+        if (config->{show_errors} && $error->has_exception) {
+            $msg .= "\n\n" . $error->exception;
+        }
+    } else {
+        $msg = $error->message || "Error $status";
+    }
+
+    my $results = $Results_Class->new;
+    $results->add_error($status, $msg);
+    $request->var(json_error => $results->format);
+};
+
+hook after_error => sub {
+    my ($response) = @_;
+
+    my $json = request->var('json_error')
+        // return;
+
+    $response->content_type('application/json');
+    $response->content($json);
+};
+
+# True if the request's Accept header prefers JSON to HTML. jQuery's
+# dataType: 'json' sends "application/json, text/javascript, */*; q=0.01",
+# while browsers send text/html first, and a missing Accept header gets
+# HTML. See also login_redirect in bacds::Scheduler::Plugin::Auth.
+sub _wants_json {
+    my ($request) = @_;
+
+    state $variants = [
+        ['html', 1.000, 'text/html'       ],
+        ['json', 1.000, 'application/json'],
+    ];
+    my $choice = choose($variants, $request->headers) // 'html';
+    return $choice eq 'json';
+}
 
 =head2 before hook: cross-site request check
 

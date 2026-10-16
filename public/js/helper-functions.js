@@ -400,7 +400,14 @@ export function handleError(err) {
             });
             break;
         default:
-            alert('something bad happened, update failed, see the server logs');
+            // The server sends errors as JSON like the normal results, see
+            // the error hooks in bacds::Scheduler
+            const errors = err.responseJSON && err.responseJSON.errors;
+            if (errors && errors.length) {
+                alert(errors.map((error) => error.msg).join("\n"));
+            } else {
+                alert('something bad happened, update failed, see the server logs');
+            }
             console.log(err);
     }
 }
