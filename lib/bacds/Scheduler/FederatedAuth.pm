@@ -326,15 +326,25 @@ sub check_bacds_auth {
         email => $email_param
     });
 
-    my $programmer = $rs->first
-        or return undef, [401, "No programmer found for '$email_param'"];
-    $programmer->is_deleted
-         and return undef, [403, "The account for '$email_param' is deleted"];
-    $programmer->password_hash or return undef, [403,
-         'Please use google or facebook to login, or ask bacds-web-committee@ about dance-scheduler-user-password.pl'
-    ];
+    # When there's no account to check, hash the password anyway, so the
+    # response takes as long as a real check and the timing doesn't reveal
+    # which emails have accounts.
+    state $dummy_entry = make_password_entry('not a real password');
+    my $fail = sub {
+        password_matches($password_param, $dummy_entry);
+        return undef, [@_];
+    };
 
-    # We're being an oracle. Should return something more vague? Meh.
+    my $programmer = $rs->first
+        or return $fail->(401, "No programmer found for '$email_param'");
+    $programmer->is_deleted
+         and return $fail->(403, "The account for '$email_param' is deleted");
+    $programmer->password_hash or return $fail->(403,
+         'Please use google or facebook to login, or ask bacds-web-committee@ about dance-scheduler-user-password.pl'
+    );
+
+    # /bacds-signin shows the same message for all of these failures, so
+    # the details here only go to the log.
     password_matches($password_param, $programmer->password_hash)
          or return undef, [401, 'Incorrect password'] ;
 

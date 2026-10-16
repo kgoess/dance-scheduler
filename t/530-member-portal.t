@@ -33,6 +33,11 @@ $Test->add_header(Referer => undef);
 my $Portal_base_url = 'https://bacds.example.org/dance-scheduler';
 bacds::Scheduler::set(member_portal_base_url => $Portal_base_url);
 
+# These tests request lots of links from one IP and for the same contacts.
+# Rate limiting has its own tests in t/404-rate-limit.t, so raise the limits
+# out of the way here.
+$_->{max} = 1000 for values %bacds::Scheduler::RateLimit::Limits;
+
 # --- Mock CiviCRM so tests don't need real API keys or network ---
 #
 # $find_contacts_stub: arrayref of contact_ids to return, or undef for []

@@ -45,6 +45,7 @@ use bacds::Scheduler::ICal;
 use bacds::Scheduler::Plugin::AccordionConfig;
 use bacds::Scheduler::Plugin::Auth;
 use bacds::Scheduler::Plugin::Checksum;
+use bacds::Scheduler::RateLimit;
 use bacds::Scheduler::Model::Band;
 use bacds::Scheduler::Model::Caller;
 use bacds::Scheduler::Model::Calendar;
@@ -126,6 +127,19 @@ register_type_check 'DancefinderResultsFormat' => sub {
 
 
 preload_accordion_config;
+
+# Per-bucket overrides of the default rate limits, from the "rate_limits"
+# setting. See bacds::Scheduler::RateLimit.
+if (my $overrides = config->{rate_limits}) {
+    my $limits = \%bacds::Scheduler::RateLimit::Limits;
+    foreach my $bucket (sort keys %$overrides) {
+        if (!$limits->{$bucket}) {
+            warn "ignoring unknown bucket '$bucket' in the rate_limits setting\n";
+            next;
+        }
+        $limits->{$bucket} = { %{ $limits->{$bucket} }, %{ $overrides->{$bucket} } };
+    }
+}
 
 # Adds the "esc" filter to the templates, see bacds::Scheduler::Util::Escape.
 # This has to happen before the first template is rendered, since that's when
@@ -356,6 +370,14 @@ login credential checking redirector
 A request to signin.html will show a login-with-bacds button
 and others. Submitting the bacds login form ends up here.
 
+Failed attempts are counted per email and per IP address (see
+bacds::Scheduler::RateLimit). Over either limit, the request gets a 429
+before the password is checked, so a flood of guesses can't keep the
+server busy computing bcrypt hashes.
+
+Every failure gets the same message, so the form doesn't reveal which
+emails have accounts. The real reason goes to the log.
+
 =cut
 
 post '/bacds-signin' => sub {
@@ -364,12 +386,24 @@ post '/bacds-signin' => sub {
     my $password = params->{password}
         or send_error 'missing parameter "password"' => 400;
 
+    my $rate_limit = 'bacds::Scheduler::RateLimit';
+    my $ip = request->address;
+    if ($rate_limit->over_limit(signin_fail_email => $programmer_email)
+        || $rate_limit->over_limit(signin_fail_ip => $ip)
+    ) {
+        warn "bacds-signin throttled for $programmer_email from $ip\n";
+        send_error 'Too many failed logins. Please wait a while and try again.' => 429;
+    }
+
     my ($email, $err) = bacds::Scheduler::FederatedAuth->check_bacds_auth($programmer_email, $password);
 
     if ($err) {
         my ($code, $msg) = @$err;
         warn "bacds-signin login failure for $programmer_email: $msg\n";
-        send_error $msg => $code;
+        $rate_limit->record(signin_fail_email => $programmer_email);
+        $rate_limit->record(signin_fail_ip    => $ip);
+        send_error 'Incorrect email or password. (If you usually sign in with '
+            .'Google or Facebook, use those buttons instead.)' => 401;
     }
 
     my $session_cookie = bacds::Scheduler::FederatedAuth->create_session_cookie($email);
@@ -1980,6 +2014,11 @@ environments/*.yml), never from the request, so a forged Host or
 X-Forwarded-Host header can't point the emailed link at another server.
 If the setting is missing, no email is sent.
 
+Requests are rate-limited per IP address before the CiviCRM lookup, and
+emails per contact in request_link (see bacds::Scheduler::RateLimit). Over
+either limit nothing is sent, but the user still sees the same
+confirmation page.
+
 =cut
 
 post '/unearth/member/request-link' => sub {
@@ -1992,6 +2031,15 @@ post '/unearth/member/request-link' => sub {
             season     => get_season(),
             error      => 'Please enter a valid email address.',
             email      => $email,
+        }, { layout => 'unearth-page-wrapper' };
+    }
+
+    if (bacds::Scheduler::RateLimit->hit(member_link_ip => request->address)) {
+        warn "MemberPortal request_link throttled for $email from "
+            . request->address . "\n";
+        return template 'member/request_sent' => {
+            page_title => 'Check Your Email',
+            season     => get_season(),
         }, { layout => 'unearth-page-wrapper' };
     }
 
