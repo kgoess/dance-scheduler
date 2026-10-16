@@ -34,9 +34,8 @@ WriteMakefile(
         'Clone' => 0,
         'CLI::Osprey' => 0.09,
         'Crypt::Bcrypt' => 0,
-        'Crypt::Blowfish' => 0,
-        'Crypt::CBC' => 0,
         'Crypt::JWT' => 0,
+        'CryptX' => 0, # Crypt::AuthEnc::GCM for the session cookie
         'Data::UUID' => 0,
         'Date::Calc' => 0,
         'DateTime::Format::MySQL' => 0,
@@ -64,7 +63,6 @@ WriteMakefile(
         'LWP::Protocol::https' => 0,
         'Module::Pluggable' => 6.2,
         'Role::Tiny' => 2.000007,
-        'String::Random' => 0,
         'SQL::Translator' => 0,
         'Switch::Plain' => 0,
         'Template' => 0,

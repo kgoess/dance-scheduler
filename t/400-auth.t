@@ -10,8 +10,9 @@ use Encode qw/decode_utf8/;
 use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
+use MIME::Base64 ();
 use Plack::Test;
-use Test::More tests => 70;
+use Test::More tests => 80;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -132,6 +133,38 @@ sub test_session_key_and_cookie {
     ok !$res, 'nobody cookie rejected';
     like $err, qr{^no programmer found for 'nobody\@evil.ru'},
         'nobody cookie threw error';
+
+    unlike MIME::Base64::decode_base64url($prog_session), qr{paul},
+        "the cookie doesn't show the email";
+
+    # flip one bit in the ciphertext
+    my $raw = MIME::Base64::decode_base64url($prog_session);
+    substr($raw, -1, 1) ^= "\x01";
+    my $tampered = MIME::Base64::encode_base64url($raw);
+    ($res, $err) = $class->check_session_cookie($tampered);
+    ok !$res, 'tampered cookie rejected';
+    like $err, qr{^session cookie failed to decrypt}, 'tampered cookie error';
+    unlike $err, qr{\Q$tampered\E|paul}, "error doesn't show the cookie or email";
+
+    my $expired = $class->create_session_cookie('paul@programmer.com',
+        issued_at => time - 73 * 60 * 60);
+    ($res, $err) = $class->check_session_cookie($expired);
+    ok !$res, 'cookie older than 72 hours rejected';
+    like $err, qr{has expired}, 'expired cookie error';
+
+    my $future = $class->create_session_cookie('paul@programmer.com',
+        issued_at => time + 60 * 60);
+    ($res, $err) = $class->check_session_cookie($future);
+    ok !$res, 'cookie issued in the future rejected';
+
+    ($res, $err) = $class->check_session_cookie('not-a-cookie');
+    ok !$res, 'junk cookie rejected';
+
+    $programmer->update({ is_deleted => 1 });
+    ($res, $err) = $class->check_session_cookie($prog_session);
+    ok !$res, "deleted programmer's cookie rejected";
+    like $err, qr{is deleted}, 'deleted programmer error';
+    $programmer->update({ is_deleted => 0 });
 }
 
 sub test_password_matches {
