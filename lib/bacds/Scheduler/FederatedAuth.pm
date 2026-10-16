@@ -48,8 +48,10 @@ package bacds::Scheduler::FederatedAuth;
 use 5.16.0;
 use warnings;
 
+use Crypt::AuthEnc::GCM qw/gcm_encrypt_authenticate gcm_decrypt_verify/;
 use Crypt::JWT qw/decode_jwt/;
-use Crypt::CBC;
+use Crypt::Mac::HMAC qw/hmac/;
+use Crypt::PRNG qw/random_bytes/;
 use Data::Dump qw/dump/;
 use Data::Entropy::Algorithms qw(rand_bits); # recommended by Digest::Bcrypt
 use Data::UUID;
@@ -60,7 +62,6 @@ use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
 use LWP::UserAgent;
 use MIME::Base64 qw/encode_base64url decode_base64url/;
-use String::Random;
 
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 
@@ -382,39 +383,63 @@ sub make_password_entry {
     return join '=', 'bcrypt', $salt_b64, $bcrypt->b64digest;
 }
 
-sub cipher {
-    state $cipher = Crypt::CBC->new(
-        -pass => _get_session_encryption_key(),
-        -cipher => 'Crypt::Blowfish',
-        -pbkdf => 'pbkdf2',
-    );
-    return $cipher;
+# How long a session cookie is good for. This matches the cookie's
+# "expires", but unlike that it's enforced on our side, so a copied cookie
+# stops working too.
+use constant SESSION_MAX_AGE => 72 * 60 * 60;
+
+# A cookie issued up to this far in the future is still ok, in case clocks
+# on different servers disagree a bit.
+use constant SESSION_CLOCK_SKEW => 5 * 60;
+
+# Additional authenticated data for the AES-GCM encryption, so a cookie
+# can only be used as a v2 session cookie.
+use constant SESSION_AAD => 'bacds-session-v2';
+
+# The 256-bit AES key, derived from the contents of the
+# session-encryption-key file.
+sub _session_aes_key {
+    state $key = hmac('SHA256', _get_session_encryption_key(), SESSION_AAD);
+    return $key;
 }
 
-=head2 create_session_cookie
+=head2 create_session_cookie($email, issued_at => $epoch)
 
-If they login with the email/password/submit form, we'll create this session
-cookie and check it on subsequent protected requests.
+If they login with the email/password/submit form or Facebook, we'll create
+this session cookie and check it on subsequent protected requests.
+
+The cookie holds the email and the time it was issued, encrypted and
+authenticated with AES-GCM, so it can't be read or changed without the
+session-encryption-key. issued_at defaults to now, and is only there for the
+tests.
 
 =cut
 
 sub create_session_cookie {
-    my ($class, $email) = @_;
+    my ($class, $email, %args) = @_;
 
-    my $cookie = join $;,
-        'v1',
-        $email,
-        'this-is-bacds',
-        String::Random->new->randpattern('.'x128),
-    ;
+    my $issued_at = $args{issued_at} // time;
 
-    return encode_base64url cipher()->encrypt($cookie);
+    my $plaintext = join $;, 'v2', $email, $issued_at;
+
+    my $nonce = random_bytes(12);
+    my ($ciphertext, $tag) = gcm_encrypt_authenticate(
+        'AES', _session_aes_key(), $nonce, SESSION_AAD, $plaintext,
+    );
+
+    return encode_base64url($nonce . $tag . $ciphertext);
 }
 
 =head2 check_session_cookie
 
 This checks the cookie we created if they logged in with our
-email/password/submit form (as opposed to the Facebook and Google buttons).
+email/password/submit form or Facebook (as opposed to the Google button,
+which keeps Google's own token).
+
+Returns ($programmer, $err), with only one of those populated. It's an error
+if the cookie doesn't decrypt, is older than SESSION_MAX_AGE, or belongs to
+a programmer who isn't there or is deleted. The error never includes the
+cookie's contents.
 
 =cut
 
@@ -424,21 +449,39 @@ sub check_session_cookie {
     my $programmer;
 
     eval {
-        my $session_str = cipher()->decrypt(decode_base64url $session_cookie);
-        my ($version, $email, $canary, $nonce) = split /$;/, $session_str;
-        ($version//'') eq 'v1' or die "version looks funny: $session_str";
-        # not sure this is necessary, but seems helpful
-        $canary eq 'this-is-bacds' or die "canary looks funny: $session_str";
-        length $nonce == 128 or die "nonce wrong length: $session_str";
+        my $raw = decode_base64url($session_cookie // '');
+        # 12 bytes of nonce plus 16 of tag, then the ciphertext
+        length $raw > 28 or die "session cookie is too short\n";
+        my ($nonce, $tag, $ciphertext) = unpack 'a12 a16 a*', $raw;
+
+        my $plaintext = gcm_decrypt_verify(
+            'AES', _session_aes_key(), $nonce, SESSION_AAD, $ciphertext, $tag,
+        );
+        defined $plaintext
+            or die "session cookie failed to decrypt\n";
+
+        my ($version, $email, $issued_at) = split /$;/, $plaintext;
+        ($version // '') eq 'v2'
+            or die "session cookie has the wrong version\n";
+        ($issued_at // '') =~ /\A[0-9]+\z/
+            or die "session cookie has no issue time\n";
+
+        my $now = time;
+        $issued_at <= $now + SESSION_CLOCK_SKEW
+            or die "session cookie for '$email' was issued in the future\n";
+        $now - $issued_at <= SESSION_MAX_AGE
+            or die "session cookie for '$email' has expired\n";
 
         my $dbh = get_dbh();
         my $rs = $dbh->resultset('Programmer')->search({
             email => $email
         });
-        $programmer = $rs->first or die "no programmer found for '$email'";
+        $programmer = $rs->first or die "no programmer found for '$email'\n";
+        $programmer->is_deleted
+            and die "the account for '$email' is deleted\n";
     };
-    if ($@) {
-        return undef, $@;
+    if (my $err = $@) {
+        return undef, $err;
     }
     return $programmer;
 }
