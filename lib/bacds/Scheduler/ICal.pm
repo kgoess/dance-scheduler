@@ -133,9 +133,9 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
     }
 
     # lifted this from views/unearth/listings.tt
-    my @callers = $e->callers({}, { order_by => 'me.ordering' })->all;
-    my @bands   = $e->bands  ({}, { order_by => 'me.ordering' })->all;
-    my @talent  = $e->talent ({}, { order_by => 'me.ordering' })->all;
+    my @callers = $e->ordered_callers;
+    my @bands   = $e->ordered_bands;
+    my @talent  = $e->ordered_talent;
 
     my $description = calendar_description_for_event($e, \@callers, \@bands, \@talent);
 
@@ -229,9 +229,9 @@ sub event_to_ical ($class, $rs_event, $canonical_scheme, $canonical_host) {
 sub calendar_description_for_event ($e, $callers=undef, $bands=undef, $talent=undef) {
 
     # lifted this from views/unearth/listings.tt
-    $callers ||= [ $e->callers({}, { order_by => 'me.ordering' })->all ];
-    $bands   ||= [ $e->bands  ({}, { order_by => 'me.ordering' })->all ];
-    $talent  ||= [ $e->talent ({}, { order_by => 'me.ordering' })->all ];
+    $callers ||= [ $e->ordered_callers ];
+    $bands   ||= [ $e->ordered_bands ];
+    $talent  ||= [ $e->ordered_talent ];
 
     my $d = '';
     if (my $long_desc = $e->long_desc) {

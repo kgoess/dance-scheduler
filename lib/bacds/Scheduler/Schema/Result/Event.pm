@@ -420,6 +420,45 @@ use Role::Tiny::With;
 with 'bacds::Scheduler::Schema::Role::AutoTimestamps';
 with 'bacds::Scheduler::Schema::Role::EventCalendarLinks';
 
+=head2 ordered_bands, ordered_callers, ordered_parent_orgs, ordered_role_pairs, ordered_styles, ordered_talent, ordered_teams, ordered_venues
+
+Each returns the related rows sorted by the mapping table's C<ordering>,
+like
+
+    $event->bands({}, { order_by => 'me.ordering' })
+
+but that runs a new query for every event. These sort the mapping rows in
+perl instead, so when the event came from a resultset that prefetched the
+mapping table and the other end (e.g. search_events in
+bacds::Scheduler::Model::DanceFinder), they use the prefetched rows and
+don't query at all. Without a prefetch they still work, just with queries.
+
+They return a list, or an arrayref in scalar context.
+
+=cut
+
+foreach my $rel (
+    [ordered_bands       => event_band_maps        => 'band'      ],
+    [ordered_callers     => event_callers_maps     => 'caller'    ],
+    [ordered_parent_orgs => event_parent_orgs_maps => 'parent_org'],
+    [ordered_role_pairs  => event_role_pairs_maps  => 'role_pair' ],
+    [ordered_styles      => event_styles_maps      => 'style'     ],
+    [ordered_talent      => event_talent_maps      => 'talent'    ],
+    [ordered_teams       => event_team_maps        => 'team'      ],
+    [ordered_venues      => event_venues_maps      => 'venue'     ],
+) {
+    my ($method, $map_rel, $other) = @$rel;
+    no strict 'refs';
+    *{__PACKAGE__ . "::$method"} = sub {
+        my ($self) = @_;
+        # list context, so a prefetched relationship comes from its cache
+        my @maps = $self->$map_rel;
+        my @rows = map { $_->$other }
+            sort { ($a->ordering // 0) <=> ($b->ordering // 0) } @maps;
+        return wantarray ? @rows : \@rows;
+    };
+}
+
 sub get_fields_for_programmer_row {
     my ($self) = @_;
     return {

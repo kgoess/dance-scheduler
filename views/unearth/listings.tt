@@ -22,7 +22,7 @@ page.
   found_styles = [];
   IF highlight_special_types;
     special_styles = { special => 1, workshop => 1, woodshed => 1, camp => 1 };
-    FOREACH style IN event.styles({}, { order_by => 'me.ordering' });
+    FOREACH style IN event.ordered_styles;
       style_name = style.name.lower;
       IF special_styles.$style_name;
         found_styles.push(style_name);
@@ -198,19 +198,19 @@ END -%>
         <span class="special-event-name"><% event.name | esc %></span>
       <% END -%>
       <span class="event-types">
-        <% style_open_parens %><%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) -%>
+        <% style_open_parens %><%- FOREACH style IN event.ordered_styles -%>
           <%- style.name | esc %><% IF !loop.last() %>/<% END -%>
         <%- END -%><% style_close_parens %>
       </span>
       <% IF event.venues %> at <% END %>
-      <% FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) -%>
+      <% FOREACH venue IN event.ordered_venues -%>
         <%- maybe_linkit(venue.hall_name _ " in " _ venue.city, event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) ) -%>.
       <% END -%>
       <% IF event.long_desc -%>
         <div class="event-long-desc"><% event.long_desc %></div>
       <%- ELSE -%>
         <%- IF event.callers -%>
-          <%- FOREACH caller IN event.callers({}, { order_by => 'me.ordering' }) -%>
+          <%- FOREACH caller IN event.ordered_callers -%>
             <%- maybe_linkit_ssh(caller.name, caller.url) -%><% IF !loop.last() %>, <% END %>
           <%- END -%>
           <%- IF event.bands || event.talent %> with <% END %>
@@ -219,11 +219,11 @@ END -%>
             Music by
           <% END %>
         <%- END %>
-        <%- FOREACH band IN event.bands({}, { order_by => 'me.ordering' }) %>
+        <%- FOREACH band IN event.ordered_bands %>
           <%- maybe_linkit(band.name, band.url) -%><% IF loop.last() && event.talent %>: <% ELSIF !loop.last %>, <% END %>
         <%- END %>
         <% IF event.talent %>
-          <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
+          <%- FOREACH talent IN event.ordered_talent -%>
             <%- maybe_linkit_ssh(talent.name, talent.url) -%><% IF !loop.last() %>, <% END %>
           <%- END -%>
         <%- END %>

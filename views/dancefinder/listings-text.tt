@@ -14,13 +14,13 @@ This is used by the send-weekly-schedule cron job
 <%- END -%>
 
 <%- MACRO event_styles(event) BLOCK -%>
-    <%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) %>
+    <%- FOREACH style IN event.ordered_styles %>
         <%- style.name %><% IF !loop.last() %>/<% END %>
     <%- END %>
 <%- END -%>
 
 <%- MACRO event_teams(event) BLOCK -%>
-    <%- FOREACH team IN event.teams({}, { order_by => 'me.ordering' }) -%>
+    <%- FOREACH team IN event.ordered_teams -%>
         <%- IF loop.last() && !loop.first() %>and <% END %><% team.name- %>
         <%- IF !loop.last() %>, <% END -%>
     <%- END -%>
@@ -29,7 +29,7 @@ This is used by the send-weekly-schedule cron job
 <%- MACRO event_callers_and_bands(event) BLOCK -%>
     <%- output = "" -%>
     <%- IF event.callers;
-        FOREACH caller IN event.callers({}, { order_by => 'me.ordering' });
+        FOREACH caller IN event.ordered_callers;
             output = output _ caller.name;
             IF !loop.last();
                 output = output _ ", ";
@@ -39,7 +39,7 @@ This is used by the send-weekly-schedule cron job
     <%- ELSE %>
         <%- IF event.bands || event.talent; output = output _ "Music by "; END -%>
     <%- END -%>
-    <%- FOREACH band IN event.bands({}, { order_by => 'me.ordering' });
+    <%- FOREACH band IN event.ordered_bands;
         output = output _ band.name;
         IF loop.last() && event.talent; 
             output = output _ ": ";
@@ -51,7 +51,7 @@ This is used by the send-weekly-schedule cron job
 <%- END -%>
 
 <%- MACRO event_talent(event) BLOCK -%>
-    <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
+    <%- FOREACH talent IN event.ordered_talent -%>
         <%- talent.name %><% IF !loop.last() %>, <% END -%>
     <%- END -%>
     <%- IF (event.bands || event.talent) && event.and_friends -%> and friends<% END -%>
@@ -59,7 +59,7 @@ This is used by the send-weekly-schedule cron job
 
 <%- MACRO event_venues(event) BLOCK -%>
     <%- IF event.venues %> at <% END %>
-    <%- FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) %>
+    <%- FOREACH venue IN event.ordered_venues %>
 <%- venue.hall_name _ ' in ' _ venue.city %>.
     <%- END %>
 <%- END -%>
