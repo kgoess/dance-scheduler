@@ -47,6 +47,11 @@ otherwise we're using the "schedule_test" table, probably via
 
 You can also set $ENV{DBIX_DEBUG} instead of passing debug => 1.
 
+The schema object is cached per DSN for the life of the process, so repeated
+calls share one database connection instead of each opening a new one.
+DBIx::Class reconnects if the connection drops, and after a fork. Since the
+connection is shared, once a call turns on debug it stays on.
+
 =cut
 
 sub get_dbh {
@@ -78,11 +83,13 @@ sub get_dbh {
         $dbi_params{sqlite_unicode} = 1;
     }
 
-    my $password = _get_password_for($database);
+    state %schema_for;
+    my $dbh = $schema_for{"$dbi_dsn;$user"} //= do {
+        my $password = _get_password_for($database);
+        bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params);
+    };
 
-    my $dbh = bacds::Scheduler::Schema->connect($dbi_dsn, $user, $password, \%dbi_params);
-
-    if ($ENV{DBIX_DEBUG} || $args{debug}) {
+    if (($ENV{DBIX_DEBUG} || $args{debug}) && !$dbh->storage->debug) {
       warn "connecting to $dbi_dsn as '$user'\n";
       $dbh->storage->debug(1);
     }

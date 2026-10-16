@@ -156,7 +156,8 @@ hook before => sub {
                 ->check_google_auth($google_token);
             if ($err) {
                 my ($code, $msg) = @$err;
-                warn qq{hook before check_google_auth: "$msg" for token '$google_token"};
+                # don't log the token, it's a credential
+                warn qq{hook before check_google_auth: "$msg"\n};
                 return;
             }
             $signed_in_as = $programmer;
@@ -170,7 +171,8 @@ hook before => sub {
                 ->check_session_cookie($session_cookie);
 
             if ($err) {
-                warn qq{hook before session: "$err" for $session_cookie};
+                # don't log the cookie, it's a credential
+                warn qq{hook before session: "$err"\n};
                 return;
             };
 
@@ -185,6 +187,23 @@ hook before => sub {
         );
     }
 };
+
+=head2 _auth_cookie_opts
+
+Extra options for the login and Checksum cookies. SameSite=Lax keeps the
+browser from sending them on cross-site POSTs, which blocks most CSRF.
+Secure is only set over https so the dev server on http://...:5000 still
+works.
+
+=cut
+
+sub _auth_cookie_opts {
+    return (
+        same_site => 'Lax',
+        secure    => (request->secure ? 1 : 0),
+        http_only => 1,
+    );
+}
 
 =head2 /google-signin
 
@@ -217,8 +236,8 @@ post '/google-signin' => sub {
         send_error $msg => $code;
     }
 
-    cookie GoogleToken, $jwt,     expires => "72 hours";
-    cookie LoginMethod, 'google', expires => "72 hours";
+    cookie GoogleToken, $jwt,     expires => "72 hours", _auth_cookie_opts();
+    cookie LoginMethod, 'google', expires => "72 hours", _auth_cookie_opts();
     redirect '/' => 303;
 };
 
@@ -259,8 +278,8 @@ post '/facebook-signin' => sub {
     # We should just do this with Google too, and then we can probably just use
     # the Plack auth session.
     my $session_cookie = bacds::Scheduler::FederatedAuth->create_session_cookie($email);
-    cookie LoginSession, $session_cookie, expires => "72 hours";
-    cookie LoginMethod, 'session';
+    cookie LoginSession, $session_cookie, expires => "72 hours", _auth_cookie_opts();
+    cookie LoginMethod, 'session',        expires => "72 hours", _auth_cookie_opts();
     redirect '/' => 303;
 };
 
@@ -289,8 +308,8 @@ post '/bacds-signin' => sub {
 
     my $session_cookie = bacds::Scheduler::FederatedAuth->create_session_cookie($email);
 
-    cookie LoginSession, $session_cookie, expires => "72 hours";
-    cookie LoginMethod, 'session'       , expires => "72 hours";
+    cookie LoginSession, $session_cookie, expires => "72 hours", _auth_cookie_opts();
+    cookie LoginMethod, 'session'       , expires => "72 hours", _auth_cookie_opts();
     redirect '/' => 303;
 };
 
@@ -299,8 +318,9 @@ post '/bacds-signin' => sub {
 =cut
 
 get '/signout' => sub {
-    cookie LoginSession, '', expires => "-1 hours";
-    cookie LoginMethod,  '', expires => "-1 hours";
+    cookie LoginSession, '', expires => "-1 hours", _auth_cookie_opts();
+    cookie LoginMethod,  '', expires => "-1 hours", _auth_cookie_opts();
+    cookie GoogleToken,  '', expires => "-1 hours", _auth_cookie_opts();
     redirect '/signin.html', 302;
 };
 
@@ -447,7 +467,7 @@ get '/' => requires_login sub {
     my $accordion = get_accordion_config();
 
     my $checksum = bacds::Scheduler::Util::Initialize::get_checksum();
-    cookie Checksum => $checksum;
+    cookie Checksum => $checksum, _auth_cookie_opts();
 
     my $yesterday_ymd = DateTime
         ->from_epoch(epoch => ($ENV{TEST_NOW} || time), time_zone => 'local')
@@ -1534,7 +1554,7 @@ sub get_season {
 
         October   => 'fall',
         November  => 'fall',
-        Decenber  => 'fall',
+        December  => 'fall',
     };
 
     # see Time::Piece for this localtime() usage

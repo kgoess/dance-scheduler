@@ -117,7 +117,7 @@ sub get_contact_for_portal {
     my $civi = bacds::Scheduler::CiviCRM->new;
     my $contact = $civi->get_contact($token_row->civicrm_contact_id);
 
-    croak "No membership record found for this account.\n"
+    die "No membership record found for this account.\n"
         unless defined $contact->{membership_is_active};
 
     return $contact;
@@ -153,22 +153,24 @@ sub save_contact {
 
 # --- private helpers ---
 
-# FIXME this token isn't checked that it belongs to the
-# MemberToken.civicrm_contact_id, so could be used to update *any* contact
-# record???
+# The contact a token can touch comes from its MemberToken row, never from
+# the form, so a token only works for the contact it was emailed to.
+#
+# These messages are shown to the member, so they use die with a trailing
+# newline: croak would add the file and line number.
 sub _validate_token {
     my ($token, $dbh) = @_;
 
     # Avoid a DB lookup for obvious junk (tokens are always 64 hex chars)
-    croak "Invalid link." unless $token && $token =~ /\A[0-9a-f]{64}\z/;
+    die "Invalid link.\n" unless $token && $token =~ /\A[0-9a-f]{64}\z/;
 
     my $row = $dbh->resultset('MemberToken')->find({ token => $token })
-        or croak "This link is not valid.";
+        or die "This link is not valid.\n";
 
-    croak "This link has already been used. Please request a new one.\n"
+    die "This link has already been used. Please request a new one.\n"
         if $row->used_ts;
 
-    croak "This link has expired. Please request a new one.\n"
+    die "This link has expired. Please request a new one.\n"
         if DateTime->compare(DateTime->now, $row->expires_ts) > 0;
 
     return $row;

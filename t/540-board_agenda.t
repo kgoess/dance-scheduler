@@ -8,7 +8,7 @@ use utf8;
 use Data::Dump qw/dump/;
 use DateTime;
 use JSON::MaybeXS qw/decode_json/;
-use Test::More tests => 37;
+use Test::More tests => 41;
 use Plack::Test;
 use Test::Differences qw/eq_or_diff/;
 
@@ -150,3 +150,18 @@ is $agenda, <<EOL, 'special DRAFT MINUTES URL slug removal ok';
 - Approve minutes
 here is some text  more text
 EOL
+
+#
+# the agenda text can't break out of the edit form's textarea
+#
+my $evil = q{</textarea><script>alert("pwned")</script>};
+$res = $test->post('/board-agenda/edit', {
+    meeting_date => $tomorrow,
+    agenda_text => $evil,
+    draft_minutes_url => 'https://github.com/asdfasdf',
+});
+ok $res->is_redirect, 'POST of agenda with markup gave us a 303 redirect';
+$test->get_ok('/board-agenda/edit');
+$content = $test->content;
+unlike $content, qr{<script>alert}, 'agenda markup is not echoed raw in the edit form';
+like $content, qr{&lt;/textarea&gt;&lt;script&gt;alert}, 'agenda markup is escaped in the edit form';
