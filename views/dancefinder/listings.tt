@@ -44,13 +44,13 @@ page.
 <%- END -%>
 
 <%- MACRO event_styles(event) BLOCK -%>
-    <%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) %>
+    <%- FOREACH style IN event.ordered_styles %>
         <%- style.name | esc %><% IF !loop.last() %>/<% END %>
     <%- END %>
 <%- END -%>
 
 <%- MACRO event_teams(event) BLOCK -%>
-    <%- FOREACH team IN event.teams({}, { order_by => 'me.ordering' }) %>
+    <%- FOREACH team IN event.ordered_teams %>
         <%- IF loop.last() && !loop.first() %>and <% END %><% maybe_linkit(team.name, team.team_url) %>
         <%- IF !loop.last() %>, <% END %>
     <%- END %>
@@ -64,14 +64,14 @@ page.
 
 <%- MACRO event_callers_and_bands(event) BLOCK -%>
     <%- IF event.callers %>
-        <%- FOREACH caller IN event.callers({}, { order_by => 'me.ordering' }) %>
+        <%- FOREACH caller IN event.ordered_callers %>
             <% caller.name | esc %><% IF !loop.last() %>, <% END %>
         <%- END %>
         <%- IF event.bands || event.talent %> with <% END %>
     <%- ELSE %>
         <%- IF event.bands || event.talent %> Music by <% END -%>
     <%- END -%>
-    <%- FOREACH band IN event.bands({}, { order_by => 'me.ordering' }) -%>
+    <%- FOREACH band IN event.ordered_bands -%>
         <%- maybe_linkit(band.name, band.url) -%>
         <%- IF loop.last() && event.talent %>: 
         <%- ELSIF !loop.last %>, 
@@ -80,7 +80,7 @@ page.
 <%- END -%>
 
 <%- MACRO event_talent(event) BLOCK -%>
-    <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
+    <%- FOREACH talent IN event.ordered_talent -%>
         <%- talent.name | esc %><% IF !loop.last() %>, <% END -%>
     <%- END -%>
     <%- IF (event.bands || event.talent) && event.and_friends -%>&#8230;and friends<% END -%>
@@ -88,7 +88,7 @@ page.
 
 <%- MACRO event_venues(event) BLOCK -%>
     <%- IF event.venues %> at <% END %>
-    <%- FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) %>
+    <%- FOREACH venue IN event.ordered_venues %>
         <a href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) | esc %>"><% venue.hall_name | esc %> in <% venue.city | esc %></a>.
     <%- END %>
 <%- END -%>

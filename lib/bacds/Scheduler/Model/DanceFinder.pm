@@ -181,7 +181,7 @@ sub search_events {
         {event_venues_maps => 'venue'},
         {event_parent_orgs_maps => 'parent_org'},
         {event_team_maps => 'team'},
-        {event_band_maps => {band => { band_memberships => 'talent'}}},
+        {event_band_maps => 'band'},
         {event_role_pairs_maps => 'role_pair'}
     );
 
