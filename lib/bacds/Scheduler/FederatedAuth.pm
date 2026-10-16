@@ -130,6 +130,12 @@ sub check_google_auth {
         return undef, [401, 'Login failed'];
     }
 
+    # A Google account can be registered on someone else's non-Gmail address
+    # without proving it owns that address, so only trust verified emails.
+    if (!$decoded->{email_verified}) {
+        return undef, [401, "Google hasn't verified the email for this account"];
+    }
+
     my $dbh = get_dbh();
 
     my $rs = $dbh->resultset('Programmer')->search({

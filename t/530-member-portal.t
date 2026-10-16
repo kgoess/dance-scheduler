@@ -289,6 +289,7 @@ sub test_portal_invalid_token {
     $res = $Test->request(GET '/unearth/member/portal');
     ok $res->is_success, 'GET portal without token returns 200';
     like $res->content, qr{Invalid link}, 'shows error for missing token';
+    unlike $res->content, qr{ at \S+ line \d+}, "doesn't show the file and line";
 
     $res = $Test->request(GET '/unearth/member/portal?token=notahextoken');
     ok $res->is_success, 'GET portal with non-hex token returns 200';
@@ -303,6 +304,7 @@ sub test_portal_invalid_token {
     $res = $Test->request(GET "/unearth/member/portal?token=$unknown_token");
     ok $res->is_success, 'GET portal with unknown token returns 200';
     like $res->content, qr{not valid}, 'shows error for unknown token';
+    unlike $res->content, qr{ at \S+ line \d+}, "doesn't show the file and line";
 }
 
 sub test_portal_expired_token {

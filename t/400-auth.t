@@ -10,8 +10,9 @@ use Encode qw/decode_utf8/;
 use FindBin qw/$Bin/;
 use HTTP::Request::Common;
 use JSON::MaybeXS qw/decode_json/;
+use JSON::PP ();
 use Plack::Test;
-use Test::More tests => 70;
+use Test::More tests => 81;
 use Test::Warn;
 
 use bacds::Scheduler;
@@ -24,6 +25,8 @@ $ENV{TEST_CACHE_PATH} = "$Bin/cache"; # s/b t/cache/
 
 test_fetch_google_oauth_keys();
 test_google_login();
+test_google_email_verified();
+test_get_dbh_is_cached();
 test_session_key_and_cookie();
 test_password_matches();
 test_bacds_login();
@@ -91,6 +94,57 @@ sub test_google_login {
 
     # set it back to what it was for other tests
     bacds::Scheduler->dsl->set(logger => 'console');
+}
+
+# Sign our own JWTs and stand in for Google's keys, to check that we turn
+# away tokens whose email Google hasn't verified.
+sub test_google_email_verified {
+    require Crypt::JWT;
+    require Crypt::PK::RSA;
+
+    my $pk = Crypt::PK::RSA->new;
+    $pk->generate_key(256);
+    my $jwk = $pk->export_key_jwk('public', 1);
+    $jwk->{kid} = 'test-kid';
+
+    no warnings 'redefine';
+    local *bacds::Scheduler::FederatedAuth::fetch_google_oauth_keys = sub {
+        return { keys => [$jwk] };
+    };
+
+    my $make_jwt = sub {
+        my ($email_verified) = @_;
+        return Crypt::JWT::encode_jwt(
+            alg => 'RS256',
+            key => $pk,
+            extra_headers => { kid => 'test-kid' },
+            payload => {
+                iss => 'https://accounts.google.com',
+                aud => '1098017941996-inv98s0als8ikk474e2tm6b2necuna1g.apps.googleusercontent.com',
+                exp => time + 600,
+                email => 'petertheadmin@test.com',
+                email_verified => $email_verified,
+            },
+        );
+    };
+
+    my $class = 'bacds::Scheduler::FederatedAuth';
+    my ($programmer, $err);
+
+    ($programmer, $err) = $class->check_google_auth($make_jwt->(JSON::PP::true()));
+    ok $programmer, 'verified email logs in' or dump $err;
+    is $programmer && $programmer->email, 'petertheadmin@test.com', 'as the right programmer';
+
+    ($programmer, $err) = $class->check_google_auth($make_jwt->(JSON::PP::false()));
+    ok !$programmer, 'unverified email is refused';
+    is $err->[0], 401, 'with a 401';
+
+    ($programmer, $err) = $class->check_google_auth($make_jwt->(undef));
+    ok !$programmer, 'missing email_verified is refused';
+}
+
+sub test_get_dbh_is_cached {
+    is get_dbh(), get_dbh(), 'get_dbh returns the same schema each time';
 }
 
 sub test_session_key_and_cookie {
@@ -190,6 +244,17 @@ sub test_bacds_login {
     $res = $test->request(POST '/bacds-signin', $good_params);
     is $res->code, 303, 'successful login';
     is $res->header('location'), '/', 'success login redirect to /';
+    my @set_cookies = $res->header('set-cookie');
+    is scalar(@set_cookies), 2, 'sets two cookies';
+    is scalar(grep { /SameSite=Lax/i } @set_cookies), 2, 'login cookies are SameSite=Lax'
+        or dump \@set_cookies;
+    is scalar(grep { /HttpOnly/i } @set_cookies), 2, 'login cookies are HttpOnly';
+    is scalar(grep { /;\s*Secure/i } @set_cookies), 0, 'no Secure flag over plain http';
+
+    $res = $test->request(GET '/signout');
+    my @cleared = map { /^([^=]+)=/ } $res->header('set-cookie');
+    ok( (grep { /GoogleToken$/ } @cleared), 'signout clears GoogleToken too')
+        or dump \@cleared;
 
     my $wrong_pw_params = {
         programmer_email => 'bacds@loginner.com',
