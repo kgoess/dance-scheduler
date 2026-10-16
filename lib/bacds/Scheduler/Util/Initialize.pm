@@ -25,7 +25,7 @@ use Dancer2;
 
 our $checksum;
 
-sub initialize{
+sub initialize {
     my ($class) = @_;
 
     my $sha = Digest::SHA->new(256);
@@ -64,7 +64,7 @@ sub initialize{
     $checksum = $sha->hexdigest;
 }
 
-sub get_checksum{
+sub get_checksum {
     if (!$checksum) {
         initialize();
     }

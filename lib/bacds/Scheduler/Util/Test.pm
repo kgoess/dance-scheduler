@@ -22,6 +22,8 @@ use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession/;
 use bacds::Scheduler::Util::Initialize;
 use bacds::Scheduler::FederatedAuth;
+use bacds::Scheduler::Util::Cookie qw/JSChecksum/;
+
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
@@ -99,10 +101,10 @@ sub get_tester {
     }
     if ((! exists $args{checksum}) || $args{checksum} == 1) {
         my $checksum = bacds::Scheduler::Util::Initialize::get_checksum();
-        push @cookies, "Checksum=$checksum";
+        push @cookies, join '=', JSChecksum, $checksum;
     }
     elsif ($args{checksum}){
-        push @cookies, "Checksum=$args{checksum}";
+        push @cookies, join '=', JSChecksum, $args{checksum};
     }
 
     if (@cookies) {

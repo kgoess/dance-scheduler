@@ -20,11 +20,12 @@ use 5.16.0;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT_OK = qw/LoginMethod LoginSession GoogleToken /;
+our @EXPORT_OK = qw/ GoogleToken JSChecksum LoginMethod LoginSession /;
 
+sub GoogleToken()  { cookie_name('GoogleToken')  };
+sub JSChecksum()   { cookie_name('JSChecksum')  };
 sub LoginMethod()  { cookie_name('LoginMethod')  };
 sub LoginSession() { cookie_name('LoginSession') };
-sub GoogleToken()  { cookie_name('GoogleToken')  };
 
 sub cookie_name {
     my ($s) = @_;
@@ -34,7 +35,7 @@ sub cookie_name {
     } else {
         # we're running from a dev's git checkout under plackup
         # so make the cookie name separate
-        my $user = $ENV{USER} =~ s/[^a-zA-Z0-9]//r;
+        my $user = $ENV{USER} =~ s/[^a-zA-Z0-9]//gr;
         return "$user-$s";
     }
 }

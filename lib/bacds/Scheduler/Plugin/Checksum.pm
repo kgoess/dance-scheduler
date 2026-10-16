@@ -33,6 +33,7 @@ use warnings;
 use Dancer2::Plugin;
 use Data::Dump qw/dump/;
 
+use bacds::Scheduler::Util::Cookie qw/JSChecksum/;
 use bacds::Scheduler::Util::Initialize;
 use bacds::Scheduler::Util::Results;
 
@@ -40,14 +41,15 @@ my $Results_Class = "bacds::Scheduler::Util::Results";
 
 =head2 requires_checksum
 
-Checks that the current checksum matches the on in the request
+Checks that the current checksum matches the one in the request
+
 =cut
 
 plugin_keywords requires_checksum => sub {
     my ($plugin, $route_sub, @args) = @_;
     return sub {
         my ($self) = @_;
-        my $checksum = $self->app->cookie('Checksum');
+        my $checksum = $self->app->cookie(JSChecksum);
         if (!$checksum) {
             $self->app->response->status(426);
             my $results = $Results_Class->new;

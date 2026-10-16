@@ -61,7 +61,7 @@ use bacds::Scheduler::Model::Team;
 use bacds::Scheduler::Model::Style;
 use bacds::Scheduler::Model::MemberPortal;
 use bacds::Scheduler::Model::Venue;
-use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
+use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken JSChecksum/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
 use bacds::Scheduler::Util::Escape;
 use bacds::Scheduler::Util::Results;
@@ -270,7 +270,7 @@ hook before => sub {
 
 =head2 _auth_cookie_opts
 
-Extra options for the login and Checksum cookies. SameSite=Lax keeps the
+Extra options for the login cookies. SameSite=Lax keeps the
 browser from sending them on cross-site POSTs, which blocks most CSRF.
 Secure is only set over https so the dev server on http://...:5000 still
 works.
@@ -567,7 +567,7 @@ get '/' => requires_login sub {
     my $accordion = get_accordion_config();
 
     my $checksum = bacds::Scheduler::Util::Initialize::get_checksum();
-    cookie Checksum => $checksum, _auth_cookie_opts();
+    cookie JSChecksum, $checksum;
 
     my $yesterday_ymd = DateTime
         ->from_epoch(epoch => ($ENV{TEST_NOW} || time), time_zone => 'local')
