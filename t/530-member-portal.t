@@ -22,6 +22,11 @@ setup_test_db;
 
 my $dbh  = get_dbh();
 my $Test = get_tester();  # no auth needed - portal is public
+# Mechanize sends the last page as the Referer. Some tests here forge the
+# Host header, and the cross-site request check would see that Referer as
+# coming from another site. A real attacker sending a forged Host wouldn't
+# send a Referer, so don't send one.
+$Test->add_header(Referer => undef);
 
 # The public URL that magic links point at. It comes from config, as in
 # production, never from the request.
