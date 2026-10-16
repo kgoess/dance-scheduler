@@ -63,3 +63,9 @@ engines:
 #      cookie_name: eshop.session
 #      is_secure: 1
 #      is_http_only: 1
+
+# Override the default rate limits for logins and member-portal links, per
+# bucket. The defaults and bucket names are in bacds::Scheduler::RateLimit.
+#rate_limits:
+#  signin_fail_email:   { max: 5,  window: 900 }
+#  member_link_contact: { max: 3,  window: 3600 }

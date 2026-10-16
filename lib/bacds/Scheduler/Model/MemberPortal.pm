@@ -44,6 +44,7 @@ use Carp qw/croak/;
 use DateTime;
 
 use bacds::Scheduler::CiviCRM;
+use bacds::Scheduler::RateLimit;
 
 use constant TOKEN_TTL_SECONDS => 3600;  # 1 hour
 
@@ -52,6 +53,11 @@ use constant TOKEN_TTL_SECONDS => 3600;  # 1 hour
 Looks up $email in CiviCRM. If a contact is found, generates a token,
 stores it in the database, and triggers CiviCRM to send the magic link
 email. If no contact is found, does nothing (silent ignore).
+
+Also does nothing if the contact has already been sent too many links
+recently (the member_link_contact limit in bacds::Scheduler::RateLimit), so
+nobody can flood a member's inbox. Tokens that expired more than a day ago
+are deleted along the way.
 
 $base_url is the public URL of dance-scheduler, from the
 member_portal_base_url setting (never from the request), e.g.
@@ -80,6 +86,12 @@ sub request_link {
     my $contact = $contacts->[0];
     my ($contact_id, $display_name) = ($contact->{contact_id}, $contact->{display_name});
 
+    if (bacds::Scheduler::RateLimit->hit(member_link_contact => $contact_id)) {
+        warn "civicrm request_link: too many links sent to contact $contact_id recently, "
+            ."not sending another\n";
+        return;
+    }
+
     # The address on file, not the typed one (see
     # CiviCRM::_contacts_matching_email)
     my $to_email = $contact->{email}
@@ -87,6 +99,8 @@ sub request_link {
 
     my $token = _generate_token();
     my $now   = DateTime->now;
+
+    _delete_old_tokens($dbh, $now);
 
     $dbh->resultset('MemberToken')->create({
         token              => $token,
@@ -174,6 +188,15 @@ sub _validate_token {
         if DateTime->compare(DateTime->now, $row->expires_ts) > 0;
 
     return $row;
+}
+
+sub _delete_old_tokens {
+    my ($dbh, $now) = @_;
+
+    my $before = $now->clone->subtract(days => 1);
+    $dbh->resultset('MemberToken')->search({
+        expires_ts => { '<' => $dbh->storage->datetime_parser->format_datetime($before) },
+    })->delete;
 }
 
 sub _generate_token {
