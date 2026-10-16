@@ -53,7 +53,8 @@ Looks up $email in CiviCRM. If a contact is found, generates a token,
 stores it in the database, and triggers CiviCRM to send the magic link
 email. If no contact is found, does nothing (silent ignore).
 
-$base_url should be the scheme+host of dance-scheduler, e.g.
+$base_url is the public URL of dance-scheduler, from the
+member_portal_base_url setting (never from the request), e.g.
 'https://bacds.org/dance-scheduler', used to build the portal link.
 
 =cut
