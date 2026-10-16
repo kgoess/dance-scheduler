@@ -7,7 +7,7 @@ page.
 <% USE Date %>
 
 <%- MACRO maybe_linkit(string, url) BLOCK -%>
-    <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+    <%- IF url %><a href="<% url | esc %>"><% string | esc %></a><% ELSE %><% string | esc %><% END -%>
 <%- END -%>
 
 <%- MACRO special_class(event) BLOCK %>
@@ -45,7 +45,7 @@ page.
 
 <%- MACRO event_styles(event) BLOCK -%>
     <%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) %>
-        <%- style.name %><% IF !loop.last() %>/<% END %>
+        <%- style.name | esc %><% IF !loop.last() %>/<% END %>
     <%- END %>
 <%- END -%>
 
@@ -65,7 +65,7 @@ page.
 <%- MACRO event_callers_and_bands(event) BLOCK -%>
     <%- IF event.callers %>
         <%- FOREACH caller IN event.callers({}, { order_by => 'me.ordering' }) %>
-            <% caller.name %><% IF !loop.last() %>, <% END %>
+            <% caller.name | esc %><% IF !loop.last() %>, <% END %>
         <%- END %>
         <%- IF event.bands || event.talent %> with <% END %>
     <%- ELSE %>
@@ -81,7 +81,7 @@ page.
 
 <%- MACRO event_talent(event) BLOCK -%>
     <%- FOREACH talent IN event.talent({}, { order_by => 'me.ordering' }) -%>
-        <%- talent.name %><% IF !loop.last() %>, <% END -%>
+        <%- talent.name | esc %><% IF !loop.last() %>, <% END -%>
     <%- END -%>
     <%- IF (event.bands || event.talent) && event.and_friends -%>&#8230;and friends<% END -%>
 <%- END -%>
@@ -89,12 +89,12 @@ page.
 <%- MACRO event_venues(event) BLOCK -%>
     <%- IF event.venues %> at <% END %>
     <%- FOREACH venue IN event.venues({}, { order_by => 'me.ordering' }) %>
-        <a href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) %>"><% venue.hall_name %> in <% venue.city %></a>.
+        <a href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) | esc %>"><% venue.hall_name | esc %> in <% venue.city | esc %></a>.
     <%- END %>
 <%- END -%>
  
 <%- MACRO event_name(event) BLOCK -%>
-    <span class="special-event-name"><% event.name %></span>
+    <span class="special-event-name"><% event.name | esc %></span>
 <%- END -%>
 
 <%- MACRO class_for_is_non_bacds(event) BLOCK -%>
@@ -121,9 +121,9 @@ page.
         <br><em>Presented by
         <%- FOREACH parent_org IN event.parent_orgs -%>
             <%- IF parent_org.abbreviation == 'BACDS' -%>
-                the <a href="<% parent_org.url %>">BACDS</a>
+                the <a href="<% parent_org.url | esc %>">BACDS</a>
             <%- ELSE  %>
-                the <a href="<% parent_org.url %>"><% parent_org.full_name %></a></em>
+                the <a href="<% parent_org.url | esc %>"><% parent_org.full_name | esc %></a></em>
             <%- END %>
         <%- IF loop.last() %>.<% ELSE %> and <% END %>
         <%- END -%>
@@ -174,7 +174,7 @@ page.
         <% END %>
         <% IF event.short_desc %> - <% END %><% event.short_desc %>
         <%- IF event.custom_url || event.series.series_url -%>
-            <a href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) %>">More Info</a>
+            <a href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) | esc %>">More Info</a>
         <%- END -%>
         <%- includes_non_bacds_org(event) -%>
     <%- END -%>

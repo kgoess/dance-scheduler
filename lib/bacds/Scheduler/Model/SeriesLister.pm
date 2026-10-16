@@ -281,6 +281,10 @@ sub generate_ldjson {
         \%json_data,
         { pretty => 1, ,canonical => 1 }
     );
+    # A "</script>" inside a name or description would end the script
+    # element early. "<\/" means the same thing in JSON.
+    $json_str =~ s{</}{<\\/}g;
+
     return <<EOL;
     <script type="application/ld+json">
     $json_str

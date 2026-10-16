@@ -9,11 +9,11 @@ page.
 <% USE Date %>
 
 <% MACRO maybe_linkit(string, url) BLOCK %>
-  <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+  <%- IF url %><a href="<% url | esc %>"><% string | esc %></a><% ELSE %><% string | esc %><% END -%>
 <% END %>
 <%# a quieter version (ssshh) -%>
 <% MACRO maybe_linkit_ssh(string, url) BLOCK %>
-  <%- IF url %><a class="quieter-link" href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+  <%- IF url %><a class="quieter-link" href="<% url | esc %>"><% string | esc %></a><% ELSE %><% string | esc %><% END -%>
 <% END %>
 
 <% MACRO classes_for_event(event) BLOCK;
@@ -75,9 +75,9 @@ END %>
   >
     <div class="polaroid-frame">
       <div class="event-inner-image-container">
-        <img class="event-inner-image" src="<% entity.photo_url %>">
+        <img class="event-inner-image" src="<% entity.photo_url | esc %>">
       </div>
-      <div class="polaroid-caption"><% entity.name || entity.full_name %></div>
+      <div class="polaroid-caption"><% entity.name || entity.full_name | esc %></div>
     </div>
   </div>
 <% END %>
@@ -94,9 +94,9 @@ END %>
     <%- FOREACH parent_org IN parent_orgs;
       IF loop.last() && !loop.first() %> and <% END;
       IF parent_org.abbreviation == 'BACDS' -%>
-        the <a href="<% parent_org.url %>">BACDS</a>
+        the <a href="<% parent_org.url | esc %>">BACDS</a>
       <%- ELSE  %>
-        the <a href="<% parent_org.url %>"><% parent_org.full_name %></a>
+        the <a href="<% parent_org.url | esc %>"><% parent_org.full_name | esc %></a>
       <%- END;
     IF loop.last() %>.</em></div><% END;
     END;
@@ -195,11 +195,11 @@ END -%>
         style_close_parens = '';
       END;
       IF emphasize_name_over_style -%>
-        <span class="special-event-name"><% event.name %></span>
+        <span class="special-event-name"><% event.name | esc %></span>
       <% END -%>
       <span class="event-types">
         <% style_open_parens %><%- FOREACH style IN event.styles({}, { order_by => 'me.ordering' }) -%>
-          <%- style.name %><% IF !loop.last() %>/<% END -%>
+          <%- style.name | esc %><% IF !loop.last() %>/<% END -%>
         <%- END -%><% style_close_parens %>
       </span>
       <% IF event.venues %> at <% END %>
@@ -230,13 +230,13 @@ END -%>
         <%- IF (event.bands || event.talent) && event.and_friends %>&hellip;and friends<% END %>
         <%- IF !emphasize_name_over_style && event.name %>
           <%# if a special event, print out the title. %>
-          <span class="special-event-name"><% event.name %></span>
+          <span class="special-event-name"><% event.name | esc %></span>
         <%- END %>
         <%- IF event.start_time && !event.end_date %> <span class="event-time-range">&#8226; <% Date.format(event.start_time _ ' 00:00:0000', '%-I:%M%P') -%>
           <%- IF event.end_time %>&ndash;<%  Date.format(event.end_time _ ' 00:00:0000', '%-I:%M%P') %><% END %></span><% END %>
         <%- IF event.short_desc %><div class="event-short-desc"><% event.short_desc %><% END %>
         <%- IF event.custom_url || event.series.series_url %>
-            <a class="more-info-link" href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) %>">More Info</a>
+            <a class="more-info-link" href="<% event.custom_url || event.series.get_canonical_url(canonical_scheme, canonical_host) | esc %>">More Info</a>
         <%- END %>
         <% IF event.short_desc %></div><% END %>
       <%- END -%>

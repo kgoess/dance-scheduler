@@ -14,7 +14,7 @@
     layout. -%>
     <meta name="viewport" content="width=device-width" />
     <title>
-      <% page_title %>
+      <% page_title | esc %>
     </title>
     <link rel="stylesheet" href="https://bacds.org/css/cd-carousel.css" />
     <style>
@@ -66,8 +66,8 @@
           <%- IF breadcrumbs %>
             <span class="desktop-only">This page is <a href="/">www.bacds.org</a> &gt; </span>
             <%- FOREACH crumb IN breadcrumbs %>
-              <a href="<% crumb.href %><% IF loop.last %>#top<% END %>">
-                <% crumb.label %>
+              <a href="<% crumb.href | esc %><% IF loop.last %>#top<% END %>">
+                <% crumb.label | esc %>
               </a>
               <%- IF ! loop.last %> &gt;<% END %>
                   <% END %>

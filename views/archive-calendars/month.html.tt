@@ -7,7 +7,7 @@
 
 <%- MACRO includes_non_bacds_org(event) BLOCK -%>
     <%- IF event.parent_orgs != 'BACDS' -%>
-        (<% event.parent_orgs %>)
+        (<% event.parent_orgs | esc %>)
     <%- END -%>
 <%- END -%>
 
@@ -82,7 +82,7 @@
             <% talent = talent _ ", " %>
         <%- END %>
         <%- talent = talent _ event.musos %>
-        <tr class="archive-schedule-of-events-row <% class_for_non_bacds(event) %>" style="cursor: pointer" onclick="document.location='<% event.info_url %>'">
+        <tr class="archive-schedule-of-events-row <% class_for_non_bacds(event) %>" style="cursor: pointer" data-info-url="<% event.info_url | esc %>" onclick="document.location=this.dataset.infoUrl">
             <td class="<% listing_class %>">
                 <a name="<% event.startday_obj.ymd %>">
                     <%- event.startday_obj.month_name %>&nbsp;<% event.startday_obj.day %>
@@ -93,20 +93,20 @@
             </td>
             <td class="<% listing_class %>">
                 <%- IF event.name %>
-                    <span class="special-event-name"><% event.name %></span> (<% event.type %>)
+                    <span class="special-event-name"><% event.name | esc %></span> (<% event.type | esc %>)
                 <%- ELSE %>
-                    <% event.type %>
+                    <% event.type | esc %>
                 <%- END %>
                 <%- includes_non_bacds_org(event) -%>
             </td>
             <td class="<% listing_class %>">
-                <% event.loc %>
+                <% event.loc | esc %>
             </td>
             <td class="<% listing_class %>">
-                <% event.leader %>
+                <% event.leader | esc %>
             </td>
             <td class="<% listing_class %>">
-                <% talent %>
+                <% talent | esc %>
             </td>
         </tr>
         <%- IF event.comments %>
@@ -132,10 +132,10 @@
     </tr>
     <% FOR venue IN venues %>
         <tr>
-            <td class="callisting"><% venue.vkey %></td>
-            <td class="callisting"><% venue.hall_name %></td>
-            <td class="callisting"><% venue.address %></td>
-            <td class="callisting"><% venue.city %></td>
+            <td class="callisting"><% venue.vkey | esc %></td>
+            <td class="callisting"><% venue.hall_name | esc %></td>
+            <td class="callisting"><% venue.address | esc %></td>
+            <td class="callisting"><% venue.city | esc %></td>
         </tr>
 
     <% END %>

@@ -17,20 +17,20 @@
 <div style="padding-left: 1em;">
 <div class="search_args">
 <% FOREACH style IN style_arg %>
-    <span class="search_arg"><% style.name.lower().ucfirst() %></span><% IF !loop.last() %> or <% END %>
+    <span class="search_arg"><% style.name.lower().ucfirst() | esc %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 Dances
 <% FOREACH venue IN venue_arg %>
-    <% IF loop.first() %>At <% END %><span class="search_arg"><% venue.hall_name %> in <% venue.city %></span><% IF !loop.last() %> or <% END %>
+    <% IF loop.first() %>At <% END %><span class="search_arg"><% venue.hall_name | esc %> in <% venue.city | esc %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 <% FOREACH caller IN caller_arg %>
-    <% IF loop.first() %>Led By <% END %><span class="search_arg"><% caller.name %></span><% IF !loop.last() %> or <% END %>
+    <% IF loop.first() %>Led By <% END %><span class="search_arg"><% caller.name | esc %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 <% FOREACH team IN teams_arg %>
-    <% IF loop.first() %>Featuring <% END %><span class="search_arg"><% team.name %></span><% IF !loop.last() %> or <% END %>
+    <% IF loop.first() %>Featuring <% END %><span class="search_arg"><% team.name | esc %></span><% IF !loop.last() %> or <% END %>
 <% END %>
 <% FOREACH role_pair IN role_pair_arg %>
-    <% IF loop.first() %>Intending to Use <% END %><span class="role_pair_arg"><% role_pair.role_pair %></span><% IF !loop.last() %> or <% END %>
+    <% IF loop.first() %>Intending to Use <% END %><span class="role_pair_arg"><% role_pair.role_pair | esc %></span><% IF !loop.last() %> or <% END %>
      <% IF loop.last() %><% IF role_blanks %> or unspecified <% END %> role names <% END %>
 <% END %>
 <% IF NOT role_pair_arg.size() AND role_blanks %> with unspecified role names <% END %>
@@ -38,7 +38,7 @@ Dances
     Featuring
     <% FOREACH bands_and_musos IN bands_and_musos_arg %>
         <% IF loop.last() && !loop.first() %> and <% END %>
-        <span class="search_arg"><% bands_and_musos.name %></span>
+        <span class="search_arg"><% bands_and_musos.name | esc %></span>
         <%- IF !loop.last() %>, <% END %>
     <% END %>
 <% END %>
@@ -47,7 +47,7 @@ Dances
 <div style="margin: 40px">
     <hr>
     <em>To subscribe to these results in your own calendar program, copy
-    <a href="<% ical_url %>">this iCalendar link</a> into wherever your calendar program takes
+    <a href="<% ical_url | esc %>">this iCalendar link</a> into wherever your calendar program takes
     calendar urls to subscribe to them.</em>
 </div>
 </div>

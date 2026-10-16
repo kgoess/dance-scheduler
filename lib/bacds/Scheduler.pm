@@ -62,6 +62,7 @@ use bacds::Scheduler::Model::MemberPortal;
 use bacds::Scheduler::Model::Venue;
 use bacds::Scheduler::Util::Cookie qw/LoginMethod LoginSession GoogleToken/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
+use bacds::Scheduler::Util::Escape;
 use bacds::Scheduler::Util::Results;
 use bacds::Scheduler::Util::Time qw/get_today/;
 my $Results_Class = "bacds::Scheduler::Util::Results";
@@ -125,6 +126,12 @@ register_type_check 'DancefinderResultsFormat' => sub {
 
 
 preload_accordion_config;
+
+# Adds the "esc" filter to the templates, see bacds::Scheduler::Util::Escape.
+# This has to happen before the first template is rendered, since that's when
+# Dancer2 builds the Template Toolkit engine from the config.
+config->{engines}{template}{template_toolkit}{FILTERS}
+    = bacds::Scheduler::Util::Escape->tt_filters;
 
 
 =head2 before hook

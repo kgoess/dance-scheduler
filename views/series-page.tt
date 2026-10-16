@@ -1,6 +1,6 @@
 <% # this page is wrapped by views/layouts/unearth-page-wrapper.tt %>
 <% MACRO maybe_linkit(string, url) BLOCK %>
-    <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+    <%- IF url %><a href="<% url | esc %>"><% string | esc %></a><% ELSE %><% string | esc %><% END -%>
 <% END -%>
       <div class="row">
         <!-- ***************************** -->
@@ -8,7 +8,7 @@
         <!-- ***************************** -->
         <section class="col">
           <h1 class="text-center text-capitalize">
-              <a href="<% series.series_url %>"><% series.name %></a>
+              <a href="<% series.series_url | esc %>"><% series.name | esc %></a>
           </h1>
           <div class="text-center fw-bold pl-1 fs-2">
               <% series.short_desc %>

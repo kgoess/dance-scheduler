@@ -1,8 +1,8 @@
 <% MACRO maybe_linkit(string, url) BLOCK %>
-    <%- IF url %><a href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+    <%- IF url %><a href="<% url | esc %>"><% string | esc %></a><% ELSE %><% string | esc %><% END -%>
 <% END %>
 
-<h1 class="dance"><% series.name %></h1>
+<h1 class="dance"><% series.name | esc %></h1>
 <div class="series-display-text">
     <% display_text %>
 </div>

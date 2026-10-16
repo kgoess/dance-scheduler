@@ -10,7 +10,7 @@
         IF event.is_canceled; -%>canceled-event<%- END;
   END %>
 <% MACRO maybe_linkit_ssh(string, url) BLOCK %>
-  <%- IF url %><a class="quieter-link" href="<% url %>"><% string %></a><% ELSE %><% string %><% END -%>
+  <%- IF url %><a class="quieter-link" href="<% url | esc %>"><% string | esc %></a><% ELSE %><% string | esc %><% END -%>
 <% END %>
 
 <% FOREACH event IN events %>
@@ -26,10 +26,10 @@
             </b>
         </p>
             <%- IF event.styles.grep('^SPECIAL$') && event.name %>
-                <p class="fs-4 fw-bolder fst-italic" style="font-variant: small-caps"><% event.name %></p>
+                <p class="fs-4 fw-bolder fst-italic" style="font-variant: small-caps"><% event.name | esc %></p>
             <%- END %>
             <%- FOREACH venue IN event.venues %>
-                <p class="mb-0"><% venue.hall_name %>, <% venue.address %>, <%venue.city %>.</p>
+                <p class="mb-0"><% venue.hall_name | esc %>, <% venue.address | esc %>, <% venue.city | esc %>.</p>
             <%- END %>
             <%- IF event.callers.size() %>
                 <p class="mb-0">Caller:
@@ -56,7 +56,7 @@
             <%- END %>
             <%- IF (event.bands || event.talent) && event.and_friends %>&#8230;and friends<% END %>
             <%- IF event.role_pairs %>
-                <p class="mb-0">The caller intends to use <% event.role_pairs.role_pair %> role names.</p>
+                <p class="mb-0">The caller intends to use <% event.role_pairs.role_pair | esc %> role names.</p>
             <%- END %>
             <% IF event.is_canceled %></s><% END %>
         <%- IF event.short_desc %><p class="ms-3 mb-0"><% event.short_desc %></p><% END -%>
@@ -66,12 +66,12 @@
         </p><%- END -%>
         <% IF ! event.is_canceled %>
             <a
-              href="<% event.gcal_link %>"
+              href="<% event.gcal_link | esc %>"
               target="_blank"
               rel="noopener noreferrer"
               class="calendar-subscription-button"
             > + Google Calendar </a>
-            <a href="<% event.ical_link %>"
+            <a href="<% event.ical_link | esc %>"
               target="_blank"
               rel="noopener noreferrer"
               class="calendar-subscription-button"
