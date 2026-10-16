@@ -26,3 +26,9 @@ appdir: /var/www/bacds.org/dance-scheduler
 # Public base URL for links in member-portal emails. Set here rather than
 # taken from the request's Host header, which the client controls.
 member_portal_base_url: "https://bacds.org/dance-scheduler"
+
+# Pages on these origins may POST/PUT to the app, besides the app's own
+# origin. See the "cross-site request check" hook in bacds::Scheduler.
+trusted_origins:
+  - "https://bacds.org"
+  - "https://www.bacds.org"

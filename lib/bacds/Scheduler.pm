@@ -134,6 +134,65 @@ config->{engines}{template}{template_toolkit}{FILTERS}
     = bacds::Scheduler::Util::Escape->tt_filters;
 
 
+=head2 before hook: cross-site request check
+
+Refuses POST, PUT, PATCH and DELETE requests sent from a page on some other
+site. This backs up the SameSite=Lax cookies (see L</_auth_cookie_opts>):
+SameSite only separates sites, so it doesn't stop a request coming from
+some other page on bacds.org or one of its subdomains.
+
+Browsers send an Origin header on every cross-origin POST, and a page's
+script can't change it. If it's missing we fall back to the Referer. The
+request is allowed if that origin is either
+
+  - this app's own origin (scheme and host of the request), or
+  - in the C<trusted_origins> setting (see environments/*.yml)
+
+Requests with neither header are allowed. Browsers send Origin on every
+POST from another site, so a request without it didn't come from an
+attacker's page. That lets curl, scripts, and the unit tests keep working.
+
+/google-signin is exempt: with the "redirect" sign-in button, Google's own
+page POSTs the signed credential to it from accounts.google.com, and
+check_google_auth verifies that signature.
+
+=cut
+
+my %Origin_Check_Exempt = map { $_ => 1 } qw(
+    /google-signin
+);
+
+hook before => sub {
+    my $method = request->method;
+    return unless $method =~ /\A(?:POST|PUT|PATCH|DELETE)\z/;
+    return if $Origin_Check_Exempt{ request->path };
+
+    my $origin = request->header('Origin');
+    if (!defined $origin) {
+        my $referer = request->header('Referer') // return;
+        ($origin) = $referer =~ m{\A([a-z][a-z0-9+.-]*://[^/?#]+)}i;
+        $origin //= 'unparseable referer';
+    }
+
+    return if _is_trusted_origin($origin);
+
+    warn sprintf qq{refusing cross-site %s %s from origin "%s"\n},
+        $method, request->path, $origin;
+    send_error 'This request came from another website, so it was refused.' => 403;
+};
+
+sub _is_trusted_origin {
+    my ($origin) = @_;
+
+    $origin = lc $origin;
+    $origin =~ s{/+\z}{};
+
+    return 1 if $origin eq lc(request->scheme . '://' . request->host);
+
+    my $trusted = config->{trusted_origins} || [];
+    return List::Util::any { $origin eq lc $_ } @$trusted;
+}
+
 =head2 before hook
 
 The "before" hook is set up to catch every dancer2 request, check for the
