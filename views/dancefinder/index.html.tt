@@ -18,7 +18,7 @@
               <option value="">ALL LEADERS</option>
               <%- FOREACH caller IN callers %>
                 <option value="<% caller.0 | html %>">
-                  <% caller.1 | html %>
+                  <% caller.1 | esc %>
                 </option>
                 <%- END %>
             </select>
@@ -29,7 +29,7 @@
               <option value="">ALL MUSICIANS</option>
               <%- FOREACH muso IN musos %>
                 <option value="<% muso.0 | html %>">
-                  <% muso.1 | html %>
+                  <% muso.1 | esc %>
                 </option>
                 <%- END %>
             </select>
@@ -42,7 +42,7 @@
               <option value="">ALL LOCATIONS</option>
               <%- FOREACH venue_rec IN venues %>
                 <option value="<% venue_rec.0 | html %>">
-                  <% venue_rec.1 | html %>
+                  <% venue_rec.1 | esc %>
                 </option>
                 <%- END %>
             </select>
@@ -55,7 +55,7 @@
               <option value="">ALL BANDS</option>
               <%- FOREACH band IN bands %>
                 <option value="<% band.0 | html %>">
-                  <% band.1 | html %>
+                  <% band.1 | esc %>
                 </option>
                 <%- END %>
             </select>
@@ -69,7 +69,7 @@
                 <input aria-describedby="style_group" type="checkbox" class="btn-check" name="style"
                   value="<% style.0 | html %>" id="style_<% style.0 | html %>">
                 <label class="btn btn-outline-primary" for="style_<% style.0 | html %>">
-                  <% style.1 | html %>
+                  <% style.1 | esc %>
                 </label>
               </div>
               <%- END %>
@@ -89,7 +89,7 @@
                 <input aria-describedby="role_group" type="checkbox" class="btn-check" name="role_pair"
                   value="<% role_pair.0 | html %>" id="role_<% role_pair.0 | html %>">
                 <label class="btn btn-outline-primary" for="role_<% role_pair.0 | html %>">
-                  <% role_pair.1 | html %>
+                  <% role_pair.1 | esc %>
                 </label>
                 <% role_i=role_i + 1 %>
                   <% IF role_i % 3==0 %>

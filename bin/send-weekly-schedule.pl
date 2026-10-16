@@ -17,6 +17,7 @@ use Template;
 use bacds::Scheduler::Model::DanceFinder;
 use bacds::Scheduler::Util::Time qw/get_today/;
 use bacds::Scheduler::Util::Db qw/get_dbh/;
+use bacds::Scheduler::Util::Escape;
 use bacds::Scheduler::WeeklyEmailQueue;
 
 my ($days, $to, $html, $subject, $basedir, $data_dir, $db, $dbuser,
@@ -75,6 +76,8 @@ my $tt = Template->new(
     # these are duplicated from config.yml?
     START_TAG => '<%',
     END_TAG   => '%>',
+    # the "esc" filter the templates use
+    FILTERS   => bacds::Scheduler::Util::Escape->tt_filters,
 );
 
 my ($html_part, $text_part);

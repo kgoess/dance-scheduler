@@ -4,22 +4,22 @@
   <!-- 📅 -->
     Subscribe to all upcoming events:
 <!--
-    <a href="<% series.ical_link %>"
+    <a href="<% series.ical_link | esc %>"
       target="_blank"
       rel="noopener noreferrer"
       class="calendar-subscription-button"
     > + iCal series subscription (updates automatically)</a>
 -->
     <button type="button" class="calendar-subscription-button"
-        data-ical-link="<% series.ical_link %>"
+        data-ical-link="<% series.ical_link | esc %>"
         data-bs-toggle="popover"
         data-bs-trigger="focus"
         data-bs-content='
-          I copied the link! <i><% series.ical_link %></i><br>
+          I copied the link! <i><% series.ical_link | esc %></i><br>
           Now go to your calendaring app&mdash;Google Calendar, Apple Calendar, etc.<br>
           Find the place to add a new calendar subscription by url, paste
           the link there, and you should have a new calendar named something like
-          "<% series.name %>" which you can turn on and off at will.<br>
+          "<% series.name | esc %>" which you can turn on and off at will.<br>
           Enjoy!<hr>
           <img width="200px" src="/images/unearth/calendar-series-subscribe.png">
         '
@@ -32,11 +32,11 @@
         data-bs-trigger="focus"
         data-bs-title="Subscribe with iCal"
         data-bs-content='
-          Click the button to copy the link: <% series.ical_link %><br>
+          Click the button to copy the link: <% series.ical_link | esc %><br>
           Now go to your calendaring app&mdash;Google Calendar, Apple Calendar, etc.<br>
           Find the place to add a new calendar subscription by url, paste
           the link there, and you should have a new calendar named something like
-          "<% series.name %>" which you can turn on and off at will.<br>
+          "<% series.name | esc %>" which you can turn on and off at will.<br>
           <img width="200px" src="/images/unearth/calendar-series-subscribe.png">
         '
       >
