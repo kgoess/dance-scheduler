@@ -284,7 +284,9 @@ When the contact holds the membership themselves, membership_covers lists
 the other people it covers through a relationship, as
 C<< { contact_id, display_name, relationship } >> hashes (relationship is
 the other person's side, e.g. "Spouse of"), and membership_max_related is
-the membership type's limit on them, or undef for none. Otherwise
+the membership's limit on them, or undef for none. That's the limit CiviCRM
+copied from the membership type when the membership was created, which it
+keeps using even if the type's limit changes later. Otherwise
 membership_covers is [] and membership_max_related is undef.
 
 For a holder whose membership type passes to related contacts,
@@ -345,6 +347,7 @@ sub get_contact {
             end_date
             membership_type_id
             membership_type_id:name
+            max_related
             owner_membership_id
             owner_membership_id.contact_id.display_name
         )],
@@ -360,6 +363,7 @@ sub get_contact {
             end_date   => $own->{end_date},
             type_id    => $own->{membership_type_id},
             type_name  => $own->{'membership_type_id:name'},
+            max_related => $own->{max_related},
             owner_name => (
                 $own->{owner_membership_id}
                     ? $own->{'owner_membership_id.contact_id.display_name'}
@@ -381,6 +385,9 @@ sub get_contact {
     my ($add_url, $at_max_related) = ('', 0);
     if ($membership->{id} && !$membership->{owner_name}) {
         $covered = $self->_covered_by_membership($contact_id, $membership->{type_id});
+        # CiviCRM enforces the limit copied onto the membership when it was
+        # created, not the type's current one; NULL means no limit
+        $covered->{max_related} = $membership->{max_related};
         my $max = $covered->{max_related};
         $at_max_related = ($max && @{ $covered->{covered} } >= $max) ? 1 : 0;
         $add_url = $self->add_to_membership_url($contact_id)
@@ -661,6 +668,230 @@ sub end_covered_relationships {
     });
 
     return scalar keys %to_end;
+}
+
+=head2 get_form_submissions($form_name, %filter)
+
+Returns an arrayref of FormBuilder submissions for the form named
+$form_name (e.g. $ADD_TO_MEMBERSHIP_FORM), oldest first, as hashrefs:
+
+    {
+        id              => 19,
+        submitter_id    => 16,            # contact who submitted the form
+        submitter_name  => 'Pat Holder',
+        submission_date => '2026-10-09 18:47:08',
+        status          => 'Pending',     # or Processed, Rejected, Draft
+        data            => { Individual1 => [...], ... },  # the form values
+    }
+
+%filter can be C<< status => 'Pending' >> and/or C<< id => 19 >>.
+
+=cut
+
+sub get_form_submissions {
+    my ($self, $form_name, %filter) = @_;
+
+    my @where = (['afform_name', '=', $form_name]);
+    push @where, ['status_id:name', '=', $filter{status}] if defined $filter{status};
+    push @where, ['id', '=', $filter{id} + 0]              if defined $filter{id};
+
+    my $result = $self->_call_v4('AfformSubmission', 'get', {
+        select  => [qw(
+            id
+            contact_id
+            contact_id.display_name
+            submission_date
+            status_id:name
+            data
+        )],
+        where   => \@where,
+        orderBy => { id => 'ASC' },
+    });
+
+    return [
+        map {
+            {
+                id              => $_->{id},
+                submitter_id    => $_->{contact_id},
+                submitter_name  => $_->{'contact_id.display_name'} // '',
+                submission_date => $_->{submission_date},
+                status          => $_->{'status_id:name'},
+                data            => $_->{data} // {},
+            }
+        } @{ $result->{values} }
+    ];
+}
+
+=head2 process_form_submission($form_name, $submission_id)
+
+Processes a pending FormBuilder submission, saving its values to CiviCRM.
+This is what the "Process" button on the form's submissions page does. Since
+CiviCRM 6.19 it saves on behalf of the contact who submitted the form, not
+the API key's contact.
+
+FormBuilder doesn't report most failures (it logs and carries on), so check
+the result afterwards; see bacds::Scheduler::Model::FormQueue->approve.
+
+=cut
+
+sub process_form_submission {
+    my ($self, $form_name, $submission_id) = @_;
+
+    return $self->_call_v4('Afform', 'process', {
+        name         => $form_name,
+        submissionId => $submission_id + 0,
+    });
+}
+
+=head2 reject_form_submission($submission_id)
+
+Marks a pending FormBuilder submission as Rejected, like the "Reject" button
+on the form's submissions page. Nothing from it is saved. Returns the number
+of submissions changed: 0 if it wasn't pending.
+
+=cut
+
+sub reject_form_submission {
+    my ($self, $submission_id) = @_;
+
+    my $result = $self->_call_v4('AfformSubmission', 'update', {
+        values => { 'status_id:name' => 'Rejected' },
+        where  => [
+            ['id',             '=', $submission_id + 0],
+            ['status_id:name', '=', 'Pending'],
+        ],
+    });
+    return scalar @{ $result->{values} // [] };
+}
+
+=head2 relationship_type_labels()
+
+Returns a hashref of relationship type id => its contact_a label, e.g.
+C<< { 1 => 'Child of', 2 => 'Spouse of' } >>, for describing a relationship
+as "contact_a is <label> contact_b".
+
+=cut
+
+sub relationship_type_labels {
+    my ($self) = @_;
+
+    my $result = $self->_call_v4('RelationshipType', 'get', {
+        select => [qw(id label_a_b)],
+    });
+    return { map { $_->{id} => $_->{label_a_b} } @{ $result->{values} } };
+}
+
+=head2 relationships_between($contact_id_a, $contact_id_b)
+
+Returns an arrayref of the relationships where $contact_id_a is contact_a
+and $contact_id_b is contact_b, as
+C<< { id, relationship_type_id, is_active } >> hashrefs (is_active is 1 or
+0).
+
+=cut
+
+sub relationships_between {
+    my ($self, $contact_id_a, $contact_id_b) = @_;
+
+    my $result = $self->_call_v4('Relationship', 'get', {
+        select => [qw(id relationship_type_id is_active)],
+        where  => [
+            ['contact_id_a', '=', $contact_id_a + 0],
+            ['contact_id_b', '=', $contact_id_b + 0],
+        ],
+    });
+    return [
+        map {
+            {
+                id                   => $_->{id},
+                relationship_type_id => $_->{relationship_type_id},
+                is_active            => $_->{is_active} ? 1 : 0,
+            }
+        } @{ $result->{values} }
+    ];
+}
+
+=head2 inherited_membership_from($contact_id, $owner_id)
+
+Returns the membership $contact_id inherits from a membership held by
+$owner_id, as C<< { id, type_name, end_date } >>, or undef if there isn't
+one.
+
+=cut
+
+sub inherited_membership_from {
+    my ($self, $contact_id, $owner_id) = @_;
+
+    my $result = $self->_call_v4('Membership', 'get', {
+        select => ['id', 'membership_type_id:name', 'end_date'],
+        where  => [
+            ['contact_id',                     '=', $contact_id + 0],
+            ['owner_membership_id.contact_id', '=', $owner_id + 0],
+        ],
+        orderBy => { end_date => 'DESC' },
+        limit   => 1,
+    });
+    my $membership = $result->{values}[0]
+        or return undef;
+    return {
+        id        => $membership->{id},
+        type_name => $membership->{'membership_type_id:name'},
+        end_date  => $membership->{end_date},
+    };
+}
+
+=head2 membership_capacities($contact_id)
+
+Returns an arrayref of the current memberships $contact_id holds directly
+(not inherited), with how many people they pass to:
+
+    {
+        id                => 867,
+        type_name         => 'Family',
+        passes_to_related => 1,  # the type passes to related contacts at all
+        max_related       => 2,  # this membership's limit, undef for none
+        inherited_count   => 2,  # current memberships inherited from it
+    }
+
+max_related is copied from the membership type when the membership is
+created, and CiviCRM enforces that copy: raising the type's limit doesn't
+change existing memberships. CiviCRM won't create another inherited
+membership once inherited_count reaches max_related.
+
+=cut
+
+sub membership_capacities {
+    my ($self, $contact_id) = @_;
+
+    my $result = $self->_call_v4('Membership', 'get', {
+        select => [qw(id membership_type_id membership_type_id:name max_related)],
+        where  => [
+            ['contact_id',                    '=', $contact_id + 0],
+            ['owner_membership_id',           'IS NULL'],
+            ['status_id.is_current_member',   '=', \1],
+        ],
+        orderBy => { id => 'ASC' },
+    });
+    my $inheritance = $self->_membership_inheritance;
+
+    return [
+        map {
+            my $count = $self->_call_v4('Membership', 'get', {
+                select => ['row_count'],
+                where  => [
+                    ['owner_membership_id',         '=', $_->{id}],
+                    ['status_id.is_current_member', '=', \1],
+                ],
+            });
+            {
+                id                => $_->{id},
+                type_name         => $_->{'membership_type_id:name'},
+                passes_to_related => ($inheritance->{inherits}{ $_->{membership_type_id} } ? 1 : 0),
+                max_related       => $_->{max_related},
+                inherited_count   => $count->{count} // 0,
+            }
+        } @{ $result->{values} }
+    ];
 }
 
 =head2 send_magic_link_email($contact_id, $email, $display_name, $url)
