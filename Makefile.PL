@@ -117,7 +117,8 @@ app-install:
 # the httpd.conf requires sudo, so keeping it separate (it won't change often)
 httpd-conf-install:
 	@if [ ! $$(id -u) = 0 ]; then echo -e "\n*****************\n*** You need to run this with sudo: 'sudo make httpd-conf-install'***\n*******************\n" ; false; fi
-	install apache/dance-scheduler.conf /etc/httpd/conf.d/dance-scheduler.conf
+	install --mode 0644 apache/dance-scheduler.preload.inc /etc/httpd/conf.d/dance-scheduler.preload.inc
+	install --mode 0644 apache/dance-scheduler.location.inc /etc/httpd/conf.d/dance-scheduler.location.inc
 	@echo -e "\n*****************\n*** Done! Now do 'sudo service httpd restart'***\n*******************\n"
 
 # ditto for cron-install
