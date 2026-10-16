@@ -107,8 +107,12 @@ plugin_keywords requires_nothing => sub {
 
 Redirects to signin page if not logged-in.
 
-The user must be signed in and be linked to either the series or
-the event.
+The user must be signed in and be linked to the event's series, the event
+itself, or one of the event's teams.
+
+The edit can't attach the event to a series or team the user isn't linked
+to, and only a superuser can take an event out of its series (see
+L</check_series_and_teams>).
 
 An is_superuser user can always edit the event.
 
@@ -147,12 +151,15 @@ plugin_keywords can_edit_event => sub {
         my @teams_rs = $programmer->teams(
              {'team.team_id' => [map $_->team_id, @event_teams_rs]}
         );
-        if (@series_rs or @event_rs or @teams_rs) {
-            $route_sub->($self, @args); # this is success
-        } else {
+        if (!(@series_rs or @event_rs or @teams_rs)) {
             return $plugin->json_error($self, 403, 40301,
                 "You do not have permission to modify this event");
         }
+
+        $plugin->check_series_and_teams($self, $programmer, $event)
+            or return; # it set the error response
+
+        return $route_sub->($self, @args); # this is success
     };
 };
 
@@ -162,6 +169,9 @@ plugin_keywords can_edit_event => sub {
 Redirects to signin page if not logged-in.
 
 The user must be logged in, the event must have a series_id, and the programmer must be linked to the series.
+
+Any teams on the new event must be ones the programmer is linked to, too
+(see L</check_series_and_teams>).
 
 An is_superuser user can always create an event. And they're the
 only ones who can create events that aren't part of a series.
@@ -183,12 +193,15 @@ plugin_keywords can_create_event => sub {
         my @series_rs = $programmer->series(
              { 'series.series_id' => $series_id }
         );
-        if (@series_rs ) {
-            return $route_sub->($self, @args); # this is success
-        } else {
+        if (!@series_rs) {
             return $plugin->json_error($self, 403, 40303,
                 "You do not have permission to create this event");
         }
+
+        $plugin->check_series_and_teams($self, $programmer, undef)
+            or return; # it set the error response
+
+        return $route_sub->($self, @args); # this is success
     };
 };
 
@@ -254,6 +267,80 @@ sub login_redirect_json {
     $app->response->status(401);
     $app->response->headers->content_type('application/json');
     $app->response->content($results->format);
+}
+
+=head2 check_series_and_teams($app, $programmer, $event)
+
+For a non-superuser creating ($event undef) or editing an event, checks
+what the request does to the event's series and teams:
+
+  - a new series_id must be a series the programmer is linked to
+  - an empty series_id, which takes an existing event out of its series,
+    is superuser-only, like creating an event without one
+  - every team_id the request adds must be a team the programmer is
+    linked to; removing teams is fine
+
+Without this, a programmer who could edit one event could move it onto
+another series' page or into another team's listings.
+
+A series_id that isn't in the request is left alone by
+Model->put_row, so isn't checked. A missing team_id means "no teams"
+to put_row, so it's treated that way here too.
+
+Returns true if it's all allowed, otherwise sets a 403 JSON response and
+returns false.
+
+=cut
+
+sub check_series_and_teams {
+    my ($plugin, $app, $programmer, $event) = @_;
+
+    my $params = $app->request->parameters;
+
+    # the form sends "" for an empty select, and "NULL" for some disabled
+    # inputs
+    my $clean = sub {
+        my %seen;
+        return grep { defined && length && $_ ne 'NULL' && !$seen{$_}++ } @_;
+    };
+
+    if ($event && defined $params->get('series_id')) {
+        my ($new_series_id) = $clean->($params->get_all('series_id'));
+        my $old_series_id   = $event->series_id;
+
+        if (($new_series_id // '') ne ($old_series_id // '')) {
+            if (!defined $new_series_id) {
+                $plugin->json_error($app, 403, 40304,
+                    "Only a superuser can take an event out of its series");
+                return 0;
+            }
+            my @linked = $programmer->series({ 'series.series_id' => $new_series_id });
+            if (!@linked) {
+                $plugin->json_error($app, 403, 40305,
+                    "You can't move an event into a series you're not linked to");
+                return 0;
+            }
+        }
+    }
+
+    my %old_team = map { $_->team_id => 1 } ($event ? $event->teams : ());
+    my @added_team_ids = grep { !$old_team{$_} } $clean->($params->get_all('team_id'));
+    if (@added_team_ids) {
+        my %linked = map { $_->team_id => 1 }
+            $programmer->teams({ 'team.team_id' => \@added_team_ids });
+        if (my @not_linked = grep { !$linked{$_} } @added_team_ids) {
+            my @names = map { $_->name }
+                get_dbh()->resultset('Team')->search(
+                    { team_id => \@not_linked }, { order_by => 'name' },
+                );
+            @names = @not_linked unless @names;
+            $plugin->json_error($app, 403, 40306,
+                "You can't add a team you're not linked to: " . join(', ', @names));
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 =head2 json_error
