@@ -1,0 +1,7 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# Every morning, email a summary if anyone is waiting to be added to a
+# membership; see bin/civicrm-check-form-queue.pl
+17 7 * * * root /var/lib/dance-scheduler/bin/civicrm-check-form-queue.pl --to kgoess.bacds.board@gmail.com

@@ -20,6 +20,8 @@ WriteMakefile(
         'bin/dance-scheduler-add-programmer.pl',
         'bin/dancefinder.pl',
         'bin/send-weekly-schedule.pl',
+        'bin/civicrm-check-form-queue.pl',
+        'bin/civicrm-form-queue.pl',
         'bin/tonightheader.pl',
     ],
     PL_FILES            => {},
@@ -126,6 +128,7 @@ cron-install:
 	@if [ ! $$(id -u) = 0 ]; then  echo -e "\n*****************\n*** You need to run this with sudo: 'sudo make cron-install'***\n*******************\n" ; false; fi
 	install cron/dance-scheduler-backup /etc/cron.daily/dance-scheduler-backup
 	install cron/send-weekly-schedule /etc/cron.d/send-weekly-schedule
+	install cron/civicrm-check-form-queue /etc/cron.d/civicrm-check-form-queue
 
 MAKE_FRAG
 }

@@ -66,7 +66,8 @@ my %owner_memberships = (
 # Canned responses for get_contact, keyed by contact id
 my %own_membership = (
     16  => { id => 867, end_date => '2027-03-31', membership_type_id => 2,
-             'membership_type_id:name' => 'Family', owner_membership_id => undef },
+             'membership_type_id:name' => 'Family', owner_membership_id => undef,
+             max_related => 10 },
     735 => { id => 868, end_date => '2027-03-31',
              'membership_type_id:name' => 'Family', owner_membership_id => 867,
              'owner_membership_id.contact_id.display_name' => 'Pat Holder' },
@@ -87,6 +88,12 @@ my @email_rows;
 # Keep the real one for test_call_v4_url_encodes_params
 my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
 
+# How many current memberships are inherited from any membership
+our $inherited_count = 2;
+
+# FormBuilder submission calls, and what they return
+my (@form_queue_calls, $form_queue_response);
+
 {
     no warnings 'redefine';
     *bacds::Scheduler::CiviCRM::_call_v4 = sub {
@@ -96,6 +103,10 @@ my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
         if ("$entity.$action" eq 'Relationship.update') {
             push @relationship_updates, $params;
             return { values => [] };
+        }
+        if ($entity eq 'AfformSubmission' || "$entity.$action" eq 'Afform.process') {
+            push @form_queue_calls, ["$entity.$action", $params];
+            return $form_queue_response;
         }
         if ("$entity.$action" eq 'WorkflowMessage.render') {
             push @render_calls, $params;
@@ -114,6 +125,9 @@ my $real_call_v4 = \&bacds::Scheduler::CiviCRM::_call_v4;
         return { values => [] } if $entity eq 'Address' || $entity eq 'Phone';
 
         if ($entity eq 'Membership') {
+            # counting a membership's current inherited memberships
+            return { values => [], count => $inherited_count }
+                if $where->[0][0] eq 'owner_membership_id';
             # the owner lookup filters by a list of contact ids
             return \%owner_memberships if $where->[0][1] eq 'IN';
             my $own = $own_membership{ $where->[0][2] };
@@ -132,7 +146,10 @@ test_end_covered_relationships();
 test_add_to_membership_url();
 test_add_to_membership_url_failure();
 test_get_contact_at_max_related();
+test_get_contact_uses_membership_max_related();
+test_membership_capacities();
 test_call_v4_url_encodes_params();
+test_form_submission_calls();
 test_find_member_contacts_returns_stored_email();
 test_find_member_contacts_ignores_lookalike_email();
 test_find_related_contacts_returns_stored_email();
@@ -225,9 +242,36 @@ sub test_add_to_membership_url_failure {
     is $url, '', 'and returns no link';
 }
 
+sub test_get_contact_uses_membership_max_related {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+
+    # The type now allows 10, but this membership was created when it was 2
+    local $membership_types{values}[0]{max_related} = 10;
+    local $own_membership{16}{max_related} = 2;
+    my $contact = $civi->get_contact(16);
+    is $contact->{membership_max_related}, 2, "uses the membership's own limit, not the type's";
+    is $contact->{membership_at_max_related}, 1, '... so it is at its limit';
+
+    local $own_membership{16}{max_related} = undef;
+    $contact = $civi->get_contact(16);
+    is $contact->{membership_max_related}, undef, 'NULL max_related means no limit';
+    is $contact->{membership_at_max_related}, 0, '... and never at the limit';
+}
+
+sub test_membership_capacities {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+    local $own_membership{16}{max_related} = 2;
+    local $inherited_count = 2;
+
+    is_deeply $civi->membership_capacities(16), [{
+        id => 867, type_name => 'Family', passes_to_related => 1,
+        max_related => 2, inherited_count => 2,
+    }], "the holder's membership, its own limit, and how many inherit from it";
+}
+
 sub test_get_contact_at_max_related {
     my $civi = bacds::Scheduler::CiviCRM->new;
-    local $membership_types{values}[0]{max_related} = 2;  # 100 and 101 are covered
+    local $own_membership{16}{max_related} = 2;  # 100 and 101 are covered
 
     my $contact = $civi->get_contact(16);
     is $contact->{membership_at_max_related}, 1, 'at limit: flagged';
@@ -272,6 +316,43 @@ sub test_get_contact_through_relationship {
     is $contact->{membership_is_active}, 1, 'related: active';
     is $contact->{membership_owner_name}, 'Pat Holder', 'related: names the holder';
     is $contact->{membership_payment_url}, '', 'related: no payment link';
+}
+
+sub test_form_submission_calls {
+    my $civi = bacds::Scheduler::CiviCRM->new;
+
+    @form_queue_calls = ();
+    $form_queue_response = { values => [{
+        id => 19, contact_id => 16, 'contact_id.display_name' => 'Pat Holder',
+        submission_date => '2026-10-09 18:47:08', 'status_id:name' => 'Pending',
+        data => { Individual2 => [] },
+    }] };
+    my $submissions = $civi->get_form_submissions('afformTest', status => 'Pending', id => '19');
+    is_deeply $form_queue_calls[0][1]{where}, [
+        ['afform_name',    '=', 'afformTest'],
+        ['status_id:name', '=', 'Pending'],
+        ['id',             '=', 19],
+    ], 'get_form_submissions: filters by form, status, and id';
+    is_deeply $submissions, [{
+        id => 19, submitter_id => 16, submitter_name => 'Pat Holder',
+        submission_date => '2026-10-09 18:47:08', status => 'Pending',
+        data => { Individual2 => [] },
+    }], 'get_form_submissions: renames the fields';
+
+    @form_queue_calls = ();
+    $form_queue_response = { values => [] };
+    $civi->process_form_submission('afformTest', '19');
+    is_deeply \@form_queue_calls,
+        [['Afform.process', { name => 'afformTest', submissionId => 19 }]],
+        'process_form_submission: calls Afform.process';
+
+    @form_queue_calls = ();
+    $form_queue_response = { values => [{ id => 19 }] };
+    is $civi->reject_form_submission(19), 1, 'reject_form_submission: returns the count';
+    is_deeply $form_queue_calls[0], ['AfformSubmission.update', {
+        values => { 'status_id:name' => 'Rejected' },
+        where  => [['id', '=', 19], ['status_id:name', '=', 'Pending']],
+    }], 'reject_form_submission: only rejects it if pending';
 }
 
 # A "+" in an unencoded form body arrives as a space, so plus-addressed
