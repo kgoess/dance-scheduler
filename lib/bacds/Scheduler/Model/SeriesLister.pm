@@ -80,7 +80,7 @@ sub get_upcoming_events_for_series {
         {event_styles_maps => 'style'},
         {event_talent_maps => 'talent'},
         {event_venues_maps => 'venue'},
-        {event_band_maps => {band => { band_memberships => 'talent'}}},
+        {event_band_maps => 'band'},
     );
 
     my @events = $dbh->resultset('Event')->search(
@@ -126,7 +126,7 @@ sub get_event_details {
         {event_styles_maps => 'style'},
         {event_talent_maps => 'talent'},
         {event_venues_maps => 'venue'},
-        {event_band_maps => {band => { band_memberships => 'talent'}}},
+        {event_band_maps => 'band'},
     );
 
     my $event = $dbh->resultset('Event')->find(
