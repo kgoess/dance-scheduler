@@ -23,113 +23,82 @@ use DateTime::Format::ISO8601;
 
 =head2 related_entities_for_upcoming_events
 
-Load events within the date range, and load the stuff from the related
-tables the dancefinder needs to display the input form.
+Returns the callers, venues, bands, musos, styles and role pairs on
+upcoming events (today onward, not deleted), for the dancefinder form's
+dropdowns:
+
+    {
+        callers    => { $caller_id => $caller_row, ... },
+        venues     => { ... },
+        bands      => { ... },
+        musos      => { ... },  # talent on the events, and in their bands
+        styles     => { ... },
+        role_pairs => { ... },
+    }
+
+Deleted entries are left out. Each list is one small query, with the
+upcoming events as a subquery. This used to load every upcoming event with
+all of its related rows in one big JOIN and collect them in perl, which
+took over a second for a few months of events, nearly all of it spent
+building objects from the JOIN's rows.
 
 =cut
 
 sub related_entities_for_upcoming_events {
-    my ($class, %args) = @_;
-
-    my $rs = _all_upcoming_events();
-
-    # this all is for displaying the dropdowns on the input form:
-    my (%stylehash, %venuehash, %bandhash, %musohash, %callerhash,
-        %role_pair_hash);
-    while (my $event = $rs->next) {
-        # grab the callers
-        my $callers = $event->callers;
-        while (my $caller = $callers->next) {
-            next if $caller->is_deleted;
-            $callerhash{$caller->caller_id} = $caller;
-        }
-        # grab the venues
-        my $venues = $event->venues;
-        while (my $venue = $venues->next) {
-            next if $venue->is_deleted;
-            $venuehash{$venue->venue_id} = $venue;
-        }
-        if (my $bands = $event->bands) {
-            # grab the bands
-            while (my $band = $bands->next) {
-                next if $band->is_deleted;
-                $bandhash{$band->band_id} = $band;
-                # and the band members
-                if (my $talentii = $band->talents) {
-                    while (my $talent = $talentii->next) {
-                        next if $talent->is_deleted;
-                        $musohash{$talent->talent_id} = $talent;
-                    }
-                }
-            }
-        }
-        # and any unattached musos
-        if (my $talentii = $event->talent) {
-            while (my $talent = $talentii->next) {
-                next if $talent->is_deleted;
-                $musohash{$talent->talent_id} = $talent
-            }
-        }
-        # grab the styles
-        my $styles = $event->styles;
-        while (my $style = $styles->next) {
-            next if $style->is_deleted;
-            $stylehash{$style->style_id} = $style;
-        }
-
-        # grab the role_pairs
-        my $role_pairs = $event->role_pairs;
-        while (my $role_pair = $role_pairs->next) {
-            next if $role_pair->is_deleted;
-            $role_pair_hash{$role_pair->role_pair_id} = $role_pair;
-        }
-    }
-
-    return {
-        callers    => \%callerhash,
-        venues     => \%venuehash,
-        bands      => \%bandhash,
-        musos      => \%musohash,
-        role_pairs => \%role_pair_hash,
-        styles     => \%stylehash,
-    };
-}
-
-# _all_upcoming_events is a simpler version of search_events, it takes
-# no args and it doesn't do the subselect. It makes sure all the
-# related tables are loaded whether they match the args or not, so
-# this is more suited for displaying the form with its drop-downs.
-sub _all_upcoming_events {
+    my ($class) = @_;
 
     my $dbh = get_dbh(debug => 0);
 
-    # These prefetches means all the data is fetched with one big
-    # JOIN, you can verify that by adding debug=>1 in the
-    # get_dbh call above
-    my @prefetches = (
-        {event_callers_maps => 'caller'},
-        {event_styles_maps => 'style'},
-        {event_talent_maps => 'talent'},
-        {event_venues_maps => 'venue'},
-        {event_band_maps => {band => { band_memberships => 'talent'}}},
-        {event_role_pairs_maps => 'role_pair'},
-    );
-
-    my $start_date = get_today()->ymd;
-
-    # wrt join and prefetch see:
-    # https://metacpan.org/dist/DBIx-Class/view/lib/DBIx/Class/Manual/Cookbook.pod#Using-joins-and-prefetch
-    my $rs = $dbh->resultset('Event')->search(
+    my $upcoming_event_ids = $dbh->resultset('Event')->search(
         {
-            start_date => { '>=' => $start_date },
-            '-not_bool' => 'me.is_deleted',
+            start_date => { '>=' => get_today()->ymd },
+            '-not_bool' => 'is_deleted',
         },
-        {
-            prefetch => \@prefetches,
-        },
-    );
+        { columns => ['event_id'] },
+    )->as_query;
 
-    return $rs
+    # ids from a mapping table, for the upcoming events
+    my $ids_on_upcoming_events = sub {
+        my ($map_source, $id_column) = @_;
+        return $dbh->resultset($map_source)->search(
+            { event_id => { -in => $upcoming_event_ids } },
+            { columns => [$id_column] },
+        )->as_query;
+    };
+
+    # the non-deleted rows of $source whose $id_column is in any of the
+    # @id_queries
+    my $rows_by_id = sub {
+        my ($source, $id_column, @id_queries) = @_;
+        my $rs = $dbh->resultset($source)->search({
+            is_deleted => 0,
+            -or => [ map { { $id_column => { -in => $_ } } } @id_queries ],
+        });
+        return { map { $_->$id_column => $_ } $rs->all };
+    };
+
+    # musos are talent on the events themselves, plus the members of the
+    # events' bands
+    my $band_member_ids = $dbh->resultset('BandMembership')->search(
+        { band_id => { -in => $ids_on_upcoming_events->('EventBandMap', 'band_id') } },
+        { columns => ['talent_id'] },
+    )->as_query;
+
+    return {
+        callers    => $rows_by_id->(Caller => 'caller_id',
+                          $ids_on_upcoming_events->('EventCallersMap', 'caller_id')),
+        venues     => $rows_by_id->(Venue => 'venue_id',
+                          $ids_on_upcoming_events->('EventVenuesMap', 'venue_id')),
+        bands      => $rows_by_id->(Band => 'band_id',
+                          $ids_on_upcoming_events->('EventBandMap', 'band_id')),
+        musos      => $rows_by_id->(Talent => 'talent_id',
+                          $ids_on_upcoming_events->('EventTalentMap', 'talent_id'),
+                          $band_member_ids),
+        styles     => $rows_by_id->(Style => 'style_id',
+                          $ids_on_upcoming_events->('EventStylesMap', 'style_id')),
+        role_pairs => $rows_by_id->(RolePair => 'role_pair_id',
+                          $ids_on_upcoming_events->('EventRolePairsMap', 'role_pair_id')),
+    };
 }
 
 =head2 search_events
