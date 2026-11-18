@@ -142,69 +142,46 @@
             </li>
             <li class="nav-item dropdown">
               <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Special Events &amp; Projects</a>
+                aria-expanded="false">Special Events</a>
               <ul class="dropdown-menu">
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/" class="nav-link">Event
-                    Listing</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/playford/" class="nav-link">Playford
-                    Ball</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/camps/cc2020/" class="nav-link">Contra
-                    College</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/mayday/" class="nav-link">May
-                    Day</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/teams/" class="nav-link">Performance
-                    Teams</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/halloween/" class="nav-link">Halloween
-                    Ball</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/fallball/" class="nav-link">Fall
-                    Ball</a>
-                </li>
-               <li class="nav-item dropdown-item"><a href="https://bacds.org/events/1726/" class="nav-link">1726
-                    Ball</a>
-                </li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/playford/" class="nav-link">Playford Ball</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/camps/cc2020/" class="nav-link">Contra College</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/mayday/" class="nav-link">May Day</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/teams/" class="nav-link">Performance Teams</a></li>
 
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/nsb/" class="nav-link">No Snow
-                    Ball</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/#nye" class="nav-link">New
-                    Year's
-                    Eve English</a>
-                </li>
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/#nyep" class="nav-link">New
-                    Year's
-                    Eve Contra</a>
-                </li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/halloween/" class="nav-link">Halloween Ball</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/fallball/" class="nav-link">Fall Ball</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/1726/" class="nav-link">1726 Ball</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/nsb/" class="nav-link">No Snow Ball</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/#nye" class="nav-link">New Year's Eve English</a></li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/events/#nyep" class="nav-link">New Year's Eve Contra</a></li>
               </ul>
+            </li>
+            <li class="nav-item">
+              <a href="https://bacds.org/newcomers/" class="nav-link" role="button" 
+                aria-expanded="false">Newcomers</a>
             </li>
             <li class="nav-item dropdown">
               <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">About Us</a>
               <ul class="dropdown-menu">
-                <li class="nav-item dropdown-item"><a href="https://bacds.org/newcomers/" class="nav-link">Newcomers</a>
+                <li class="nav-item dropdown-item"><a href="https://bacds.org/donate/" class="nav-link">Donate</a>
+                </li>
+                <li class="nav-item dropdown-item"><a href="https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2"
+                    class="nav-link">Become a Member</a>
+                </li>
+                <li class="nav-item dropdown-item"><a href="<% make_link("/unearth/member") %>"
+                    class="nav-link">Update Your Membership</a>
                 </li>
                 <li class="dropdown-item dropend nav-item dropdown">
                   <a href="#" class="dropdown-toggle nav-link" role="button" data-bs-toggle="dropdown"
                     aria-expanded="false">For Dancers</a>
                   <ul class="dropdown-menu">
-                    <li class="nav-item dropdown-item"><a href="https://bacds.org/CodeOfConduct/" class="nav-link">Code
-                        of Conduct</a>
-                    </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.groups.io/g/main/" class="nav-link">Email
                         List Signups</a>
                     </li>
-                    <li class="nav-item dropdown-item"><a href="https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2"
-                        class="nav-link">Become a Member</a>
-                    </li>
-                    <li class="nav-item dropdown-item"><a href="<% make_link("/unearth/member") %>"
-                        class="nav-link">Update Membership Details</a>
-                    </li>
-                    <li class="nav-item dropdown-item"><a href="https://bacds.org/donate/" class="nav-link">Donate</a>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/CodeOfConduct/" class="nav-link">Code
+                        of Conduct</a>
                     </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/covid/" class="nav-link">COVID Safety
                         Info</a>
@@ -237,6 +214,8 @@
                     </li>
                     <li class="nav-item dropdown-item"><a href="https://bacds.org/dance-scheduler/" class="nav-link">Dance
                         Scheduler App</a>
+                    </li>
+                    <li class="nav-item dropdown-item"><a href="https://bacds.org/events/" class="nav-link">Event Listing</a>
                     </li>
                   </ul>
                 </li>
