@@ -198,7 +198,7 @@
                     <li class="nav-item dropdown-item"><a href="https://bacds.groups.io/g/main/" class="nav-link">Email
                         List Signups</a>
                     </li>
-                    <li class="nav-item dropdown-item"><a href="https://bacds.org/memberform/"
+                    <li class="nav-item dropdown-item"><a href="https://bacds.civicrm.org/civicrm/contribute/transact?reset=1&id=2"
                         class="nav-link">Become a Member</a>
                     </li>
                     <li class="nav-item dropdown-item"><a href="<% make_link("/unearth/member") %>"
